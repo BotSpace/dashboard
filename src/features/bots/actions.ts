@@ -1,0 +1,62 @@
+"use server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { ProjectsAPI, ReleasesAPI, EnvAPI } from "@/shared/api/services";
+import { isApiError } from "@/shared/api/client";
+
+export async function createBotAction(_prev: unknown, formData: FormData) {
+  const name = String(formData.get("name") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const token = String(formData.get("token") ?? "").trim();
+  const locale = String(formData.get("locale") ?? "uz");
+  if (!name) return { ok: false, message: "Bot nomini kiriting" };
+  try {
+    const project = await ProjectsAPI.create({ name, description, token: token || undefined });
+    revalidatePath("/app/bots");
+    redirect(`/${locale}/app/bots/${project.id}`);
+  } catch (e) {
+    if (isApiError(e)) return { ok: false, message: e.message };
+    throw e;
+  }
+}
+
+export async function updateBotAction(id: string | number, _prev: unknown, formData: FormData) {
+  const name = String(formData.get("name") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const token = String(formData.get("token") ?? "").trim();
+  try {
+    await ProjectsAPI.update(id, { name, description, token: token || undefined });
+    revalidatePath(`/app/bots/${id}`);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: isApiError(e) ? e.message : "Saqlashda xatolik" };
+  }
+}
+
+export async function deleteBotAction(id: string | number, locale: string) {
+  await ProjectsAPI.remove(id);
+  revalidatePath("/app/bots");
+  redirect(`/${locale}/app/bots`);
+}
+
+export async function deployReleaseAction(projectId: string | number) {
+  await ReleasesAPI.create(projectId);
+  revalidatePath(`/app/bots/${projectId}/releases`);
+  return { ok: true };
+}
+
+export async function addEnvAction(_prev: unknown, formData: FormData) {
+  const project = String(formData.get("project") ?? "");
+  const key = String(formData.get("key") ?? "").trim();
+  const value = String(formData.get("value") ?? "");
+  if (!project || !key) return { ok: false, message: "Key bo'sh bo'lmasin" };
+  await EnvAPI.create({ project, key, value });
+  revalidatePath(`/app/bots/${project}/env`);
+  return { ok: true };
+}
+
+export async function removeEnvAction(id: string | number, projectId: string | number) {
+  await EnvAPI.remove(id);
+  revalidatePath(`/app/bots/${projectId}/env`);
+  return { ok: true };
+}

@@ -1,0 +1,287 @@
+{
+  "common": {
+    "app": "Botmother",
+    "loading": "Yuklanmoqda…",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "delete": "O'chirish",
+    "edit": "Tahrirlash",
+    "create": "Yaratish",
+    "search": "Qidirish",
+    "back": "Orqaga",
+    "next": "Keyingi",
+    "submit": "Yuborish",
+    "confirm": "Tasdiqlash",
+    "yes": "Ha",
+    "no": "Yo'q",
+    "all": "Barchasi",
+    "active": "Faol",
+    "inactive": "Faol emas",
+    "empty": "Hozircha hech narsa yo'q",
+    "error": "Xatolik yuz berdi",
+    "retry": "Qayta urinish",
+    "settings": "Sozlamalar",
+    "logout": "Chiqish",
+    "language": "Til",
+    "theme": "Tema",
+    "themeLight": "Yorug'",
+    "themeDark": "Qorong'i",
+    "themeSystem": "Tizim"
+  },
+  "nav": {
+    "dashboard": "Boshqaruv",
+    "agent": "AI Agent",
+    "bots": "Botlar",
+    "cms": "Ma'lumotlar",
+    "templates": "Shablonlar",
+    "files": "Fayllar",
+    "messages": "Xabarlar",
+    "billing": "To'lov",
+    "tickets": "Murojaatlar",
+    "settings": "Sozlamalar",
+    "submissions": "Topshirilganlar",
+    "earnings": "Daromad"
+  },
+  "agent": {
+    "title": "AI Agent",
+    "subtitle": "Tabiiy tilda bot quring, deploy qiling va boshqaring",
+    "project": "Loyiha"
+  },
+  "cms": {
+    "title": "Ma'lumotlar (CMS)",
+    "subtitle": "Kollektsiyalar va dokumentlarni boshqarish",
+    "project": "Loyiha",
+    "noProject": "Loyiha tanlang",
+    "create": "Yangi collection",
+    "empty": "Hozircha kollektsiya yo'q",
+    "system": "system",
+    "fields": "field",
+    "openData": "Ma'lumot",
+    "schema": "Schema",
+    "backToList": "Ro'yxat",
+    "backToData": "Hujjatlar",
+    "newTitle": "Yangi collection",
+    "newSubtitle": "Schema yarating, keyin field'larni qo'shing",
+    "newDoc": "Yangi hujjat"
+  },
+  "landing": {
+    "navHome": "Bosh sahifa",
+    "navFeatures": "Imkoniyatlar",
+    "navPricing": "Narxlar",
+    "navTemplates": "Shablonlar",
+    "navContact": "Aloqa",
+    "navLogin": "Kirish",
+    "navStart": "Boshlash",
+    "hero": {
+      "badge": "Yangi: AI yordamchi va vizual flow konstruktor",
+      "title": "Telegram botlarni vizual konstruktor bilan yarating",
+      "subtitle": "Drag-and-drop, AI agent va marketplace — bir joyda. Kod yozmasdan startap boshlang.",
+      "ctaPrimary": "Bepul boshlash",
+      "ctaSecondary": "Imkoniyatlarni ko'rish",
+      "stats": {
+        "users": "10K+ foydalanuvchi",
+        "bots": "50K+ bot ishga tushgan",
+        "uptime": "99.9% uptime"
+      }
+    },
+    "features": {
+      "title": "Botingiz uchun barchasi",
+      "subtitle": "Konstruktordan tortib analitikagacha — to'liq platforma",
+      "items": [
+        {
+          "title": "Vizual konstruktor",
+          "desc": "Nodelar va edge'lar bilan murakkab flow'larni 5 daqiqada quring"
+        },
+        {
+          "title": "AI agent",
+          "desc": "LangGraph asosidagi AI yordamchi: mijozlar bilan tabiiy muloqot"
+        },
+        {
+          "title": "Shablonlar marketplace",
+          "desc": "Tayyor botlarni sotib oling yoki o'zingiznikini sotib daromad qiling"
+        },
+        {
+          "title": "Multi-channel",
+          "desc": "Telegram, web va boshqa kanallar uchun bir kod baza"
+        },
+        {
+          "title": "Ma'lumotlar bazasi",
+          "desc": "O'rnatilgan kolleksiya tizimi — DBA shartmas"
+        },
+        {
+          "title": "Analitika",
+          "desc": "Real-time monitoring, CPU/RAM/trafik, foydalanuvchi xulqi"
+        }
+      ]
+    },
+    "pricing": {
+      "title": "Sodda va shaffof narxlar",
+      "subtitle": "Bepul boshlang, kerak bo'lsa kengaytiring",
+      "perMonth": "/oy",
+      "popular": "Mashhur",
+      "cta": "Tanlash"
+    },
+    "templates": {
+      "title": "Tayyor shablonlar",
+      "subtitle": "Marketplace'dan tayyor bot shablonlarini olib, daqiqalar ichida ishga tushiring",
+      "viewAll": "Barchasini ko'rish"
+    },
+    "cta": {
+      "title": "Bugun birinchi botingizni ishga tushiring",
+      "subtitle": "Karta talab qilinmaydi. 5 daqiqada tayyor bo'ladi.",
+      "button": "Bepul ro'yxatdan o'tish"
+    },
+    "footer": {
+      "tagline": "Telegram botlarni vizual yarating — Botmother bilan",
+      "product": "Mahsulot",
+      "company": "Kompaniya",
+      "resources": "Resurslar",
+      "legal": "Huquqiy",
+      "about": "Biz haqimizda",
+      "contact": "Aloqa",
+      "blog": "Blog",
+      "docs": "Hujjatlar",
+      "terms": "Foydalanish shartlari",
+      "privacy": "Maxfiylik",
+      "rights": "Barcha huquqlar himoyalangan"
+    }
+  },
+  "auth": {
+    "login": {
+      "or": "yoki",
+      "google": "Google bilan kirish"
+    },
+    "telegram": {
+      "title": "Telegram orqali kirish",
+      "subtitle": "Telegram botimizga o'ting va 6 xonali kodni oling",
+      "openBot": "Botni Telegram'da ochish",
+      "enterCode": "Olgan kodingizni shu yerga kiriting",
+      "submit": "Kirish"
+    },
+    "errors": {
+      "invalidOtp": "Kod noto'g'ri yoki muddati o'tgan",
+      "unknown": "Kutilmagan xatolik. Qayta urinib ko'ring"
+    }
+  },
+  "dashboard": {
+    "welcome": "Salom, {name}!",
+    "overview": "Umumiy ko'rinish",
+    "totalBots": "Jami botlar",
+    "activeBots": "Faol botlar",
+    "totalMessages": "Jami xabarlar",
+    "balance": "Balans",
+    "recentBots": "So'nggi botlar",
+    "createBot": "Bot yaratish",
+    "browseTemplates": "Shablonlarni ko'rish",
+    "noBots": "Hali bot yaratmagansiz",
+    "createFirst": "Birinchi botingizni yarating"
+  },
+  "bots": {
+    "title": "Botlar",
+    "new": "Yangi bot",
+    "search": "Bot nomi bo'yicha qidirish",
+    "empty": "Hech qanday bot topilmadi",
+    "create": {
+      "title": "Yangi bot yaratish",
+      "name": "Bot nomi",
+      "namePlaceholder": "Masalan: Mijozlarga xizmat",
+      "description": "Tavsif",
+      "token": "Telegram bot token",
+      "tokenPlaceholder": "12345:ABC-DEF...",
+      "tokenHint": "BotFather'dan oling: t.me/BotFather",
+      "submit": "Yaratish",
+      "blank": "Bo'sh boshlash",
+      "fromTemplate": "Shablondan",
+      "blankDesc": "Bo'sh konstruktor bilan boshlang",
+      "fromTemplateDesc": "Tayyor shablon asosida tezroq boshlang"
+    },
+    "tabs": {
+      "overview": "Umumiy",
+      "editor": "Konstruktor",
+      "messages": "Xabarlar",
+      "collections": "Ma'lumotlar",
+      "files": "Fayllar",
+      "env": "Sozlamalar",
+      "releases": "Versiyalar",
+      "monitoring": "Monitoring",
+      "plan": "Tarif"
+    },
+    "release": {
+      "deploy": "Ishga tushirish",
+      "rollback": "Qaytarish",
+      "version": "Versiya",
+      "deployedAt": "Vaqt",
+      "status": "Holat",
+      "running": "Ishlamoqda",
+      "stopped": "To'xtatilgan",
+      "failed": "Xatolik"
+    }
+  },
+  "templates": {
+    "title": "Shablonlar marketplace",
+    "subtitle": "Tayyor bot shablonlaridan birini tanlang",
+    "search": "Shablon qidirish",
+    "category": "Kategoriya",
+    "allCategories": "Barcha kategoriyalar",
+    "priceFrom": "Narx (dan)",
+    "priceTo": "Narx (gacha)",
+    "filter": "Filtrlash",
+    "reset": "Tozalash",
+    "notFound": "Shablon topilmadi",
+    "price": "Narxi",
+    "free": "Bepul",
+    "buy": "Sotib olish",
+    "preview": "Demo ko'rish",
+    "use": "Bepul olish",
+    "owned": "Sizda bor",
+    "about": "Shablon haqida",
+    "features": "Imkoniyatlar",
+    "views": "ko'rishlar",
+    "likes": "yoqtirishlar",
+    "backToList": "Ro'yxatga qaytish",
+    "orderSuccess": "Shablon buyurtma qilindi",
+    "orderError": "Buyurtma berishda xatolik",
+    "openInDashboard": "Dashboardda ochish",
+    "loginToBuy": "Sotib olish uchun kiring",
+    "submit": "Shablon topshirish",
+    "earnings": "Daromad",
+    "withdraw": "Pul yechish",
+    "withdrawalRequest": "Yechish so'rovi"
+  },
+  "billing": {
+    "title": "To'lov va tariflar",
+    "currentPlan": "Joriy tarif",
+    "upgrade": "Yangilash",
+    "history": "To'lov tarixi",
+    "balance": "Balans",
+    "addFunds": "Hisobni to'ldirish",
+    "noHistory": "To'lov tarixi mavjud emas"
+  },
+  "profile": {
+    "title": "Profil",
+    "tabs": {
+      "general": "Asosiy",
+      "security": "Xavfsizlik",
+      "preferences": "Afzalliklar",
+      "tokens": "API tokenlar"
+    },
+    "name": "Ism",
+    "email": "Email",
+    "phone": "Telefon",
+    "updated": "Saqlandi",
+    "changePassword": "Parolni o'zgartirish",
+    "currentPassword": "Joriy parol",
+    "newPassword": "Yangi parol"
+  },
+  "tickets": {
+    "title": "Murojaatlar",
+    "new": "Yangi murojaat",
+    "subject": "Mavzu",
+    "message": "Xabar",
+    "status": "Holat",
+    "open": "Ochiq",
+    "closed": "Yopiq",
+    "reply": "Javob berish",
+    "empty": "Hozircha murojaatingiz yo'q"
+  }
+}

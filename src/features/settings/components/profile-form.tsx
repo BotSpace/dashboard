@@ -1,0 +1,65 @@
+"use client";
+import { useActionState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { updateProfileAction } from "@/features/settings/actions";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+
+export function ProfileForm({
+  defaultFirstName,
+  defaultLastName,
+  defaultEmail,
+  defaultPhone,
+}: {
+  defaultFirstName?: string;
+  defaultLastName?: string;
+  defaultEmail?: string;
+  defaultPhone?: string;
+}) {
+  const t = useTranslations("profile");
+  const tCommon = useTranslations("common");
+  const [state, action, pending] = useActionState<{ ok: boolean; message?: string } | undefined, FormData>(
+    updateProfileAction,
+    undefined
+  );
+
+  useEffect(() => {
+    if (state?.ok) toast.success(t("updated"));
+    else if (state?.message) toast.error(state.message);
+  }, [state, t]);
+
+  return (
+    <form action={action} className="grid gap-4 sm:max-w-md">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="first_name">Ism</Label>
+          <Input id="first_name" name="first_name" defaultValue={defaultFirstName} required />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="last_name">Familiya</Label>
+          <Input id="last_name" name="last_name" defaultValue={defaultLastName} />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="email">{t("email")}</Label>
+        <Input id="email" name="email" type="email" defaultValue={defaultEmail} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="phone">{t("phone")}</Label>
+        <Input id="phone" name="phone" defaultValue={defaultPhone} disabled />
+        <p className="text-xs text-muted-foreground">
+          Telefon raqamini o'zgartirish uchun support'ga murojaat qiling
+        </p>
+      </div>
+      <div>
+        <Button type="submit" disabled={pending}>
+          {pending && <Loader2 className="h-4 w-4 animate-spin" />}
+          {tCommon("save")}
+        </Button>
+      </div>
+    </form>
+  );
+}

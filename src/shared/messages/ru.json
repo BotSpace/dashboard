@@ -1,0 +1,269 @@
+{
+  "common": {
+    "app": "Botmother",
+    "loading": "Загрузка…",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "search": "Поиск",
+    "back": "Назад",
+    "next": "Далее",
+    "submit": "Отправить",
+    "confirm": "Подтвердить",
+    "yes": "Да",
+    "no": "Нет",
+    "all": "Все",
+    "active": "Активен",
+    "inactive": "Неактивен",
+    "empty": "Здесь пока ничего нет",
+    "error": "Произошла ошибка",
+    "retry": "Повторить",
+    "settings": "Настройки",
+    "logout": "Выйти",
+    "language": "Язык",
+    "theme": "Тема",
+    "themeLight": "Светлая",
+    "themeDark": "Тёмная",
+    "themeSystem": "Системная"
+  },
+  "nav": {
+    "dashboard": "Панель",
+    "agent": "AI Агент",
+    "bots": "Боты",
+    "cms": "Данные",
+    "templates": "Шаблоны",
+    "files": "Файлы",
+    "messages": "Сообщения",
+    "billing": "Оплата",
+    "tickets": "Поддержка",
+    "settings": "Настройки",
+    "submissions": "Заявки",
+    "earnings": "Доход"
+  },
+  "landing": {
+    "navHome": "Главная",
+    "navFeatures": "Возможности",
+    "navPricing": "Цены",
+    "navTemplates": "Шаблоны",
+    "navContact": "Контакты",
+    "navLogin": "Войти",
+    "navStart": "Начать",
+    "hero": {
+      "badge": "Новое: AI-ассистент и визуальный конструктор",
+      "title": "Создавайте Telegram-ботов в визуальном конструкторе",
+      "subtitle": "Drag-and-drop, AI-агент и маркетплейс — в одном месте. Запустите стартап без кода.",
+      "ctaPrimary": "Начать бесплатно",
+      "ctaSecondary": "Смотреть возможности",
+      "stats": {
+        "users": "10K+ пользователей",
+        "bots": "50K+ ботов запущено",
+        "uptime": "99.9% uptime"
+      }
+    },
+    "features": {
+      "title": "Всё для вашего бота",
+      "subtitle": "От конструктора до аналитики — полная платформа",
+      "items": [
+        { "title": "Визуальный конструктор", "desc": "Сложные сценарии за 5 минут — узлы и связи" },
+        { "title": "AI-агент", "desc": "Ассистент на LangGraph — естественное общение с клиентами" },
+        { "title": "Маркетплейс шаблонов", "desc": "Покупайте готовых ботов или продавайте свои" },
+        { "title": "Мульти-канал", "desc": "Telegram, веб и др. — одна кодовая база" },
+        { "title": "Встроенная БД", "desc": "Коллекции без DBA" },
+        { "title": "Аналитика", "desc": "Мониторинг CPU/RAM/трафика и поведения пользователей" }
+      ]
+    },
+    "pricing": {
+      "title": "Простые и прозрачные цены",
+      "subtitle": "Начните бесплатно и масштабируйтесь",
+      "perMonth": "/мес",
+      "popular": "Популярно",
+      "cta": "Выбрать"
+    },
+    "templates": {
+      "title": "Готовые шаблоны",
+      "subtitle": "Выберите шаблон из маркетплейса и запустите бота за минуты",
+      "viewAll": "Все шаблоны"
+    },
+    "cta": {
+      "title": "Запустите своего первого бота сегодня",
+      "subtitle": "Без карты. Готов за 5 минут.",
+      "button": "Зарегистрироваться"
+    },
+    "footer": {
+      "tagline": "Создавайте Telegram-ботов визуально — с Botmother",
+      "product": "Продукт",
+      "company": "Компания",
+      "resources": "Ресурсы",
+      "legal": "Юридическое",
+      "about": "О нас",
+      "contact": "Контакты",
+      "blog": "Блог",
+      "docs": "Документация",
+      "terms": "Условия использования",
+      "privacy": "Конфиденциальность",
+      "rights": "Все права защищены"
+    }
+  },
+  "auth": {
+    "login": {
+      "or": "или",
+      "google": "Войти через Google"
+    },
+    "telegram": {
+      "title": "Войти через Telegram",
+      "subtitle": "Откройте наш Telegram-бот и получите 6-значный код",
+      "openBot": "Открыть бот в Telegram",
+      "enterCode": "Введите полученный код",
+      "submit": "Войти"
+    },
+    "errors": {
+      "invalidOtp": "Код неверный или истёк",
+      "unknown": "Непредвиденная ошибка. Попробуйте снова"
+    }
+  },
+  "dashboard": {
+    "welcome": "Привет, {name}!",
+    "overview": "Обзор",
+    "totalBots": "Всего ботов",
+    "activeBots": "Активных",
+    "totalMessages": "Всего сообщений",
+    "balance": "Баланс",
+    "recentBots": "Последние боты",
+    "createBot": "Создать бота",
+    "browseTemplates": "Смотреть шаблоны",
+    "noBots": "У вас пока нет ботов",
+    "createFirst": "Создать первого бота"
+  },
+  "agent": {
+    "title": "AI Агент",
+    "subtitle": "Создавайте, развёртывайте и управляйте ботами на естественном языке",
+    "project": "Проект"
+  },
+  "cms": {
+    "title": "Данные (CMS)",
+    "subtitle": "Управление коллекциями и документами",
+    "project": "Проект",
+    "noProject": "Выберите проект",
+    "create": "Новая коллекция",
+    "empty": "Пока нет коллекций",
+    "system": "system",
+    "fields": "полей",
+    "openData": "Данные",
+    "schema": "Схема",
+    "backToList": "Список",
+    "backToData": "Документы",
+    "newTitle": "Новая коллекция",
+    "newSubtitle": "Создайте схему, затем добавьте поля",
+    "newDoc": "Новый документ"
+  },
+  "bots": {
+    "title": "Боты",
+    "new": "Новый бот",
+    "search": "Поиск по имени",
+    "empty": "Боты не найдены",
+    "create": {
+      "title": "Создать нового бота",
+      "name": "Имя бота",
+      "namePlaceholder": "Например: Поддержка клиентов",
+      "description": "Описание",
+      "token": "Telegram bot token",
+      "tokenPlaceholder": "12345:ABC-DEF...",
+      "tokenHint": "Получите у BotFather: t.me/BotFather",
+      "submit": "Создать",
+      "blank": "Пустой",
+      "fromTemplate": "Из шаблона",
+      "blankDesc": "Начните с пустого конструктора",
+      "fromTemplateDesc": "Быстрее с готовым шаблоном"
+    },
+    "tabs": {
+      "overview": "Обзор",
+      "editor": "Конструктор",
+      "messages": "Сообщения",
+      "collections": "Данные",
+      "files": "Файлы",
+      "env": "Настройки",
+      "releases": "Релизы",
+      "monitoring": "Мониторинг",
+      "plan": "Тариф"
+    },
+    "release": {
+      "deploy": "Запустить",
+      "rollback": "Откатить",
+      "version": "Версия",
+      "deployedAt": "Дата",
+      "status": "Статус",
+      "running": "Работает",
+      "stopped": "Остановлен",
+      "failed": "Ошибка"
+    }
+  },
+  "templates": {
+    "title": "Маркетплейс шаблонов",
+    "subtitle": "Выберите готовый шаблон бота",
+    "search": "Поиск шаблонов",
+    "category": "Категория",
+    "allCategories": "Все категории",
+    "priceFrom": "Цена от",
+    "priceTo": "Цена до",
+    "filter": "Фильтровать",
+    "reset": "Сбросить",
+    "notFound": "Шаблоны не найдены",
+    "price": "Цена",
+    "free": "Бесплатно",
+    "buy": "Купить",
+    "preview": "Демо",
+    "use": "Получить",
+    "owned": "Куплено",
+    "about": "О шаблоне",
+    "features": "Возможности",
+    "views": "просмотров",
+    "likes": "лайков",
+    "backToList": "К списку",
+    "orderSuccess": "Шаблон заказан",
+    "orderError": "Ошибка при заказе",
+    "openInDashboard": "Открыть в панели",
+    "loginToBuy": "Войдите для покупки",
+    "submit": "Отправить шаблон",
+    "earnings": "Доход",
+    "withdraw": "Вывести",
+    "withdrawalRequest": "Запрос на вывод"
+  },
+  "billing": {
+    "title": "Оплата и тарифы",
+    "currentPlan": "Текущий тариф",
+    "upgrade": "Улучшить",
+    "history": "История платежей",
+    "balance": "Баланс",
+    "addFunds": "Пополнить",
+    "noHistory": "Истории платежей пока нет"
+  },
+  "profile": {
+    "title": "Профиль",
+    "tabs": {
+      "general": "Основное",
+      "security": "Безопасность",
+      "preferences": "Настройки",
+      "tokens": "API-токены"
+    },
+    "name": "Имя",
+    "email": "Email",
+    "phone": "Телефон",
+    "updated": "Сохранено",
+    "changePassword": "Сменить пароль",
+    "currentPassword": "Текущий пароль",
+    "newPassword": "Новый пароль"
+  },
+  "tickets": {
+    "title": "Обращения",
+    "new": "Новое обращение",
+    "subject": "Тема",
+    "message": "Сообщение",
+    "status": "Статус",
+    "open": "Открыто",
+    "closed": "Закрыто",
+    "reply": "Ответить",
+    "empty": "У вас пока нет обращений"
+  }
+}

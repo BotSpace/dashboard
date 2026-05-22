@@ -1,0 +1,269 @@
+{
+  "common": {
+    "app": "Botmother",
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "all": "All",
+    "active": "Active",
+    "inactive": "Inactive",
+    "empty": "Nothing here yet",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "settings": "Settings",
+    "logout": "Log out",
+    "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "agent": "AI Agent",
+    "bots": "Bots",
+    "cms": "Data",
+    "templates": "Templates",
+    "files": "Files",
+    "messages": "Messages",
+    "billing": "Billing",
+    "tickets": "Support",
+    "settings": "Settings",
+    "submissions": "Submissions",
+    "earnings": "Earnings"
+  },
+  "landing": {
+    "navHome": "Home",
+    "navFeatures": "Features",
+    "navPricing": "Pricing",
+    "navTemplates": "Templates",
+    "navContact": "Contact",
+    "navLogin": "Log in",
+    "navStart": "Get started",
+    "hero": {
+      "badge": "New: AI assistant & visual flow builder",
+      "title": "Build Telegram bots with a visual constructor",
+      "subtitle": "Drag-and-drop, AI agent and a marketplace — all in one. Launch a startup without code.",
+      "ctaPrimary": "Start free",
+      "ctaSecondary": "See features",
+      "stats": {
+        "users": "10K+ users",
+        "bots": "50K+ bots launched",
+        "uptime": "99.9% uptime"
+      }
+    },
+    "features": {
+      "title": "Everything your bot needs",
+      "subtitle": "From the builder to analytics — a complete platform",
+      "items": [
+        { "title": "Visual builder", "desc": "Build complex flows with nodes and edges in 5 minutes" },
+        { "title": "AI agent", "desc": "LangGraph-powered AI assistant: natural conversations with customers" },
+        { "title": "Templates marketplace", "desc": "Buy ready-made bots or sell yours and earn" },
+        { "title": "Multi-channel", "desc": "One codebase for Telegram, web and more" },
+        { "title": "Built-in database", "desc": "Built-in collections — no DBA required" },
+        { "title": "Analytics", "desc": "Real-time monitoring of CPU, RAM, traffic and user behavior" }
+      ]
+    },
+    "pricing": {
+      "title": "Simple, transparent pricing",
+      "subtitle": "Start free, scale when you need to",
+      "perMonth": "/mo",
+      "popular": "Popular",
+      "cta": "Choose"
+    },
+    "templates": {
+      "title": "Ready-made templates",
+      "subtitle": "Pick a template from the marketplace and launch your bot in minutes",
+      "viewAll": "View all"
+    },
+    "cta": {
+      "title": "Launch your first bot today",
+      "subtitle": "No card required. Ready in 5 minutes.",
+      "button": "Sign up free"
+    },
+    "footer": {
+      "tagline": "Build Telegram bots visually — with Botmother",
+      "product": "Product",
+      "company": "Company",
+      "resources": "Resources",
+      "legal": "Legal",
+      "about": "About",
+      "contact": "Contact",
+      "blog": "Blog",
+      "docs": "Docs",
+      "terms": "Terms of Service",
+      "privacy": "Privacy",
+      "rights": "All rights reserved"
+    }
+  },
+  "auth": {
+    "login": {
+      "or": "or",
+      "google": "Continue with Google"
+    },
+    "telegram": {
+      "title": "Sign in with Telegram",
+      "subtitle": "Open our Telegram bot to get a 6-digit code",
+      "openBot": "Open bot in Telegram",
+      "enterCode": "Enter the code you received",
+      "submit": "Log in"
+    },
+    "errors": {
+      "invalidOtp": "Code is invalid or expired",
+      "unknown": "Unexpected error. Please try again"
+    }
+  },
+  "dashboard": {
+    "welcome": "Hi, {name}!",
+    "overview": "Overview",
+    "totalBots": "Total bots",
+    "activeBots": "Active bots",
+    "totalMessages": "Total messages",
+    "balance": "Balance",
+    "recentBots": "Recent bots",
+    "createBot": "Create bot",
+    "browseTemplates": "Browse templates",
+    "noBots": "You haven't built a bot yet",
+    "createFirst": "Create your first bot"
+  },
+  "agent": {
+    "title": "AI Agent",
+    "subtitle": "Build, deploy and manage bots in natural language",
+    "project": "Project"
+  },
+  "cms": {
+    "title": "Data (CMS)",
+    "subtitle": "Manage collections and documents",
+    "project": "Project",
+    "noProject": "Select a project",
+    "create": "New collection",
+    "empty": "No collections yet",
+    "system": "system",
+    "fields": "fields",
+    "openData": "Data",
+    "schema": "Schema",
+    "backToList": "Back",
+    "backToData": "Documents",
+    "newTitle": "New collection",
+    "newSubtitle": "Create schema, then add fields",
+    "newDoc": "New document"
+  },
+  "bots": {
+    "title": "Bots",
+    "new": "New bot",
+    "search": "Search by bot name",
+    "empty": "No bots found",
+    "create": {
+      "title": "Create a new bot",
+      "name": "Bot name",
+      "namePlaceholder": "e.g. Customer support",
+      "description": "Description",
+      "token": "Telegram bot token",
+      "tokenPlaceholder": "12345:ABC-DEF...",
+      "tokenHint": "Get one from BotFather: t.me/BotFather",
+      "submit": "Create",
+      "blank": "Start blank",
+      "fromTemplate": "From template",
+      "blankDesc": "Begin with an empty constructor",
+      "fromTemplateDesc": "Start quicker with a ready-made template"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "editor": "Editor",
+      "messages": "Messages",
+      "collections": "Data",
+      "files": "Files",
+      "env": "Settings",
+      "releases": "Releases",
+      "monitoring": "Monitoring",
+      "plan": "Plan"
+    },
+    "release": {
+      "deploy": "Deploy",
+      "rollback": "Rollback",
+      "version": "Version",
+      "deployedAt": "When",
+      "status": "Status",
+      "running": "Running",
+      "stopped": "Stopped",
+      "failed": "Failed"
+    }
+  },
+  "templates": {
+    "title": "Templates marketplace",
+    "subtitle": "Pick one of the ready-made bot templates",
+    "search": "Search templates",
+    "category": "Category",
+    "allCategories": "All categories",
+    "priceFrom": "Price from",
+    "priceTo": "Price to",
+    "filter": "Filter",
+    "reset": "Reset",
+    "notFound": "No templates found",
+    "price": "Price",
+    "free": "Free",
+    "buy": "Buy now",
+    "preview": "View demo",
+    "use": "Get for free",
+    "owned": "Owned",
+    "about": "About the template",
+    "features": "Features",
+    "views": "views",
+    "likes": "likes",
+    "backToList": "Back to list",
+    "orderSuccess": "Template ordered",
+    "orderError": "Failed to place order",
+    "openInDashboard": "Open in dashboard",
+    "loginToBuy": "Sign in to purchase",
+    "submit": "Submit template",
+    "earnings": "Earnings",
+    "withdraw": "Withdraw",
+    "withdrawalRequest": "Withdrawal request"
+  },
+  "billing": {
+    "title": "Billing & plans",
+    "currentPlan": "Current plan",
+    "upgrade": "Upgrade",
+    "history": "Payment history",
+    "balance": "Balance",
+    "addFunds": "Add funds",
+    "noHistory": "No payment history yet"
+  },
+  "profile": {
+    "title": "Profile",
+    "tabs": {
+      "general": "General",
+      "security": "Security",
+      "preferences": "Preferences",
+      "tokens": "API tokens"
+    },
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "updated": "Saved",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password"
+  },
+  "tickets": {
+    "title": "Support tickets",
+    "new": "New ticket",
+    "subject": "Subject",
+    "message": "Message",
+    "status": "Status",
+    "open": "Open",
+    "closed": "Closed",
+    "reply": "Reply",
+    "empty": "You have no tickets yet"
+  }
+}

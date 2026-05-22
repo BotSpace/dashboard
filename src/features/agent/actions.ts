@@ -1,0 +1,77 @@
+"use server";
+import {
+  createAgentRun,
+  clarifyAgentRun,
+  approveAgentRun,
+  cancelAgentRun,
+  getAgentRun,
+  type AgentRunStatus,
+} from "@/shared/api/agent";
+
+export type RunCreateState = { ok: boolean; request_id?: string; message?: string };
+
+export async function startRunAction(args: {
+  projectId: string;
+  prompt: string;
+  threadId?: string;
+}): Promise<RunCreateState> {
+  try {
+    const res = await createAgentRun(args.projectId, {
+      prompt: args.prompt,
+      thread_id: args.threadId,
+    });
+    return { ok: true, request_id: res.request_id };
+  } catch (e) {
+    return { ok: false, message: (e as Error).message };
+  }
+}
+
+export async function clarifyRunAction(args: {
+  projectId: string;
+  requestId: string;
+  answer: string;
+}): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await clarifyAgentRun(args.projectId, args.requestId, args.answer);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: (e as Error).message };
+  }
+}
+
+export async function approveRunAction(args: {
+  projectId: string;
+  requestId: string;
+  approved: boolean;
+  reason?: string;
+}): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await approveAgentRun(args.projectId, args.requestId, args.approved, args.reason);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: (e as Error).message };
+  }
+}
+
+export async function cancelRunAction(args: {
+  projectId: string;
+  requestId: string;
+}): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await cancelAgentRun(args.projectId, args.requestId);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: (e as Error).message };
+  }
+}
+
+export async function getRunStatusAction(args: {
+  projectId: string;
+  requestId: string;
+}): Promise<AgentRunStatus | { error: string }> {
+  try {
+    return await getAgentRun(args.projectId, args.requestId);
+  } catch (e) {
+    return { error: (e as Error).message };
+  }
+}
