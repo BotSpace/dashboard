@@ -1,45 +1,24 @@
 import "server-only";
 import { apiFetch, type ApiOptions } from "./client";
-import { readSession, setSessionCookie, clearSessionCookie, type SessionPayload } from "@/shared/auth/session";
+import { readSession } from "@/shared/auth/session";
 
-async function refreshAccess(refresh: string): Promise<{ access: string; refresh: string } | null> {
-  try {
-    const raw = await apiFetch<unknown>("/auth/token/refresh/", {
-      method: "POST",
-      json: { refresh },
-      skipAuth: true,
-    });
-    if (!raw || typeof raw !== "object") return null;
-    const r = raw as Record<string, unknown>;
-    const root = (r.data && typeof r.data === "object" ? (r.data as Record<string, unknown>) : r) as Record<string, unknown>;
-    const token = root.token as Record<string, unknown> | undefined;
-    const access = (token?.access as string | undefined) ?? (root.access as string | undefined);
-    const newRefresh = (token?.refresh as string | undefined) ?? (root.refresh as string | undefined) ?? refresh;
-    if (!access) return null;
-    return { access, refresh: newRefresh };
-  } catch {
-    return null;
-  }
-}
-
+/**
+ * Server-side authenticated fetch.
+ *
+ * Token refresh lives in `middleware.ts`: it proactively rotates the access
+ * token (and the rotated refresh token) onto a fresh session cookie before
+ * the request reaches Server Components / Server Actions. By the time `api()`
+ * runs, the cookie holds a valid access token, so we just attach it.
+ *
+ * If a 401 still happens (e.g. token invalidated server-side mid-request)
+ * we let it propagate — callers usually wrap it in `.catch(() => fallback)`,
+ * and the next navigation's middleware pass will refresh again or redirect
+ * to /login if the refresh token is also dead.
+ */
 export async function api<T = unknown>(path: string, opts: ApiOptions = {}): Promise<T> {
   const session = await readSession();
   if (!session) return apiFetch<T>(path, { ...opts, skipAuth: true });
-
-  try {
-    return await apiFetch<T>(path, { ...opts, token: session.access });
-  } catch (e) {
-    const status = (e as { status?: number }).status;
-    if (status !== 401) throw e;
-    const refreshed = await refreshAccess(session.refresh);
-    if (!refreshed) {
-      await clearSessionCookie();
-      throw e;
-    }
-    const next: SessionPayload = { ...session, access: refreshed.access, refresh: refreshed.refresh };
-    await setSessionCookie(next);
-    return apiFetch<T>(path, { ...opts, token: refreshed.access });
-  }
+  return apiFetch<T>(path, { ...opts, token: session.access });
 }
 
 export { apiFetch };
