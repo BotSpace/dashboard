@@ -177,9 +177,10 @@
       "blankDesc": "Begin with an empty constructor",
       "fromTemplateDesc": "Start quicker with a ready-made template"
     },
+    "openConstructor": "Constructor",
+    "openConstructorTooltip": "Open in visual constructor",
     "tabs": {
       "overview": "Overview",
-      "editor": "Editor",
       "messages": "Messages",
       "cms": "Data",
       "files": "Files",

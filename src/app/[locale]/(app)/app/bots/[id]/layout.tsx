@@ -3,6 +3,7 @@ import { ChevronLeft } from "lucide-react";
 import { setRequestLocale } from "next-intl/server";
 import { ProjectsAPI } from "@/shared/api/services";
 import { BotTabs } from "@/features/bots/components/bot-tabs";
+import { ConstructorButton } from "@/features/bots/components/constructor-button";
 import { Link } from "@/shared/i18n/routing";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Badge } from "@/shared/components/ui/badge";
@@ -42,6 +43,7 @@ export default async function BotLayout({
           </div>
           {bot.username && <p className="text-sm text-muted-foreground">@{bot.username}</p>}
         </div>
+        <ConstructorButton botId={id} />
       </header>
 
       <BotTabs id={id} />

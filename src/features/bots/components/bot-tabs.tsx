@@ -11,7 +11,6 @@ export function BotTabs({ id }: { id: string | number }) {
 
   const tabs = [
     { href: `/app/bots/${id}`, label: t("overview"), end: true },
-    { href: `/app/bots/${id}/editor`, label: t("editor") },
     { href: `/app/bots/${id}/messages`, label: t("messages") },
     { href: `/app/bots/${id}/cms`, label: t("cms") },
     { href: `/app/bots/${id}/files`, label: t("files") },

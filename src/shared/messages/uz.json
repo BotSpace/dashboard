@@ -195,9 +195,10 @@
       "blankDesc": "Bo'sh konstruktor bilan boshlang",
       "fromTemplateDesc": "Tayyor shablon asosida tezroq boshlang"
     },
+    "openConstructor": "Konstruktor",
+    "openConstructorTooltip": "Vizual konstruktorda ochish",
     "tabs": {
       "overview": "Umumiy",
-      "editor": "Konstruktor",
       "messages": "Xabarlar",
       "cms": "Ma'lumotlar",
       "files": "Fayllar",

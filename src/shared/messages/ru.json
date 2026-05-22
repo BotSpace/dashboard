@@ -177,9 +177,10 @@
       "blankDesc": "Начните с пустого конструктора",
       "fromTemplateDesc": "Быстрее с готовым шаблоном"
     },
+    "openConstructor": "Конструктор",
+    "openConstructorTooltip": "Открыть в визуальном конструкторе",
     "tabs": {
       "overview": "Обзор",
-      "editor": "Конструктор",
       "messages": "Сообщения",
       "cms": "Данные",
       "files": "Файлы",
