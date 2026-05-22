@@ -7,7 +7,8 @@ on:
       - "*-dev"
 
 env:
-  PROJECT_NAME: botmother-dashboard
+  # Harbor project / image name → registry.irpgrammer.uz/botspace/dashboard
+  PROJECT_NAME: botspace/dashboard
 
 permissions:
   contents: read
