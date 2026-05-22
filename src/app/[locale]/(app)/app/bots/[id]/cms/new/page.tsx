@@ -1,27 +1,22 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { notFound } from "next/navigation";
 import { ArrowLeft, Database } from "lucide-react";
 import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
 import { SchemaBuilder } from "@/features/cms/components/schema-builder";
 
-export default async function CmsCreatePage({
+export default async function BotCmsCreatePage({
   params,
-  searchParams,
 }: {
-  params: Promise<{ locale: string }>;
-  searchParams: Promise<{ project?: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
-  const { locale } = await params;
-  const sp = await searchParams;
+  const { locale, id } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("cms");
-  if (!sp.project) notFound();
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <Button asChild variant="ghost" size="sm">
-        <Link href={`/app/cms?project=${sp.project}`} className="gap-1">
+        <Link href={`/app/bots/${id}/cms`} className="gap-1">
           <ArrowLeft className="h-4 w-4" />
           {t("backToList")}
         </Link>
@@ -33,7 +28,7 @@ export default async function CmsCreatePage({
         </h1>
         <p className="text-sm text-muted-foreground">{t("newSubtitle")}</p>
       </header>
-      <SchemaBuilder projectId={sp.project} />
+      <SchemaBuilder projectId={id} />
     </div>
   );
 }

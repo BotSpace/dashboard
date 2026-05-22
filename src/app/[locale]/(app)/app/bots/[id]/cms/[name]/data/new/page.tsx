@@ -7,26 +7,22 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 import { CmsAPI } from "@/shared/api/services";
 import { DocumentForm } from "@/features/cms/components/document-form";
 
-export default async function CmsNewDocPage({
+export default async function BotCmsNewDocPage({
   params,
-  searchParams,
 }: {
-  params: Promise<{ locale: string; name: string }>;
-  searchParams: Promise<{ project?: string }>;
+  params: Promise<{ locale: string; id: string; name: string }>;
 }) {
-  const { locale, name } = await params;
-  const sp = await searchParams;
+  const { locale, id, name } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("cms");
-  if (!sp.project) notFound();
 
-  const collection = await CmsAPI.getCollection(sp.project, name).catch(() => null);
+  const collection = await CmsAPI.getCollection(id, name).catch(() => null);
   if (!collection) notFound();
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <Button asChild variant="ghost" size="sm">
-        <Link href={`/app/cms/${name}/data?project=${sp.project}`} className="gap-1">
+        <Link href={`/app/bots/${id}/cms/${name}/data`} className="gap-1">
           <ArrowLeft className="h-4 w-4" />
           {t("backToData")}
         </Link>
@@ -44,7 +40,7 @@ export default async function CmsNewDocPage({
       <Card>
         <CardContent className="p-6">
           <DocumentForm
-            projectId={sp.project}
+            projectId={id}
             collectionName={collection.name}
             fields={collection.fields ?? []}
           />

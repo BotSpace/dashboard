@@ -6,7 +6,6 @@ import type {
   EnvVar,
   Plan,
   FileItem,
-  Collection,
   CmsAuditEntry,
   CmsCollection,
   CmsDocument,
@@ -104,16 +103,11 @@ export const FilesAPI = {
     const d = await api<unknown>("/api/file/", { query: { project } });
     return unwrapList<FileItem>(d);
   },
-  remove: (id: string | number) => api<void>(`/api/file/${id}/`, { method: "DELETE" }),
-};
-
-// COLLECTIONS
-export const CollectionsAPI = {
-  list: async (project: string | number) => {
-    const d = await api<unknown>("/api/collection/", { query: { project } });
-    return unwrapList<Collection>(d);
+  upload: async (body: FormData) => {
+    const d = await api<unknown>("/api/file/", { method: "POST", body });
+    return unwrapItem<FileItem>(d);
   },
-  get: (id: string | number) => api<Collection>(`/api/collection/${id}/`).then(unwrapItem<Collection>),
+  remove: (id: string | number) => api<void>(`/api/file/${id}/`, { method: "DELETE" }),
 };
 
 // TEMPLATES

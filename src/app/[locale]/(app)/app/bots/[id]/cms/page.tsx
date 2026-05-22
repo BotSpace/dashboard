@@ -1,37 +1,21 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Database, Plus, Settings2, Table } from "lucide-react";
-import { CmsAPI, ProjectsAPI } from "@/shared/api/services";
+import { CmsAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
 
-export default async function CmsListPage({
+export default async function BotCmsListPage({
   params,
-  searchParams,
 }: {
-  params: Promise<{ locale: string }>;
-  searchParams: Promise<{ project?: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
-  const { locale } = await params;
-  const sp = await searchParams;
+  const { locale, id } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("cms");
 
-  let projectId = sp.project;
-  if (!projectId) {
-    const projects = await ProjectsAPI.list().catch(() => []);
-    projectId = projects[0]?.id ? String(projects[0].id) : "";
-  }
-
-  if (!projectId) {
-    return (
-      <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
-        {t("noProject")}
-      </div>
-    );
-  }
-
+  const projectId = id;
   const collections = await CmsAPI.listCollections(projectId).catch(() => []);
 
   return (
@@ -45,16 +29,12 @@ export default async function CmsListPage({
           <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
         <Button asChild>
-          <Link href={`/app/cms/new?project=${projectId}`} className="gap-2">
+          <Link href={`/app/bots/${projectId}/cms/new`} className="gap-2">
             <Plus className="h-4 w-4" />
             {t("create")}
           </Link>
         </Button>
       </header>
-
-      <div className="text-xs text-muted-foreground">
-        {t("project")}: <code className="font-mono">{projectId}</code>
-      </div>
 
       {collections.length === 0 ? (
         <div className="rounded-lg border border-dashed py-16 text-center text-sm text-muted-foreground">
@@ -84,7 +64,7 @@ export default async function CmsListPage({
                   <div className="flex gap-1">
                     <Button asChild variant="ghost" size="sm">
                       <Link
-                        href={`/app/cms/${c.name}/data?project=${projectId}`}
+                        href={`/app/bots/${projectId}/cms/${c.name}/data`}
                         className="gap-1"
                       >
                         <Table className="h-3.5 w-3.5" />
@@ -93,7 +73,7 @@ export default async function CmsListPage({
                     </Button>
                     <Button asChild variant="ghost" size="sm">
                       <Link
-                        href={`/app/cms/${c.name}?project=${projectId}`}
+                        href={`/app/bots/${projectId}/cms/${c.name}`}
                         className="gap-1"
                       >
                         <Settings2 className="h-3.5 w-3.5" />

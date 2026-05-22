@@ -6,33 +6,29 @@ import { Button } from "@/shared/components/ui/button";
 import { CmsAPI } from "@/shared/api/services";
 import { DataGrid } from "@/features/cms/components/data-grid";
 
-export default async function CmsDataPage({
+export default async function BotCmsDataPage({
   params,
-  searchParams,
 }: {
-  params: Promise<{ locale: string; name: string }>;
-  searchParams: Promise<{ project?: string }>;
+  params: Promise<{ locale: string; id: string; name: string }>;
 }) {
-  const { locale, name } = await params;
-  const sp = await searchParams;
+  const { locale, id, name } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("cms");
-  if (!sp.project) notFound();
 
-  const collection = await CmsAPI.getCollection(sp.project, name).catch(() => null);
+  const collection = await CmsAPI.getCollection(id, name).catch(() => null);
   if (!collection) notFound();
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/app/cms?project=${sp.project}`} className="gap-1">
+          <Link href={`/app/bots/${id}/cms`} className="gap-1">
             <ArrowLeft className="h-4 w-4" />
             {t("backToList")}
           </Link>
         </Button>
         <Button asChild variant="outline" size="sm">
-          <Link href={`/app/cms/${name}?project=${sp.project}`} className="gap-2">
+          <Link href={`/app/bots/${id}/cms/${name}`} className="gap-2">
             <Settings2 className="h-4 w-4" />
             {t("schema")}
           </Link>
@@ -50,7 +46,7 @@ export default async function CmsDataPage({
       </header>
 
       <DataGrid
-        projectId={sp.project}
+        projectId={id}
         collectionName={collection.name}
         fields={collection.fields ?? []}
       />

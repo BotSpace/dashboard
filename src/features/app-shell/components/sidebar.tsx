@@ -4,7 +4,6 @@ import { useLocale, useTranslations } from "next-intl";
 import {
   Bot,
   CreditCard,
-  Database,
   Files,
   LayoutDashboard,
   LifeBuoy,
@@ -29,7 +28,6 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     { href: "/app", icon: LayoutDashboard, key: "dashboard" },
     { href: "/app/agent", icon: Wand2, key: "agent" },
     { href: "/app/bots", icon: Bot, key: "bots" },
-    { href: "/app/cms", icon: Database, key: "cms" },
     { href: "/app/templates", icon: PackageOpen, key: "templates" },
     { href: "/app/files", icon: Files, key: "files" },
   ];

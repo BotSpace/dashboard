@@ -57,7 +57,7 @@ export function DocumentForm({ projectId, collectionName, fields }: Props) {
         return;
       }
       toast.success("Hujjat qo'shildi");
-      router.push(`/app/cms/${collectionName}/data?project=${projectId}`);
+      router.push(`/app/bots/${projectId}/cms/${collectionName}/data`);
       router.refresh();
     });
   };

@@ -3,6 +3,7 @@ import { FileIcon } from "lucide-react";
 import { FilesAPI } from "@/shared/api/services";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { formatNumber } from "@/shared/lib/utils";
+import { FileUploader } from "@/features/files/components/file-uploader";
 
 function humanSize(bytes?: number) {
   if (!bytes && bytes !== 0) return "—";
@@ -27,6 +28,8 @@ export default async function FilesPage({ params }: { params: Promise<{ locale: 
         <h1 className="text-2xl font-semibold tracking-tight">Fayllar</h1>
         <p className="text-sm text-muted-foreground">{formatNumber(files.length)} ta fayl</p>
       </header>
+
+      <FileUploader />
 
       <Card>
         <CardContent className="p-0">

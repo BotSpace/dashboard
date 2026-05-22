@@ -125,7 +125,7 @@ export function DataGrid({ projectId, collectionName, fields }: Props) {
             </Button>
           )}
           <Button asChild size="sm">
-            <Link href={`/app/cms/${collectionName}/data/new?project=${projectId}`} className="gap-1">
+            <Link href={`/app/bots/${projectId}/cms/${collectionName}/data/new`} className="gap-1">
               <Plus className="h-3.5 w-3.5" /> Yangi
             </Link>
           </Button>
@@ -181,7 +181,7 @@ export function DataGrid({ projectId, collectionName, fields }: Props) {
                   </td>
                   <td className="px-2 py-2 font-mono text-xs">
                     <Link
-                      href={`/app/cms/${collectionName}/data/${id}?project=${projectId}`}
+                      href={`/app/bots/${projectId}/cms/${collectionName}/data/${id}`}
                       className="hover:underline"
                     >
                       {id.slice(-8)}
