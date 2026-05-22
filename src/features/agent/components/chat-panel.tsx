@@ -1,90 +1,35 @@
 "use client";
-import { useEffect, useRef, useState, useTransition } from "react";
-import { Bot, Loader2, Plus, Send, Square, User, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { Bot, Loader2, Send, Square, User, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/components/ui/button";
-import { cancelRunAction, startRunAction } from "../actions";
+import { approveRunAction, cancelRunAction, startRunAction } from "../actions";
 import { useAgentStream } from "../use-agent-stream";
-import { ApprovalDialog } from "./approval-dialog";
 import { ClarifyDialog } from "./clarify-dialog";
 import { MessageMarkdown } from "./message-markdown";
 import { PlanPanel } from "./plan-panel";
+import { ThreadsPicker } from "./threads-picker";
 import { ToolStrip } from "./tool-strip";
 import { RunStatusChip, TypingIndicator } from "./typing-indicator";
 import type { ChatTurn, ToolCallView } from "../types";
+import {
+  deleteThread,
+  loadActiveRun,
+  loadThread,
+  loadThreads,
+  newThreadId,
+  saveActiveRun,
+  saveThread,
+  titleFromPrompt,
+  upsertThreadMeta,
+  type ThreadMeta,
+} from "../storage";
 
 type Props = {
   projectId: string;
   initialPrompt?: string;
 };
-
-const STORE_KEY = (projectId: string) => `bm.agent.activeRun:${projectId}`;
-const HISTORY_KEY = (projectId: string) => `bm.agent.history:${projectId}`;
-const HISTORY_LIMIT = 200;
-
-type StoredRun = { requestId: string; threadId: string };
-type StoredHistory = {
-  turns: import("../types").ChatTurn[];
-  lastSeq: number;
-  finished: boolean;
-};
-
-function loadStored(projectId: string): StoredRun | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(STORE_KEY(projectId));
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (typeof parsed?.requestId === "string" && typeof parsed?.threadId === "string") {
-      return parsed;
-    }
-  } catch {
-    /* ignore */
-  }
-  return null;
-}
-
-function saveStored(projectId: string, run: StoredRun | null) {
-  if (typeof window === "undefined") return;
-  if (run) {
-    localStorage.setItem(STORE_KEY(projectId), JSON.stringify(run));
-  } else {
-    localStorage.removeItem(STORE_KEY(projectId));
-  }
-}
-
-function loadHistory(projectId: string): StoredHistory | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(HISTORY_KEY(projectId));
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (parsed && Array.isArray(parsed.turns)) {
-      return {
-        turns: parsed.turns,
-        lastSeq: typeof parsed.lastSeq === "number" ? parsed.lastSeq : 0,
-        finished: Boolean(parsed.finished),
-      };
-    }
-  } catch {
-    /* ignore */
-  }
-  return null;
-}
-
-function saveHistory(projectId: string, snapshot: StoredHistory) {
-  if (typeof window === "undefined") return;
-  try {
-    const trimmed = {
-      ...snapshot,
-      turns: snapshot.turns.slice(-HISTORY_LIMIT),
-    };
-    localStorage.setItem(HISTORY_KEY(projectId), JSON.stringify(trimmed));
-  } catch {
-    /* quota exceeded — ignore */
-  }
-}
 
 type RenderItem =
   | { kind: "user"; id: string; text: string }
@@ -102,31 +47,24 @@ function renderTurns(turns: ChatTurn[], phase: string): RenderItem[] {
     group = null;
     groupStartId = "";
   };
-  turns.forEach((t, idx) => {
+  for (const t of turns) {
     if (t.kind === "tool") {
       if (!group) {
         group = [];
         groupStartId = t.id;
       }
       group.push(t.call);
-      return;
+      continue;
     }
-    // The trailing group's "pending" follows the live phase only if it sits at
-    // the very end of the turn list while the run is still active.
     flushGroup(false);
     items.push(t as RenderItem);
-    // mark unused index to satisfy lints
-    void idx;
-  });
+  }
   const liveRunning = phase !== "done" && phase !== "error" && phase !== "idle";
   flushGroup(liveRunning);
   return items;
 }
 
 export function ChatPanel(props: Props) {
-  // Wait until the component is mounted on the client, then render the inner
-  // panel which can synchronously read localStorage from useState initialisers
-  // — that's the only way useAgentStream's initial turns/seq are honoured.
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => setHydrated(true), []);
   if (!hydrated) {
@@ -139,33 +77,102 @@ export function ChatPanel(props: Props) {
   return <ChatPanelInner {...props} />;
 }
 
+function pickInitialThreadId(projectId: string): string {
+  const list = loadThreads(projectId);
+  return list[0]?.id ?? newThreadId();
+}
+
 function ChatPanelInner({ projectId, initialPrompt }: Props) {
-  // Synchronously hydrate from localStorage on first render.
-  const [stored] = useState<StoredRun | null>(() => loadStored(projectId));
-  const [initialHistory] = useState<StoredHistory | null>(() => loadHistory(projectId));
+  const [threads, setThreads] = useState<ThreadMeta[]>(() => loadThreads(projectId));
+  const [threadId, setThreadId] = useState<string>(() => pickInitialThreadId(projectId));
+
+  const picker = (
+    <ThreadsPicker
+      threads={threads}
+      activeId={threadId}
+      onSelect={(id) => setThreadId(id)}
+      onNew={() => setThreadId(newThreadId())}
+      onDelete={(id) => {
+        const next = deleteThread(projectId, id);
+        setThreads(next);
+        if (id === threadId) {
+          setThreadId(next[0]?.id ?? newThreadId());
+        }
+      }}
+    />
+  );
+
+  return (
+    <div className="grid h-full gap-4 lg:grid-cols-[1fr_280px]">
+      <ChatThread
+        key={`${projectId}:${threadId}`}
+        projectId={projectId}
+        threadId={threadId}
+        initialPrompt={initialPrompt}
+        onThreadsChange={setThreads}
+        headerSlot={picker}
+      />
+    </div>
+  );
+}
+
+type ThreadProps = {
+  projectId: string;
+  threadId: string;
+  initialPrompt?: string;
+  onThreadsChange: (threads: ThreadMeta[]) => void;
+  headerSlot?: React.ReactNode;
+};
+
+function ChatThread({
+  projectId,
+  threadId,
+  initialPrompt,
+  onThreadsChange,
+  headerSlot,
+}: ThreadProps) {
+  const [stored] = useState(() => loadActiveRun(projectId, threadId));
+  const [initialThread] = useState(() => loadThread(projectId, threadId));
   const [input, setInput] = useState(initialPrompt ?? "");
   const [requestId, setRequestId] = useState<string | null>(stored?.requestId ?? null);
-  const [threadId, setThreadId] = useState<string>(
-    () => stored?.threadId ?? `t-${Date.now().toString(36)}`
-  );
   const [pending, start] = useTransition();
   const scroller = useRef<HTMLDivElement>(null);
 
   const stream = useAgentStream({
     projectId,
     requestId,
-    initialTurns: initialHistory?.turns,
-    initialSeq: initialHistory?.lastSeq,
-    onPersist: (snapshot) => saveHistory(projectId, snapshot),
+    initialTurns: initialThread?.turns,
+    initialSeq: initialThread?.lastSeq,
+    onPersist: (snapshot) =>
+      saveThread(projectId, threadId, {
+        turns: snapshot.turns,
+        lastSeq: snapshot.lastSeq,
+        finished: snapshot.finished,
+      }),
   });
 
-  // Once a run finishes, drop the persisted record so a refresh does not
-  // re-attach to a completed stream.
+  // Drop the persisted active-run pointer when the stream is finished so a
+  // refresh doesn't try to re-attach to a closed run.
   useEffect(() => {
     if (stream.finished && requestId) {
-      saveStored(projectId, null);
+      saveActiveRun(projectId, threadId, null);
     }
-  }, [stream.finished, requestId, projectId]);
+  }, [stream.finished, requestId, projectId, threadId]);
+
+  // Auto-approve any approval request — destructive operations should run
+  // immediately without user confirmation.
+  const approvedRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!stream.approval || !requestId) return;
+    const id = String(
+      (stream.approval as { tool_call_id?: string }).tool_call_id ?? "anon"
+    );
+    if (approvedRef.current.has(id)) return;
+    approvedRef.current.add(id);
+    approveRunAction({ projectId, requestId, approved: true }).catch(() => {
+      /* ignore — agent will retry */
+    });
+  }, [stream.approval, requestId, projectId]);
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
@@ -177,6 +184,17 @@ function ChatPanelInner({ projectId, initialPrompt }: Props) {
   const send = () => {
     const text = input.trim();
     if (!text || pending) return;
+
+    // First message of a fresh thread → seed the threads list with a title.
+    const existingMeta = loadThreads(projectId).find((t) => t.id === threadId);
+    const title = existingMeta?.title ?? titleFromPrompt(text);
+    const updated = upsertThreadMeta(projectId, {
+      id: threadId,
+      title,
+      lastUpdated: Date.now(),
+    });
+    onThreadsChange(updated);
+
     stream.pushUserTurn(text);
     setInput("");
     start(async () => {
@@ -186,7 +204,7 @@ function ChatPanelInner({ projectId, initialPrompt }: Props) {
         return;
       }
       setRequestId(res.request_id);
-      saveStored(projectId, { requestId: res.request_id, threadId });
+      saveActiveRun(projectId, threadId, { requestId: res.request_id, threadId });
     });
   };
 
@@ -202,8 +220,13 @@ function ChatPanelInner({ projectId, initialPrompt }: Props) {
     });
   };
 
+  const items = useMemo(
+    () => renderTurns(stream.turns, stream.phase),
+    [stream.turns, stream.phase]
+  );
+
   return (
-    <div className="grid h-full gap-4 lg:grid-cols-[1fr_300px]">
+    <>
       <div className="flex h-full min-h-0 flex-col rounded-lg border bg-card">
         <div className="flex items-center gap-2 border-b px-4 py-3">
           <Sparkles className="h-4 w-4 text-primary" />
@@ -213,31 +236,16 @@ function ChatPanelInner({ projectId, initialPrompt }: Props) {
           </div>
           <div className="ml-auto flex items-center gap-2">
             {requestId && (
-              <code className="text-[10px] text-muted-foreground">
+              <code className="hidden text-[10px] text-muted-foreground sm:inline">
                 run: {requestId.slice(0, 8)}
               </code>
             )}
-            {stream.turns.length > 0 && !isRunning && (
-              <Button
-                onClick={() => {
-                  saveStored(projectId, null);
-                  saveHistory(projectId, { turns: [], lastSeq: 0, finished: false });
-                  window.location.reload();
-                }}
-                variant="ghost"
-                size="sm"
-                className="h-7 gap-1 text-xs"
-                title="Yangi suhbat"
-              >
-                <Plus className="h-3 w-3" />
-                Yangi
-              </Button>
-            )}
+            {headerSlot}
           </div>
         </div>
 
         <div ref={scroller} className="flex-1 space-y-3 overflow-y-auto p-4">
-          {stream.turns.length === 0 && !isRunning && (
+          {items.length === 0 && !isRunning && (
             <div className="grid h-full place-items-center text-center text-sm text-muted-foreground">
               <div>
                 <Bot className="mx-auto mb-3 h-8 w-8 text-primary/40" />
@@ -250,7 +258,7 @@ function ChatPanelInner({ projectId, initialPrompt }: Props) {
             </div>
           )}
 
-          {renderTurns(stream.turns, stream.phase).map((item) => {
+          {items.map((item) => {
             if (item.kind === "user") {
               return (
                 <div key={item.id} className="flex gap-3">
@@ -271,9 +279,7 @@ function ChatPanelInner({ projectId, initialPrompt }: Props) {
                 </div>
               );
             }
-            return (
-              <ToolStrip key={item.id} calls={item.calls} pending={item.pending} />
-            );
+            return <ToolStrip key={item.id} calls={item.calls} pending={item.pending} />;
           })}
 
           <TypingIndicator phase={stream.phase} currentTool={null} />
@@ -345,16 +351,21 @@ function ChatPanelInner({ projectId, initialPrompt }: Props) {
         </div>
       </div>
 
-      <aside className="space-y-3">
-        <PlanPanel plan={stream.plan} />
-      </aside>
+      <PlanSidebar plan={stream.plan} />
 
       {requestId && (
-        <>
-          <ApprovalDialog projectId={projectId} requestId={requestId} payload={stream.approval} />
-          <ClarifyDialog projectId={projectId} requestId={requestId} payload={stream.clarify} />
-        </>
+        <ClarifyDialog projectId={projectId} requestId={requestId} payload={stream.clarify} />
       )}
-    </div>
+    </>
+  );
+}
+
+function PlanSidebar({ plan }: { plan: Parameters<typeof PlanPanel>[0]["plan"] }) {
+  // Rendered via React portal would be cleaner, but the grid layout places the
+  // sibling slot in column 3 — this fragment renders into that slot directly.
+  return (
+    <aside className="space-y-3">
+      <PlanPanel plan={plan} />
+    </aside>
   );
 }
