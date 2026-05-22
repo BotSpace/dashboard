@@ -58,7 +58,7 @@ export function SchemaBuilder({ projectId }: { projectId: string }) {
         return;
       }
       toast.success("Collection yaratildi");
-      router.push(`/app/cms/${name.trim().toLowerCase()}?project=${projectId}`);
+      router.push(`/app/bots/${projectId}/cms/${name.trim().toLowerCase()}`);
       router.refresh();
     });
   };

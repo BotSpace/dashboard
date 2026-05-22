@@ -9,33 +9,29 @@ import { Badge } from "@/shared/components/ui/badge";
 import { Separator } from "@/shared/components/ui/separator";
 import { FieldEditor } from "@/features/cms/components/field-editor";
 
-export default async function CmsDetailPage({
+export default async function BotCmsDetailPage({
   params,
-  searchParams,
 }: {
-  params: Promise<{ locale: string; name: string }>;
-  searchParams: Promise<{ project?: string }>;
+  params: Promise<{ locale: string; id: string; name: string }>;
 }) {
-  const { locale, name } = await params;
-  const sp = await searchParams;
+  const { locale, id, name } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("cms");
-  if (!sp.project) notFound();
 
-  const collection = await CmsAPI.getCollection(sp.project, name).catch(() => null);
+  const collection = await CmsAPI.getCollection(id, name).catch(() => null);
   if (!collection) notFound();
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/app/cms?project=${sp.project}`} className="gap-1">
+          <Link href={`/app/bots/${id}/cms`} className="gap-1">
             <ArrowLeft className="h-4 w-4" />
             {t("backToList")}
           </Link>
         </Button>
         <Button asChild>
-          <Link href={`/app/cms/${name}/data?project=${sp.project}`} className="gap-2">
+          <Link href={`/app/bots/${id}/cms/${name}/data`} className="gap-2">
             <Table className="h-4 w-4" />
             {t("openData")}
           </Link>
@@ -71,7 +67,7 @@ export default async function CmsDetailPage({
           </div>
           <Separator className="my-4" />
           <FieldEditor
-            projectId={sp.project}
+            projectId={id}
             collectionName={collection.name}
             initialFields={collection.fields ?? []}
           />

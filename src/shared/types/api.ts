@@ -53,14 +53,6 @@ export type FileItem = {
   created_at?: string;
 };
 
-export type Collection = {
-  id: number | string;
-  project: number | string;
-  name: string;
-  schema?: Array<{ name: string; type: string }>;
-  created_at?: string;
-};
-
 export type TemplateCategory = {
   id: number | string;
   name: string;
