@@ -1,12 +1,21 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { Check, Copy, Key, Loader2, Plus, Terminal, Trash2 } from "lucide-react";
+import { Check, Copy, Key, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import { Badge } from "@/shared/components/ui/badge";
-import { Card, CardContent } from "@/shared/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/shared/components/ui/dialog";
 import { createTokenAction, deleteTokenAction, listTokensAction } from "../actions/token-actions";
 
 type TokenMeta = { id: number; name: string; prefix: string; last_used_at: string | null; created_at: string };
@@ -18,6 +27,7 @@ export function APITokensPanel() {
   const [copied, setCopied] = useState(false);
   const [pending, start] = useTransition();
   const [loaded, setLoaded] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     listTokensAction()
@@ -36,7 +46,6 @@ export function APITokensPanel() {
           setName("");
           const updated = await listTokensAction();
           setTokens(updated);
-          toast.success("Token yaratildi");
         }
       } catch {
         toast.error("Token yaratishda xatolik");
@@ -63,77 +72,100 @@ export function APITokensPanel() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setNewToken(null);
+    setName("");
+  };
+
   return (
     <div className="space-y-6">
-      {/* Description */}
-      <div className="rounded-lg border border-dashed p-4">
-        <div className="flex items-start gap-3">
-          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
-            <Terminal className="h-4 w-4" />
-          </div>
-          <div className="space-y-1 text-sm">
-            <p className="font-medium">Tashqi xizmatlar uchun API token</p>
-            <p className="text-muted-foreground">
-              MCP server, CI/CD yoki boshqa integratsiyalar uchun token yarating.
-              Token bilan <code className="rounded bg-muted px-1 py-0.5 text-xs">POST /auth/token/exchange/</code> ga
-              so'rov yuborib JWT olasiz.
-            </p>
-          </div>
+      {/* Header with create button */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground">
+            API tokenlar orqali tashqi ilovalar BotSpace platformasiga ulanadi.
+          </p>
         </div>
-      </div>
-
-      {/* Create form */}
-      <div className="flex gap-2">
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Token nomi (masalan: MCP Server)"
-          className="max-w-sm"
-          onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-          disabled={pending}
-        />
-        <Button onClick={handleCreate} disabled={pending || !name.trim()} size="sm" className="shrink-0">
-          {pending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Plus className="mr-1.5 h-3.5 w-3.5" />}
-          Yaratish
-        </Button>
-      </div>
-
-      {/* New token display */}
-      {newToken && (
-        <Card className="border-emerald-500/30 bg-emerald-500/5">
-          <CardContent className="p-4">
-            <p className="mb-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-              Token yaratildi — hozir nusxalab oling, keyinchalik ko'ra olmaysiz:
-            </p>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 overflow-x-auto rounded-md bg-muted px-3 py-2 text-xs font-mono select-all">
-                {newToken}
-              </code>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 shrink-0"
-                onClick={() => handleCopy(newToken)}
-              >
-                {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
-              </Button>
-            </div>
-            <Button variant="ghost" size="sm" className="mt-3 text-xs text-muted-foreground" onClick={() => setNewToken(null)}>
-              Yopish
+        <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) { setNewToken(null); setName(""); } }}>
+          <DialogTrigger asChild>
+            <Button size="sm">
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              Yangi token
             </Button>
-          </CardContent>
-        </Card>
-      )}
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-lg">
+            {!newToken ? (
+              <>
+                <DialogHeader>
+                  <DialogTitle>API token yaratish</DialogTitle>
+                  <DialogDescription>
+                    Token nomi faqat sizga ko'rinadi — qaysi xizmat uchun ekanligini belgilang.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3 py-4">
+                  <Label htmlFor="token-name">Token nomi</Label>
+                  <Input
+                    id="token-name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Masalan: MCP Server, CI/CD, Monitoring"
+                    onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+                    autoFocus
+                  />
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={closeDialog}>Bekor qilish</Button>
+                  <Button onClick={handleCreate} disabled={pending || !name.trim()}>
+                    {pending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                    Yaratish
+                  </Button>
+                </DialogFooter>
+              </>
+            ) : (
+              <>
+                <DialogHeader>
+                  <DialogTitle>Token yaratildi</DialogTitle>
+                  <DialogDescription>
+                    Bu tokenni hozir nusxalab oling. Xavfsizlik sababli uni qayta ko'ra olmaysiz.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="py-4">
+                  <div className="flex items-center gap-2 rounded-lg border bg-muted/50 p-3">
+                    <code className="flex-1 overflow-x-auto text-xs font-mono select-all break-all">
+                      {newToken}
+                    </code>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0"
+                      onClick={() => handleCopy(newToken)}
+                    >
+                      {copied ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button onClick={closeDialog}>Tayyor</Button>
+                </DialogFooter>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {/* Token list */}
       {!loaded ? (
-        <div className="flex items-center justify-center py-8">
+        <div className="flex items-center justify-center py-12">
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : tokens.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-12 text-center">
-          <Key className="h-8 w-8 text-muted-foreground/40" />
-          <p className="text-sm text-muted-foreground">Hali token yaratmagansiz</p>
+        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16 text-center">
+          <Key className="h-10 w-10 text-muted-foreground/30" />
+          <div>
+            <p className="text-sm font-medium">Tokenlar yo'q</p>
+            <p className="text-xs text-muted-foreground">Tashqi xizmatlarni ulash uchun token yarating</p>
+          </div>
         </div>
       ) : (
         <div className="space-y-2">
@@ -143,16 +175,17 @@ export function APITokensPanel() {
               className="flex items-center justify-between rounded-lg border px-4 py-3 transition-colors hover:bg-muted/30"
             >
               <div className="flex items-center gap-3">
-                <Key className="h-4 w-4 text-muted-foreground" />
+                <div className="grid h-8 w-8 place-items-center rounded-md bg-muted">
+                  <Key className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
                 <div>
                   <div className="text-sm font-medium">{t.name}</div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <code className="rounded bg-muted px-1 py-0.5">{t.prefix}••••••</code>
-                    {t.last_used_at && (
-                      <>
-                        <span className="text-muted-foreground/40">·</span>
-                        <span>Oxirgi: {new Date(t.last_used_at).toLocaleDateString()}</span>
-                      </>
+                    <code>{t.prefix}••••</code>
+                    {t.last_used_at ? (
+                      <span>· Oxirgi: {new Date(t.last_used_at).toLocaleDateString()}</span>
+                    ) : (
+                      <span>· Hali ishlatilmagan</span>
                     )}
                   </div>
                 </div>
