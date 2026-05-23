@@ -1,15 +1,20 @@
 "use client";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { cn } from "@/shared/lib/utils";
 
 export function Logo({ className, withText = true }: { className?: string; withText?: boolean }) {
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  const isDark = mounted && resolvedTheme === "dark";
 
   if (withText) {
     return (
-      <div className={cn("flex items-center", className)}>
+      <div className={cn("flex items-center", className)} suppressHydrationWarning>
         <Image
           src={isDark ? "/logo-dark.png" : "/logo-light.png"}
           alt="BotSpace"
@@ -23,7 +28,7 @@ export function Logo({ className, withText = true }: { className?: string; withT
   }
 
   return (
-    <div className={cn("flex items-center", className)}>
+    <div className={cn("flex items-center", className)} suppressHydrationWarning>
       <Image
         src={isDark ? "/logo-icon-dark.png" : "/logo-icon-light.png"}
         alt="BotSpace"
