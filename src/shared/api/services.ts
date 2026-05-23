@@ -308,14 +308,14 @@ export const CmsAPI = {
 // API TOKENS
 export const APITokensAPI = {
   list: async () => {
-    const d = await api<unknown>("/auth/api-tokens/");
+    const d = await api<unknown>("/v1/auth/api-tokens/");
     return unwrapList<{ id: number; name: string; prefix: string; last_used_at: string | null; created_at: string }>(d);
   },
   create: async (name: string) => {
-    const d = await api<unknown>("/auth/api-tokens/", { method: "POST", json: { name } });
+    const d = await api<unknown>("/v1/auth/api-tokens/", { method: "POST", json: { name } });
     return unwrapItem<{ id: number; name: string; token: string; prefix: string }>(d);
   },
-  remove: (id: number | string) => api<void>(`/auth/api-tokens/${id}/`, { method: "DELETE" }),
+  remove: (id: number | string) => api<void>(`/v1/auth/api-tokens/${id}/`, { method: "DELETE" }),
 };
 
 // AUTH (profile)
