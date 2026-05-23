@@ -20,7 +20,6 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
         <TabsList>
           <TabsTrigger value="general">{t("tabs.general")}</TabsTrigger>
           <TabsTrigger value="security">{t("tabs.security")}</TabsTrigger>
-          <TabsTrigger value="preferences">{t("tabs.preferences")}</TabsTrigger>
           <TabsTrigger value="tokens">{t("tabs.tokens")}</TabsTrigger>
         </TabsList>
 
@@ -47,19 +46,6 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
             </CardHeader>
             <CardContent>
               <PasswordForm />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="preferences">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("tabs.preferences")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Til va tema sozlamalarini yuqori o'ng burchakdagi tugmalardan o'zgartirishingiz mumkin.
-              </p>
             </CardContent>
           </Card>
         </TabsContent>

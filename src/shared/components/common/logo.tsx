@@ -10,17 +10,19 @@ export function Logo({ className, withText = true }: { className?: string; withT
 
   useEffect(() => setMounted(true), []);
 
-  const isDark = mounted && resolvedTheme === "dark";
+  if (!mounted) {
+    return <div className={cn("h-10", withText ? "w-32" : "w-10", className)} />;
+  }
 
   if (withText) {
     return (
-      <div className={cn("flex items-center", className)} suppressHydrationWarning>
+      <div className={cn("flex items-center", className)}>
         <Image
-          src={isDark ? "/logo-dark.png" : "/logo-light.png"}
+          src="/logo-dark.png"
           alt="BotSpace"
-          width={140}
-          height={36}
-          className="h-9 w-auto"
+          width={480}
+          height={120}
+          className="w-full h-auto"
           priority
         />
       </div>
@@ -28,13 +30,13 @@ export function Logo({ className, withText = true }: { className?: string; withT
   }
 
   return (
-    <div className={cn("flex items-center", className)} suppressHydrationWarning>
+    <div className={cn("flex items-center", className)}>
       <Image
-        src={isDark ? "/logo-icon-dark.png" : "/logo-icon-light.png"}
+        src="/logo-icon-dark.png"
         alt="BotSpace"
-        width={36}
-        height={36}
-        className="h-8 w-8"
+        width={80}
+        height={80}
+        className="h-12 w-12"
         priority
       />
     </div>
