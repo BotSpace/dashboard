@@ -101,12 +101,18 @@ export function Pricing() {
               {/* Animated border for Pro */}
               {p.highlighted && (
                 <div
-                  className="absolute -inset-[1px] rounded-2xl opacity-60"
-                  style={{
-                    background: "conic-gradient(from 0deg, #00e5ff, #8b5cf6, #06b6d4, #8b5cf6, #00e5ff)",
-                    animation: "lp-orb-rotate 4s linear infinite",
-                  }}
-                />
+                  className="absolute -inset-[1px] overflow-hidden rounded-2xl"
+                  style={{ padding: "1px" }}
+                >
+                  <div
+                    className="absolute inset-0 rounded-2xl"
+                    style={{
+                      background: "conic-gradient(from 0deg, #00e5ff, #8b5cf6, #06b6d4, #8b5cf6, #00e5ff)",
+                      animation: "lp-orb-rotate 4s linear infinite",
+                      opacity: 0.5,
+                    }}
+                  />
+                </div>
               )}
 
               <div
