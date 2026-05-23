@@ -54,7 +54,7 @@ export async function setSessionCookie(payload: SessionPayload) {
     sameSite: "lax",
     path: "/",
     maxAge: REFRESH_TOKEN_TTL_SEC,
-    // When set (e.g. ".botmother.uz") the cookie is shared across subdomains
+    // When set (e.g. ".botspace.uz") the cookie is shared across subdomains
     // — used so the constructor panel reads the same session.
     ...(env.SESSION_COOKIE_DOMAIN ? { domain: env.SESSION_COOKIE_DOMAIN } : {}),
   });

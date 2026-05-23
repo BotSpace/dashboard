@@ -1,7 +1,7 @@
 export const APP = {
-  name: "Botmother",
+  name: "BotSpace",
   tagline: "Telegram botlaringizni vizual konstruktor bilan yarating",
-  supportEmail: "support@botmother.uz",
+  supportEmail: "support@botspace.uz",
 } as const;
 
 export const PAGINATION_SIZE = 20;

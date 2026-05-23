@@ -230,7 +230,7 @@ function ChatThread({
       <div className="flex h-full min-h-0 flex-col rounded-lg border bg-card">
         <div className="flex items-center gap-2 border-b px-4 py-3">
           <Sparkles className="h-4 w-4 text-primary" />
-          <div className="text-sm font-medium">Botmother Agent</div>
+          <div className="text-sm font-medium">BotSpace Agent</div>
           <div className="ml-2">
             <RunStatusChip phase={stream.phase} currentTool={null} />
           </div>

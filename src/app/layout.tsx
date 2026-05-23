@@ -3,11 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Botmother — Telegram botlarni vizual yarating",
-    template: "%s · Botmother",
+    default: "BotSpace — Telegram botlarni vizual yarating",
+    template: "%s · BotSpace",
   },
   description:
-    "Botmother — Telegram botlarni vizual konstruktor, AI agent va marketplace bilan yaratish platformasi.",
+    "BotSpace — Telegram botlarni vizual konstruktor, AI agent va marketplace bilan yaratish platformasi.",
 };
 
 export const viewport: Viewport = {

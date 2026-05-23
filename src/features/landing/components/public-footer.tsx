@@ -56,7 +56,7 @@ export function PublicFooter() {
       </div>
       <div className="border-t">
         <div className="container-page py-6 text-xs text-muted-foreground">
-          © {year} Botmother. {t("rights")}.
+          © {year} BotSpace. {t("rights")}.
         </div>
       </div>
     </footer>

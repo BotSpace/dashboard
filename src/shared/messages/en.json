@@ -1,6 +1,6 @@
 {
   "common": {
-    "app": "Botmother",
+    "app": "BotSpace",
     "loading": "Loading…",
     "save": "Save",
     "cancel": "Cancel",
@@ -92,7 +92,7 @@
       "button": "Sign up free"
     },
     "footer": {
-      "tagline": "Build Telegram bots visually — with Botmother",
+      "tagline": "Build Telegram bots visually — with BotSpace",
       "product": "Product",
       "company": "Company",
       "resources": "Resources",

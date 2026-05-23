@@ -1,6 +1,6 @@
 {
   "common": {
-    "app": "Botmother",
+    "app": "BotSpace",
     "loading": "Yuklanmoqda…",
     "save": "Saqlash",
     "cancel": "Bekor qilish",
@@ -132,7 +132,7 @@
       "button": "Bepul ro'yxatdan o'tish"
     },
     "footer": {
-      "tagline": "Telegram botlarni vizual yarating — Botmother bilan",
+      "tagline": "Telegram botlarni vizual yarating — BotSpace bilan",
       "product": "Mahsulot",
       "company": "Kompaniya",
       "resources": "Resurslar",

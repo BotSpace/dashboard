@@ -1,6 +1,6 @@
 {
   "common": {
-    "app": "Botmother",
+    "app": "BotSpace",
     "loading": "Загрузка…",
     "save": "Сохранить",
     "cancel": "Отмена",
@@ -92,7 +92,7 @@
       "button": "Зарегистрироваться"
     },
     "footer": {
-      "tagline": "Создавайте Telegram-ботов визуально — с Botmother",
+      "tagline": "Создавайте Telegram-ботов визуально — с BotSpace",
       "product": "Продукт",
       "company": "Компания",
       "resources": "Ресурсы",

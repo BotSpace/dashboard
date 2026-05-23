@@ -25,7 +25,7 @@ export function PublicHeader() {
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container-page flex h-16 items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center" aria-label="Botmother">
+          <Link href="/" className="flex items-center" aria-label="BotSpace">
             <Logo />
           </Link>
           <nav className="hidden gap-6 md:flex">

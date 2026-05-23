@@ -44,7 +44,7 @@ export function Hero() {
               <span className="h-3 w-3 rounded-full bg-red-400/80" />
               <span className="h-3 w-3 rounded-full bg-amber-400/80" />
               <span className="h-3 w-3 rounded-full bg-emerald-400/80" />
-              <span className="ml-3 text-xs text-muted-foreground">app.botmother.uz</span>
+              <span className="ml-3 text-xs text-muted-foreground">app.botspace.uz</span>
             </div>
             <div className="aspect-[16/9] bg-[radial-gradient(circle_at_30%_30%,oklch(0.618_0.213_264_/_0.10),transparent_60%),radial-gradient(circle_at_70%_70%,oklch(0.7_0.18_320_/_0.10),transparent_60%)]">
               <div className="grid h-full place-items-center text-sm text-muted-foreground/70">
