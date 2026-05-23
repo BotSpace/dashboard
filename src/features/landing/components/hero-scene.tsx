@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Float, Sparkles, Stars, Text } from "@react-three/drei";
+import { Float, Sparkles, Stars } from "@react-three/drei";
 import * as THREE from "three";
 
 /* ── Central Telegram-style bot head ─────────────────────── */
@@ -103,17 +103,11 @@ function FlowNode({ label, color, dist, speed, phase, y }: typeof NODE_DATA[0]) 
         <sphereGeometry args={[0.04, 8, 8]} />
         <meshStandardMaterial color={color} emissive={emissive} emissiveIntensity={3} />
       </mesh>
-      {/* Label */}
-      <Text
-        position={[0.05, 0.0, 0.03]}
-        fontSize={0.1}
-        color="white"
-        anchorX="center"
-        anchorY="middle"
-        fillOpacity={0.6}
-      >
-        {label}
-      </Text>
+      {/* Label indicator bar */}
+      <mesh position={[0.05, 0, 0.03]}>
+        <boxGeometry args={[0.3, 0.04, 0.01]} />
+        <meshBasicMaterial color="white" transparent opacity={0.2} />
+      </mesh>
     </group>
   );
 }
@@ -187,20 +181,13 @@ function DataStream() {
 /* ── Mouse camera rig ────────────────────────────────────── */
 function CameraRig() {
   const { camera } = useThree();
-  const mouse = useRef({ x: 0, y: 0 });
-  const listening = useRef(false);
+  const target = useRef({ x: 0, y: 0.8 });
 
-  useFrame(() => {
-    if (typeof window === "undefined") return;
-    if (!listening.current) {
-      window.addEventListener("mousemove", (e) => {
-        mouse.current.x = (e.clientX / window.innerWidth - 0.5) * 2;
-        mouse.current.y = -(e.clientY / window.innerHeight - 0.5) * 2;
-      }, { passive: true });
-      listening.current = true;
-    }
-    camera.position.x += (mouse.current.x * 0.4 - camera.position.x) * 0.015;
-    camera.position.y += (mouse.current.y * 0.25 + 0.8 - camera.position.y) * 0.015;
+  useFrame(({ pointer }) => {
+    target.current.x = pointer.x * 0.4;
+    target.current.y = pointer.y * 0.25 + 0.8;
+    camera.position.x += (target.current.x - camera.position.x) * 0.02;
+    camera.position.y += (target.current.y - camera.position.y) * 0.02;
     camera.lookAt(0, 0, 0);
   });
 
