@@ -3,7 +3,6 @@ import { Bell, Menu, Search } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { ThemeToggle } from "@/shared/components/common/theme-toggle";
 import { LanguageSwitcher } from "@/shared/components/common/language-switcher";
 import { UserMenu, type UserMenuUser } from "./user-menu";
 import { MobileSidebar } from "./mobile-sidebar";
@@ -35,7 +34,6 @@ export function TopBar({ user }: { user: UserMenuUser }) {
             <Bell className="h-4 w-4" />
           </Button>
           <LanguageSwitcher />
-          <ThemeToggle />
           <UserMenu user={user} />
         </div>
       </header>

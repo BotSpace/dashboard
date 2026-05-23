@@ -1,6 +1,5 @@
 import { Logo } from "@/shared/components/common/logo";
 import { Link } from "@/shared/i18n/routing";
-import { ThemeToggle } from "@/shared/components/common/theme-toggle";
 import { LanguageSwitcher } from "@/shared/components/common/language-switcher";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -12,7 +11,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </Link>
         <div className="flex items-center gap-1.5">
           <LanguageSwitcher />
-          <ThemeToggle />
         </div>
       </header>
       <main className="flex flex-1 items-center justify-center px-4 pb-10">

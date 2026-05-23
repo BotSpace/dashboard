@@ -45,8 +45,8 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className="flex items-center px-3 py-3">
-        <Link href="/app" aria-label="BotSpace" onClick={onNavigate} className="block w-full">
+      <div className="flex items-center px-4 py-4">
+        <Link href="/app" aria-label="BotSpace" onClick={onNavigate} className="block max-w-[160px]">
           <Logo className="w-full" />
         </Link>
       </div>

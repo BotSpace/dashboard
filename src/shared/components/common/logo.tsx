@@ -1,19 +1,7 @@
-"use client";
-import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useTheme } from "next-themes";
 import { cn } from "@/shared/lib/utils";
 
 export function Logo({ className, withText = true }: { className?: string; withText?: boolean }) {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) {
-    return <div className={cn("h-10", withText ? "w-32" : "w-10", className)} />;
-  }
-
   if (withText) {
     return (
       <div className={cn("flex items-center", className)}>
