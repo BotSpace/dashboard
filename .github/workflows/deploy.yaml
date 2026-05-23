@@ -2,16 +2,18 @@ name: Build and Push Docker Image (tag + latest)
 
 on:
   push:
-    tags:
-      - "*-prod"
-      - "*-dev"
+    branches:
+      - main
+    paths-ignore:
+      - 'helm/**'
+      - '*.md'
 
 env:
   # Harbor project / image name → registry.irpgrammer.uz/botspace/dashboard
   PROJECT_NAME: botspace/dashboard
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-push:
@@ -20,6 +22,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       # Next.js bakes NEXT_PUBLIC_* into the static bundle at build time, so
       # they must exist as env vars during `npm run build` inside the Docker
@@ -58,5 +66,14 @@ jobs:
           push: true
           no-cache: true
           tags: |
-            ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.ref_name }}
+            ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ env.SHORT_SHA }}
             ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:latest
+
+      - name: Update Helm values with new image tag
+        run: |
+          sed -i "s|tag:.*|tag: \"${{ env.SHORT_SHA }}\"|" helm/values.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add helm/values.yaml
+          git diff --cached --quiet || git commit -m "deploy: update image tag to ${{ env.SHORT_SHA }}"
+          git push origin main
