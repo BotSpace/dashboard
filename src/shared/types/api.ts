@@ -37,10 +37,42 @@ export type EnvVar = {
 export type Plan = {
   id: number | string;
   name: string;
+  name_display?: string;
   price: number;
   currency?: string;
-  features?: string[];
+  max_bots?: number;
+  max_output_tokens?: number;
+  max_input_tokens?: number;
+  max_users?: number;
+  features?: string[] | Record<string, unknown>;
   is_default?: boolean;
+  is_active?: boolean;
+};
+
+export type Subscription = {
+  id: number | string;
+  plan: Plan;
+  status: "active" | "suspended" | "cancelled";
+  started_at?: string;
+  expires_at?: string;
+  tokens_used_input: number;
+  tokens_used_output: number;
+  token_reset_at?: string;
+  bots_count: number;
+};
+
+export type SubscriptionUsage = {
+  tokens_used_input: number;
+  tokens_used_output: number;
+  tokens_limit_output: number;
+  tokens_limit_input: number;
+  tokens_remaining: number;
+  bots_count: number;
+  max_bots: number;
+  plan_name: string;
+  status: string;
+  usage_percentage: number;
+  token_reset_at?: string;
 };
 
 export type FileItem = {

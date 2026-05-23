@@ -5,6 +5,8 @@ import type {
   Release,
   EnvVar,
   Plan,
+  Subscription,
+  SubscriptionUsage,
   FileItem,
   CmsAuditEntry,
   CmsCollection,
@@ -95,6 +97,23 @@ export const PlansAPI = {
   },
   current: (project: string | number) =>
     api<Plan>(`/api/project/${project}/plan/`).then(unwrapItem<Plan>),
+};
+
+// SUBSCRIPTION — per-user global plan
+export const SubscriptionAPI = {
+  current: async () => {
+    const d = await api<unknown>("/api/subscription/");
+    return unwrapItem<Subscription>(d);
+  },
+  usage: async () => {
+    const d = await api<unknown>("/api/subscription/usage/");
+    return unwrapItem<SubscriptionUsage>(d);
+  },
+  upgrade: (planId: number | string, months = 1) =>
+    api<unknown>("/api/subscription/upgrade/", {
+      method: "POST",
+      json: { plan_id: planId, months },
+    }).then(unwrapItem),
 };
 
 // FILES

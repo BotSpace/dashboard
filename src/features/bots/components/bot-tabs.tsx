@@ -17,7 +17,6 @@ export function BotTabs({ id }: { id: string | number }) {
     { href: `/app/bots/${id}/env`, label: t("env") },
     { href: `/app/bots/${id}/releases`, label: t("releases") },
     { href: `/app/bots/${id}/monitoring`, label: t("monitoring") },
-    { href: `/app/bots/${id}/plan`, label: t("plan") },
   ];
 
   return (
