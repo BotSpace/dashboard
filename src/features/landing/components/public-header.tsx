@@ -35,7 +35,7 @@ export function PublicHeader() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       style={{
-        background: scrolled ? "rgba(8,8,12,0.85)" : "rgba(8,8,12,0.4)",
+        background: scrolled ? "rgba(3,3,8,0.85)" : "rgba(3,3,8,0.4)",
         backdropFilter: "blur(16px)",
         borderBottom: scrolled
           ? "1px solid rgba(255,255,255,0.06)"
@@ -108,7 +108,7 @@ export function PublicHeader() {
             transition={{ duration: 0.25, ease: "easeInOut" }}
             className="overflow-hidden md:hidden"
             style={{
-              background: "rgba(8,8,12,0.95)",
+              background: "rgba(3,3,8,0.95)",
               backdropFilter: "blur(20px)",
             }}
           >

@@ -16,7 +16,7 @@ const marqueeItems = [...companies, ...companies];
 
 export function TrustedBy() {
   return (
-    <section className="relative overflow-hidden py-16" style={{ background: "#06060a" }}>
+    <section className="relative overflow-hidden py-16" style={{ background: "#030308" }}>
       <div className="container-page mb-8">
         <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-white/20">
           Ishonchli hamkorlar
@@ -27,13 +27,13 @@ export function TrustedBy() {
       <div
         className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24"
         style={{
-          background: "linear-gradient(to right, #06060a, transparent)",
+          background: "linear-gradient(to right, #030308, transparent)",
         }}
       />
       <div
         className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24"
         style={{
-          background: "linear-gradient(to left, #06060a, transparent)",
+          background: "linear-gradient(to left, #030308, transparent)",
         }}
       />
 

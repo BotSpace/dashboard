@@ -37,7 +37,7 @@ export function FAQ() {
   return (
     <SectionWrapper
       className="relative py-24 md:py-32"
-      style={{ background: "#06060a" }}
+      style={{ background: "#030308" }}
     >
       <div className="container-page">
         <div className="mx-auto max-w-2xl text-center">

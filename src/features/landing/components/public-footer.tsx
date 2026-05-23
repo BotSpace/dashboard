@@ -34,7 +34,7 @@ export function PublicFooter() {
   ];
 
   return (
-    <footer className="relative overflow-hidden" style={{ background: "#06060a" }}>
+    <footer className="relative overflow-hidden" style={{ background: "#030308" }}>
       {/* Dot grid pattern background */}
       <div
         className="pointer-events-none absolute inset-0"

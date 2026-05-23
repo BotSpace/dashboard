@@ -18,7 +18,7 @@ export async function TemplatesPreview({ locale }: { locale: string }) {
   if (top.length === 0) return null;
 
   return (
-    <section id="templates" className="relative py-24 md:py-32" style={{ background: "#06060a" }}>
+    <section id="templates" className="relative py-24 md:py-32" style={{ background: "#030308" }}>
       <div className="container-page">
         <div className="mx-auto max-w-2xl text-center">
           <h2
