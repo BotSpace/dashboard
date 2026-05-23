@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="flex min-h-svh flex-col">
       <header className="container-page flex h-16 items-center justify-between">
         <Link href="/" aria-label="BotSpace">
-          <Logo />
+          <Logo className="max-w-[160px]" />
         </Link>
         <div className="flex items-center gap-1.5">
           <LanguageSwitcher />

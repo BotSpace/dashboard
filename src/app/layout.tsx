@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   },
   description:
     "BotSpace — Telegram botlarni vizual konstruktor, AI agent va marketplace bilan yaratish platformasi.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export const viewport: Viewport = {
