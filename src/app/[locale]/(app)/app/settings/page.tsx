@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { ProfileForm } from "@/features/settings/components/profile-form";
 import { PasswordForm } from "@/features/settings/components/password-form";
+import { APITokensPanel } from "@/features/settings/components/api-tokens";
 
 export default async function SettingsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -69,9 +70,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
               <CardTitle>{t("tabs.tokens")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                API tokenlar tez orada qo'shiladi.
-              </p>
+              <APITokensPanel />
             </CardContent>
           </Card>
         </TabsContent>
