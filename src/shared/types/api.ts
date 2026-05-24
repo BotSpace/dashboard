@@ -62,6 +62,16 @@ export type Subscription = {
 };
 
 export type SubscriptionUsage = {
+  ai_token_usage?: {
+    limit: number;
+    used: number;
+    remaining: number;
+    input_used: number;
+    output_used: number;
+    plan?: { id?: number | string; name?: string; display?: string } | string | null;
+    status?: string | null;
+    token_reset_at?: string | null;
+  };
   tokens_used_input: number;
   tokens_used_output: number;
   tokens_limit_output: number;

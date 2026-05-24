@@ -96,8 +96,10 @@ export const PlansAPI = {
     const d = await api<unknown>("/api/plans/");
     return unwrapList<Plan>(d);
   },
-  current: (project: string | number) =>
-    api<Plan>(`/api/project/${project}/plan/`).then(unwrapItem<Plan>),
+  current: async (_project?: string | number) => {
+    const d = await api<unknown>("/api/subscription/");
+    return unwrapItem<Subscription>(d).plan;
+  },
 };
 
 // SUBSCRIPTION — per-user global plan

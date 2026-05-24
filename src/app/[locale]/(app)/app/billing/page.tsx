@@ -33,9 +33,9 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
   ]);
 
   const currentPlanName = (subscription as { plan?: { name?: string } })?.plan?.name ?? "free";
-  const tokensUsed = usage?.tokens_used_output ?? 0;
-  const tokensLimit = usage?.tokens_limit_output ?? 200_000;
-  const tokensRemaining = usage?.tokens_remaining ?? tokensLimit;
+  const tokensUsed = usage?.ai_token_usage?.used ?? usage?.tokens_used_output ?? 0;
+  const tokensLimit = usage?.ai_token_usage?.limit ?? usage?.tokens_limit_output ?? 200_000;
+  const tokensRemaining = usage?.ai_token_usage?.remaining ?? usage?.tokens_remaining ?? tokensLimit;
   const botsCount = usage?.bots_count ?? 0;
   const maxBots = usage?.max_bots ?? 1;
   const tokenPct = tokensLimit > 0 ? (tokensUsed / tokensLimit) * 100 : 0;

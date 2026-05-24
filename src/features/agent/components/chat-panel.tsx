@@ -242,7 +242,7 @@ function ChatThread({
             <RunStatusChip phase={stream.phase} currentTool={null} />
           </div>
           <div className="ml-auto flex shrink-0 items-center gap-2">
-            <UsageBadge projectId={projectId} refreshKey={usageKey} />
+            <UsageBadge refreshKey={usageKey} />
             {requestId && (
               <code className="hidden text-[10px] text-muted-foreground sm:inline">
                 run: {requestId.slice(0, 8)}

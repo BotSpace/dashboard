@@ -4,17 +4,16 @@ import { getUsageAction } from "../actions";
 import type { AgentUsage } from "@/shared/api/agent";
 
 type Props = {
-  projectId: string;
   refreshKey?: unknown;
 };
 
-export function UsageBadge({ projectId, refreshKey }: Props) {
+export function UsageBadge({ refreshKey }: Props) {
   const [usage, setUsage] = useState<AgentUsage | null>(null);
 
   const load = useCallback(async () => {
-    const data = await getUsageAction(projectId);
+    const data = await getUsageAction();
     setUsage(data);
-  }, [projectId]);
+  }, []);
 
   useEffect(() => { load(); }, [load, refreshKey]);
 
