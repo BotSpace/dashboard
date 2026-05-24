@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { UsageBadge } from "./usage-badge";
 import { Bot, Loader2, Send, Square, User, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
@@ -136,6 +137,7 @@ function ChatThread({
   const [input, setInput] = useState(initialPrompt ?? "");
   const [requestId, setRequestId] = useState<string | null>(stored?.requestId ?? null);
   const [pending, start] = useTransition();
+  const [usageKey, setUsageKey] = useState(0);
   const scroller = useRef<HTMLDivElement>(null);
 
   const stream = useAgentStream({
@@ -158,6 +160,11 @@ function ChatThread({
       saveActiveRun(projectId, threadId, null);
     }
   }, [stream.finished, requestId, projectId, threadId]);
+
+  // Refresh usage badge whenever a run finishes.
+  useEffect(() => {
+    if (stream.finished) setUsageKey((k) => k + 1);
+  }, [stream.finished]);
 
   // Auto-approve any approval request — destructive operations should run
   // immediately without user confirmation.
@@ -235,6 +242,7 @@ function ChatThread({
             <RunStatusChip phase={stream.phase} currentTool={null} />
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <UsageBadge refreshKey={usageKey} />
             {requestId && (
               <code className="hidden text-[10px] text-muted-foreground sm:inline">
                 run: {requestId.slice(0, 8)}

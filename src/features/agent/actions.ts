@@ -5,7 +5,9 @@ import {
   approveAgentRun,
   cancelAgentRun,
   getAgentRun,
+  getAgentUsage,
   type AgentRunStatus,
+  type AgentUsage,
 } from "@/shared/api/agent";
 
 export type RunCreateState = { ok: boolean; request_id?: string; message?: string };
@@ -73,5 +75,13 @@ export async function getRunStatusAction(args: {
     return await getAgentRun(args.projectId, args.requestId);
   } catch (e) {
     return { error: (e as Error).message };
+  }
+}
+
+export async function getUsageAction(): Promise<AgentUsage | null> {
+  try {
+    return await getAgentUsage();
+  } catch {
+    return null;
   }
 }

@@ -110,4 +110,17 @@ export function agentEventStreamUrl(
   return `/api/agent/${encodeURIComponent(projectId)}/runs/${encodeURIComponent(requestId)}/events${q}`;
 }
 
+export type AgentUsage = {
+  user_id: string;
+  used_today: number;
+  limit: number;
+  remaining: number;
+};
+
+export async function getAgentUsage(): Promise<AgentUsage> {
+  const res = await agentFetch("/usage");
+  if (!res.ok) throw new Error(`agent usage failed: ${res.status}`);
+  return res.json();
+}
+
 export { AGENT_BASE, agentFetch };
