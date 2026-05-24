@@ -62,7 +62,7 @@ export async function TemplatesPreview({ locale }: { locale: string }) {
                   <div className="flex flex-col gap-2 p-5">
                     <h3 className="line-clamp-1 text-sm font-semibold text-white/80">{tpl.name}</h3>
                     {tpl.short_description && (
-                      <p className="line-clamp-2 text-xs leading-relaxed text-white/30">{tpl.short_description}</p>
+                      <div className="line-clamp-2 text-xs leading-relaxed text-white/30" dangerouslySetInnerHTML={{ __html: tpl.short_description }} />
                     )}
                     <div className="mt-2 flex items-end justify-between">
                       <div>

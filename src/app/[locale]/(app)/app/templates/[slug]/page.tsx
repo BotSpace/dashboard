@@ -70,7 +70,7 @@ export default async function TemplateDetailPage({
               </div>
             )}
             {tpl.short_description && (
-              <p className="mt-4 text-base text-muted-foreground">{tpl.short_description}</p>
+              <div className="mt-4 text-base text-muted-foreground" dangerouslySetInnerHTML={{ __html: tpl.short_description }} />
             )}
           </div>
 
@@ -102,7 +102,7 @@ export default async function TemplateDetailPage({
                     <li key={f.id} className="rounded-md border p-3">
                       <div className="text-sm font-medium">{f.name}</div>
                       {f.value && (
-                        <div className="mt-1 text-xs text-muted-foreground">{f.value}</div>
+                        <div className="mt-1 text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: f.value }} />
                       )}
                     </li>
                   ))}
