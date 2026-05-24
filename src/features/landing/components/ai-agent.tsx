@@ -1,17 +1,13 @@
 "use client";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { Bot, User, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { SectionWrapper } from "./section-wrapper";
+
+const AIKitchenScene = dynamic(() => import("./ai-kitchen-scene"), { ssr: false });
 
 const BG = "#030308";
 
-const messages = [
-  { role: "user" as const, text: "Mijozlarga xizmat ko'rsatuvchi bot yarat" },
-  { role: "bot" as const, text: "Flow tuzamiz: /start trigger → salomlashish → menyu. 3 ta node qo'shildi..." },
-  { role: "bot" as const, text: "✅ Bot tayyor. Deploy qilaymi?" },
-  { role: "user" as const, text: "Ha, deploy qil" },
-  { role: "bot" as const, text: "🚀 Bot ishga tushdi! @support_bot dan tekshiring." },
-];
 
 export function AIAgent() {
   return (
@@ -87,74 +83,15 @@ export function AIAgent() {
             </div>
           </motion.div>
 
-          {/* Right: chat */}
+          {/* Right: 3D AI Kitchen */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="aspect-square w-full max-w-[500px] mx-auto"
           >
-            <div
-              className="overflow-hidden rounded-2xl"
-              style={{
-                background: "rgba(255,255,255,0.015)",
-                border: "1px solid rgba(255,255,255,0.05)",
-                boxShadow: "0 40px 80px rgba(0,0,0,0.5), 0 0 60px rgba(139,92,246,0.04)",
-              }}
-            >
-              <div
-                className="flex items-center gap-3 px-5 py-3.5"
-                style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-              >
-                <div
-                  className="flex h-7 w-7 items-center justify-center rounded-full"
-                  style={{ background: "linear-gradient(135deg, #00c8ff, #8b5cf6)" }}
-                >
-                  <Bot className="h-3.5 w-3.5 text-white" />
-                </div>
-                <div>
-                  <div className="text-[12px] font-medium text-white/60">BotSpace Agent</div>
-                  <div className="flex items-center gap-1 text-[10px] text-emerald-400/50">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/80" /> Online
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 p-5" style={{ minHeight: 280 }}>
-                {messages.map((msg, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: msg.role === "user" ? 20 : -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.15 }}
-                    className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
-                  >
-                    <div
-                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
-                      style={{
-                        background: msg.role === "user" ? "rgba(255,255,255,0.06)" : "rgba(0,200,255,0.08)",
-                      }}
-                    >
-                      {msg.role === "user" ? (
-                        <User className="h-3 w-3 text-white/35" />
-                      ) : (
-                        <Bot className="h-3 w-3 text-cyan-400/50" />
-                      )}
-                    </div>
-                    <div
-                      className="max-w-[80%] rounded-xl px-3.5 py-2 text-xs leading-relaxed text-white/45"
-                      style={{
-                        background: msg.role === "user" ? "rgba(255,255,255,0.04)" : "rgba(0,229,255,0.04)",
-                        border: `1px solid ${msg.role === "user" ? "rgba(255,255,255,0.05)" : "rgba(0,229,255,0.06)"}`,
-                      }}
-                    >
-                      {msg.text}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+            <AIKitchenScene />
           </motion.div>
         </div>
       </div>
