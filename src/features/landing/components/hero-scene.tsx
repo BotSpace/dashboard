@@ -90,9 +90,9 @@ function Scene() {
       <pointLight position={[0, 5, -3]} color="#06b6d4" intensity={2} distance={15} decay={2} />
       <Stars radius={100} depth={80} count={5000} factor={3} saturation={0.1} fade speed={0.5} />
       <EnergyCore />
-      <OrbitalRing radius={2.6} speed={0.3} tilt={1.2} color="#00e5ff" />
-      <OrbitalRing radius={3.4} speed={-0.2} tilt={0.8} color="#8b5cf6" />
-      <OrbitalRing radius={4.0} speed={0.15} tilt={1.5} color="#06b6d4" />
+      <OrbitalRing radius={2.6} speed={0.3} tilt={1.1} color="#00e5ff" />
+      <OrbitalRing radius={3.4} speed={-0.2} tilt={0.4} color="#8b5cf6" />
+      <OrbitalRing radius={4.0} speed={0.15} tilt={0.7} color="#06b6d4" />
       {CRYSTALS.map((c, i) => <Crystal key={i} {...c} />)}
       <Sparkles count={200} size={1.5} scale={15} speed={0.2} opacity={0.4} color="#00e5ff" />
       <Sparkles count={100} size={2} scale={12} speed={0.15} opacity={0.3} color="#8b5cf6" />
