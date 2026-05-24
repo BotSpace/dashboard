@@ -1,10 +1,12 @@
 "use client";
 import { useRef, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 function WaveParticles() {
   const ref = useRef<THREE.Points>(null);
+  const groupRef = useRef<THREE.Group>(null);
+  const { pointer } = useThree();
   const count = 2000;
 
   const positions = useMemo(() => {
@@ -30,15 +32,24 @@ function WaveParticles() {
       pos[i * 3 + 1] = Math.sin(x * 0.5 + t * 0.8) * 0.3 + Math.cos(z * 0.4 + t * 0.6) * 0.2;
     }
     geo.attributes.position.needsUpdate = true;
+
+    if (groupRef.current) {
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, pointer.x * 0.5, 0.06);
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -pointer.y * 0.3, 0.06);
+      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, pointer.x * 1.0, 0.04);
+      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, pointer.y * 0.5, 0.04);
+    }
   });
 
   return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial size={0.025} color="#00e5ff" transparent opacity={0.35} sizeAttenuation />
-    </points>
+    <group ref={groupRef}>
+      <points ref={ref}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        </bufferGeometry>
+        <pointsMaterial size={0.025} color="#00e5ff" transparent opacity={0.35} sizeAttenuation />
+      </points>
+    </group>
   );
 }
 

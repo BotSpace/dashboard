@@ -16,7 +16,7 @@ export function Hero() {
   return (
     <section className="relative min-h-screen overflow-hidden" style={{ background: BG }}>
       {/* 3D canvas */}
-      <div className="pointer-events-none absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0">
         <HeroScene />
       </div>
 
@@ -35,7 +35,7 @@ export function Hero() {
       />
 
       {/* Content overlay */}
-      <div className="container-page relative z-10 flex min-h-screen flex-col items-center justify-center pb-24 pt-36">
+      <div className="container-page pointer-events-none relative z-10 flex min-h-screen flex-col items-center justify-center pb-24 pt-36">
         <div className="mx-auto max-w-4xl text-center">
 
           {/* Badge */}
@@ -101,7 +101,7 @@ export function Hero() {
           >
             <Link
               href="/login"
-              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full px-8 py-3.5 text-sm font-bold text-white transition-transform hover:scale-[1.04] active:scale-[0.98]"
+              className="pointer-events-auto group relative inline-flex items-center gap-2 overflow-hidden rounded-full px-8 py-3.5 text-sm font-bold text-white transition-transform hover:scale-[1.04] active:scale-[0.98]"
               style={{
                 background: "linear-gradient(135deg, #00c8ff 0%, #7c3aed 100%)",
                 boxShadow: "0 0 40px rgba(0,200,255,0.25), 0 0 80px rgba(124,58,237,0.12), inset 0 1px 0 rgba(255,255,255,0.15)",
@@ -112,7 +112,7 @@ export function Hero() {
             </Link>
             <a
               href="#features"
-              className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-medium text-white/50 transition-all hover:text-white/80 hover:bg-white/[0.03]"
+              className="pointer-events-auto inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-medium text-white/50 transition-all hover:text-white/80 hover:bg-white/[0.03]"
               style={{ border: "1px solid rgba(255,255,255,0.08)" }}
             >
               {t("ctaSecondary")}
