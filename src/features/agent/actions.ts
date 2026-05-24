@@ -78,9 +78,9 @@ export async function getRunStatusAction(args: {
   }
 }
 
-export async function getUsageAction(): Promise<AgentUsage | null> {
+export async function getUsageAction(projectId: string): Promise<AgentUsage | null> {
   try {
-    return await getAgentUsage();
+    return await getAgentUsage(projectId);
   } catch {
     return null;
   }

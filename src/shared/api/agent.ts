@@ -125,6 +125,7 @@ export function agentEventStreamUrl(
 
 export type AgentUsage = {
   user_id: string;
+  project_id: string;
   limit: number;
   used: number;
   remaining: number;
@@ -135,8 +136,8 @@ export type AgentUsage = {
   token_reset_at?: string | null;
 };
 
-export async function getAgentUsage(): Promise<AgentUsage> {
-  const res = await agentFetch("/usage");
+export async function getAgentUsage(projectId: string): Promise<AgentUsage> {
+  const res = await agentFetch(`/usage?project_id=${encodeURIComponent(projectId)}`);
   if (!res.ok) throw new Error(`agent usage failed: ${res.status}`);
   return res.json();
 }
