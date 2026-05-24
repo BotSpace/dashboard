@@ -22,13 +22,13 @@ export default async function AgentPage({
 
   return (
     <div className="flex h-[calc(100vh-7rem)] flex-col gap-4">
-      <header className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-            <Sparkles className="h-5 w-5 text-primary" />
-            {t("title")}
+      <header className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight sm:text-2xl">
+            <Sparkles className="h-5 w-5 shrink-0 text-primary" />
+            <span className="truncate">{t("title")}</span>
           </h1>
-          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+          <p className="hidden text-sm text-muted-foreground sm:block">{t("subtitle")}</p>
         </div>
         <ProjectPicker projects={projects} current={projectId} />
       </header>

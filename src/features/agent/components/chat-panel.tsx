@@ -235,13 +235,13 @@ function ChatThread({
   return (
     <>
       <div className="flex h-full min-h-0 flex-col rounded-lg border bg-card">
-        <div className="flex items-center gap-2 border-b px-4 py-3">
-          <Sparkles className="h-4 w-4 text-primary" />
-          <div className="text-sm font-medium">BotSpace Agent</div>
-          <div className="ml-2">
+        <div className="flex items-center gap-2 border-b px-3 py-2">
+          <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+          <div className="hidden text-sm font-medium sm:block">BotSpace Agent</div>
+          <div className="shrink-0">
             <RunStatusChip phase={stream.phase} currentTool={null} />
           </div>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-2">
             <UsageBadge refreshKey={usageKey} />
             {requestId && (
               <code className="hidden text-[10px] text-muted-foreground sm:inline">
@@ -351,9 +351,9 @@ function ChatThread({
             )}
           </div>
           {isRunning && (
-            <div className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-              Agent javob tayyorlamoqda — qizil tugmani bosib to'xtatishingiz mumkin
+            <div className="mt-2 flex items-center gap-1.5 overflow-hidden text-[11px] text-muted-foreground">
+              <span className="inline-block h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
+              <span className="truncate">Agent javob tayyorlamoqda — qizil tugmani bosib to'xtatishingiz mumkin</span>
             </div>
           )}
         </div>
@@ -369,10 +369,8 @@ function ChatThread({
 }
 
 function PlanSidebar({ plan }: { plan: Parameters<typeof PlanPanel>[0]["plan"] }) {
-  // Rendered via React portal would be cleaner, but the grid layout places the
-  // sibling slot in column 3 — this fragment renders into that slot directly.
   return (
-    <aside className="space-y-3">
+    <aside className={`space-y-3 ${plan.length === 0 ? "hidden lg:block" : ""}`}>
       <PlanPanel plan={plan} />
     </aside>
   );

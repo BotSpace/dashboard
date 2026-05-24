@@ -29,7 +29,7 @@ export function ThreadsPicker({ threads, activeId, onSelect, onNew, onDelete }: 
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 gap-1.5">
           <MessageSquare className="h-3.5 w-3.5 text-primary" />
-          <span className="max-w-[220px] truncate">{label}</span>
+          <span className="max-w-[80px] truncate sm:max-w-[180px]">{label}</span>
           <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
