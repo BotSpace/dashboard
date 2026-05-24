@@ -1,26 +1,13 @@
 import "server-only";
 import { env } from "@/shared/lib/env";
 import { readSession } from "@/shared/auth/session";
-import { SignJWT } from "jose";
 
 const AGENT_BASE = (env.NEXT_PUBLIC_AGENT_URL ?? "http://localhost:8100").replace(/\/$/, "");
 
 async function buildBearer(): Promise<string | null> {
   const session = await readSession();
-  if (!session) return null;
-  // Sign a short-lived JWT containing user+access for the agent.
-  const secret = new TextEncoder().encode(env.SESSION_SECRET);
-  const token = await new SignJWT({
-    user: { id: session.user.id },
-    sub: String(session.user.id),
-    access: session.access,
-    refresh: session.refresh,
-  })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("15m")
-    .sign(secret);
-  return token;
+  if (!session?.access) return null;
+  return session.access;
 }
 
 async function agentFetch(path: string, init?: RequestInit): Promise<Response> {
