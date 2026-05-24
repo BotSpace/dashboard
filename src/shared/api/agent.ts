@@ -27,6 +27,19 @@ async function agentFetch(path: string, init?: RequestInit): Promise<Response> {
   });
 }
 
+async function errorMessage(res: Response, fallback: string): Promise<string> {
+  try {
+    const body = await res.json();
+    const detail = body?.detail;
+    if (typeof detail === "string") return detail;
+    if (typeof detail?.message === "string") return detail.message;
+    if (typeof body?.message === "string") return body.message;
+  } catch {
+    // Ignore malformed/non-JSON error bodies and use the caller's fallback.
+  }
+  return fallback;
+}
+
 export type AgentRunCreate = {
   prompt: string;
   thread_id?: string;
@@ -51,7 +64,7 @@ export async function createAgentRun(
     method: "POST",
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`agent create_run failed: ${res.status}`);
+  if (!res.ok) throw new Error(await errorMessage(res, `agent create_run failed: ${res.status}`));
   return res.json();
 }
 
@@ -112,9 +125,14 @@ export function agentEventStreamUrl(
 
 export type AgentUsage = {
   user_id: string;
-  used_today: number;
   limit: number;
+  used: number;
   remaining: number;
+  input_used: number;
+  output_used: number;
+  plan?: { id?: number | string; name?: string; display?: string } | string | null;
+  status?: string | null;
+  token_reset_at?: string | null;
 };
 
 export async function getAgentUsage(): Promise<AgentUsage> {
