@@ -56,7 +56,7 @@ export function UsageBadge({ refreshKey }: Props) {
         />
       </div>
       <span className={`text-[11px] tabular-nums ${color}`}>
-        {formatTokens(remaining)} token
+        {formatTokens(used)}/{formatTokens(limit)} - {formatTokens(remaining)} qoldi
       </span>
     </div>
   );

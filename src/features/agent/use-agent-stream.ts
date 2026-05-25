@@ -25,6 +25,7 @@ type State = {
   plan: PlanItem[];
   approval: ApprovalPayload | null;
   clarify: ClarifyPayload | null;
+  usageRefreshTick: number;
   finished: boolean;
   error: string | null;
   thinking: string;
@@ -44,6 +45,7 @@ export function useAgentStream({
     plan: [],
     approval: null,
     clarify: null,
+    usageRefreshTick: 0,
     finished: false,
     error: null,
     thinking: "",
@@ -205,6 +207,10 @@ export function useAgentStream({
             next.phase = "thinking";
             break;
           }
+          case "usage_updated": {
+            next.usageRefreshTick = s.usageRefreshTick + 1;
+            break;
+          }
           case "run_completed":
           case "run_failed":
           case "close":
@@ -246,6 +252,7 @@ export function useAgentStream({
       "approval_resolved",
       "clarification_required",
       "clarification_resolved",
+      "usage_updated",
       "run_completed",
       "run_failed",
       "close",

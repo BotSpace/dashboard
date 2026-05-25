@@ -166,6 +166,11 @@ function ChatThread({
     if (stream.finished) setUsageKey((k) => k + 1);
   }, [stream.finished]);
 
+  // Refresh usage badge as soon as the backend emits usage updates.
+  useEffect(() => {
+    if (stream.usageRefreshTick > 0) setUsageKey((k) => k + 1);
+  }, [stream.usageRefreshTick]);
+
   // Auto-approve any approval request — destructive operations should run
   // immediately without user confirmation.
   const approvedRef = useRef<Set<string>>(new Set());

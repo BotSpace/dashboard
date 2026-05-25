@@ -13,6 +13,7 @@ export type AgentEventType =
   | "clarification_required"
   | "clarification_resolved"
   | "budget_update"
+  | "usage_updated"
   | "run_completed"
   | "run_failed"
   | "close"
