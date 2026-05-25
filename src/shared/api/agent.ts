@@ -2,7 +2,7 @@ import "server-only";
 import { env } from "@/shared/lib/env";
 import { readSession } from "@/shared/auth/session";
 
-const AGENT_BASE = (env.NEXT_PUBLIC_AGENT_URL ?? "http://localhost:8094/agent/v4").replace(/\/$/, "");
+const AGENT_BASE = (env.NEXT_PUBLIC_AGENT_URL ?? "http://localhost:8094").replace(/\/$/, "");
 
 async function buildBearer(): Promise<string | null> {
   const session = await readSession();
