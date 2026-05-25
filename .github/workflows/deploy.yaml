@@ -36,7 +36,7 @@ jobs:
         run: |
           cat > .env.production <<EOF
           NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL || 'https://api.botmother.uz' }}
-          NEXT_PUBLIC_AGENT_URL=${{ vars.NEXT_PUBLIC_AGENT_URL || 'https://api.botmother.uz/api/agent' }}
+          NEXT_PUBLIC_AGENT_URL=${{ vars.NEXT_PUBLIC_AGENT_URL || 'https://api.botmother.uz/api/agent/v4' }}
           NEXT_PUBLIC_CONSTRUCTOR_URL=${{ vars.NEXT_PUBLIC_CONSTRUCTOR_URL || 'https://botspace.uz/constructor' }}
           NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL || 'https://botspace.uz' }}
           NEXT_PUBLIC_TELEGRAM_BOT=${{ vars.NEXT_PUBLIC_TELEGRAM_BOT || 'botmother_authbot' }}

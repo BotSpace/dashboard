@@ -22,7 +22,7 @@ configMaps:
     NODE_ENV: "production"
     PORT: "3010"
     NEXT_PUBLIC_API_URL: "https://api.botspace.uz"
-    NEXT_PUBLIC_AGENT_URL: "https://api.botspace.uz/api/agent"
+    NEXT_PUBLIC_AGENT_URL: "https://api.botspace.uz/api/agent/v4"
     NEXT_PUBLIC_CONSTRUCTOR_URL: "https://botspace.uz/constructor"
     NEXT_PUBLIC_SITE_URL: "https://botspace.uz"
     NEXT_PUBLIC_TELEGRAM_BOT: "botmother_authbot"
