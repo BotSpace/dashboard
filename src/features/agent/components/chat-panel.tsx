@@ -290,6 +290,17 @@ function ChatThread({
             return <ToolStrip key={item.id} calls={item.calls} pending={item.pending} />;
           })}
 
+          {stream.thinking && stream.phase === "thinking" && (
+            <div className="flex gap-3">
+              <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                <Bot className="h-3.5 w-3.5" />
+              </div>
+              <div className="flex-1 whitespace-pre-wrap text-sm text-muted-foreground">
+                {stream.thinking}
+              </div>
+            </div>
+          )}
+
           <TypingIndicator phase={stream.phase} currentTool={null} />
 
           {stream.error && (
