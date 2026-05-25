@@ -80,10 +80,53 @@ export function ToolStrip({ calls, pending }: Props) {
                   {c.result}
                 </pre>
               )}
+              {renderNestedActions(c)}
             </li>
           ))}
         </ul>
       )}
     </div>
   );
+}
+
+function renderNestedActions(call: ToolCallView) {
+  const commands = Array.isArray(call.data?.commands)
+    ? (call.data.commands as Array<Record<string, unknown>>)
+    : [];
+  if (!commands.length) return null;
+
+  return (
+    <div className="mt-2 space-y-1.5">
+      <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground/70">
+        AI build actions
+      </div>
+      <ul className="space-y-1">
+        {commands.map((command, index) => {
+          const action = typeof command.action === "string" ? command.action : "action";
+          const summary = summarizeCommand(command);
+          return (
+            <li key={`${call.id}:cmd:${index}`} className="rounded-sm border border-border/40 bg-muted/30 px-2 py-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-muted-foreground/70">#{index + 1}</span>
+                <code className="font-mono text-[10px] text-foreground">{action}</code>
+                {summary ? <span className="truncate text-[10px] text-muted-foreground">{summary}</span> : null}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function summarizeCommand(command: Record<string, unknown>): string {
+  const parts: string[] = [];
+  for (const key of ["key", "name", "text", "source", "target", "after", "on", "node_type"]) {
+    const value = command[key];
+    if (typeof value !== "string" || !value) continue;
+    const compact = value.replace(/\s+/g, " ").trim();
+    parts.push(`${key}=${compact.length > 48 ? `${compact.slice(0, 48)}...` : compact}`);
+    if (parts.length >= 2) break;
+  }
+  return parts.join(" ");
 }

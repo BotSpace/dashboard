@@ -15,12 +15,17 @@ async function agentFetch(path: string, init?: RequestInit): Promise<Response> {
   if (!bearer) {
     throw new Error("Not authenticated");
   }
+  const baseHeaders: Record<string, string> = {
+    Accept: init?.headers ? (init.headers as Record<string, string>).Accept ?? "application/json" : "application/json",
+    Authorization: `Bearer ${bearer}`,
+  };
+  if (init?.body !== undefined) {
+    baseHeaders["Content-Type"] = "application/json";
+  }
   return fetch(AGENT_BASE + path, {
     ...init,
     headers: {
-      "Content-Type": "application/json",
-      Accept: init?.headers ? (init.headers as Record<string, string>).Accept ?? "application/json" : "application/json",
-      Authorization: `Bearer ${bearer}`,
+      ...baseHeaders,
       ...(init?.headers ?? {}),
     },
     cache: "no-store",
