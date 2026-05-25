@@ -244,7 +244,7 @@ function ChatThread({
           <Sparkles className="h-4 w-4 shrink-0 text-primary" />
           <div className="hidden text-sm font-medium sm:block">BotSpace Agent</div>
           <div className="shrink-0">
-            <RunStatusChip phase={stream.phase} currentTool={null} />
+            <RunStatusChip phase={stream.phase} currentTool={stream.currentTool} />
           </div>
           <div className="ml-auto flex shrink-0 items-center gap-2">
             <UsageBadge refreshKey={usageKey} />

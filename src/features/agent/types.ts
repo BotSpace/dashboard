@@ -40,6 +40,7 @@ export type ToolCallView = {
   result?: string;
   isError?: boolean;
   data?: Record<string, unknown> | null;
+  hidden?: boolean;
 };
 
 export type ChatTurn =

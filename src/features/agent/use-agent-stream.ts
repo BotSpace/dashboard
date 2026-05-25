@@ -150,17 +150,37 @@ export function useAgentStream({
               id?: string;
               name?: string;
               arguments?: Record<string, unknown>;
+              hidden?: boolean;
             };
             if (!p.id || !p.name) break;
             const view: ToolCallView = {
               id: p.id,
               name: p.name,
               arguments: p.arguments ?? {},
+              hidden: Boolean(p.hidden),
             };
             toolViewMap.current[p.id] = view;
-            next.turns = [...s.turns, { kind: "tool", id: `t-${p.id}`, call: view }];
-            next.phase = "tool";
-            next.currentTool = p.name;
+            if (!view.hidden) {
+              next.turns = [...s.turns, { kind: "tool", id: `t-${p.id}`, call: view }];
+              next.phase = "tool";
+              next.currentTool = p.name;
+            }
+            break;
+          }
+          case "plan_set": {
+            const p = ev.payload as { plan?: PlanItem[] };
+            if (Array.isArray(p.plan)) next.plan = p.plan;
+            next.phase = "thinking";
+            break;
+          }
+          case "plan_update": {
+            const p = ev.payload as { plan?: PlanItem[]; item?: PlanItem };
+            if (Array.isArray(p.plan)) {
+              next.plan = p.plan;
+            } else if (p.item?.id) {
+              next.plan = s.plan.map((item) => (item.id === p.item?.id ? p.item : item));
+            }
+            next.phase = "thinking";
             break;
           }
           case "tool_result": {
@@ -169,11 +189,12 @@ export function useAgentStream({
               content?: string;
               is_error?: boolean;
               data?: Record<string, unknown>;
+              hidden?: boolean;
             };
             const id = p.tool_call_id;
             if (!id) break;
             const view = toolViewMap.current[id];
-            if (view) {
+            if (view && !view.hidden) {
               view.result = p.content;
               view.isError = p.is_error;
               view.data = p.data ?? null;
@@ -182,9 +203,11 @@ export function useAgentStream({
               const plan = (p.data as { plan?: PlanItem[] }).plan;
               if (Array.isArray(plan)) next.plan = plan;
             }
-            next.turns = [...s.turns];
-            next.phase = "thinking";
-            next.currentTool = null;
+            if (!Boolean(p.hidden)) {
+              next.turns = [...s.turns];
+              next.phase = "thinking";
+              next.currentTool = null;
+            }
             break;
           }
           case "approval_required": {
