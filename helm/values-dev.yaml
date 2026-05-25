@@ -9,7 +9,7 @@ configMaps:
     NODE_ENV: "development"
     PORT: "3010"
     NEXT_PUBLIC_API_URL: "https://api-dev.botspace.uz/api"
-    NEXT_PUBLIC_AGENT_URL: "https://api-dev.botspace.uz/api/agent/v4"
+    NEXT_PUBLIC_AGENT_URL: "https://api-dev.botspace.uz/api/agent/v3"
     NEXT_PUBLIC_CONSTRUCTOR_URL: "https://dev.botspace.uz/constructor"
     NEXT_PUBLIC_SITE_URL: "https://dev.botspace.uz"
     NEXT_PUBLIC_TELEGRAM_BOT: "botmother_authbot"

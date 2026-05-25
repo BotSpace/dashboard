@@ -33,9 +33,14 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
   ]);
 
   const currentPlanName = (subscription as { plan?: { name?: string } })?.plan?.name ?? "free";
-  const tokensUsed = usage?.ai_token_usage?.used ?? usage?.tokens_used_output ?? 0;
-  const tokensLimit = usage?.ai_token_usage?.limit ?? usage?.tokens_limit_output ?? 200_000;
+  const tokensUsed =
+    usage?.ai_token_usage?.used ?? (usage ? usage.tokens_used_input + usage.tokens_used_output : 0);
+  const tokensLimit =
+    usage?.ai_token_usage?.limit ??
+    (usage ? usage.tokens_limit_input + usage.tokens_limit_output : 200_000);
   const tokensRemaining = usage?.ai_token_usage?.remaining ?? usage?.tokens_remaining ?? tokensLimit;
+  const inputUsed = usage?.ai_token_usage?.input_used ?? usage?.tokens_used_input ?? 0;
+  const outputUsed = usage?.ai_token_usage?.output_used ?? usage?.tokens_used_output ?? 0;
   const botsCount = usage?.bots_count ?? 0;
   const maxBots = usage?.max_bots ?? 1;
   const tokenPct = tokensLimit > 0 ? (tokensUsed / tokensLimit) * 100 : 0;
@@ -81,6 +86,9 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
             <p className="text-xs text-muted-foreground">
               Qolgan: {formatTokens(tokensRemaining)} token
             </p>
+            <p className="text-xs text-muted-foreground">
+              Input: {formatTokens(inputUsed)} · Output: {formatTokens(outputUsed)}
+            </p>
           </CardContent>
         </Card>
 
@@ -106,7 +114,9 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
             const isCurrent = p.name === currentPlanName;
             const Icon = PLAN_ICONS[p.name] ?? Zap;
             const planMaxBots = (p as { max_bots?: number }).max_bots ?? 1;
-            const planMaxTokens = (p as { max_output_tokens?: number }).max_output_tokens ?? 200_000;
+            const planMaxTokens =
+              ((p as { max_input_tokens?: number }).max_input_tokens ?? 0) +
+                ((p as { max_output_tokens?: number }).max_output_tokens ?? 0) || 200_000;
 
             return (
               <Card
