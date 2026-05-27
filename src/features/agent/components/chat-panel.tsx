@@ -410,7 +410,7 @@ function ChatThread({
               )}
 
               {stream.plan.length > 0 && (
-                <div className="mx-auto max-w-xl">
+                <div className="ml-11 max-w-md">
                   <PlanPanel plan={stream.plan} />
                 </div>
               )}
