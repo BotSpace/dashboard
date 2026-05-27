@@ -21,7 +21,6 @@ export function UsageBadge({ refreshKey }: Props) {
 
   const { used, limit, remaining } = usage;
   const pct = limit > 0 ? (used / limit) * 100 : 0;
-  const plan = typeof usage.plan === "string" ? usage.plan : usage.plan?.display ?? usage.plan?.name;
 
   const formatTokens = (value: number) => {
     if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
@@ -35,28 +34,25 @@ export function UsageBadge({ refreshKey }: Props) {
       : pct >= 80
       ? "text-amber-500"
       : "text-muted-foreground";
+
+  const barColor =
+    remaining === 0 ? "bg-destructive" : pct >= 80 ? "bg-amber-500" : "bg-primary";
+
   const title = [
-    `Token ishlatildi: ${used.toLocaleString()} / ${limit.toLocaleString()}`,
+    `Token: ${used.toLocaleString()} / ${limit.toLocaleString()}`,
     `Qoldi: ${remaining.toLocaleString()}`,
-    `Input: ${usage.input_used.toLocaleString()}`,
-    `Output: ${usage.output_used.toLocaleString()}`,
-    plan ? `Tarif: ${plan}` : null,
-  ]
-    .filter(Boolean)
-    .join(". ");
+  ].join(" · ");
 
   return (
-    <div className="flex items-center gap-1.5" title={title}>
-      <div className="relative h-1.5 w-14 overflow-hidden rounded-full bg-muted">
+    <div className="hidden items-center gap-1.5 sm:flex" title={title}>
+      <div className="relative h-1.5 w-10 overflow-hidden rounded-full bg-muted">
         <div
-          className={`h-full rounded-full transition-all ${
-            remaining === 0 ? "bg-destructive" : pct >= 80 ? "bg-amber-500" : "bg-primary"
-          }`}
+          className={`h-full rounded-full transition-all ${barColor}`}
           style={{ width: `${Math.min(pct, 100)}%` }}
         />
       </div>
-      <span className={`text-[11px] tabular-nums ${color}`}>
-        {formatTokens(used)}/{formatTokens(limit)} - {formatTokens(remaining)} qoldi
+      <span className={`text-[10px] tabular-nums ${color}`}>
+        {formatTokens(remaining)}
       </span>
     </div>
   );

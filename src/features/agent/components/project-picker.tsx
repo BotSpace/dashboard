@@ -30,25 +30,26 @@ export function ProjectPicker({ projects, current }: Props) {
     router.refresh();
   };
 
+  const currentProject = projects.find((p) => String(p.id) === current);
   const currentLabel =
     current === "global"
-      ? "Umumiy (loyiha tanlanmagan)"
-      : projects.find((p) => String(p.id) === current)?.name ?? `Loyiha #${current}`;
+      ? "Umumiy"
+      : currentProject?.name ?? `#${current}`;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1.5">
+        <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs">
           {current === "global" ? (
             <Globe className="h-3.5 w-3.5 text-muted-foreground" />
           ) : (
             <Bot className="h-3.5 w-3.5 text-primary" />
           )}
-          <span className="max-w-[180px] truncate">{currentLabel}</span>
-          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+          <span className="hidden max-w-[100px] truncate sm:inline">{currentLabel}</span>
+          <ChevronDown className="h-3 w-3 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-72">
+      <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel>Loyiha tanlash</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => select("global")} className="gap-2">
@@ -63,14 +64,14 @@ export function ProjectPicker({ projects, current }: Props) {
             className="gap-2"
           >
             <Bot className="h-4 w-4 text-primary" />
-            <div className="flex flex-1 items-center justify-between gap-2">
-              <span className="truncate">{p.name}</span>
-              <code className="text-[10px] text-muted-foreground">#{p.id}</code>
-            </div>
+            <span className="flex-1 truncate">{p.name}</span>
+            <code className="text-[10px] text-muted-foreground">#{p.id}</code>
           </DropdownMenuItem>
         ))}
         {projects.length === 0 && (
-          <DropdownMenuItem disabled>(loyihalar topilmadi)</DropdownMenuItem>
+          <DropdownMenuItem disabled className="text-xs text-muted-foreground">
+            Loyihalar topilmadi
+          </DropdownMenuItem>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,5 +1,6 @@
 "use client";
 import { Bot, Loader2, Wrench } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/shared/lib/utils";
 
 type Phase = "idle" | "queued" | "thinking" | "tool" | "waiting" | "done" | "error";
@@ -13,8 +14,8 @@ function label(phase: Phase, tool: string | null): string {
   if (phase === "queued") return "Boshlanmoqda…";
   if (phase === "tool" && tool) return `${tool} bajarilmoqda…`;
   if (phase === "tool") return "Tool ishlamoqda…";
-  if (phase === "thinking") return "Agent o'ylamoqda…";
-  if (phase === "waiting") return "Foydalanuvchi javobi kutilmoqda";
+  if (phase === "thinking") return "O'ylamoqda…";
+  if (phase === "waiting") return "Javob kutilmoqda";
   return "";
 }
 
@@ -22,38 +23,42 @@ export function TypingIndicator({ phase, currentTool }: Props) {
   if (phase === "idle" || phase === "done" || phase === "error") return null;
 
   return (
-    <div className="flex items-center gap-3">
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex items-start gap-3"
+    >
       <div
         className={cn(
-          "grid h-7 w-7 shrink-0 place-items-center rounded-full",
-          phase === "tool" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400" : "bg-primary/10 text-primary"
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+          phase === "tool"
+            ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+            : "bg-gradient-to-br from-primary/20 to-primary/5 text-primary"
         )}
       >
-        {phase === "tool" ? <Wrench className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
+        {phase === "tool" ? <Wrench className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
       </div>
-      <div className="flex items-center gap-2 rounded-md bg-muted/40 px-3 py-2">
+      <div className="flex items-center gap-2.5 rounded-2xl bg-muted/40 px-4 py-2.5">
         <Dots />
         <span className="text-xs text-muted-foreground">{label(phase, currentTool)}</span>
         {phase !== "waiting" && (
-          <Loader2 className="ml-1 h-3 w-3 animate-spin text-muted-foreground" />
+          <Loader2 className="h-3 w-3 animate-spin text-muted-foreground/60" />
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function Dots() {
   return (
     <span className="inline-flex items-center gap-1">
-      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-60 [animation-delay:-0.3s]" />
-      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-60 [animation-delay:-0.15s]" />
-      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-60" />
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50 [animation-delay:-0.3s]" />
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50 [animation-delay:-0.15s]" />
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50" />
     </span>
   );
 }
 
-
-// Header chip — used in the chat panel toolbar
 export function RunStatusChip({ phase, currentTool }: Props) {
   if (phase === "idle" || phase === "done") return null;
   const color =
@@ -71,18 +76,23 @@ export function RunStatusChip({ phase, currentTool }: Props) {
         : phase === "queued"
           ? "Navbatda"
           : phase === "tool"
-            ? `Tool: ${currentTool ?? "…"}`
+            ? `${currentTool ?? "Tool"}`
             : "Ishlamoqda";
 
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-medium", color)}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium",
+        color
+      )}
+    >
       <span
         className={cn(
           "h-1.5 w-1.5 rounded-full bg-current",
           phase !== "error" && "animate-pulse"
         )}
       />
-      {text}
+      <span className="hidden sm:inline">{text}</span>
     </span>
   );
 }

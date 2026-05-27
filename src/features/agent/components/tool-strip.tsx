@@ -1,19 +1,15 @@
 "use client";
 import { useState } from "react";
 import { ChevronRight, ChevronDown, Loader2, Wrench, CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/shared/lib/utils";
 import type { ToolCallView } from "../types";
 
 type Props = {
   calls: ToolCallView[];
-  /** True if the very last call in this group is still running. */
   pending: boolean;
 };
 
-/**
- * Compact "Worked …" strip that groups consecutive tool turns into a single
- * foldable line — no border, no card, blends with the chat background.
- */
 export function ToolStrip({ calls, pending }: Props) {
   const [open, setOpen] = useState(false);
   if (!calls.length) return null;
@@ -23,11 +19,18 @@ export function ToolStrip({ calls, pending }: Props) {
   const count = calls.length;
 
   return (
-    <div className="ml-10 text-xs text-muted-foreground">
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="ml-11 text-xs"
+    >
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-2 py-1 hover:text-foreground"
+        className={cn(
+          "inline-flex items-center gap-2 rounded-lg px-3 py-1.5 transition-colors",
+          "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+        )}
       >
         {open ? (
           <ChevronDown className="h-3 w-3" />
@@ -41,51 +44,61 @@ export function ToolStrip({ calls, pending }: Props) {
         ) : (
           <CheckCircle2 className="h-3 w-3 text-emerald-500" />
         )}
-        <span>{pending ? "Ishlamoqda" : "Bajarildi"} ·</span>
-        <code className={cn("font-mono text-foreground", pending && "text-primary")}>
+        <span>{pending ? "Ishlamoqda" : "Bajarildi"}</span>
+        <code className={cn("font-mono font-medium", pending && "text-primary")}>
           {last.name}
         </code>
         {count > 1 && (
-          <span>
-            {pending ? `(${count - 1} ta tugadi)` : `(+${count - 1} boshqa)`}
+          <span className="text-muted-foreground/70">
+            {pending ? `(${count - 1} ta tugadi)` : `(+${count - 1})`}
           </span>
         )}
       </button>
 
-      {open && (
-        <ul className="mt-1 space-y-3 pl-5">
-          {calls.map((c, i) => (
-            <li key={c.id} className="text-xs">
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground/70">#{i + 1}</span>
-                <code
-                  className={cn(
-                    "font-mono font-medium",
-                    c.isError ? "text-destructive" : "text-foreground"
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.15 }}
+            className="mt-1.5 space-y-2 overflow-hidden pl-3"
+          >
+            {calls.map((c, i) => (
+              <li key={c.id} className="rounded-lg border bg-card/50 px-3 py-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-4 w-4 items-center justify-center rounded bg-muted text-[9px] font-medium text-muted-foreground">
+                    {i + 1}
+                  </span>
+                  <code
+                    className={cn(
+                      "font-mono font-medium",
+                      c.isError ? "text-destructive" : "text-foreground"
+                    )}
+                  >
+                    {c.name}
+                  </code>
+                  {c.result === undefined && (
+                    <Loader2 className="ml-auto h-3 w-3 animate-spin text-primary" />
                   )}
-                >
-                  {c.name}
-                </code>
-                {c.result === undefined && (
-                  <Loader2 className="ml-1 h-3 w-3 animate-spin text-primary" />
+                </div>
+                {Object.keys(c.arguments ?? {}).length > 0 && (
+                  <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap rounded-md bg-muted/50 p-2 text-[10px] text-muted-foreground">
+                    {JSON.stringify(c.arguments, null, 2)}
+                  </pre>
                 )}
-              </div>
-              {Object.keys(c.arguments ?? {}).length > 0 && (
-                <pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-[10px] text-muted-foreground">
-                  {JSON.stringify(c.arguments, null, 2)}
-                </pre>
-              )}
-              {c.result !== undefined && (
-                <pre className="mt-1 max-h-32 overflow-y-auto overflow-x-auto whitespace-pre-wrap text-[10px] text-muted-foreground/90">
-                  {c.result}
-                </pre>
-              )}
-              {renderNestedActions(c)}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+                {c.result !== undefined && (
+                  <pre className="mt-1.5 max-h-28 overflow-y-auto overflow-x-auto whitespace-pre-wrap rounded-md bg-muted/50 p-2 text-[10px] text-muted-foreground/80">
+                    {c.result}
+                  </pre>
+                )}
+                {renderNestedActions(c)}
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 
@@ -96,18 +109,18 @@ function renderNestedActions(call: ToolCallView) {
   if (!commands.length) return null;
 
   return (
-    <div className="mt-2 space-y-1.5">
-      <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground/70">
+    <div className="mt-2 space-y-1">
+      <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground/60">
         AI build actions
       </div>
-      <ul className="space-y-1">
+      <ul className="space-y-0.5">
         {commands.map((command, index) => {
           const action = typeof command.action === "string" ? command.action : "action";
           const summary = summarizeCommand(command);
           return (
-            <li key={`${call.id}:cmd:${index}`} className="rounded-sm border border-border/40 bg-muted/30 px-2 py-1">
+            <li key={`${call.id}:cmd:${index}`} className="rounded-md bg-muted/40 px-2 py-1">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-foreground/70">#{index + 1}</span>
+                <span className="text-[10px] text-muted-foreground/60">#{index + 1}</span>
                 <code className="font-mono text-[10px] text-foreground">{action}</code>
                 {summary ? <span className="truncate text-[10px] text-muted-foreground">{summary}</span> : null}
               </div>
