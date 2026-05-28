@@ -1,90 +1,54 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { SectionWrapper } from "./section-wrapper";
 
-const faqs = [
-  {
-    q: "BotSpace bepulmi?",
-    a: "Ha, Free tarif bilan 1 ta bot va oyiga 200K AI token bepul. Karta talab qilinmaydi.",
-  },
-  {
-    q: "Kod yozish kerakmi?",
-    a: "Yo'q. Vizual konstruktor yoki AI agent bilan tabiiy tilda bot yaratishingiz mumkin.",
-  },
-  {
-    q: "Qanday to'lov usullari bor?",
-    a: "Payme, Click va xalqaro kartalar (Visa/Mastercard) orqali to'lash mumkin.",
-  },
-  {
-    q: "AI agent nima qila oladi?",
-    a: "Flow tuzadi, node qo'shadi, deploy qiladi, CRM boshqaradi, broadcast yuboradi — barchasi tabiiy tilda.",
-  },
-  {
-    q: "Botni boshqa platformalarga ulasa bo'ladimi?",
-    a: "Hozircha Telegram to'liq qo'llab-quvvatlanadi. Boshqa kanallar tez orada qo'shiladi.",
-  },
-  {
-    q: "MCP server nima?",
-    a: "Claude Desktop yoki Cursor kabi AI agentlar orqali BotSpace platformasini boshqarish imkonini beradi.",
-  },
-];
-
 export function FAQ() {
-  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const t = useTranslations("landing.faq");
+  const items = t.raw("items") as { q: string; a: string }[];
+  const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <SectionWrapper
-      className="relative py-24 md:py-32"
-      style={{ background: "#030308" }}
-    >
-      <div className="container-page">
+    <SectionWrapper className="relative isolate bg-deep py-28 md:py-36">
+      <div className="spot-orb spot-cyan left-1/2 top-[20%] h-[360px] w-[700px] -translate-x-1/2 opacity-[0.18]" />
+
+      <div className="container-page relative">
         <div className="mx-auto max-w-2xl text-center">
-          <h2
-            className="text-3xl font-bold tracking-tight md:text-4xl"
-            style={{
-              background: "linear-gradient(135deg, #fff 40%, #06b6d4 100%)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
-            }}
-          >
-            Ko&apos;p beriladigan savollar
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-white/55">
+            <span className="h-1 w-1 rounded-full bg-cyan-300" />
+            {t("eyebrow")}
+          </div>
+          <h2 className="display mt-5 text-3xl font-semibold text-white md:text-4xl lg:text-[44px]">
+            {t("title")}
           </h2>
         </div>
 
-        <div className="mx-auto mt-12 max-w-2xl space-y-3">
-          {faqs.map((faq, i) => {
+        <div className="mx-auto mt-12 max-w-3xl divide-y divide-white/[0.07] rounded-2xl border border-white/[0.07]"
+          style={{
+            background: "linear-gradient(180deg, rgba(255,255,255,0.015) 0%, rgba(255,255,255,0.005) 100%)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+          }}
+        >
+          {items.map((item, i) => {
             const isOpen = openIdx === i;
             return (
-              <motion.div
-                key={i}
-                initial={false}
-                animate={{
-                  background: isOpen
-                    ? "rgba(255,255,255,0.03)"
-                    : "rgba(255,255,255,0.015)",
-                  borderColor: isOpen
-                    ? "rgba(14,165,233,0.15)"
-                    : "rgba(255,255,255,0.05)",
-                }}
-                className="overflow-hidden rounded-xl"
-                style={{ border: "1px solid" }}
-                transition={{ duration: 0.25 }}
-              >
+              <div key={i} className="overflow-hidden">
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : i)}
-                  className="flex w-full items-center justify-between px-5 py-4 text-left"
+                  className="group flex w-full items-center justify-between gap-6 px-6 py-5 text-left transition-colors hover:bg-white/[0.018]"
                   aria-expanded={isOpen}
                 >
-                  <span className="text-sm font-medium text-white/80">{faq.q}</span>
+                  <span className={`text-[15px] font-medium transition-colors ${isOpen ? "text-white" : "text-white/80 group-hover:text-white/95"}`}>
+                    {item.q}
+                  </span>
                   <motion.span
-                    animate={{ rotate: isOpen ? 180 : 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="ml-4 shrink-0"
+                    animate={{ rotate: isOpen ? 45 : 0 }}
+                    transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white/60"
                   >
-                    <ChevronDown className="h-4 w-4 text-white/30" />
+                    <Plus className="h-3.5 w-3.5" />
                   </motion.span>
                 </button>
 
@@ -96,18 +60,18 @@ export function FAQ() {
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{
-                        height: { type: "spring", stiffness: 300, damping: 32 },
-                        opacity: { duration: 0.2 },
+                        height: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] },
+                        opacity: { duration: 0.25, delay: isOpen ? 0.08 : 0 },
                       }}
                       style={{ overflow: "hidden" }}
                     >
-                      <p className="px-5 pb-4 text-sm leading-relaxed text-white/35">
-                        {faq.a}
+                      <p className="px-6 pb-5 pr-12 text-[14px] leading-relaxed text-white/55">
+                        {item.a}
                       </p>
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </div>
             );
           })}
         </div>

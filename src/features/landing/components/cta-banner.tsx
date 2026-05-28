@@ -1,60 +1,101 @@
 "use client";
-import dynamic from "next/dynamic";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Link } from "@/shared/i18n/routing";
 
-const CtaScene = dynamic(() => import("./cta-scene"), { ssr: false });
-const BG = "#030308";
-
 export function CtaBanner() {
   const t = useTranslations("landing.cta");
+
   return (
-    <section id="contact" className="relative py-28 md:py-36" style={{ background: BG }}>
-      {/* 3D particle wave */}
-      <div className="pointer-events-none absolute inset-0 z-0 opacity-50">
-        <CtaScene />
-      </div>
+    <section
+      id="contact"
+      className="relative isolate overflow-hidden bg-deep py-32 md:py-40 grain"
+    >
+      {/* Strong central glow */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[680px] w-[680px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-50"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(139,92,246,0.45) 0%, rgba(6,182,212,0.20) 35%, transparent 70%)",
+          filter: "blur(60px)",
+        }}
+      />
+
+      {/* Grid overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-grid bg-grid-fade opacity-[0.35]" />
+
+      {/* Beams */}
+      <div className="beam beam-thick left-[22%] opacity-50" />
+      <div className="beam beam-thick right-[22%] opacity-50" />
+      <div className="beam left-[40%] opacity-25" />
+      <div className="beam right-[40%] opacity-25" />
+
+      {/* Top/bottom fade */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-32"
+        style={{
+          background: "linear-gradient(180deg, var(--bg-deep), transparent)",
+        }}
+      />
 
       <div className="container-page relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="mx-auto max-w-2xl text-center"
+          className="mx-auto max-w-3xl text-center"
         >
-          <h2
-            className="text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl"
-            style={{
-              background: "linear-gradient(135deg, #fff 15%, #00e5ff 50%, #8b5cf6 100%)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
-            }}
-          >
-            {t("title")}
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-white/65 backdrop-blur-md">
+            <Sparkles className="h-3 w-3 text-cyan-300" />
+            Start free today
+          </div>
+
+          <h2 className="display mt-6 text-[34px] font-semibold leading-[1.05] sm:text-[44px] md:text-[56px] lg:text-[64px]">
+            <span
+              style={{
+                background:
+                  "linear-gradient(180deg, #ffffff 0%, #ffffff 45%, rgba(255,255,255,0.45) 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
+            >
+              {t("title")}
+            </span>
           </h2>
-          <p className="mt-5 text-[15px] text-white/30">{t("subtitle")}</p>
+
+          <p className="mt-5 text-[15px] text-white/55 md:text-[17px]">
+            {t("subtitle")}
+          </p>
+
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-10"
+            className="mt-10 flex items-center justify-center"
           >
             <Link
               href="/login"
-              className="group inline-flex items-center gap-2.5 rounded-full px-9 py-4 text-sm font-bold text-white transition-transform hover:scale-[1.04] active:scale-[0.98]"
-              style={{
-                background: "linear-gradient(135deg, #00c8ff, #8b5cf6)",
-                boxShadow: "0 0 50px rgba(0,200,255,0.3), 0 0 100px rgba(139,92,246,0.15)",
-              }}
+              className="btn-primary group inline-flex items-center gap-2.5 rounded-full px-8 py-4 text-[15px] font-bold"
             >
               {t("button")}
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
+          </motion.div>
+
+          {/* Small trust line */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.45, duration: 0.6 }}
+            className="mt-6 flex items-center justify-center gap-2 text-[11px] text-white/35"
+          >
+            <span className="inline-flex h-1 w-1 rounded-full bg-emerald-400" style={{ boxShadow: "0 0 6px #10b981" }} />
+            No card required · 5 min setup
           </motion.div>
         </motion.div>
       </div>

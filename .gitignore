@@ -39,3 +39,8 @@ next-env.d.ts
 # IDE
 .vscode/
 .idea/
+
+# Local test screenshots
+.playwright-mcp/
+landing-*.png
+[0-9][0-9]-*.png

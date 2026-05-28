@@ -34,76 +34,58 @@ export function PublicFooter() {
   ];
 
   return (
-    <footer className="relative overflow-hidden" style={{ background: "#030308" }}>
-      {/* Dot grid pattern background */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-          opacity: 0.5,
-        }}
-      />
+    <footer className="relative isolate overflow-hidden bg-deep">
+      {/* Top hairline */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.10] to-transparent" />
 
-      {/* Subtle top glow */}
-      <div
-        className="pointer-events-none absolute left-1/2 top-0 h-48 w-[600px] -translate-x-1/2 rounded-full opacity-10"
-        style={{
-          background: "radial-gradient(circle, rgba(14,165,233,0.4), transparent 70%)",
-        }}
-      />
+      {/* Subtle bottom spot */}
+      <div className="spot-orb spot-violet left-1/2 -bottom-40 h-[320px] w-[700px] -translate-x-1/2 opacity-[0.18]" />
 
-      <div
-        className="relative"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
-      >
-        <div className="container-page grid gap-10 py-14 md:grid-cols-4">
-          <div className="space-y-4">
-            <Logo className="max-w-[130px]" />
-            <p className="max-w-xs text-sm leading-relaxed text-white/25">
-              {t("tagline")}
-            </p>
+      <div className="container-page relative grid gap-10 py-16 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="space-y-4">
+          <Logo className="max-w-[130px]" />
+          <p className="max-w-xs text-[13px] leading-relaxed text-white/40">
+            {t("tagline")}
+          </p>
+          <div className="flex items-center gap-2 pt-1">
+            <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" style={{ boxShadow: "0 0 6px #10b981" }} />
+            <span className="text-[11px] uppercase tracking-[0.18em] text-white/30">
+              All systems normal
+            </span>
           </div>
-          {groups.map((g) => (
-            <div key={g.title} className="space-y-3">
-              <div className="text-xs font-semibold uppercase tracking-[0.15em] text-white/40">
-                {g.title}
-              </div>
-              <ul className="space-y-2">
-                {g.items.map((item) => (
-                  <li key={item.label}>
-                    <Link
-                      href={item.href}
-                      className="group relative inline-block text-sm text-white/25 transition-colors hover:text-white/50"
-                    >
-                      {item.label}
-                      <span
-                        className="absolute -bottom-0.5 left-0 h-px w-0 bg-current transition-all duration-300 group-hover:w-full"
-                        aria-hidden="true"
-                      />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
         </div>
+
+        {groups.map((g) => (
+          <div key={g.title} className="space-y-3">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
+              {g.title}
+            </div>
+            <ul className="space-y-2.5">
+              {g.items.map((item) => (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    className="group inline-flex items-center text-[13.5px] text-white/55 transition-colors hover:text-white"
+                  >
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
 
-      <div
-        className="relative"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}
-      >
-        <div className="container-page flex items-center justify-between py-6">
-          <span className="text-xs text-white/20">
-            &copy; {year} BotSpace. {t("rights")}.
+      <div className="relative border-t border-white/[0.06]">
+        <div className="container-page flex flex-col items-start justify-between gap-3 py-6 md:flex-row md:items-center">
+          <span className="text-[11.5px] text-white/30">
+            © {year} BotSpace. {t("rights")}.
           </span>
-          <div className="flex items-center gap-3">
-            {["Telegram", "GitHub"].map((name) => (
+          <div className="flex items-center gap-4">
+            {["Telegram", "GitHub", "X"].map((name) => (
               <span
                 key={name}
-                className="cursor-pointer text-xs text-white/15 transition-colors hover:text-white/30"
+                className="cursor-pointer text-[11.5px] text-white/30 transition-colors hover:text-white/70"
               >
                 {name}
               </span>

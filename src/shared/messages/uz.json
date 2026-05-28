@@ -74,7 +74,7 @@
     "navStart": "Boshlash",
     "hero": {
       "badge": "Yangi: AI yordamchi va vizual flow konstruktor",
-      "title": "Telegram botlarni vizual konstruktor bilan yarating",
+      "title": "AI yordamida Telegram bot yarating",
       "subtitle": "Drag-and-drop, AI agent va marketplace — bir joyda. Kod yozmasdan startap boshlang.",
       "ctaPrimary": "Bepul boshlash",
       "ctaSecondary": "Imkoniyatlarni ko'rish",
@@ -114,12 +114,78 @@
         }
       ]
     },
+    "flow": {
+      "eyebrow": "Vizual konstruktor",
+      "title": "Tortib qo'ying — ishlab ketadi",
+      "subtitle": "Cheksiz canvas'da murakkab bot flow'larini kodsiz yarating.",
+      "bullets": [
+        "10+ tayyor node turi",
+        "Real vaqtli mantiq preview",
+        "Versiyalar va bir bosishda rollback"
+      ],
+      "nodes": {
+        "trigger": { "type": "Trigger", "label": "/start" },
+        "msg": { "type": "Message", "label": "Salomlashish" },
+        "menu": { "type": "Keyboard", "label": "Menyu" },
+        "cond": { "type": "Shart", "label": "Tekshirish" },
+        "ai": { "type": "AI", "label": "AI Agent" },
+        "save": { "type": "Holat", "label": "Saqlash" }
+      }
+    },
+    "agent": {
+      "eyebrow": "AI Agent",
+      "title": "Bot yaratish — suhbat orqali",
+      "subtitle": "Agent bilan tabiiy tilda gaplashing — u flow tuzadi, node qo'shadi va deploy qiladi.",
+      "tags": ["Flow tuzish", "Deploy", "CRM", "Broadcast", "Analitika"],
+      "chat": {
+        "headerTitle": "BotSpace AI",
+        "headerStatus": "Onlayn · Telegram bot quruvchi",
+        "u1": "Menga Telegram do'kon bot yarat — mahsulot katalogi, savatcha va Click to'lov bilan",
+        "a1": "Tayyor ✓ — 6 ta node tuzildi:",
+        "a1Flow": "/start → Katalog → Savatcha → Manzil → Click → Tasdiq",
+        "u2": "Ishga tushur",
+        "a2": "Ishga tushdi —",
+        "a2Mention": "@mydokon_bot",
+        "a2Tail": "mijozlarni qabul qilmoqda",
+        "placeholder": "Botingiz haqida yozing…"
+      }
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Ko'p beriladigan savollar",
+      "items": [
+        { "q": "BotSpace bepulmi?", "a": "Ha, Free tarif bilan 1 ta bot va oyiga 200K AI token bepul. Karta talab qilinmaydi." },
+        { "q": "Kod yozish kerakmi?", "a": "Yo'q. Vizual konstruktor yoki AI agent bilan tabiiy tilda bot yaratishingiz mumkin." },
+        { "q": "Qanday to'lov usullari bor?", "a": "Payme, Click va xalqaro kartalar (Visa / Mastercard) orqali to'lash mumkin." },
+        { "q": "AI agent nima qila oladi?", "a": "Flow tuzadi, node qo'shadi, deploy qiladi, CRM boshqaradi, broadcast yuboradi — barchasi tabiiy tilda." },
+        { "q": "Botni boshqa platformalarga ulasa bo'ladimi?", "a": "Hozircha Telegram to'liq qo'llab-quvvatlanadi. WhatsApp va web kanallar tez orada qo'shiladi." },
+        { "q": "MCP server nima?", "a": "Claude Desktop yoki Cursor kabi AI agentlar orqali BotSpace platformasini boshqarish imkonini beradi." }
+      ]
+    },
     "pricing": {
       "title": "Sodda va shaffof narxlar",
       "subtitle": "Bepul boshlang, kerak bo'lsa kengaytiring",
       "perMonth": "/oy",
       "popular": "Mashhur",
-      "cta": "Tanlash"
+      "cta": "Tanlash",
+      "perTokens": "token/oy",
+      "plans": {
+        "free": {
+          "name": "Free",
+          "tagBots": "1 bot",
+          "features": ["Vizual konstruktor", "AI agent (limitli)", "Marketplace", "Hamjamiyat yordami"]
+        },
+        "pro": {
+          "name": "Pro",
+          "tagBots": "10 bot",
+          "features": ["Free'ning barchasi", "Kengaytirilgan AI", "Priority yordam", "Custom domen", "Analitika"]
+        },
+        "max": {
+          "name": "Max",
+          "tagBots": "Cheksiz",
+          "features": ["Pro'ning barchasi", "Cheksiz botlar", "Maxsus integratsiyalar", "SLA 99.9%", "Shaxsiy menejer", "API access"]
+        }
+      }
     },
     "templates": {
       "title": "Tayyor shablonlar",
@@ -158,10 +224,20 @@
       "enterCode": "Olgan kodingizni shu yerga kiriting",
       "submit": "Kirish"
     },
-    "errors": {
-      "invalidOtp": "Kod noto'g'ri yoki muddati o'tgan",
-      "unknown": "Kutilmagan xatolik. Qayta urinib ko'ring"
-    }
+    "brand": {
+      "headline": "Telegram bot — daqiqalar ichida.",
+      "tagline": "Drag-and-drop konstruktor, AI agent va shablonlar marketplace — bot biznesini ishga tushirish uchun hammasi.",
+      "perks": [
+        "Doim bepul — 1 bot, 200K AI token",
+        "Soniyalar ichida deploy, infra shartmas",
+        "Botlarni sotib olish yoki sotish marketplace'i"
+      ],
+      "status": "99.9% uptime · global edge"
+    },
+    "welcome": "Xush kelibsiz!",
+    "terms": "Davom etib siz Shartlar va Maxfiylik siyosatiga rozilik bildirasiz.",
+    "back": "Orqaga",
+    "loading": "Yuklanmoqda…"
   },
   "dashboard": {
     "welcome": "Salom, {name}!",

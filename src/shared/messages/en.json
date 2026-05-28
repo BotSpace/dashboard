@@ -52,7 +52,7 @@
     "navStart": "Get started",
     "hero": {
       "badge": "New: AI assistant & visual flow builder",
-      "title": "Build Telegram bots with a visual constructor",
+      "title": "Build Telegram bots with AI",
       "subtitle": "Drag-and-drop, AI agent and a marketplace — all in one. Launch a startup without code.",
       "ctaPrimary": "Start free",
       "ctaSecondary": "See features",
@@ -74,12 +74,78 @@
         { "title": "Analytics", "desc": "Real-time monitoring of CPU, RAM, traffic and user behavior" }
       ]
     },
+    "flow": {
+      "eyebrow": "Visual builder",
+      "title": "Drag, drop, deploy",
+      "subtitle": "Build complex bot flows on an infinite canvas — no code required.",
+      "bullets": [
+        "10+ ready node types",
+        "Real-time logic preview",
+        "Versioning and one-click rollback"
+      ],
+      "nodes": {
+        "trigger": { "type": "Trigger", "label": "/start" },
+        "msg": { "type": "Message", "label": "Greeting" },
+        "menu": { "type": "Keyboard", "label": "Menu" },
+        "cond": { "type": "Condition", "label": "Check" },
+        "ai": { "type": "AI", "label": "AI Agent" },
+        "save": { "type": "State", "label": "Save" }
+      }
+    },
+    "agent": {
+      "eyebrow": "AI Agent",
+      "title": "Build a bot by chatting",
+      "subtitle": "Talk to the agent in plain language — it builds the flow, adds nodes and deploys for you.",
+      "tags": ["Flow building", "Deploy", "CRM", "Broadcast", "Analytics"],
+      "chat": {
+        "headerTitle": "BotSpace AI",
+        "headerStatus": "Online · Telegram bot builder",
+        "u1": "Build me a Telegram shop bot — product catalog, cart and Click payment",
+        "a1": "Done ✓ — 6 nodes created:",
+        "a1Flow": "/start → Catalog → Cart → Address → Click → Confirm",
+        "u2": "Launch it",
+        "a2": "Launched —",
+        "a2Mention": "@myshop_bot",
+        "a2Tail": "is now accepting customers",
+        "placeholder": "Describe your bot…"
+      }
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Frequently asked",
+      "items": [
+        { "q": "Is BotSpace free?", "a": "Yes. The Free plan gives you 1 bot and 200K AI tokens per month. No card required." },
+        { "q": "Do I need to write code?", "a": "No. You can use the visual builder or describe what you need in natural language to the AI agent." },
+        { "q": "Which payment methods are supported?", "a": "Payme, Click and international cards (Visa / Mastercard)." },
+        { "q": "What can the AI agent do?", "a": "It builds flows, adds nodes, deploys, manages CRM, sends broadcasts — all in natural language." },
+        { "q": "Can I connect other platforms?", "a": "Telegram is fully supported today. WhatsApp and web channels are coming soon." },
+        { "q": "What is the MCP server?", "a": "It lets AI agents like Claude Desktop or Cursor control your BotSpace projects directly." }
+      ]
+    },
     "pricing": {
       "title": "Simple, transparent pricing",
       "subtitle": "Start free, scale when you need to",
       "perMonth": "/mo",
       "popular": "Popular",
-      "cta": "Choose"
+      "cta": "Choose",
+      "perTokens": "tokens/mo",
+      "plans": {
+        "free": {
+          "name": "Free",
+          "tagBots": "1 bot",
+          "features": ["Visual builder", "AI agent (limited)", "Marketplace", "Community support"]
+        },
+        "pro": {
+          "name": "Pro",
+          "tagBots": "10 bots",
+          "features": ["Everything in Free", "Advanced AI", "Priority support", "Custom domain", "Analytics"]
+        },
+        "max": {
+          "name": "Max",
+          "tagBots": "Unlimited",
+          "features": ["Everything in Pro", "Unlimited bots", "Custom integrations", "99.9% SLA", "Dedicated manager", "API access"]
+        }
+      }
     },
     "templates": {
       "title": "Ready-made templates",
@@ -118,6 +184,20 @@
       "enterCode": "Enter the code you received",
       "submit": "Log in"
     },
+    "brand": {
+      "headline": "Build a Telegram bot in minutes.",
+      "tagline": "Drag-and-drop builder, AI agent and a template marketplace — everything you need to launch a bot business.",
+      "perks": [
+        "Free forever — 1 bot, 200K AI tokens",
+        "Deploy in seconds, no infra",
+        "Marketplace to buy or sell bots"
+      ],
+      "status": "99.9% uptime · global edge"
+    },
+    "welcome": "Welcome!",
+    "terms": "By continuing you agree to the Terms and Privacy Policy.",
+    "back": "Back",
+    "loading": "Loading…",
     "errors": {
       "invalidOtp": "Code is invalid or expired",
       "unknown": "Unexpected error. Please try again"
