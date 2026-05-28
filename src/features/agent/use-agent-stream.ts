@@ -7,6 +7,7 @@ import type {
   PlanItem,
   ApprovalPayload,
   ClarifyPayload,
+  SubAgentTurn,
   ToolCallView,
 } from "./types";
 
@@ -55,6 +56,10 @@ export function useAgentStream({
   const esRef = useRef<EventSource | null>(null);
   const finishedRef = useRef(false);
   const toolViewMap = useRef<Record<string, ToolCallView>>({});
+  // Map sub_agent_id → ChatTurn id (so child tool_call/result events can be
+  // routed into the SubAgentAccordion they belong to instead of bubbling up
+  // to the main chat).
+  const subAgentTurnIdMap = useRef<Record<string, string>>({});
   const lastSeqRef = useRef<number>(initialSeq ?? 0);
   const persistRef = useRef(onPersist);
   persistRef.current = onPersist;
@@ -74,11 +79,17 @@ export function useAgentStream({
     esRef.current = es;
     finishedRef.current = false;
     toolViewMap.current = {};
+    subAgentTurnIdMap.current = {};
     // Rebuild tool view map from any restored tool turns so a tool_result
     // arriving in replay can be matched to its earlier tool_call.
     setState((s) => {
       for (const t of s.turns) {
-        if (t.kind === "tool") toolViewMap.current[t.call.id] = t.call;
+        if (t.kind === "tool") {
+          toolViewMap.current[t.call.id] = t.call;
+        } else if (t.kind === "sub_agent") {
+          subAgentTurnIdMap.current[t.sub_agent_id] = t.id;
+          for (const step of t.steps) toolViewMap.current[step.id] = step;
+        }
       }
       return {
         ...s,
@@ -151,6 +162,7 @@ export function useAgentStream({
               name?: string;
               arguments?: Record<string, unknown>;
               hidden?: boolean;
+              sub_agent_id?: string;
             };
             if (!p.id || !p.name) break;
             const view: ToolCallView = {
@@ -160,11 +172,75 @@ export function useAgentStream({
               hidden: Boolean(p.hidden),
             };
             toolViewMap.current[p.id] = view;
+            // Sub-agent ichida — accordion ostiga joylaymiz
+            if (p.sub_agent_id && subAgentTurnIdMap.current[p.sub_agent_id]) {
+              const turnId = subAgentTurnIdMap.current[p.sub_agent_id];
+              next.turns = s.turns.map((t) =>
+                t.kind === "sub_agent" && t.id === turnId
+                  ? { ...t, steps: [...t.steps, view], toolCalls: t.toolCalls + 1 }
+                  : t,
+              );
+              next.phase = "tool";
+              next.currentTool = `${p.name}`;
+              break;
+            }
+            // Main agent tool_call
             if (!view.hidden) {
               next.turns = [...s.turns, { kind: "tool", id: `t-${p.id}`, call: view }];
               next.phase = "tool";
               next.currentTool = p.name;
             }
+            break;
+          }
+          case "sub_agent_started": {
+            const p = ev.payload as {
+              sub_agent_id?: string;
+              name?: string;
+              description?: string;
+              prompt?: string;
+            };
+            if (!p.sub_agent_id || !p.name) break;
+            const turnId = `sa-${p.sub_agent_id}`;
+            subAgentTurnIdMap.current[p.sub_agent_id] = turnId;
+            const turn: SubAgentTurn = {
+              kind: "sub_agent",
+              id: turnId,
+              sub_agent_id: p.sub_agent_id,
+              name: p.name,
+              description: p.description,
+              prompt: p.prompt ?? "",
+              steps: [],
+              toolCalls: 0,
+              finished: false,
+            };
+            next.turns = [...s.turns, turn];
+            next.phase = "tool";
+            next.currentTool = p.name;
+            break;
+          }
+          case "sub_agent_finished": {
+            const p = ev.payload as {
+              sub_agent_id?: string;
+              ok?: boolean;
+              summary?: string;
+              tool_calls?: number;
+            };
+            if (!p.sub_agent_id) break;
+            const turnId = subAgentTurnIdMap.current[p.sub_agent_id];
+            if (!turnId) break;
+            next.turns = s.turns.map((t) =>
+              t.kind === "sub_agent" && t.id === turnId
+                ? {
+                    ...t,
+                    finished: true,
+                    ok: p.ok,
+                    summary: p.summary,
+                    toolCalls: p.tool_calls ?? t.toolCalls,
+                  }
+                : t,
+            );
+            next.phase = "thinking";
+            next.currentTool = null;
             break;
           }
           case "plan_set": {
@@ -190,6 +266,7 @@ export function useAgentStream({
               is_error?: boolean;
               data?: Record<string, unknown>;
               hidden?: boolean;
+              sub_agent_id?: string;
             };
             const id = p.tool_call_id;
             if (!id) break;
@@ -202,6 +279,21 @@ export function useAgentStream({
             if (p.data && typeof p.data === "object") {
               const plan = (p.data as { plan?: PlanItem[] }).plan;
               if (Array.isArray(plan)) next.plan = plan;
+            }
+            // Sub-agent ichida — accordion turn'ini refresh qilamiz
+            if (p.sub_agent_id && subAgentTurnIdMap.current[p.sub_agent_id]) {
+              const turnId = subAgentTurnIdMap.current[p.sub_agent_id];
+              next.turns = s.turns.map((t) =>
+                t.kind === "sub_agent" && t.id === turnId
+                  ? {
+                      ...t,
+                      steps: t.steps.map((step) =>
+                        step.id === id ? { ...step, result: p.content, isError: p.is_error, data: p.data ?? null } : step,
+                      ),
+                    }
+                  : t,
+              );
+              break;
             }
             if (!Boolean(p.hidden)) {
               next.turns = [...s.turns];
@@ -276,6 +368,8 @@ export function useAgentStream({
       "clarification_required",
       "clarification_resolved",
       "usage_updated",
+      "sub_agent_started",
+      "sub_agent_finished",
       "run_completed",
       "run_failed",
       "close",

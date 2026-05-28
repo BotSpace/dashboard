@@ -24,6 +24,7 @@ import { PlanPanel } from "./plan-panel";
 import { ProjectPicker } from "./project-picker";
 import { ThreadsSidebar } from "./threads-sidebar";
 import { ToolStrip } from "./tool-strip";
+import { SubAgentAccordion } from "./sub-agent-accordion";
 import { RunStatusChip, TypingIndicator } from "./typing-indicator";
 import { UsageBadge } from "./usage-badge";
 import type { ChatTurn, ToolCallView } from "../types";
@@ -50,7 +51,8 @@ type Props = {
 type RenderItem =
   | { kind: "user"; id: string; text: string }
   | { kind: "assistant"; id: string; text: string }
-  | { kind: "tool-group"; id: string; calls: ToolCallView[]; pending: boolean };
+  | { kind: "tool-group"; id: string; calls: ToolCallView[]; pending: boolean }
+  | { kind: "sub_agent"; id: string; turn: Extract<ChatTurn, { kind: "sub_agent" }> };
 
 function renderTurns(turns: ChatTurn[], phase: string): RenderItem[] {
   const items: RenderItem[] = [];
@@ -73,6 +75,10 @@ function renderTurns(turns: ChatTurn[], phase: string): RenderItem[] {
       continue;
     }
     flushGroup(false);
+    if (t.kind === "sub_agent") {
+      items.push({ kind: "sub_agent", id: t.id, turn: t });
+      continue;
+    }
     items.push(t as RenderItem);
   }
   const liveRunning = phase !== "done" && phase !== "error" && phase !== "idle";
@@ -386,6 +392,9 @@ function ChatThread({
                 }
                 if (item.kind === "assistant") {
                   return <AssistantMessage key={item.id} text={item.text} />;
+                }
+                if (item.kind === "sub_agent") {
+                  return <SubAgentAccordion key={item.id} turn={item.turn} />;
                 }
                 return <ToolStrip key={item.id} calls={item.calls} pending={item.pending} />;
               })}

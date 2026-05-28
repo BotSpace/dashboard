@@ -14,6 +14,8 @@ export type AgentEventType =
   | "clarification_resolved"
   | "budget_update"
   | "usage_updated"
+  | "sub_agent_started"
+  | "sub_agent_finished"
   | "run_completed"
   | "run_failed"
   | "close"
@@ -43,10 +45,25 @@ export type ToolCallView = {
   hidden?: boolean;
 };
 
+export type SubAgentTurn = {
+  kind: "sub_agent";
+  id: string;
+  sub_agent_id: string;
+  name: string;
+  description?: string;
+  prompt: string;
+  steps: ToolCallView[];
+  toolCalls: number;
+  summary?: string;
+  ok?: boolean;
+  finished: boolean;
+};
+
 export type ChatTurn =
   | { kind: "user"; id: string; text: string }
   | { kind: "assistant"; id: string; text: string }
-  | { kind: "tool"; id: string; call: ToolCallView };
+  | { kind: "tool"; id: string; call: ToolCallView }
+  | SubAgentTurn;
 
 export type ApprovalPayload = {
   tool_call_id?: string;
