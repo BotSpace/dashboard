@@ -266,12 +266,20 @@ function ChatThread({
     approveRunAction({ projectId, requestId, approved: true }).catch(() => {});
   }, [stream.approval, requestId, projectId]);
 
-  const scrollToBottom = () => {
-    scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
+  // Foydalanuvchi pastda turgan bo'lsagina avto-scroll qilamiz. Tepaga
+  // chiqib o'qish paytida yangi xabar kelganda joyini "yutib qo'ymaymiz".
+  const stickToBottomRef = useRef(true);
+
+  const scrollToBottom = (smooth = true) => {
+    scroller.current?.scrollTo({
+      top: scroller.current.scrollHeight,
+      behavior: smooth ? "smooth" : "auto",
+    });
+    stickToBottomRef.current = true;
   };
 
   useEffect(() => {
-    scrollToBottom();
+    if (stickToBottomRef.current) scrollToBottom();
   }, [stream.turns.length, stream.thinking, stream.phase]);
 
   useEffect(() => {
@@ -279,6 +287,9 @@ function ChatThread({
     if (!el) return;
     const onScroll = () => {
       const gap = el.scrollHeight - el.scrollTop - el.clientHeight;
+      // 80px ostida — "pastda turibdi", auto-scroll OK.
+      // 120px tepa — "scroll-to-bottom" tugmasini ko'rsatamiz.
+      stickToBottomRef.current = gap < 80;
       setShowScrollBtn(gap > 120);
     };
     el.addEventListener("scroll", onScroll, { passive: true });
@@ -448,7 +459,7 @@ function ChatThread({
                 variant="outline"
                 size="icon"
                 className="h-8 w-8 rounded-full shadow-md"
-                onClick={scrollToBottom}
+                onClick={() => scrollToBottom()}
               >
                 <ArrowDown className="h-4 w-4" />
               </Button>

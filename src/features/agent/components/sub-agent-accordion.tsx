@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/shared/lib/utils";
 import type { SubAgentTurn } from "../types";
+import { summarizeArgs, summarizeName, summarizeResult } from "../lib/summarize-tool";
 
 type Props = {
   turn: SubAgentTurn;
@@ -152,43 +153,53 @@ export function SubAgentAccordion({ turn }: Props) {
                   Qadamlar
                 </div>
                 <ul className="space-y-1.5">
-                  {turn.steps.map((step, i) => (
-                    <li
-                      key={step.id}
-                      className="rounded-md bg-background/60 px-2 py-1.5 text-[11px]"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="flex h-4 w-4 items-center justify-center rounded bg-muted text-[9px] font-medium text-muted-foreground">
-                          {i + 1}
-                        </span>
-                        <code
-                          className={cn(
-                            "font-mono font-medium",
-                            step.isError ? "text-destructive" : "text-foreground",
+                  {turn.steps.map((step, i) => {
+                    const label = summarizeName(step.name);
+                    const argLine = summarizeArgs(step.name, step.arguments);
+                    const resLine = summarizeResult(step.result);
+                    return (
+                      <li
+                        key={step.id}
+                        className="rounded-md bg-background/60 px-2 py-1.5 text-[11px]"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-muted text-[9px] font-medium text-muted-foreground">
+                            {i + 1}
+                          </span>
+                          <span
+                            className={cn(
+                              "font-medium",
+                              step.isError ? "text-destructive" : "text-foreground",
+                            )}
+                          >
+                            {label}
+                          </span>
+                          {argLine && (
+                            <span className="truncate text-muted-foreground/80">
+                              · {argLine}
+                            </span>
                           )}
-                        >
-                          {step.name}
-                        </code>
-                        {step.result === undefined ? (
-                          <Loader2 className="ml-auto h-3 w-3 animate-spin text-primary" />
-                        ) : step.isError ? (
-                          <XCircle className="ml-auto h-3 w-3 text-destructive" />
-                        ) : (
-                          <CheckCircle2 className="ml-auto h-3 w-3 text-emerald-500" />
+                          {step.result === undefined ? (
+                            <Loader2 className="ml-auto h-3 w-3 shrink-0 animate-spin text-primary" />
+                          ) : step.isError ? (
+                            <XCircle className="ml-auto h-3 w-3 shrink-0 text-destructive" />
+                          ) : (
+                            <CheckCircle2 className="ml-auto h-3 w-3 shrink-0 text-emerald-500" />
+                          )}
+                        </div>
+                        {resLine && (
+                          <div
+                            className={cn(
+                              "mt-1 line-clamp-2",
+                              step.isError ? "text-destructive/80" : "text-muted-foreground",
+                            )}
+                          >
+                            {resLine}
+                          </div>
                         )}
-                      </div>
-                      {Object.keys(step.arguments ?? {}).length > 0 && (
-                        <pre className="mt-1 max-h-32 overflow-x-auto whitespace-pre-wrap rounded bg-muted/60 p-1.5 text-[10px] text-muted-foreground">
-                          {JSON.stringify(step.arguments, null, 2)}
-                        </pre>
-                      )}
-                      {step.result !== undefined && (
-                        <pre className="mt-1 max-h-32 overflow-y-auto overflow-x-auto whitespace-pre-wrap rounded bg-muted/60 p-1.5 text-[10px] text-muted-foreground/80">
-                          {step.result}
-                        </pre>
-                      )}
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
                 </ul>
               </>
             )}
