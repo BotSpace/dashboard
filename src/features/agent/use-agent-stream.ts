@@ -21,6 +21,11 @@ type Args = {
 
 type RunPhase = "idle" | "queued" | "thinking" | "tool" | "waiting" | "done" | "error";
 
+export type CurrentSubAgent = {
+  id: string;
+  name: string;
+};
+
 type State = {
   turns: ChatTurn[];
   plan: PlanItem[];
@@ -32,6 +37,7 @@ type State = {
   thinking: string;
   phase: RunPhase;
   currentTool: string | null;
+  currentSubAgent: CurrentSubAgent | null;
 };
 
 export function useAgentStream({
@@ -52,6 +58,7 @@ export function useAgentStream({
     thinking: "",
     phase: "idle",
     currentTool: null,
+    currentSubAgent: null,
   });
   const esRef = useRef<EventSource | null>(null);
   const finishedRef = useRef(false);
@@ -215,7 +222,8 @@ export function useAgentStream({
             };
             next.turns = [...s.turns, turn];
             next.phase = "tool";
-            next.currentTool = p.name;
+            next.currentTool = null;
+            next.currentSubAgent = { id: p.sub_agent_id, name: p.name };
             break;
           }
           case "sub_agent_finished": {
@@ -241,6 +249,10 @@ export function useAgentStream({
             );
             next.phase = "thinking";
             next.currentTool = null;
+            // Faqat shu sub-agent tugagan bo'lsa, currentSubAgent'ni tozalaymiz
+            if (s.currentSubAgent && s.currentSubAgent.id === p.sub_agent_id) {
+              next.currentSubAgent = null;
+            }
             break;
           }
           case "plan_set": {
@@ -332,6 +344,7 @@ export function useAgentStream({
             next.finished = true;
             finishedRef.current = true;
             next.currentTool = null;
+            next.currentSubAgent = null;
             if (ev.type === "run_failed") {
               const p = ev.payload as { error?: string };
               next.error = p.error ?? "Run failed";
@@ -408,6 +421,7 @@ export function useAgentStream({
         error: null,
         phase: "queued",
         currentTool: null,
+        currentSubAgent: null,
       };
       if (persistRef.current) {
         persistRef.current({ turns: next.turns, lastSeq: 0, finished: false });

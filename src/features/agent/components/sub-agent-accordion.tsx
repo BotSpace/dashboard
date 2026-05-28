@@ -24,9 +24,10 @@ const NAME_LABELS: Record<string, string> = {
 };
 
 export function SubAgentAccordion({ turn }: Props) {
-  const [open, setOpen] = useState(false);
-  const label = NAME_LABELS[turn.name] ?? turn.name;
   const running = !turn.finished;
+  // Ishlayotgan paytda accordion ochiq holatda boshlanadi — qadamlar real vaqtda ko'rinadi.
+  const [open, setOpen] = useState(running);
+  const label = NAME_LABELS[turn.name] ?? turn.name;
   const failed = turn.finished && turn.ok === false;
   const stepsCount = turn.toolCalls || turn.steps.length;
 
@@ -40,36 +41,72 @@ export function SubAgentAccordion({ turn }: Props) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "group flex w-full items-start gap-2 rounded-xl border bg-card/60 px-3 py-2 text-left text-xs transition-colors",
-          "hover:bg-card",
+          "group flex w-full items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-xs transition-all",
+          running
+            ? "border-violet-400/50 bg-violet-500/10 shadow-[0_0_0_3px_rgba(139,92,246,0.08)] dark:border-violet-400/40"
+            : "border-border bg-card/60 hover:bg-card",
           failed && "border-destructive/40",
         )}
       >
-        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <div
+          className={cn(
+            "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+            running
+              ? "bg-violet-500/20 text-violet-600 dark:text-violet-300"
+              : failed
+                ? "bg-destructive/10 text-destructive"
+                : "bg-primary/10 text-primary",
+          )}
+        >
           {running ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
+            <>
+              <Bot className="h-3.5 w-3.5" />
+              <span className="absolute -right-0.5 -top-0.5 flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-500" />
+              </span>
+            </>
           ) : failed ? (
-            <XCircle className="h-3 w-3 text-destructive" />
+            <XCircle className="h-3.5 w-3.5" />
           ) : (
-            <Bot className="h-3 w-3" />
+            <Bot className="h-3.5 w-3.5" />
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-foreground">{label}</span>
-            <span className="text-muted-foreground">
-              {running ? "ishlamoqda" : failed ? "xatolik" : "bajarildi"}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span
+              className={cn(
+                "font-semibold",
+                running ? "text-violet-700 dark:text-violet-200" : "text-foreground",
+              )}
+            >
+              {label}
             </span>
+            {running ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-violet-500/15 px-2 py-0.5 text-[10px] font-medium text-violet-700 dark:text-violet-300">
+                <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                ishlamoqda
+              </span>
+            ) : failed ? (
+              <span className="inline-flex items-center rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive">
+                xatolik
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-300">
+                <CheckCircle2 className="h-2.5 w-2.5" />
+                bajarildi
+              </span>
+            )}
             {stepsCount > 0 && (
-              <span className="text-muted-foreground/70">
-                · {stepsCount} ta tool
+              <span className="text-muted-foreground/80">
+                {stepsCount} ta tool
               </span>
             )}
             <span className="ml-auto text-muted-foreground/60">
               {open ? (
-                <ChevronDown className="h-3 w-3" />
+                <ChevronDown className="h-3.5 w-3.5" />
               ) : (
-                <ChevronRight className="h-3 w-3" />
+                <ChevronRight className="h-3.5 w-3.5" />
               )}
             </span>
           </div>
@@ -79,7 +116,7 @@ export function SubAgentAccordion({ turn }: Props) {
             </div>
           )}
           {!turn.summary && running && (
-            <div className="mt-1 line-clamp-1 text-muted-foreground/70">
+            <div className="mt-1 line-clamp-1 text-muted-foreground/80">
               {turn.prompt}
             </div>
           )}

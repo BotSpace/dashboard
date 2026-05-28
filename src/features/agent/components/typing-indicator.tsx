@@ -2,16 +2,34 @@
 import { Bot, Loader2, Wrench } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/shared/lib/utils";
+import type { CurrentSubAgent } from "../use-agent-stream";
 
 type Phase = "idle" | "queued" | "thinking" | "tool" | "waiting" | "done" | "error";
 
 type Props = {
   phase: Phase;
   currentTool: string | null;
+  currentSubAgent?: CurrentSubAgent | null;
 };
 
-function label(phase: Phase, tool: string | null): string {
+const SUB_AGENT_LABELS: Record<string, string> = {
+  "flow-builder": "Flow Builder",
+  "crm-manager": "CRM Manager",
+  "cms-manager": "CMS Manager",
+  "deploy-manager": "Deploy Manager",
+};
+
+function subAgentLabel(name: string): string {
+  return SUB_AGENT_LABELS[name] ?? name;
+}
+
+function label(phase: Phase, tool: string | null, sub: CurrentSubAgent | null | undefined): string {
   if (phase === "queued") return "Boshlanmoqda…";
+  if (sub) {
+    const name = subAgentLabel(sub.name);
+    if (tool) return `${name} → ${tool}`;
+    return `${name} ishlamoqda…`;
+  }
   if (phase === "tool" && tool) return `${tool} bajarilmoqda…`;
   if (phase === "tool") return "Tool ishlamoqda…";
   if (phase === "thinking") return "O'ylamoqda…";
@@ -19,8 +37,10 @@ function label(phase: Phase, tool: string | null): string {
   return "";
 }
 
-export function TypingIndicator({ phase, currentTool }: Props) {
+export function TypingIndicator({ phase, currentTool, currentSubAgent }: Props) {
   if (phase === "idle" || phase === "done" || phase === "error") return null;
+
+  const activeSubAgent = Boolean(currentSubAgent);
 
   return (
     <motion.div
@@ -30,19 +50,44 @@ export function TypingIndicator({ phase, currentTool }: Props) {
     >
       <div
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-          phase === "tool"
-            ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-            : "bg-gradient-to-br from-primary/20 to-primary/5 text-primary"
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-2 ring-transparent",
+          activeSubAgent
+            ? "animate-pulse bg-violet-500/15 text-violet-600 ring-violet-400/30 dark:text-violet-300"
+            : phase === "tool"
+              ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+              : "bg-gradient-to-br from-primary/20 to-primary/5 text-primary"
         )}
       >
-        {phase === "tool" ? <Wrench className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+        {activeSubAgent ? (
+          <Bot className="h-4 w-4" />
+        ) : phase === "tool" ? (
+          <Wrench className="h-4 w-4" />
+        ) : (
+          <Bot className="h-4 w-4" />
+        )}
       </div>
-      <div className="flex items-center gap-2.5 rounded-2xl bg-muted/40 px-4 py-2.5">
+      <div
+        className={cn(
+          "flex items-center gap-2.5 rounded-2xl px-4 py-2.5",
+          activeSubAgent ? "bg-violet-500/10" : "bg-muted/40"
+        )}
+      >
         <Dots />
-        <span className="text-xs text-muted-foreground">{label(phase, currentTool)}</span>
+        <span
+          className={cn(
+            "text-xs font-medium",
+            activeSubAgent ? "text-violet-700 dark:text-violet-200" : "text-muted-foreground"
+          )}
+        >
+          {label(phase, currentTool, currentSubAgent)}
+        </span>
         {phase !== "waiting" && (
-          <Loader2 className="h-3 w-3 animate-spin text-muted-foreground/60" />
+          <Loader2
+            className={cn(
+              "h-3 w-3 animate-spin",
+              activeSubAgent ? "text-violet-500" : "text-muted-foreground/60"
+            )}
+          />
         )}
       </div>
     </motion.div>
@@ -59,14 +104,17 @@ function Dots() {
   );
 }
 
-export function RunStatusChip({ phase, currentTool }: Props) {
+export function RunStatusChip({ phase, currentTool, currentSubAgent }: Props) {
   if (phase === "idle" || phase === "done") return null;
+  const activeSubAgent = Boolean(currentSubAgent);
   const color =
     phase === "error"
       ? "bg-destructive/10 text-destructive"
       : phase === "waiting"
         ? "bg-amber-500/10 text-amber-700 dark:text-amber-300"
-        : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
+        : activeSubAgent
+          ? "bg-violet-500/15 text-violet-700 dark:text-violet-300"
+          : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
 
   const text =
     phase === "error"
@@ -75,9 +123,11 @@ export function RunStatusChip({ phase, currentTool }: Props) {
         ? "Javob kutilmoqda"
         : phase === "queued"
           ? "Navbatda"
-          : phase === "tool"
-            ? `${currentTool ?? "Tool"}`
-            : "Ishlamoqda";
+          : currentSubAgent
+            ? subAgentLabel(currentSubAgent.name)
+            : phase === "tool"
+              ? `${currentTool ?? "Tool"}`
+              : "Ishlamoqda";
 
   return (
     <span
@@ -86,13 +136,14 @@ export function RunStatusChip({ phase, currentTool }: Props) {
         color
       )}
     >
+      {activeSubAgent && <Bot className="h-3 w-3" />}
       <span
         className={cn(
           "h-1.5 w-1.5 rounded-full bg-current",
           phase !== "error" && "animate-pulse"
         )}
       />
-      <span className="hidden sm:inline">{text}</span>
+      <span className={activeSubAgent ? "" : "hidden sm:inline"}>{text}</span>
     </span>
   );
 }

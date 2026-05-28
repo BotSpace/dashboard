@@ -362,7 +362,11 @@ function ChatThread({
           <span className="text-sm font-semibold">BotSpace Agent</span>
         </div>
 
-        <RunStatusChip phase={stream.phase} currentTool={stream.currentTool} />
+        <RunStatusChip
+          phase={stream.phase}
+          currentTool={stream.currentTool}
+          currentSubAgent={stream.currentSubAgent}
+        />
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
           <UsageBadge refreshKey={usageKey} />
@@ -410,7 +414,11 @@ function ChatThread({
                 </div>
               )}
 
-              <TypingIndicator phase={stream.phase} currentTool={null} />
+              <TypingIndicator
+                phase={stream.phase}
+                currentTool={stream.currentSubAgent ? stream.currentTool : null}
+                currentSubAgent={stream.currentSubAgent}
+              />
 
               {stream.error && (
                 <div className="mx-auto max-w-xl rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
