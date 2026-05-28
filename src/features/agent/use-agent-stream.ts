@@ -172,11 +172,15 @@ export function useAgentStream({
               sub_agent_id?: string;
             };
             if (!p.id || !p.name) break;
+            // `task.run` main agent tomonidan chaqirilsa, uning natijasi
+            // SubAgentAccordion (sub_agent_started/finished orqali) sifatida
+            // ko'rsatiladi. Tool-strip'da takror chiqarmaymiz — `hidden=true`.
+            const isTaskRun = p.name === "task.run" && !p.sub_agent_id;
             const view: ToolCallView = {
               id: p.id,
               name: p.name,
               arguments: p.arguments ?? {},
-              hidden: Boolean(p.hidden),
+              hidden: Boolean(p.hidden) || isTaskRun,
             };
             toolViewMap.current[p.id] = view;
             // Sub-agent ichida — accordion ostiga joylaymiz
@@ -191,7 +195,7 @@ export function useAgentStream({
               next.currentTool = `${p.name}`;
               break;
             }
-            // Main agent tool_call
+            // Main agent tool_call (task.run bundan mustasno — accordion ko'rsatadi)
             if (!view.hidden) {
               next.turns = [...s.turns, { kind: "tool", id: `t-${p.id}`, call: view }];
               next.phase = "tool";
