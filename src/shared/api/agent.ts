@@ -4,21 +4,27 @@ import { readSession } from "@/shared/auth/session";
 
 const AGENT_BASE = (env.NEXT_PUBLIC_AGENT_URL ?? "http://localhost:8100").replace(/\/$/, "");
 
-async function buildBearer(): Promise<string | null> {
+async function buildTokens(): Promise<{ access: string; refresh: string | null } | null> {
   const session = await readSession();
   if (!session?.access) return null;
-  return session.access;
+  return { access: session.access, refresh: session.refresh ?? null };
 }
 
 async function agentFetch(path: string, init?: RequestInit): Promise<Response> {
-  const bearer = await buildBearer();
-  if (!bearer) {
+  const tokens = await buildTokens();
+  if (!tokens) {
     throw new Error("Not authenticated");
   }
   const baseHeaders: Record<string, string> = {
     Accept: init?.headers ? (init.headers as Record<string, string>).Accept ?? "application/json" : "application/json",
-    Authorization: `Bearer ${bearer}`,
+    Authorization: `Bearer ${tokens.access}`,
   };
+  // Refresh token uzun yashovchi agent run'lari uchun — agent o'rta yo'lda
+  // access token muddati tugasa, backend chaqirig'ida shu refresh bilan
+  // yangilanadi (LLM'ga hech qanday signal yetmaydi, transparent retry).
+  if (tokens.refresh) {
+    baseHeaders["X-Refresh-Token"] = tokens.refresh;
+  }
   if (init?.body !== undefined) {
     baseHeaders["Content-Type"] = "application/json";
   }
