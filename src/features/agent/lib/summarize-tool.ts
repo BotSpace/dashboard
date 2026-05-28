@@ -26,6 +26,8 @@ const TOOL_LABELS: Record<string, string> = {
   "flow.validate": "Flow tekshirildi",
   "flow.save": "Flow saqlandi",
   "flow.layout_auto": "Joylashtirildi",
+  "flow.design": "Flow blueprint",
+  "flow.bulk_apply": "Flow qo'llandi",
   "flow.add_node": "Node qo'shildi",
   "flow.remove_node": "Node o'chirildi",
   "flow.patch": "Node yangilandi",
@@ -167,6 +169,19 @@ export function summarizeArgs(
     case "flow.layout_auto":
       return "";
 
+    case "flow.design": {
+      const task = String(args.task ?? "");
+      return task ? `"${trunc(task, 60)}"` : "";
+    }
+    case "flow.bulk_apply": {
+      const nodes = (args.nodes as unknown[] | undefined)?.length;
+      const edges = (args.edges as unknown[] | undefined)?.length;
+      const parts: string[] = [];
+      if (nodes !== undefined) parts.push(`${nodes} node`);
+      if (edges !== undefined) parts.push(`${edges} edge`);
+      if (args.save) parts.push("save");
+      return parts.length ? parts.join(" · ") : "state'dan";
+    }
     case "flow.add_node": {
       const t = args.type;
       const id = args.id;
