@@ -1,8 +1,18 @@
 "use server";
 import { isApiError } from "@/shared/api/client";
-import { TemplatesAPI } from "@/shared/api/services";
+import { TemplatesAPI, type TemplateListParams, type PaginatedTemplates } from "@/shared/api/services";
 
 export type OrderResult = { ok: boolean; message?: string };
+
+export async function loadMoreTemplatesAction(
+  params: TemplateListParams
+): Promise<PaginatedTemplates> {
+  try {
+    return await TemplatesAPI.listPaginated(params);
+  } catch {
+    return { items: [], page: Number(params.page) || 1, totalPages: 1, hasMore: false };
+  }
+}
 
 export async function orderTemplateAction(templateId: number | string): Promise<OrderResult> {
   try {

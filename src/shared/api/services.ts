@@ -139,12 +139,40 @@ export type TemplateListParams = {
   features?: string | number;
   price_min?: number | string;
   price_max?: number | string;
+  page?: number | string;
 };
+
+export type PaginatedTemplates = {
+  items: Template[];
+  page: number;
+  totalPages: number;
+  hasMore: boolean;
+};
+
+function unwrapPaginatedTemplates(d: unknown): PaginatedTemplates {
+  const items = unwrapList<Template>(d);
+  let page = 1;
+  let totalPages = 1;
+  let hasNext = false;
+  if (d && typeof d === "object") {
+    type Pagination = { current_page?: number; total_pages?: number; links?: { next?: string | null } };
+    const root = d as { data?: Pagination } & Pagination;
+    const data: Pagination = root.data ?? root;
+    page = Number(data.current_page) || 1;
+    totalPages = Number(data.total_pages) || 1;
+    hasNext = Boolean(data.links?.next);
+  }
+  return { items, page, totalPages, hasMore: hasNext || page < totalPages };
+}
 
 export const TemplatesAPI = {
   list: async (params: TemplateListParams = {}) => {
     const d = await api<unknown>("/api/template/list/", { query: params });
     return unwrapList<Template>(d);
+  },
+  listPaginated: async (params: TemplateListParams = {}): Promise<PaginatedTemplates> => {
+    const d = await api<unknown>("/api/template/list/", { query: params });
+    return unwrapPaginatedTemplates(d);
   },
   get: (slug: string) =>
     api<Template>(`/api/template/list/${slug}/`).then(unwrapItem<Template>),
