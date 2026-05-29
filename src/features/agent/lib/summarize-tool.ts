@@ -30,6 +30,7 @@ const TOOL_LABELS: Record<string, string> = {
   "flow.bulk_apply": "Flow qo'llandi",
   "flow.add_node": "Node qo'shildi",
   "flow.remove_node": "Node o'chirildi",
+  "flow.clear": "Flow tozalandi",
   "flow.patch": "Node yangilandi",
   "flow.connect": "Ulandi",
   "flow.disconnect": "Ulanish o'chirildi",
