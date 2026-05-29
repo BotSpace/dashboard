@@ -26,8 +26,9 @@ const NAME_LABELS: Record<string, string> = {
 
 export function SubAgentAccordion({ turn }: Props) {
   const running = !turn.finished;
-  // Ishlayotgan paytda accordion ochiq holatda boshlanadi — qadamlar real vaqtda ko'rinadi.
-  const [open, setOpen] = useState(running);
+  // Sub-agent accordion default yopiq — foydalanuvchi xohlasagina ochadi.
+  // Header chip qaysi sub-agent ishlayotganini doim ko'rsatadi.
+  const [open, setOpen] = useState(false);
   const label = NAME_LABELS[turn.name] ?? turn.name;
   const failed = turn.finished && turn.ok === false;
   const stepsCount = turn.toolCalls || turn.steps.length;
@@ -153,53 +154,9 @@ export function SubAgentAccordion({ turn }: Props) {
                   Qadamlar
                 </div>
                 <ul className="space-y-1.5">
-                  {turn.steps.map((step, i) => {
-                    const label = summarizeName(step.name);
-                    const argLine = summarizeArgs(step.name, step.arguments);
-                    const resLine = summarizeResult(step.result);
-                    return (
-                      <li
-                        key={step.id}
-                        className="rounded-md bg-background/60 px-2 py-1.5 text-[11px]"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-muted text-[9px] font-medium text-muted-foreground">
-                            {i + 1}
-                          </span>
-                          <span
-                            className={cn(
-                              "font-medium",
-                              step.isError ? "text-destructive" : "text-foreground",
-                            )}
-                          >
-                            {label}
-                          </span>
-                          {argLine && (
-                            <span className="truncate text-muted-foreground/80">
-                              · {argLine}
-                            </span>
-                          )}
-                          {step.result === undefined ? (
-                            <Loader2 className="ml-auto h-3 w-3 shrink-0 animate-spin text-primary" />
-                          ) : step.isError ? (
-                            <XCircle className="ml-auto h-3 w-3 shrink-0 text-destructive" />
-                          ) : (
-                            <CheckCircle2 className="ml-auto h-3 w-3 shrink-0 text-emerald-500" />
-                          )}
-                        </div>
-                        {resLine && (
-                          <div
-                            className={cn(
-                              "mt-1 line-clamp-2",
-                              step.isError ? "text-destructive/80" : "text-muted-foreground",
-                            )}
-                          >
-                            {resLine}
-                          </div>
-                        )}
-                      </li>
-                    );
-                  })}
+                  {turn.steps.map((step, i) => (
+                    <SubAgentStep key={step.id} step={step} index={i} />
+                  ))}
                 </ul>
               </>
             )}
@@ -216,5 +173,103 @@ export function SubAgentAccordion({ turn }: Props) {
         )}
       </AnimatePresence>
     </motion.div>
+  );
+}
+
+
+type StepProps = {
+  step: SubAgentTurn["steps"][number];
+  index: number;
+};
+
+function SubAgentStep({ step, index }: StepProps) {
+  const [open, setOpen] = useState(false);
+  const label = summarizeName(step.name);
+  const argLine = summarizeArgs(step.name, step.arguments);
+  const resLine = summarizeResult(step.result);
+  const hasArgs = Object.keys(step.arguments ?? {}).length > 0;
+  const hasFullResult =
+    typeof step.result === "string" && step.result.length > 100;
+
+  return (
+    <li className="rounded-md bg-background/60 text-[11px]">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          "flex w-full items-center gap-2 px-2 py-1.5 text-left transition-colors",
+          "hover:bg-background/80",
+          open && "rounded-b-none",
+        )}
+      >
+        <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-muted text-[9px] font-medium text-muted-foreground">
+          {index + 1}
+        </span>
+        <span
+          className={cn(
+            "font-medium",
+            step.isError ? "text-destructive" : "text-foreground",
+          )}
+        >
+          {label}
+        </span>
+        {argLine && (
+          <span className="truncate text-muted-foreground/80">· {argLine}</span>
+        )}
+        {step.result === undefined ? (
+          <Loader2 className="ml-auto h-3 w-3 shrink-0 animate-spin text-primary" />
+        ) : step.isError ? (
+          <XCircle className="ml-auto h-3 w-3 shrink-0 text-destructive" />
+        ) : (
+          <CheckCircle2 className="ml-auto h-3 w-3 shrink-0 text-emerald-500" />
+        )}
+        {(hasArgs || hasFullResult || resLine) && (
+          <span className="text-muted-foreground/60">
+            {open ? (
+              <ChevronDown className="h-3 w-3" />
+            ) : (
+              <ChevronRight className="h-3 w-3" />
+            )}
+          </span>
+        )}
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.12 }}
+            className="overflow-hidden border-t border-border/40 px-2 py-1.5 space-y-1.5"
+          >
+            {hasArgs && (
+              <div>
+                <div className="mb-0.5 text-[9px] uppercase tracking-wide text-muted-foreground/70">
+                  Argumentlar
+                </div>
+                <pre className="max-h-40 overflow-x-auto overflow-y-auto whitespace-pre-wrap rounded bg-muted/60 p-1.5 text-[10px] text-muted-foreground">
+                  {JSON.stringify(step.arguments, null, 2)}
+                </pre>
+              </div>
+            )}
+            {step.result !== undefined && (
+              <div>
+                <div className="mb-0.5 text-[9px] uppercase tracking-wide text-muted-foreground/70">
+                  Natija
+                </div>
+                <pre
+                  className={cn(
+                    "max-h-40 overflow-x-auto overflow-y-auto whitespace-pre-wrap rounded bg-muted/60 p-1.5 text-[10px]",
+                    step.isError ? "text-destructive/80" : "text-muted-foreground/90",
+                  )}
+                >
+                  {step.result}
+                </pre>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </li>
   );
 }

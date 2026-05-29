@@ -11,6 +11,7 @@ const TOOL_LABELS: Record<string, string> = {
   "plan.set": "Reja tuzildi",
   "plan.update": "Qadam yangilandi",
   "plan.complete": "Reja yakunlandi",
+  "plan.advance": "Qadam o'tdi",
 
   // project.*
   "project.list": "Loyihalar",
@@ -146,6 +147,14 @@ export function summarizeArgs(
       return `${args.id ?? "?"} → ${args.status ?? "?"}`;
     case "plan.complete":
       return "";
+    case "plan.advance": {
+      const completed = (args.complete as string[] | undefined) ?? [];
+      const started = (args.start as string[] | undefined) ?? [];
+      const parts: string[] = [];
+      if (completed.length) parts.push(`✓ ${completed.join(",")}`);
+      if (started.length) parts.push(`▶ ${started.join(",")}`);
+      return parts.join(" · ");
+    }
 
     case "project.list":
       return args.search ? `qidiruv: ${args.search}` : "barchasi";
