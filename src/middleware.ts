@@ -100,11 +100,22 @@ async function loadSession(cookieValue: string | undefined): Promise<SessionStat
 
   const exp = decodeAccessExp(payload.access);
   const now = Math.floor(Date.now() / 1000);
+  const accessAlreadyExpired = exp !== null && exp <= now;
   const needsRefresh = exp === null || exp - now <= REFRESH_BUFFER_SEC;
   if (!needsRefresh) return { kind: "valid", session: payload };
 
   const next = await refreshTokens(payload.refresh);
-  if (!next) return { kind: "broken" };
+  if (!next) {
+    // Refresh failed. Common cause: race condition between parallel
+    // middleware passes (page HTML + RSC payload, multiple tabs) — the
+    // backend rotates+blacklists the refresh token on first call, the
+    // second call sees a blacklisted token and 401s. If the access token
+    // itself is still usable, fall back to it instead of logging the user
+    // out. Only treat refresh failure as "broken" when the access token
+    // is hard-expired and we genuinely have nothing usable left.
+    if (accessAlreadyExpired) return { kind: "broken" };
+    return { kind: "valid", session: payload };
+  }
 
   const refreshed: SessionPayload = { ...payload, ...next };
   const cookie = await encodeSession(refreshed);
