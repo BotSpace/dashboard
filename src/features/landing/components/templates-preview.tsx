@@ -49,7 +49,7 @@ export async function TemplatesPreview({ locale }: { locale: string }) {
                     border: "1px solid rgba(255,255,255,0.06)",
                   }}
                 >
-                  <div className="relative aspect-[4/3]" style={{ background: "linear-gradient(135deg, rgba(14,165,233,0.05), rgba(124,58,237,0.05))" }}>
+                  <div className="relative aspect-[16/9]" style={{ background: "linear-gradient(135deg, rgba(14,165,233,0.05), rgba(124,58,237,0.05))" }}>
                     {tpl.image ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img src={tpl.image} alt={tpl.name} className="h-full w-full object-cover opacity-80 transition-opacity group-hover:opacity-100" />

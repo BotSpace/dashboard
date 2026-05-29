@@ -118,7 +118,7 @@ export default async function TemplatesPage({
             return (
               <Link key={tpl.id} href={`/app/templates/${tpl.slug}`} className="group">
                 <Card className="overflow-hidden transition group-hover:border-primary/40 group-hover:shadow-md h-full flex flex-col">
-                  <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-fuchsia-500/10">
+                  <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/10 to-fuchsia-500/10">
                     {tpl.image ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
