@@ -43,7 +43,6 @@ export type Plan = {
   max_bots?: number;
   max_output_tokens?: number;
   max_input_tokens?: number;
-  max_users?: number;
   features?: string[] | Record<string, unknown>;
   is_default?: boolean;
   is_active?: boolean;
