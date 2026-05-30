@@ -1,6 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { MessagesSquare } from "lucide-react";
 import { MessagesAPI } from "@/shared/api/services";
+import { BroadcastComposer } from "@/features/messages/components/broadcast-composer";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 
@@ -13,25 +14,42 @@ export default async function BotMessagesPage({
   setRequestLocale(locale);
   const items = await MessagesAPI.list(id).catch(() => []);
 
+  const statusLabel: Record<string, string> = {
+    progress: "Jarayonda",
+    done: "Yuborildi",
+    failed: "Xato",
+  };
+
   return (
-    <Card>
-      <CardContent className="p-0">
-        {items.length === 0 ? (
-          <div className="grid place-items-center gap-3 py-16">
-            <MessagesSquare className="h-10 w-10 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Xabarlar yo'q</p>
-          </div>
-        ) : (
-          <ul className="divide-y">
-            {items.map((m) => (
-              <li key={m.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                <span className="truncate">{m.text}</span>
-                <Badge variant="secondary">{m.status ?? "draft"}</Badge>
-              </li>
-            ))}
-          </ul>
-        )}
-      </CardContent>
-    </Card>
+    <div>
+      <BroadcastComposer projectId={id} />
+
+      <Card>
+        <CardContent className="p-0">
+          {items.length === 0 ? (
+            <div className="grid place-items-center gap-3 py-16">
+              <MessagesSquare className="h-10 w-10 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">Xabarlar yo'q</p>
+            </div>
+          ) : (
+            <ul className="divide-y">
+              {items.map((m) => (
+                <li key={m.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                  <span className="truncate">{m.caption}</span>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      {m.done ?? 0}/{m.total ?? 0}
+                    </span>
+                    <Badge variant="secondary">
+                      {statusLabel[m.status ?? ""] ?? m.status ?? "—"}
+                    </Badge>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

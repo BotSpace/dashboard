@@ -145,9 +145,15 @@ export type Transaction = {
 export type BroadcastMessage = {
   id: number | string;
   project: number | string;
-  text: string;
-  scheduled_at?: string;
-  status?: "draft" | "scheduled" | "sent" | "failed";
+  caption: string;
+  message_type: "text" | "photo" | "video";
+  button_type?: "inline" | "reply";
+  buttons?: unknown[];
+  status?: "progress" | "done" | "failed";
+  total?: number;
+  done?: number;
+  fail?: number;
+  file_id?: string;
 };
 
 export type ResourceMetric = {

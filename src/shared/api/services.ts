@@ -225,8 +225,16 @@ export const MessagesAPI = {
     const d = await api<unknown>("/api/message/", { query: { project } });
     return unwrapList<BroadcastMessage>(d);
   },
-  create: (body: Omit<BroadcastMessage, "id">) =>
-    api<BroadcastMessage>("/api/message/", { method: "POST", json: body }),
+  send: (body: {
+    project: number | string;
+    caption: string;
+    message_type?: "text" | "photo" | "video";
+    button_type?: "inline" | "reply";
+  }) =>
+    api<BroadcastMessage>("/api/message/", {
+      method: "POST",
+      json: { message_type: "text", button_type: "reply", ...body },
+    }),
   remove: (id: string | number) => api<void>(`/api/message/${id}/`, { method: "DELETE" }),
 };
 
