@@ -323,7 +323,18 @@
     "submit": "Shablon topshirish",
     "earnings": "Daromad",
     "withdraw": "Pul yechish",
-    "withdrawalRequest": "Yechish so'rovi"
+    "withdrawalRequest": "Yechish so'rovi",
+    "createProject": "Shablondan loyiha yaratish",
+    "createProjectTitle": "Shablondan yangi loyiha",
+    "createProjectDescription": "Shablon flow'i yangi loyihaga ko'chiriladi. Botingiz uchun Telegram token kiriting.",
+    "projectNameLabel": "Loyiha nomi",
+    "projectNamePlaceholder": "Mening botim",
+    "botTokenLabel": "Telegram bot token",
+    "botTokenPlaceholder": "1234567890:ABC-DEF...",
+    "botTokenHelp": "Token olish uchun:",
+    "createSubmit": "Loyiha yaratish",
+    "createSuccess": "Loyiha yaratildi, konstruktorga o'tilmoqda...",
+    "cancel": "Bekor qilish"
   },
   "billing": {
     "title": "To'lov va tariflar",

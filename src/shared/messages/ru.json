@@ -309,7 +309,18 @@
     "submit": "Отправить шаблон",
     "earnings": "Доход",
     "withdraw": "Вывести",
-    "withdrawalRequest": "Запрос на вывод"
+    "withdrawalRequest": "Запрос на вывод",
+    "createProject": "Создать проект из шаблона",
+    "createProjectTitle": "Новый проект из шаблона",
+    "createProjectDescription": "Flow шаблона будет скопирован в новый проект. Введите Telegram-токен для бота.",
+    "projectNameLabel": "Название проекта",
+    "projectNamePlaceholder": "Мой бот",
+    "botTokenLabel": "Telegram bot token",
+    "botTokenPlaceholder": "1234567890:ABC-DEF...",
+    "botTokenHelp": "Получить токен:",
+    "createSubmit": "Создать проект",
+    "createSuccess": "Проект создан, открываем конструктор...",
+    "cancel": "Отмена"
   },
   "billing": {
     "title": "Оплата и тарифы",

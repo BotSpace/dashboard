@@ -64,6 +64,10 @@ export const ProjectsAPI = {
   get: async (id: string | number) => unwrapItem<Project>(await api<unknown>(`/api/project/${id}/`)),
   create: (body: Partial<Project>) =>
     api<Project>("/api/project/", { method: "POST", json: body }).then(unwrapItem<Project>),
+  createFromTemplate: (body: { template: number | string; name: string; token: string }) =>
+    api<Project>("/api/project/create-from-template/", { method: "POST", json: body }).then(
+      unwrapItem<Project>,
+    ),
   update: (id: string | number, body: Partial<Project>) =>
     api<Project>(`/api/project/${id}/`, { method: "PATCH", json: body }).then(unwrapItem<Project>),
   remove: (id: string | number) => api<void>(`/api/project/${id}/`, { method: "DELETE" }),

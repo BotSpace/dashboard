@@ -9,6 +9,7 @@ import { Separator } from "@/shared/components/ui/separator";
 import { Link } from "@/shared/i18n/routing";
 import { formatCurrency, formatNumber } from "@/shared/lib/utils";
 import { OrderButton } from "@/features/templates/components/order-button";
+import { CreateProjectButton } from "@/features/templates/components/create-project-button";
 
 function toNumber(v: number | string | undefined | null): number {
   if (v === undefined || v === null) return 0;
@@ -138,6 +139,27 @@ export default async function TemplateDetailPage({
                   error: t("orderError"),
                 }}
               />
+
+              {isOwned && (
+                <CreateProjectButton
+                  templateId={tpl.id}
+                  defaultName={tpl.name}
+                  labels={{
+                    cta: t("createProject"),
+                    title: t("createProjectTitle"),
+                    description: t("createProjectDescription"),
+                    nameLabel: t("projectNameLabel"),
+                    namePlaceholder: t("projectNamePlaceholder"),
+                    tokenLabel: t("botTokenLabel"),
+                    tokenPlaceholder: t("botTokenPlaceholder"),
+                    tokenHelp: t("botTokenHelp"),
+                    botFatherLink: "@BotFather",
+                    submit: t("createSubmit"),
+                    success: t("createSuccess"),
+                    cancel: t("cancel"),
+                  }}
+                />
+              )}
 
               {tpl.demo_url && (
                 <Button asChild variant="outline" className="w-full" size="lg">

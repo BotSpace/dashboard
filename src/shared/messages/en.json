@@ -309,7 +309,18 @@
     "submit": "Submit template",
     "earnings": "Earnings",
     "withdraw": "Withdraw",
-    "withdrawalRequest": "Withdrawal request"
+    "withdrawalRequest": "Withdrawal request",
+    "createProject": "Create project from template",
+    "createProjectTitle": "New project from template",
+    "createProjectDescription": "The template flow will be copied into a new project. Enter your Telegram bot token.",
+    "projectNameLabel": "Project name",
+    "projectNamePlaceholder": "My bot",
+    "botTokenLabel": "Telegram bot token",
+    "botTokenPlaceholder": "1234567890:ABC-DEF...",
+    "botTokenHelp": "Get a token from:",
+    "createSubmit": "Create project",
+    "createSuccess": "Project created — opening the constructor…",
+    "cancel": "Cancel"
   },
   "billing": {
     "title": "Billing & plans",
