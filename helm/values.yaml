@@ -28,6 +28,10 @@ configMaps:
     NEXT_PUBLIC_TELEGRAM_BOT: "botmother_authbot"
     NEXT_PUBLIC_DEFAULT_LOCALE: "uz"
     SESSION_COOKIE_NAME: "bm_session"
+    # Share the session cookie across *.botspace.uz subdomains so the
+    # admin panel (admin.botspace.uz) reads the same login. Without this
+    # the cookie is host-only on botspace.uz and admin.* sees no session.
+    SESSION_COOKIE_DOMAIN: ".botspace.uz"
 
 envFrom:
   - secretRef:
