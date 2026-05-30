@@ -232,7 +232,8 @@ export const MessagesAPI = {
 
 // CMSv2 — Django + MongoDB hybrid
 function cms(projectId: string | number, ...parts: (string | number)[]): string {
-  return `/api/cms/projects/${projectId}/collections/${parts.map(encodeURIComponent).join("/")}`;
+  const tail = parts.map((p) => encodeURIComponent(p)).join("/");
+  return `/api/cms/projects/${projectId}/collections${tail ? "/" + tail : ""}`;
 }
 
 export const CmsAPI = {
