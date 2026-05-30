@@ -4,6 +4,7 @@ import { setRequestLocale } from "next-intl/server";
 import { ProjectsAPI } from "@/shared/api/services";
 import { BotTabs } from "@/features/bots/components/bot-tabs";
 import { ConstructorButton } from "@/features/bots/components/constructor-button";
+import { EditableBotName } from "@/features/bots/components/editable-bot-name";
 import { Link } from "@/shared/i18n/routing";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Badge } from "@/shared/components/ui/badge";
@@ -38,7 +39,7 @@ export default async function BotLayout({
         </Avatar>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h1 className="truncate text-2xl font-semibold tracking-tight">{bot.name}</h1>
+            <EditableBotName id={id} initialName={bot.name} />
             <Badge variant={bot.status === "active" ? "success" : "secondary"}>{bot.status ?? "draft"}</Badge>
           </div>
           {bot.username && <p className="text-sm text-muted-foreground">@{bot.username}</p>}

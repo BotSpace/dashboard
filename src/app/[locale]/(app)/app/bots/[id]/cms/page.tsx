@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Database, Plus, Settings2, Table } from "lucide-react";
+import { Database, Plus } from "lucide-react";
 import { CmsAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -43,47 +43,33 @@ export default async function BotCmsListPage({
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {collections.map((c) => (
-            <Card key={c.id} className="overflow-hidden transition hover:border-primary/40">
-              <CardContent className="space-y-3 p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base font-semibold">{c.label || c.name}</h3>
-                      {c.system && <Badge variant="secondary">{t("system")}</Badge>}
+            <Link
+              key={c.id}
+              href={`/app/bots/${projectId}/cms/${c.name}/data`}
+              className="block"
+            >
+              <Card className="overflow-hidden transition hover:border-primary/40">
+                <CardContent className="space-y-3 p-5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-semibold">{c.label || c.name}</h3>
+                        {c.system && <Badge variant="secondary">{t("system")}</Badge>}
+                      </div>
+                      <code className="text-xs text-muted-foreground">{c.name}</code>
                     </div>
-                    <code className="text-xs text-muted-foreground">{c.name}</code>
                   </div>
-                </div>
-                {c.description && (
-                  <p className="line-clamp-2 text-sm text-muted-foreground">{c.description}</p>
-                )}
-                <div className="flex items-center justify-between pt-2">
-                  <div className="text-xs text-muted-foreground">
-                    {c.fields_count ?? 0} {t("fields")} · v{c.schema_version}
+                  {c.description && (
+                    <p className="line-clamp-2 text-sm text-muted-foreground">{c.description}</p>
+                  )}
+                  <div className="pt-2">
+                    <div className="text-xs text-muted-foreground">
+                      {c.fields_count ?? 0} {t("fields")} · v{c.schema_version}
+                    </div>
                   </div>
-                  <div className="flex gap-1">
-                    <Button asChild variant="ghost" size="sm">
-                      <Link
-                        href={`/app/bots/${projectId}/cms/${c.name}/data`}
-                        className="gap-1"
-                      >
-                        <Table className="h-3.5 w-3.5" />
-                        {t("openData")}
-                      </Link>
-                    </Button>
-                    <Button asChild variant="ghost" size="sm">
-                      <Link
-                        href={`/app/bots/${projectId}/cms/${c.name}`}
-                        className="gap-1"
-                      >
-                        <Settings2 className="h-3.5 w-3.5" />
-                        {t("schema")}
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}

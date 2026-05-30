@@ -33,6 +33,18 @@ export async function updateBotAction(id: string | number, _prev: unknown, formD
   }
 }
 
+export async function renameBotAction(id: string | number, name: string) {
+  const trimmed = name.trim();
+  if (!trimmed) return { ok: false, message: "Nom bo'sh bo'lmasin" };
+  try {
+    await ProjectsAPI.update(id, { name: trimmed });
+    revalidatePath(`/app/bots/${id}`);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: isApiError(e) ? e.message : "Saqlashda xatolik" };
+  }
+}
+
 export async function deleteBotAction(id: string | number, locale: string) {
   await ProjectsAPI.remove(id);
   revalidatePath("/app/bots");
