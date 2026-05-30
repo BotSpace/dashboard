@@ -16,9 +16,16 @@ interface Props {
   locale: string;
   freeLabel: string;
   basePath?: string;
+  ownedLabel?: string;
 }
 
-export function TemplateCard({ tpl, locale, freeLabel, basePath = "/templates" }: Props) {
+export function TemplateCard({
+  tpl,
+  locale,
+  freeLabel,
+  basePath = "/templates",
+  ownedLabel,
+}: Props) {
   const price = toNumber(tpl.price);
   const original = toNumber(tpl.original_price);
   const hasDiscount = original > 0 && price < original;
@@ -37,6 +44,11 @@ export function TemplateCard({ tpl, locale, freeLabel, basePath = "/templates" }
             <div className="grid h-full place-items-center text-muted-foreground/40">
               <Tag className="h-10 w-10" />
             </div>
+          )}
+          {ownedLabel && tpl.is_order && (
+            <Badge className="absolute right-2 top-2" variant="success">
+              {ownedLabel}
+            </Badge>
           )}
         </div>
         <div className="flex flex-1 flex-col gap-2 p-5">

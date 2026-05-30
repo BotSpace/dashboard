@@ -8,29 +8,53 @@ import type { Template } from "@/shared/types/api";
 import { TemplateCard } from "./template-card";
 
 interface Props {
+  initialItems: Template[];
   baseParams: TemplateListParams;
   startPage: number;
   initialHasMore: boolean;
   locale: string;
   freeLabel: string;
   basePath?: string;
+  gridClassName?: string;
+  ownedLabel?: string;
 }
 
+const DEFAULT_GRID_CLASS = "grid gap-5 sm:grid-cols-2 lg:grid-cols-3";
+
 export function TemplatesInfiniteLoader({
+  initialItems,
   baseParams,
   startPage,
   initialHasMore,
   locale,
   freeLabel,
   basePath,
+  gridClassName = DEFAULT_GRID_CLASS,
+  ownedLabel,
 }: Props) {
-  const [items, setItems] = useState<Template[]>([]);
+  // Single source of truth: initial server-rendered items + everything
+  // appended by the infinite-scroll loader. Rendering both groups in
+  // the SAME grid container avoids the "ragged row" gap that appeared
+  // when each page lived in its own grid.
+  const [items, setItems] = useState<Template[]>(initialItems);
   const [page, setPage] = useState(startPage);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const inFlight = useRef(false);
+
+  // Reset when the filter changes (parent re-renders with a new initial
+  // page). Comparing by length + first id + startPage is cheap and avoids
+  // resetting the loader on identical re-renders.
+  const initialKey = `${initialItems.length}:${initialItems[0]?.id ?? ""}:${startPage}`;
+  useEffect(() => {
+    setItems(initialItems);
+    setPage(startPage);
+    setHasMore(initialHasMore);
+    setError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialKey]);
 
   const loadNext = useCallback(async () => {
     if (inFlight.current || !hasMore) return;
@@ -75,19 +99,18 @@ export function TemplatesInfiniteLoader({
 
   return (
     <>
-      {items.length > 0 && (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((tpl) => (
-            <TemplateCard
-              key={tpl.id}
-              tpl={tpl}
-              locale={locale}
-              freeLabel={freeLabel}
-              basePath={basePath}
-            />
-          ))}
-        </div>
-      )}
+      <div className={gridClassName}>
+        {items.map((tpl) => (
+          <TemplateCard
+            key={tpl.id}
+            tpl={tpl}
+            locale={locale}
+            freeLabel={freeLabel}
+            basePath={basePath}
+            ownedLabel={ownedLabel}
+          />
+        ))}
+      </div>
       <div ref={sentinelRef} aria-hidden className="h-1" />
       {loading && (
         <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">

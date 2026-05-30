@@ -4,7 +4,6 @@ import { TemplatesAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
-import { TemplateCard } from "@/features/templates/components/template-card";
 import { TemplatesInfiniteLoader } from "@/features/templates/components/templates-infinite-loader";
 
 type SearchParams = {
@@ -109,25 +108,14 @@ export default async function PublicTemplatesPage({
           {t("notFound")}
         </div>
       ) : (
-        <>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((tpl) => (
-              <TemplateCard
-                key={tpl.id}
-                tpl={tpl}
-                locale={locale}
-                freeLabel={t("free")}
-              />
-            ))}
-          </div>
-          <TemplatesInfiniteLoader
-            baseParams={baseParams}
-            startPage={firstPage.page}
-            initialHasMore={firstPage.hasMore}
-            locale={locale}
-            freeLabel={t("free")}
-          />
-        </>
+        <TemplatesInfiniteLoader
+          initialItems={items}
+          baseParams={baseParams}
+          startPage={firstPage.page}
+          initialHasMore={firstPage.hasMore}
+          locale={locale}
+          freeLabel={t("free")}
+        />
       )}
     </div>
   );
