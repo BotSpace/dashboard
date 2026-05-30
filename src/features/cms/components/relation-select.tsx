@@ -13,9 +13,15 @@ type Props = {
 
 const TEXT_KINDS = new Set(["text", "longtext", "email", "url", "phone"]);
 
-function pickLabel(doc: CmsDocument, fields?: CmsField[]): string {
-  if (fields) {
-    const textField = fields.find((f) => TEXT_KINDS.has(f.kind));
+function pickLabel(doc: CmsDocument, collection?: CmsCollection | null): string {
+  if (collection) {
+    // primary_field belgilangan bo'lsa — shuni birinchi sinab ko'r
+    if (collection.primary_field) {
+      const v = doc[collection.primary_field];
+      if (v !== null && v !== undefined) return String(v);
+    }
+    // fallback: birinchi text-tipdagi maydon
+    const textField = collection.fields?.find((f) => TEXT_KINDS.has(f.kind));
     if (textField) {
       const v = doc[textField.name];
       if (v !== null && v !== undefined) return String(v);
@@ -71,7 +77,7 @@ export function RelationSelect({ projectId, collections, field, value, onChange 
       {loading && <option disabled>Yuklanmoqda…</option>}
       {docs.map((doc) => (
         <option key={String(doc._id)} value={String(doc._id)}>
-          {pickLabel(doc, targetCollection.fields)}
+          {pickLabel(doc, targetCollection)}
         </option>
       ))}
     </select>

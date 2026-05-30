@@ -26,6 +26,7 @@ export function SchemaBuilder({ projectId, collections }: { projectId: string; c
   const [fields, setFields] = useState<CmsField[]>([
     { name: "title", label: "Title", kind: "text", required: true, index: "asc", order: 0 },
   ]);
+  const [primaryField, setPrimaryField] = useState("");
   const [pending, start] = useTransition();
 
   const addField = () =>
@@ -52,6 +53,7 @@ export function SchemaBuilder({ projectId, collections }: { projectId: string; c
         name: name.trim().toLowerCase(),
         label: label || undefined,
         description: description || undefined,
+        primary_field: primaryField || undefined,
         fields: dirty,
       });
       if (!res.ok) {
@@ -192,6 +194,24 @@ export function SchemaBuilder({ projectId, collections }: { projectId: string; c
         {fields.length === 0 && (
           <Badge variant="secondary">Maydonsiz collection — keyin qo'shasiz</Badge>
         )}
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-xs text-muted-foreground">
+          Primary field (relationda ko'rinadi)
+        </label>
+        <select
+          value={primaryField}
+          onChange={(e) => setPrimaryField(e.target.value)}
+          className="h-8 w-full rounded-md border bg-transparent px-2 text-sm"
+        >
+          <option value="">— tanlanmagan —</option>
+          {fields.filter((f) => f.name.trim()).map((f) => (
+            <option key={f.name} value={f.name}>
+              {f.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="flex justify-end gap-2">

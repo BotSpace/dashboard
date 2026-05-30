@@ -212,6 +212,7 @@ export type CmsCollection = {
   name: string;
   label?: string;
   description?: string;
+  primary_field?: string;
   system: boolean;
   schema_version: number;
   fields_count?: number;

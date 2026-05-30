@@ -46,6 +46,7 @@ export async function createCollectionAction(args: {
   name: string;
   label?: string;
   description?: string;
+  primary_field?: string;
   fields?: CmsField[];
 }): Promise<CmsResult> {
   try {
@@ -53,8 +54,22 @@ export async function createCollectionAction(args: {
       name: args.name,
       label: args.label,
       description: args.description,
+      primary_field: args.primary_field,
       fields: args.fields,
     });
+    return { ok: true, data: col };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function updateCollectionAction(args: {
+  projectId: string | number;
+  name: string;
+  patch: { label?: string; description?: string; primary_field?: string };
+}): Promise<CmsResult> {
+  try {
+    const col = await CmsAPI.updateCollection(args.projectId, args.name, args.patch);
     return { ok: true, data: col };
   } catch (e) {
     return fail(e);

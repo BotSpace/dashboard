@@ -5,7 +5,7 @@ import { Plus, Trash2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { addFieldAction, removeFieldAction, updateFieldAction } from "../actions";
+import { addFieldAction, removeFieldAction, updateFieldAction, updateCollectionAction } from "../actions";
 import type { CmsCascadeMode, CmsCollection, CmsField, CmsFieldKind, CmsIndexKind } from "@/shared/types/api";
 
 const KINDS: CmsFieldKind[] = [
@@ -21,11 +21,13 @@ type Props = {
   collectionName: string;
   initialFields: CmsField[];
   collections: CmsCollection[];
+  primaryField?: string;
 };
 
-export function FieldEditor({ projectId, collectionName, initialFields, collections }: Props) {
+export function FieldEditor({ projectId, collectionName, initialFields, collections, primaryField: initialPrimaryField }: Props) {
   const router = useRouter();
   const [fields, setFields] = useState<CmsField[]>(initialFields);
+  const [primaryField, setPrimaryField] = useState(initialPrimaryField ?? "");
   const [newField, setNewField] = useState<CmsField>({
     name: "",
     label: "",
@@ -99,8 +101,44 @@ export function FieldEditor({ projectId, collectionName, initialFields, collecti
     });
   };
 
+  const handlePrimaryFieldChange = (value: string) => {
+    setPrimaryField(value);
+    start(async () => {
+      const res = await updateCollectionAction({
+        projectId,
+        name: collectionName,
+        patch: { primary_field: value || undefined },
+      });
+      if (!res.ok) {
+        toast.error(res.message ?? "Xato");
+        return;
+      }
+      toast.success("Primary field saqlandi");
+      router.refresh();
+    });
+  };
+
   return (
     <div className="space-y-4">
+      <div className="space-y-1">
+        <label className="text-xs text-muted-foreground">
+          Primary field (relationda ko'rinadi)
+        </label>
+        <select
+          value={primaryField}
+          onChange={(e) => handlePrimaryFieldChange(e.target.value)}
+          disabled={pending}
+          className="h-8 w-full rounded-md border bg-transparent px-2 text-sm disabled:opacity-50"
+        >
+          <option value="">— tanlanmagan —</option>
+          {fields.filter((f) => f.name.trim()).map((f) => (
+            <option key={f.name} value={f.name}>
+              {f.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="space-y-2">
         {fields.length === 0 && (
           <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">

@@ -73,6 +73,7 @@ export default async function BotCmsDetailPage({
             collectionName={collection.name}
             initialFields={collection.fields ?? []}
             collections={collections}
+            primaryField={collection.primary_field}
           />
         </CardContent>
       </Card>

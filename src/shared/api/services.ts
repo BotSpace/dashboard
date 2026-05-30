@@ -245,9 +245,17 @@ export const CmsAPI = {
     api<CmsCollection>(cms(projectId, name) + "/").then(unwrapItem<CmsCollection>),
   createCollection: (
     projectId: string | number,
-    body: { name: string; label?: string; description?: string; fields?: CmsField[] }
+    body: { name: string; label?: string; description?: string; primary_field?: string; fields?: CmsField[] }
   ): Promise<CmsCollection> =>
     api<CmsCollection>(cms(projectId) + "/", { method: "POST", json: body }).then(
+      unwrapItem<CmsCollection>
+    ),
+  updateCollection: (
+    projectId: string | number,
+    name: string,
+    patch: { label?: string; description?: string; primary_field?: string }
+  ): Promise<CmsCollection> =>
+    api<CmsCollection>(cms(projectId, name) + "/", { method: "PATCH", json: patch }).then(
       unwrapItem<CmsCollection>
     ),
   deleteCollection: (projectId: string | number, name: string): Promise<void> =>
