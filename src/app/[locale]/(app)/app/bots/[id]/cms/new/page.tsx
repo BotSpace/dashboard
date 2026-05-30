@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowLeft, Database } from "lucide-react";
 import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
+import { CmsAPI } from "@/shared/api/services";
 import { SchemaBuilder } from "@/features/cms/components/schema-builder";
 
 export default async function BotCmsCreatePage({
@@ -12,6 +13,8 @@ export default async function BotCmsCreatePage({
   const { locale, id } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("cms");
+
+  const collections = await CmsAPI.listCollections(id).catch(() => []);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -28,7 +31,7 @@ export default async function BotCmsCreatePage({
         </h1>
         <p className="text-sm text-muted-foreground">{t("newSubtitle")}</p>
       </header>
-      <SchemaBuilder projectId={id} />
+      <SchemaBuilder projectId={id} collections={collections} />
     </div>
   );
 }

@@ -19,6 +19,8 @@ export default async function BotCmsNewDocPage({
   const collection = await CmsAPI.getCollection(id, name).catch(() => null);
   if (!collection) notFound();
 
+  const collections = await CmsAPI.listCollections(id).catch(() => []);
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <Button asChild variant="ghost" size="sm">
@@ -43,6 +45,7 @@ export default async function BotCmsNewDocPage({
             projectId={id}
             collectionName={collection.name}
             fields={collection.fields ?? []}
+            collections={collections}
           />
         </CardContent>
       </Card>

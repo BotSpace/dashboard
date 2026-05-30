@@ -7,7 +7,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Badge } from "@/shared/components/ui/badge";
 import { createCollectionAction } from "../actions";
-import type { CmsField, CmsFieldKind, CmsIndexKind } from "@/shared/types/api";
+import type { CmsCascadeMode, CmsCollection, CmsField, CmsFieldKind, CmsIndexKind } from "@/shared/types/api";
 
 const KINDS: CmsFieldKind[] = [
   "text", "longtext", "int", "float", "bool", "datetime", "date",
@@ -16,8 +16,9 @@ const KINDS: CmsFieldKind[] = [
 ];
 
 const INDEX_KINDS: CmsIndexKind[] = ["none", "asc", "desc", "text", "hashed", "unique", "ttl"];
+const CASCADE_MODES: CmsCascadeMode[] = ["cascade", "restrict", "set_null"];
 
-export function SchemaBuilder({ projectId }: { projectId: string }) {
+export function SchemaBuilder({ projectId, collections }: { projectId: string; collections: CmsCollection[] }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [label, setLabel] = useState("");
@@ -101,51 +102,90 @@ export function SchemaBuilder({ projectId }: { projectId: string }) {
           {fields.map((f, i) => (
             <div
               key={i}
-              className="grid items-center gap-2 rounded-md border p-3 lg:grid-cols-[1fr_140px_140px_120px_100px_auto]"
+              className="rounded-md border p-3 space-y-2"
             >
-              <Input
-                value={f.name}
-                onChange={(e) =>
-                  updateField(i, { name: e.target.value.replace(/[^a-z0-9_]/g, "") })
-                }
-                placeholder="field_name"
-                className="h-8"
-              />
-              <select
-                value={f.kind}
-                onChange={(e) => updateField(i, { kind: e.target.value as CmsFieldKind })}
-                className="h-8 rounded-md border bg-transparent px-2 text-sm"
-              >
-                {KINDS.map((k) => (
-                  <option key={k} value={k}>{k}</option>
-                ))}
-              </select>
-              <select
-                value={f.index}
-                onChange={(e) => updateField(i, { index: e.target.value as CmsIndexKind })}
-                className="h-8 rounded-md border bg-transparent px-2 text-sm"
-              >
-                {INDEX_KINDS.map((k) => (
-                  <option key={k} value={k}>idx: {k}</option>
-                ))}
-              </select>
-              <Input
-                value={f.label ?? ""}
-                onChange={(e) => updateField(i, { label: e.target.value })}
-                placeholder="Label"
-                className="h-8"
-              />
-              <label className="flex items-center gap-1 text-xs">
-                <input
-                  type="checkbox"
-                  checked={f.required}
-                  onChange={(e) => updateField(i, { required: e.target.checked })}
+              <div className="grid items-center gap-2 lg:grid-cols-[1fr_140px_140px_120px_100px_auto]">
+                <Input
+                  value={f.name}
+                  onChange={(e) =>
+                    updateField(i, { name: e.target.value.replace(/[^a-z0-9_]/g, "") })
+                  }
+                  placeholder="field_name"
+                  className="h-8"
                 />
-                <span>required</span>
-              </label>
-              <Button onClick={() => removeField(i)} variant="ghost" size="icon" className="h-8 w-8">
-                <Trash2 className="h-3.5 w-3.5" />
-              </Button>
+                <select
+                  value={f.kind}
+                  onChange={(e) => updateField(i, { kind: e.target.value as CmsFieldKind })}
+                  className="h-8 rounded-md border bg-transparent px-2 text-sm"
+                >
+                  {KINDS.map((k) => (
+                    <option key={k} value={k}>{k}</option>
+                  ))}
+                </select>
+                <select
+                  value={f.index}
+                  onChange={(e) => updateField(i, { index: e.target.value as CmsIndexKind })}
+                  className="h-8 rounded-md border bg-transparent px-2 text-sm"
+                >
+                  {INDEX_KINDS.map((k) => (
+                    <option key={k} value={k}>idx: {k}</option>
+                  ))}
+                </select>
+                <Input
+                  value={f.label ?? ""}
+                  onChange={(e) => updateField(i, { label: e.target.value })}
+                  placeholder="Label"
+                  className="h-8"
+                />
+                <label className="flex items-center gap-1 text-xs">
+                  <input
+                    type="checkbox"
+                    checked={f.required}
+                    onChange={(e) => updateField(i, { required: e.target.checked })}
+                  />
+                  <span>required</span>
+                </label>
+                <Button onClick={() => removeField(i)} variant="ghost" size="icon" className="h-8 w-8">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+              {f.kind === "relation" && (
+                <div className="flex flex-wrap items-center gap-2 pl-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-muted-foreground">Collection:</span>
+                    <select
+                      value={f.relation_collection ?? ""}
+                      onChange={(e) =>
+                        updateField(i, {
+                          relation_collection: e.target.value ? Number(e.target.value) : null,
+                        })
+                      }
+                      className="h-8 rounded-md border bg-transparent px-2 text-sm"
+                    >
+                      <option value="">— tanlang —</option>
+                      {collections.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.label || c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-muted-foreground">Cascade:</span>
+                    <select
+                      value={f.cascade ?? "restrict"}
+                      onChange={(e) =>
+                        updateField(i, { cascade: e.target.value as CmsCascadeMode })
+                      }
+                      className="h-8 rounded-md border bg-transparent px-2 text-sm"
+                    >
+                      {CASCADE_MODES.map((m) => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

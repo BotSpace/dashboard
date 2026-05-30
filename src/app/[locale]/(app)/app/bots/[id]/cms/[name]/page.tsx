@@ -21,6 +21,8 @@ export default async function BotCmsDetailPage({
   const collection = await CmsAPI.getCollection(id, name).catch(() => null);
   if (!collection) notFound();
 
+  const collections = await CmsAPI.listCollections(id).catch(() => []);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -70,6 +72,7 @@ export default async function BotCmsDetailPage({
             projectId={id}
             collectionName={collection.name}
             initialFields={collection.fields ?? []}
+            collections={collections}
           />
         </CardContent>
       </Card>

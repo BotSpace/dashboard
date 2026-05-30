@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { insertDocumentAction } from "../actions";
-import type { CmsField, CmsFieldKind } from "@/shared/types/api";
+import type { CmsCollection, CmsField, CmsFieldKind } from "@/shared/types/api";
+import { RelationSelect } from "./relation-select";
 
 function defaultByKind(k: CmsFieldKind): string | boolean {
   if (k === "bool") return false;
@@ -35,9 +36,10 @@ type Props = {
   projectId: string;
   collectionName: string;
   fields: CmsField[];
+  collections: CmsCollection[];
 };
 
-export function DocumentForm({ projectId, collectionName, fields }: Props) {
+export function DocumentForm({ projectId, collectionName, fields, collections }: Props) {
   const router = useRouter();
   const initial: Record<string, string | boolean> = {};
   for (const f of fields) initial[f.name] = defaultByKind(f.kind);
@@ -83,6 +85,14 @@ export function DocumentForm({ projectId, collectionName, fields }: Props) {
               onChange={(e) => setValues({ ...values, [f.name]: e.target.value })}
               rows={4}
               className="w-full rounded-md border bg-transparent px-3 py-2 text-sm font-mono"
+            />
+          ) : f.kind === "relation" ? (
+            <RelationSelect
+              projectId={projectId}
+              collections={collections}
+              field={f}
+              value={String(values[f.name] ?? "")}
+              onChange={(v) => setValues({ ...values, [f.name]: v })}
             />
           ) : (
             <Input
