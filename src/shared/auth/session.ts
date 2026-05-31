@@ -62,6 +62,19 @@ export async function setSessionCookie(payload: SessionPayload) {
 
 export async function clearSessionCookie() {
   const store = await cookies();
+  // The session cookie is set with an explicit `domain` (e.g. ".botspace.uz")
+  // and `path: "/"`. A bare `delete(name)` is scoped to the current host and
+  // does NOT match the domain-scoped cookie, so it would never get removed in
+  // production. Overwrite it as expired with the SAME attributes instead.
+  store.set(env.SESSION_COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+    ...(env.SESSION_COOKIE_DOMAIN ? { domain: env.SESSION_COOKIE_DOMAIN } : {}),
+  });
+  // Also drop a host-scoped variant if one exists (e.g. local dev).
   store.delete(env.SESSION_COOKIE_NAME);
 }
 
