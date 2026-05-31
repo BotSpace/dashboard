@@ -20,3 +20,27 @@ export async function sendBroadcastAction({
     return { ok: false, message: isApiError(e) ? e.message : "Yuborishda xatolik yuz berdi" };
   }
 }
+
+export async function sendBroadcastFormAction(
+  projectId: number | string,
+  formData: FormData,
+): Promise<{ ok: boolean; message?: string; data?: unknown }> {
+  const caption = (formData.get("caption") as string | null) ?? "";
+  const hasMedia =
+    formData.has("photo") || formData.has("video");
+
+  if (!caption.trim() && !hasMedia) {
+    return { ok: false, message: "Matn yoki media kiriting" };
+  }
+
+  // Ensure project field is set
+  formData.set("project", String(projectId));
+
+  try {
+    const data = await MessagesAPI.sendForm(formData);
+    revalidatePath(`/app/bots/${projectId}/messages`);
+    return { ok: true, data };
+  } catch (e) {
+    return { ok: false, message: isApiError(e) ? e.message : "Yuborishda xatolik yuz berdi" };
+  }
+}

@@ -235,6 +235,8 @@ export const MessagesAPI = {
       method: "POST",
       json: { message_type: "text", button_type: "reply", ...body },
     }),
+  sendForm: (body: FormData) =>
+    api<BroadcastMessage>("/api/message/", { method: "POST", body }),
   remove: (id: string | number) => api<void>(`/api/message/${id}/`, { method: "DELETE" }),
 };
 
