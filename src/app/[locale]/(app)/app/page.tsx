@@ -9,7 +9,6 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { StatCardsV2 } from "@/features/dashboard/components/stat-cards-v2";
 import { BotPerformanceChart } from "@/features/dashboard/components/bot-performance-chart";
 import { TopBotsList } from "@/features/dashboard/components/top-bots-list";
-import { WorldActivityMap } from "@/features/dashboard/components/world-activity-map";
 import { RecentBotsV2 } from "@/features/dashboard/components/recent-bots-v2";
 import { QuickActions } from "@/features/dashboard/components/quick-actions";
 import { AnalyticsDonut } from "@/features/dashboard/components/analytics-donut";
@@ -84,22 +83,7 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      {/* ── 3. Live world activity ─────────────────────── */}
-      <div className="rounded-xl border border-border/60 bg-card p-5">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold">Bot Activity</span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-              Live
-            </span>
-          </div>
-          <span className="text-xs text-muted-foreground">Dunyodan jonli faollik</span>
-        </div>
-        <WorldActivityMap />
-      </div>
-
-      {/* ── 4. Bottom row — 3 panels ───────────────────── */}
+      {/* ── 3. Bottom row — 3 panels ───────────────────── */}
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Recent Bots */}
         <div className="rounded-xl border border-border/60 bg-card p-5">
