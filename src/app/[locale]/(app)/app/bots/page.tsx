@@ -60,7 +60,7 @@ export default async function BotsPage({
           {bots.map((b) => (
             <Link
               key={b.id}
-              href={`/app/bots/${b.id}`}
+              href={`/app/bots/${b.uuid ?? b.id}`}
               className="group rounded-xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:border-blue-500/30 hover:shadow-md hover:shadow-blue-500/5"
             >
               <div className="flex items-start justify-between">

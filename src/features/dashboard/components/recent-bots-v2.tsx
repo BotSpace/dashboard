@@ -8,6 +8,7 @@ import type { Project } from "@/shared/types/api";
 
 type BotItem = {
   id: string | number;
+  uuid?: string;
   name: string;
   username?: string;
   avatar?: string;
@@ -19,6 +20,7 @@ type BotItem = {
 function toBotItems(bots: Project[]): BotItem[] {
   return bots.map((b) => ({
     id: b.id,
+    uuid: b.uuid,
     name: b.name,
     username: b.username,
     avatar: b.avatar,
@@ -37,7 +39,7 @@ export function RecentBotsV2({ bots }: { bots: Project[] }) {
       {items.map((bot) => (
         <li key={bot.id}>
           <Link
-            href={`/app/bots/${bot.id}`}
+            href={`/app/bots/${bot.uuid ?? bot.id}`}
             className="group flex items-center gap-3 rounded-xl border border-border/40 bg-card/50 p-3 transition-all duration-150 hover:border-border hover:bg-card"
           >
             {/* Avatar */}

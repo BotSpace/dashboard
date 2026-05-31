@@ -13,7 +13,7 @@ export async function createBotAction(_prev: unknown, formData: FormData) {
   try {
     const project = await ProjectsAPI.create({ name, description, token: token || undefined });
     revalidatePath("/app/bots");
-    redirect(`/${locale}/app/bots/${project.id}`);
+    redirect(`/${locale}/app/bots/${project.uuid ?? project.id}`);
   } catch (e) {
     if (isApiError(e)) return { ok: false, message: e.message };
     throw e;

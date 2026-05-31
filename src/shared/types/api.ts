@@ -7,6 +7,7 @@ export type Paginated<T> = {
 
 export type Project = {
   id: number | string;
+  uuid?: string;
   name: string;
   description?: string;
   token?: string;
