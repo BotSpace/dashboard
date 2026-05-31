@@ -48,7 +48,7 @@ function buildStats(totals: Totals): StatItem[] {
       iconColor: "text-fuchsia-400",
     },
     {
-      label: "Daromad",
+      label: "Balans",
       value: `${formatCompact(totals.revenue)} ${totals.currency}`,
       delta: null,
       icon: DollarSign,
