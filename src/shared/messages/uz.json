@@ -62,7 +62,8 @@
     "backToData": "Hujjatlar",
     "newTitle": "Yangi collection",
     "newSubtitle": "Schema yarating, keyin field'larni qo'shing",
-    "newDoc": "Yangi hujjat"
+    "newDoc": "Yangi hujjat",
+    "editDoc": "Hujjatni tahrirlash"
   },
   "landing": {
     "navHome": "Bosh sahifa",

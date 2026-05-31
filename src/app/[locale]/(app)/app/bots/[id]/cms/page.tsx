@@ -5,6 +5,8 @@ import { Link } from "@/shared/i18n/routing";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
+import { PageHeader } from "@/shared/components/common/page-header";
+import { EmptyState } from "@/shared/components/common/empty-state";
 
 export default async function BotCmsListPage({
   params,
@@ -20,26 +22,33 @@ export default async function BotCmsListPage({
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-            <Database className="h-5 w-5 text-primary" />
-            {t("title")}
-          </h1>
-          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
-        </div>
-        <Button asChild>
-          <Link href={`/app/bots/${projectId}/cms/new`} className="gap-2">
-            <Plus className="h-4 w-4" />
-            {t("create")}
-          </Link>
-        </Button>
-      </header>
+      <PageHeader
+        icon={<Database className="h-5 w-5" />}
+        title={t("title")}
+        subtitle={t("subtitle")}
+        actions={
+          <Button asChild>
+            <Link href={`/app/bots/${projectId}/cms/new`} className="gap-2">
+              <Plus className="h-4 w-4" />
+              {t("create")}
+            </Link>
+          </Button>
+        }
+      />
 
       {collections.length === 0 ? (
-        <div className="rounded-lg border border-dashed py-16 text-center text-sm text-muted-foreground">
-          {t("empty")}
-        </div>
+        <EmptyState
+          icon={<Database className="h-6 w-6" />}
+          title={t("empty")}
+          action={
+            <Button asChild size="sm">
+              <Link href={`/app/bots/${projectId}/cms/new`} className="gap-2">
+                <Plus className="h-4 w-4" />
+                {t("create")}
+              </Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {collections.map((c) => (
@@ -48,7 +57,7 @@ export default async function BotCmsListPage({
               href={`/app/bots/${projectId}/cms/${c.name}/data`}
               className="block"
             >
-              <Card className="overflow-hidden transition hover:border-primary/40">
+              <Card className="overflow-hidden transition hover:border-violet-500/40">
                 <CardContent className="space-y-3 p-5">
                   <div className="flex items-start justify-between gap-2">
                     <div>

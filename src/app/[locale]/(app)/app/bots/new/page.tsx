@@ -1,9 +1,11 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { FilePlus2, LayoutTemplate } from "lucide-react";
+import { FilePlus2, LayoutTemplate, Plus } from "lucide-react";
 import { CreateBotForm } from "@/features/bots/components/create-form";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { CardDescription } from "@/shared/components/ui/card";
 import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
+import { PageHeader } from "@/shared/components/common/page-header";
+import { Section } from "@/shared/components/common/section";
 
 export default async function NewBotPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -12,41 +14,34 @@ export default async function NewBotPage({ params }: { params: Promise<{ locale:
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-      </header>
+      <PageHeader
+        title={t("title")}
+        icon={<Plus className="h-5 w-5" />}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Card className="border-primary/40">
-          <CardHeader>
-            <div className="mb-2 grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
-              <FilePlus2 className="h-5 w-5" />
-            </div>
-            <CardTitle>{t("blank")}</CardTitle>
-            <CardDescription>{t("blankDesc")}</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <div className="mb-2 grid h-10 w-10 place-items-center rounded-lg bg-muted">
-              <LayoutTemplate className="h-5 w-5" />
-            </div>
-            <CardTitle>{t("fromTemplate")}</CardTitle>
-            <CardDescription>{t("fromTemplateDesc")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" asChild size="sm">
-              <Link href="/app/templates">→ Marketplace</Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border border-violet-500/30 bg-card p-5">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10 text-violet-400">
+            <FilePlus2 className="h-5 w-5" />
+          </div>
+          <p className="font-semibold leading-none">{t("blank")}</p>
+          <CardDescription className="mt-1.5">{t("blankDesc")}</CardDescription>
+        </div>
+        <div className="rounded-xl border border-border/60 bg-card p-5">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <LayoutTemplate className="h-5 w-5" />
+          </div>
+          <p className="font-semibold leading-none">{t("fromTemplate")}</p>
+          <CardDescription className="mt-1.5">{t("fromTemplateDesc")}</CardDescription>
+          <Button variant="outline" asChild size="sm" className="mt-3">
+            <Link href="/app/templates">→ Marketplace</Link>
+          </Button>
+        </div>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
-          <CreateBotForm />
-        </CardContent>
-      </Card>
+      <Section title="Bot ma'lumotlari" icon={<Plus className="h-4 w-4" />}>
+        <CreateBotForm />
+      </Section>
     </div>
   );
 }

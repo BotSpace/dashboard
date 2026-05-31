@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft, Eye, Heart, ExternalLink, Tag } from "lucide-react";
+import { ArrowLeft, Eye, Heart, ExternalLink, Tag, Info, Sparkles } from "lucide-react";
 import { TemplatesAPI } from "@/shared/api/services";
-import { Card, CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Separator } from "@/shared/components/ui/separator";
@@ -10,6 +9,8 @@ import { Link } from "@/shared/i18n/routing";
 import { formatCurrency, formatNumber } from "@/shared/lib/utils";
 import { OrderButton } from "@/features/templates/components/order-button";
 import { CreateProjectButton } from "@/features/templates/components/create-project-button";
+import { PageHeader } from "@/shared/components/common/page-header";
+import { Section } from "@/shared/components/common/section";
 
 function toNumber(v: number | string | undefined | null): number {
   if (v === undefined || v === null) return 0;
@@ -37,18 +38,31 @@ export default async function TemplateDetailPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/app/templates" className="gap-1">
-            <ArrowLeft className="h-4 w-4" />
-            {t("backToList")}
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        title={tpl.name}
+        subtitle={
+          tpl.categories.length > 0 ? (
+            <span className="flex flex-wrap gap-1.5 mt-1">
+              {tpl.categories.map((c) => (
+                <Badge key={c.id} variant="secondary">{c.name}</Badge>
+              ))}
+            </span>
+          ) : undefined
+        }
+        icon={<Tag className="h-5 w-5" />}
+        actions={
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/app/templates" className="gap-1">
+              <ArrowLeft className="h-4 w-4" />
+              {t("backToList")}
+            </Link>
+          </Button>
+        }
+      />
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
-          <div className="overflow-hidden rounded-xl border bg-gradient-to-br from-primary/10 to-fuchsia-500/10 aspect-[16/9]">
+          <div className="overflow-hidden rounded-xl border bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 aspect-[16/9]">
             {tpl.image ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={tpl.image} alt={tpl.name} className="h-full w-full object-cover" />
@@ -59,21 +73,12 @@ export default async function TemplateDetailPage({
             )}
           </div>
 
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight">{tpl.name}</h1>
-            {tpl.categories.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {tpl.categories.map((c) => (
-                  <Badge key={c.id} variant="secondary">
-                    {c.name}
-                  </Badge>
-                ))}
-              </div>
-            )}
-            {tpl.short_description && (
-              <div className="mt-4 text-base text-muted-foreground" dangerouslySetInnerHTML={{ __html: tpl.short_description }} />
-            )}
-          </div>
+          {tpl.short_description && (
+            <p
+              className="text-base text-muted-foreground leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: tpl.short_description }}
+            />
+          )}
 
           {tpl.video && (
             <div className="overflow-hidden rounded-xl border">
@@ -83,39 +88,33 @@ export default async function TemplateDetailPage({
           )}
 
           {tpl.description && (
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-lg font-semibold">{t("about")}</h2>
-                <div
-                  className="mt-3 text-sm leading-relaxed text-muted-foreground"
-                  dangerouslySetInnerHTML={{ __html: tpl.description }}
-                />
-              </CardContent>
-            </Card>
+            <Section title={t("about")} icon={<Info className="h-4 w-4" />}>
+              <div
+                className="text-sm leading-relaxed text-muted-foreground"
+                dangerouslySetInnerHTML={{ __html: tpl.description }}
+              />
+            </Section>
           )}
 
           {tpl.features.length > 0 && (
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-lg font-semibold">{t("features")}</h2>
-                <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {tpl.features.map((f) => (
-                    <li key={f.id} className="rounded-md border p-3">
-                      <div className="text-sm font-medium">{f.name}</div>
-                      {f.value && (
-                        <div className="mt-1 text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: f.value }} />
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+            <Section title={t("features")} icon={<Sparkles className="h-4 w-4" />}>
+              <ul className="grid gap-3 sm:grid-cols-2">
+                {tpl.features.map((f) => (
+                  <li key={f.id} className="rounded-lg border border-border/60 p-3 bg-muted/30">
+                    <div className="text-sm font-medium">{f.name}</div>
+                    {f.value && (
+                      <div className="mt-1 text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: f.value }} />
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </Section>
           )}
         </div>
 
         <aside className="lg:sticky lg:top-20 lg:self-start">
-          <Card>
-            <CardContent className="space-y-4 p-6">
+          <Section>
+            <div className="space-y-4">
               <div>
                 <div className="text-3xl font-bold">
                   {isFree ? t("free") : formatCurrency(price, "UZS", locale)}
@@ -186,8 +185,8 @@ export default async function TemplateDetailPage({
                   </span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </Section>
         </aside>
       </div>
     </div>

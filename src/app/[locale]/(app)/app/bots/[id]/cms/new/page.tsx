@@ -4,6 +4,8 @@ import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
 import { CmsAPI } from "@/shared/api/services";
 import { SchemaBuilder } from "@/features/cms/components/schema-builder";
+import { PageHeader } from "@/shared/components/common/page-header";
+import { Section } from "@/shared/components/common/section";
 
 export default async function BotCmsCreatePage({
   params,
@@ -18,20 +20,22 @@ export default async function BotCmsCreatePage({
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <Button asChild variant="ghost" size="sm">
-        <Link href={`/app/bots/${id}/cms`} className="gap-1">
-          <ArrowLeft className="h-4 w-4" />
-          {t("backToList")}
-        </Link>
-      </Button>
-      <header>
-        <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-          <Database className="h-5 w-5 text-primary" />
-          {t("newTitle")}
-        </h1>
-        <p className="text-sm text-muted-foreground">{t("newSubtitle")}</p>
-      </header>
-      <SchemaBuilder projectId={id} collections={collections} />
+      <PageHeader
+        icon={<Database className="h-5 w-5" />}
+        title={t("newTitle")}
+        subtitle={t("newSubtitle")}
+        actions={
+          <Button asChild variant="ghost" size="sm">
+            <Link href={`/app/bots/${id}/cms`} className="gap-1">
+              <ArrowLeft className="h-4 w-4" />
+              {t("backToList")}
+            </Link>
+          </Button>
+        }
+      />
+      <Section>
+        <SchemaBuilder projectId={id} collections={collections} />
+      </Section>
     </div>
   );
 }

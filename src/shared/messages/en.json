@@ -236,7 +236,8 @@
     "backToData": "Documents",
     "newTitle": "New collection",
     "newSubtitle": "Create schema, then add fields",
-    "newDoc": "New document"
+    "newDoc": "New document",
+    "editDoc": "Edit document"
   },
   "bots": {
     "title": "Bots",
