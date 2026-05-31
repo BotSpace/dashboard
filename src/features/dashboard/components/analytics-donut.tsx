@@ -6,13 +6,13 @@ import type { DashboardOverview } from "@/shared/types/api";
 
 type Distribution = DashboardOverview["distribution"];
 
-const COLORS = ["#8b5cf6", "#3b82f6", "#d946ef", "#6b7280"];
+const COLORS = ["#3b82f6", "#6366f1", "#d946ef", "#6b7280"];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-violet-500/20 bg-[#0f0f18] px-3 py-2 shadow-xl">
+    <div className="rounded-lg border border-blue-500/20 bg-[#0f0f18] px-3 py-2 shadow-xl">
       <p className="text-xs text-slate-400">{payload[0].name}</p>
       <p className="text-sm font-semibold" style={{ color: payload[0].payload.color }}>
         {payload[0].value}%

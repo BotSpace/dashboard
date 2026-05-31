@@ -48,7 +48,7 @@ export default async function BotFilesPage({
                         href={f.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="block truncate font-medium hover:underline hover:text-violet-400 transition-colors"
+                        className="block truncate font-medium hover:underline hover:text-blue-400 transition-colors"
                       >
                         {f.name}
                       </a>

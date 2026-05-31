@@ -45,7 +45,7 @@ export function SubAgentAccordion({ turn }: Props) {
         className={cn(
           "group flex w-full items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-xs transition-all",
           running
-            ? "border-violet-400/50 bg-violet-500/10 shadow-[0_0_0_3px_rgba(139,92,246,0.08)] dark:border-violet-400/40"
+            ? "border-blue-400/50 bg-blue-500/10 shadow-[0_0_0_3px_rgba(59,130,246,0.08)] dark:border-blue-400/40"
             : "border-border bg-card/60 hover:bg-card",
           failed && "border-destructive/40",
         )}
@@ -54,7 +54,7 @@ export function SubAgentAccordion({ turn }: Props) {
           className={cn(
             "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
             running
-              ? "bg-violet-500/20 text-violet-600 dark:text-violet-300"
+              ? "bg-blue-500/20 text-blue-600 dark:text-blue-300"
               : failed
                 ? "bg-destructive/10 text-destructive"
                 : "bg-primary/10 text-primary",
@@ -64,8 +64,8 @@ export function SubAgentAccordion({ turn }: Props) {
             <>
               <Bot className="h-3.5 w-3.5" />
               <span className="absolute -right-0.5 -top-0.5 flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-500" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500" />
               </span>
             </>
           ) : failed ? (
@@ -79,13 +79,13 @@ export function SubAgentAccordion({ turn }: Props) {
             <span
               className={cn(
                 "font-semibold",
-                running ? "text-violet-700 dark:text-violet-200" : "text-foreground",
+                running ? "text-blue-700 dark:text-blue-200" : "text-foreground",
               )}
             >
               {label}
             </span>
             {running ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-violet-500/15 px-2 py-0.5 text-[10px] font-medium text-violet-700 dark:text-violet-300">
+              <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-300">
                 <Loader2 className="h-2.5 w-2.5 animate-spin" />
                 ishlamoqda
               </span>

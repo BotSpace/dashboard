@@ -46,7 +46,7 @@ export function WorldActivityMap() {
         <g clipPath="url(#world-clip)">
           <rect width="900" height="450" fill="url(#dot-grid)" opacity="4" />
           {/* Extra continent brightening */}
-          <rect width="900" height="450" fill="rgba(139,92,246,0.04)" />
+          <rect width="900" height="450" fill="rgba(59,130,246,0.04)" />
         </g>
 
         {/* Subtle continent outlines */}
@@ -115,7 +115,7 @@ export function WorldActivityMap() {
               className={cn(
                 "absolute inline-flex animate-ping rounded-full opacity-60",
                 s.ping,
-                i % 3 === 0 ? "bg-violet-500" : i % 3 === 1 ? "bg-blue-500" : "bg-fuchsia-500",
+                i % 3 === 0 ? "bg-blue-500" : i % 3 === 1 ? "bg-indigo-500" : "bg-fuchsia-500",
               )}
               style={{ animationDuration: `${1.5 + (i % 4) * 0.4}s`, animationDelay: `${i * 0.2}s` }}
             />
@@ -124,7 +124,7 @@ export function WorldActivityMap() {
               className={cn(
                 "relative inline-flex rounded-full",
                 s.inner,
-                i % 3 === 0 ? "bg-violet-400" : i % 3 === 1 ? "bg-blue-400" : "bg-fuchsia-400",
+                i % 3 === 0 ? "bg-blue-400" : i % 3 === 1 ? "bg-indigo-400" : "bg-fuchsia-400",
               )}
             />
           </div>

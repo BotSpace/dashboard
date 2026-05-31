@@ -47,7 +47,7 @@ export default async function DashboardPage({
           </div>
         </div>
 
-        <Button asChild className="gap-2 bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-500/20">
+        <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
           <Link href="/app/bots/new">
             <Plus className="h-4 w-4" />
             Yangi bot
@@ -64,7 +64,7 @@ export default async function DashboardPage({
         <div className="rounded-xl border border-border/60 bg-card p-5 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-violet-400" />
+              <TrendingUp className="h-4 w-4 text-blue-400" />
               <span className="font-semibold">Bot Performance</span>
             </div>
             <span className="rounded-full border border-border/60 bg-muted/60 px-2.5 py-0.5 text-[11px] text-muted-foreground">

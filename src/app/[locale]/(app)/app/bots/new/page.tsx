@@ -20,8 +20,8 @@ export default async function NewBotPage({ params }: { params: Promise<{ locale:
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-xl border border-violet-500/30 bg-card p-5">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10 text-violet-400">
+        <div className="rounded-xl border border-blue-500/30 bg-card p-5">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400">
             <FilePlus2 className="h-5 w-5" />
           </div>
           <p className="font-semibold leading-none">{t("blank")}</p>

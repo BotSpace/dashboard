@@ -57,7 +57,7 @@ export default async function FilesPage({ params }: { params: Promise<{ locale: 
                   <tr key={f.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
                     <td className="px-4 py-3 font-medium">
                       {f.url ? (
-                        <a href={f.url} target="_blank" rel="noreferrer" className="hover:underline hover:text-violet-400 transition-colors">
+                        <a href={f.url} target="_blank" rel="noreferrer" className="hover:underline hover:text-blue-400 transition-colors">
                           {f.name}
                         </a>
                       ) : (

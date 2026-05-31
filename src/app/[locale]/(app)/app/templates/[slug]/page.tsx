@@ -62,7 +62,7 @@ export default async function TemplateDetailPage({
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
-          <div className="overflow-hidden rounded-xl border bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 aspect-[16/9]">
+          <div className="overflow-hidden rounded-xl border bg-gradient-to-br from-blue-500/10 to-fuchsia-500/10 aspect-[16/9]">
             {tpl.image ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={tpl.image} alt={tpl.name} className="h-full w-full object-cover" />

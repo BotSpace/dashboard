@@ -52,7 +52,7 @@ export function TypingIndicator({ phase, currentTool, currentSubAgent }: Props) 
         className={cn(
           "flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-2 ring-transparent",
           activeSubAgent
-            ? "animate-pulse bg-violet-500/15 text-violet-600 ring-violet-400/30 dark:text-violet-300"
+            ? "animate-pulse bg-blue-500/15 text-blue-600 ring-blue-400/30 dark:text-blue-300"
             : phase === "tool"
               ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
               : "bg-gradient-to-br from-primary/20 to-primary/5 text-primary"
@@ -69,14 +69,14 @@ export function TypingIndicator({ phase, currentTool, currentSubAgent }: Props) 
       <div
         className={cn(
           "flex items-center gap-2.5 rounded-2xl px-4 py-2.5",
-          activeSubAgent ? "bg-violet-500/10" : "bg-muted/40"
+          activeSubAgent ? "bg-blue-500/10" : "bg-muted/40"
         )}
       >
         <Dots />
         <span
           className={cn(
             "text-xs font-medium",
-            activeSubAgent ? "text-violet-700 dark:text-violet-200" : "text-muted-foreground"
+            activeSubAgent ? "text-blue-700 dark:text-blue-200" : "text-muted-foreground"
           )}
         >
           {label(phase, currentTool, currentSubAgent)}
@@ -85,7 +85,7 @@ export function TypingIndicator({ phase, currentTool, currentSubAgent }: Props) 
           <Loader2
             className={cn(
               "h-3 w-3 animate-spin",
-              activeSubAgent ? "text-violet-500" : "text-muted-foreground/60"
+              activeSubAgent ? "text-blue-500" : "text-muted-foreground/60"
             )}
           />
         )}
@@ -113,7 +113,7 @@ export function RunStatusChip({ phase, currentTool, currentSubAgent }: Props) {
       : phase === "waiting"
         ? "bg-amber-500/10 text-amber-700 dark:text-amber-300"
         : activeSubAgent
-          ? "bg-violet-500/15 text-violet-700 dark:text-violet-300"
+          ? "bg-blue-500/15 text-blue-700 dark:text-blue-300"
           : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
 
   const text =

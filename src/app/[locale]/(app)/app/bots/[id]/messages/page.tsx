@@ -32,7 +32,7 @@ function MediaTypeChip({ type }: { type: BroadcastMessage["message_type"] }) {
     );
   if (type === "video")
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-violet-500/10 px-2 py-0.5 text-[11px] font-medium text-violet-600 dark:text-violet-400">
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-blue-500/10 px-2 py-0.5 text-[11px] font-medium text-blue-600 dark:text-blue-400">
         <Video className="h-3 w-3" />
         Video
       </span>

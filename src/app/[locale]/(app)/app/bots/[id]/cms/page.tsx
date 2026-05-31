@@ -57,7 +57,7 @@ export default async function BotCmsListPage({
               href={`/app/bots/${projectId}/cms/${c.name}/data`}
               className="block"
             >
-              <Card className="overflow-hidden transition hover:border-violet-500/40">
+              <Card className="overflow-hidden transition hover:border-blue-500/40">
                 <CardContent className="space-y-3 p-5">
                   <div className="flex items-start justify-between gap-2">
                     <div>

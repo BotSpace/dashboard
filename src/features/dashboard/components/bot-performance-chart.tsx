@@ -33,9 +33,9 @@ function formatDate(dateStr: string): string {
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-violet-500/20 bg-[#0f0f18] px-3 py-2 shadow-xl">
+    <div className="rounded-lg border border-blue-500/20 bg-[#0f0f18] px-3 py-2 shadow-xl">
       <p className="mb-1 text-xs text-slate-400">{label}</p>
-      <p className="text-sm font-semibold text-violet-300">
+      <p className="text-sm font-semibold text-blue-300">
         {formatY(payload[0].value)} xabar
       </p>
     </div>
@@ -59,8 +59,8 @@ export function BotPerformanceChart({ data }: BotPerformanceChartProps) {
       <AreaChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
         <defs>
           <linearGradient id="perfGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.35} />
-            <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0} />
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.35} />
+            <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid
@@ -84,16 +84,16 @@ export function BotPerformanceChart({ data }: BotPerformanceChartProps) {
         />
         <Tooltip
           content={<CustomTooltip />}
-          cursor={{ stroke: "rgba(139,92,246,0.3)", strokeWidth: 1 }}
+          cursor={{ stroke: "rgba(59,130,246,0.3)", strokeWidth: 1 }}
         />
         <Area
           type="monotone"
           dataKey="messages"
-          stroke="#8b5cf6"
+          stroke="#3b82f6"
           strokeWidth={2}
           fill="url(#perfGrad)"
           dot={false}
-          activeDot={{ r: 4, fill: "#8b5cf6", stroke: "#fff", strokeWidth: 2 }}
+          activeDot={{ r: 4, fill: "#3b82f6", stroke: "#fff", strokeWidth: 2 }}
         />
       </AreaChart>
     </ResponsiveContainer>

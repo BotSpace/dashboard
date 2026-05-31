@@ -5,8 +5,8 @@ import type { DashboardOverview } from "@/shared/types/api";
 type TopBot = DashboardOverview["top_bots"][number];
 
 const AVATAR_COLORS = [
-  "bg-violet-500/20 text-violet-300",
   "bg-blue-500/20 text-blue-300",
+  "bg-indigo-500/20 text-indigo-300",
   "bg-fuchsia-500/20 text-fuchsia-300",
   "bg-emerald-500/20 text-emerald-300",
   "bg-amber-500/20 text-amber-300",

@@ -43,7 +43,7 @@ export function RecentBotsV2({ bots }: { bots: Project[] }) {
             {/* Avatar */}
             <Avatar className="h-9 w-9 shrink-0">
               {bot.avatar && <AvatarImage src={bot.avatar} alt={bot.name} />}
-              <AvatarFallback className="bg-violet-500/15 text-xs font-bold text-violet-300">
+              <AvatarFallback className="bg-blue-500/15 text-xs font-bold text-blue-300">
                 {bot.initial ?? initials(bot.name)}
               </AvatarFallback>
             </Avatar>

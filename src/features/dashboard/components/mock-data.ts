@@ -19,8 +19,8 @@ export const PERF_DATA = [
 ];
 
 export const TOP_BOTS = [
-  { id: 1, name: "UzShop Assistant", initial: "UA", color: "violet", value: 125430, delta: "+18%" },
-  { id: 2, name: "Delivery Tracker", initial: "DT", color: "blue", value: 98210, delta: "+12%" },
+  { id: 1, name: "UzShop Assistant", initial: "UA", color: "blue", value: 125430, delta: "+18%" },
+  { id: 2, name: "Delivery Tracker", initial: "DT", color: "indigo", value: 98210, delta: "+12%" },
   { id: 3, name: "Support Bot", initial: "SB", color: "fuchsia", value: 74350, delta: "+9%" },
   { id: 4, name: "Quiz Master", initial: "QM", color: "emerald", value: 51200, delta: "+24%" },
   { id: 5, name: "News Bot", initial: "NB", color: "amber", value: 38940, delta: "+7%" },
@@ -70,8 +70,8 @@ export const MOCK_BOTS = [
 ];
 
 export const DONUT_DATA = [
-  { name: "Foydalanuvchilar", value: 45, color: "#8b5cf6" },
-  { name: "Guruhlar", value: 30, color: "#3b82f6" },
+  { name: "Foydalanuvchilar", value: 45, color: "#3b82f6" },
+  { name: "Guruhlar", value: 30, color: "#6366f1" },
   { name: "Kanallar", value: 15, color: "#d946ef" },
   { name: "Boshqalar", value: 10, color: "#6b7280" },
 ];

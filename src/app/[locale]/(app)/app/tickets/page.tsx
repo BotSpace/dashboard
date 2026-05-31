@@ -20,7 +20,7 @@ export default async function TicketsPage({ params }: { params: Promise<{ locale
         title={t("title")}
         icon={<LifeBuoy className="h-5 w-5" />}
         actions={
-          <Button asChild className="gap-2 bg-violet-600 hover:bg-violet-700 text-white">
+          <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
             <Link href="/app/tickets/new">
               <Plus className="h-4 w-4" /> {t("new")}
             </Link>
@@ -33,7 +33,7 @@ export default async function TicketsPage({ params }: { params: Promise<{ locale
           icon={<LifeBuoy className="h-7 w-7" />}
           title={t("empty")}
           action={
-            <Button asChild className="gap-2 bg-violet-600 hover:bg-violet-700 text-white">
+            <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
               <Link href="/app/tickets/new">
                 <Plus className="h-4 w-4" /> {t("new")}
               </Link>

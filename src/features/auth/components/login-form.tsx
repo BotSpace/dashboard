@@ -191,7 +191,7 @@ export function LoginForm({ from }: { from?: string }) {
         <div className="relative flex items-center justify-center px-4 py-24 sm:px-6 md:px-8 lg:py-12">
           {/* Subtle background on mobile */}
           <div className="pointer-events-none absolute inset-0 lg:hidden">
-            <div className="spot-orb spot-violet left-1/2 top-1/3 h-[420px] w-[420px] -translate-x-1/2 opacity-50" />
+            <div className="spot-orb spot-blue left-1/2 top-1/3 h-[420px] w-[420px] -translate-x-1/2 opacity-50" />
           </div>
 
           <div className="relative w-full max-w-sm">

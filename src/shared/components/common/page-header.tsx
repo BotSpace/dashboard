@@ -16,7 +16,7 @@ export function PageHeader({ title, subtitle, actions, icon, className }: PageHe
     <header className={cn("flex flex-wrap items-center justify-between gap-3", className)}>
       <div className="flex min-w-0 items-center gap-3">
         {icon && (
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
             {icon}
           </div>
         )}

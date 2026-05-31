@@ -97,7 +97,7 @@ export function MediaUpload({ value, onChange, disabled }: MediaUploadProps) {
           </>
         ) : (
           <div className="flex items-center gap-3 p-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-500 ring-1 ring-violet-500/20">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20">
               <FileVideo className="h-6 w-6" />
             </div>
             <div className="min-w-0 flex-1">

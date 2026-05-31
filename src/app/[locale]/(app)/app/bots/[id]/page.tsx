@@ -16,7 +16,7 @@ export default async function BotOverviewPage({
     <div className="grid gap-4 lg:grid-cols-2">
       <Section
         title="Bot ma'lumotlari"
-        icon={<Info className="h-4 w-4 text-violet-400" />}
+        icon={<Info className="h-4 w-4 text-blue-400" />}
         contentClassName="space-y-3 text-sm"
       >
         <Row label="Nom" value={bot?.name} />

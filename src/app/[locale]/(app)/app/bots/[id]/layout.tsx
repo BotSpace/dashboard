@@ -34,7 +34,7 @@ export default async function BotLayout({
       </Link>
 
       <header className="flex flex-wrap items-center gap-4 rounded-xl border border-border/60 bg-card p-5">
-        <Avatar className="h-14 w-14 ring-2 ring-violet-500/20 shrink-0">
+        <Avatar className="h-14 w-14 ring-2 ring-blue-500/20 shrink-0">
           {bot.avatar && <AvatarImage src={bot.avatar} alt={bot.name} />}
           <AvatarFallback className="text-sm font-semibold">{initials(bot.name)}</AvatarFallback>
         </Avatar>

@@ -56,7 +56,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
       {/* Stats cards */}
       <div className="grid gap-4 md:grid-cols-3">
         {/* Current plan */}
-        <Card className="border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-transparent">
+        <Card className="border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-transparent">
           <CardHeader className="pb-2">
             <CardDescription>{t("currentPlan")}</CardDescription>
             <CardTitle className="flex items-center gap-2 text-2xl capitalize">
@@ -103,7 +103,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white">
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
               {t("addFunds")}
             </Button>
           </CardContent>
@@ -127,19 +127,19 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                 key={p.id}
                 className={
                   isCurrent
-                    ? "border-violet-500/40 ring-2 ring-violet-500/20 bg-gradient-to-br from-violet-500/5 to-transparent"
+                    ? "border-blue-500/40 ring-2 ring-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent"
                     : ""
                 }
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="grid h-8 w-8 place-items-center rounded-lg bg-violet-500/10 text-violet-400">
+                      <div className="grid h-8 w-8 place-items-center rounded-lg bg-blue-500/10 text-blue-400">
                         <Icon className="h-4 w-4" />
                       </div>
                       <CardTitle className="text-lg capitalize">{p.name_display ?? p.name}</CardTitle>
                     </div>
-                    {isCurrent && <Badge className="bg-violet-600 text-white border-none">Joriy</Badge>}
+                    {isCurrent && <Badge className="bg-blue-600 text-white border-none">Joriy</Badge>}
                   </div>
                   <div className="mt-2 text-3xl font-bold">
                     {p.price > 0 ? `$${p.price}` : "Bepul"}
@@ -172,7 +172,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                     className={
                       isCurrent
                         ? "w-full"
-                        : "w-full bg-violet-600 hover:bg-violet-700 text-white"
+                        : "w-full bg-blue-600 hover:bg-blue-700 text-white"
                     }
                     size="sm"
                     disabled={isCurrent}

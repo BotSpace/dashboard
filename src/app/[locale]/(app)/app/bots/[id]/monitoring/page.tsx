@@ -14,7 +14,7 @@ export default async function MonitoringPage({
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {METRICS.map((k) => (
-        <Section key={k} title={k} icon={<Activity className="h-4 w-4 text-violet-400" />}>
+        <Section key={k} title={k} icon={<Activity className="h-4 w-4 text-blue-400" />}>
           <div className="text-3xl font-bold">—</div>
           <div className="mt-1 text-xs text-muted-foreground">Tez orada</div>
         </Section>

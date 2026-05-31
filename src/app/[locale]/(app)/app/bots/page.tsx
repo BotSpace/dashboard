@@ -30,7 +30,7 @@ export default async function BotsPage({
         title={t("title")}
         subtitle={`${bots.length} ${t("title").toLowerCase()}`}
         actions={
-          <Button asChild className="gap-2 bg-violet-600 hover:bg-violet-700 text-white shadow-sm shadow-violet-500/20">
+          <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-500/20">
             <Link href="/app/bots/new">
               <Plus className="h-4 w-4" /> {t("new")}
             </Link>
@@ -48,7 +48,7 @@ export default async function BotsPage({
           icon={<Bot className="h-7 w-7" />}
           title={t("empty")}
           action={
-            <Button asChild className="gap-2 bg-violet-600 hover:bg-violet-700 text-white">
+            <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
               <Link href="/app/bots/new">
                 <Plus className="h-4 w-4" /> {t("new")}
               </Link>
@@ -61,10 +61,10 @@ export default async function BotsPage({
             <Link
               key={b.id}
               href={`/app/bots/${b.id}`}
-              className="group rounded-xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:border-violet-500/30 hover:shadow-md hover:shadow-violet-500/5"
+              className="group rounded-xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:border-blue-500/30 hover:shadow-md hover:shadow-blue-500/5"
             >
               <div className="flex items-start justify-between">
-                <Avatar className="h-12 w-12 ring-2 ring-border/40 transition-all group-hover:ring-violet-500/20">
+                <Avatar className="h-12 w-12 ring-2 ring-border/40 transition-all group-hover:ring-blue-500/20">
                   {b.avatar && <AvatarImage src={b.avatar} alt={b.name} />}
                   <AvatarFallback className="text-xs font-semibold">{initials(b.name)}</AvatarFallback>
                 </Avatar>
