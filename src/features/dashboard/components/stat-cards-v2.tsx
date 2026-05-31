@@ -1,17 +1,72 @@
 import { Bot, Users, MessageSquare, DollarSign, LayoutTemplate } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
+import type { DashboardOverview } from "@/shared/types/api";
+
+type Totals = DashboardOverview["totals"];
+
+type LucideIcon = typeof Bot;
 
 type StatItem = {
   label: string;
   value: string;
-  delta: string;
-  icon: typeof Bot;
+  delta: string | null;
+  icon: LucideIcon;
   gradient: string;
   iconColor: string;
-  glowColor: string;
 };
 
-const STATS: StatItem[] = [
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return String(n);
+}
+
+function buildStats(totals: Totals): StatItem[] {
+  return [
+    {
+      label: "Jami Botlar",
+      value: String(totals.bots),
+      delta: null,
+      icon: Bot,
+      gradient: "from-violet-500/20 to-violet-600/5",
+      iconColor: "text-violet-400",
+    },
+    {
+      label: "Foydalanuvchilar",
+      value: formatCompact(totals.users),
+      delta: null,
+      icon: Users,
+      gradient: "from-blue-500/20 to-blue-600/5",
+      iconColor: "text-blue-400",
+    },
+    {
+      label: "Xabarlar",
+      value: formatCompact(totals.messages),
+      delta: null,
+      icon: MessageSquare,
+      gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
+      iconColor: "text-fuchsia-400",
+    },
+    {
+      label: "Daromad",
+      value: `${formatCompact(totals.revenue)} ${totals.currency}`,
+      delta: null,
+      icon: DollarSign,
+      gradient: "from-emerald-500/20 to-emerald-600/5",
+      iconColor: "text-emerald-400",
+    },
+    {
+      label: "Shablonlar",
+      value: String(totals.templates),
+      delta: null,
+      icon: LayoutTemplate,
+      gradient: "from-amber-500/20 to-amber-600/5",
+      iconColor: "text-amber-400",
+    },
+  ];
+}
+
+const MOCK_STATS: StatItem[] = [
   {
     label: "Jami Botlar",
     value: "128",
@@ -19,7 +74,6 @@ const STATS: StatItem[] = [
     icon: Bot,
     gradient: "from-violet-500/20 to-violet-600/5",
     iconColor: "text-violet-400",
-    glowColor: "shadow-violet-500/20",
   },
   {
     label: "Foydalanuvchilar",
@@ -28,7 +82,6 @@ const STATS: StatItem[] = [
     icon: Users,
     gradient: "from-blue-500/20 to-blue-600/5",
     iconColor: "text-blue-400",
-    glowColor: "shadow-blue-500/20",
   },
   {
     label: "Xabarlar",
@@ -37,7 +90,6 @@ const STATS: StatItem[] = [
     icon: MessageSquare,
     gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
     iconColor: "text-fuchsia-400",
-    glowColor: "shadow-fuchsia-500/20",
   },
   {
     label: "Daromad",
@@ -46,7 +98,6 @@ const STATS: StatItem[] = [
     icon: DollarSign,
     gradient: "from-emerald-500/20 to-emerald-600/5",
     iconColor: "text-emerald-400",
-    glowColor: "shadow-emerald-500/20",
   },
   {
     label: "Shablonlar",
@@ -55,14 +106,19 @@ const STATS: StatItem[] = [
     icon: LayoutTemplate,
     gradient: "from-amber-500/20 to-amber-600/5",
     iconColor: "text-amber-400",
-    glowColor: "shadow-amber-500/20",
   },
 ];
 
-export function StatCardsV2() {
+interface StatCardsV2Props {
+  totals?: Totals | null;
+}
+
+export function StatCardsV2({ totals }: StatCardsV2Props) {
+  const stats: StatItem[] = totals ? buildStats(totals) : MOCK_STATS;
+
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">
-      {STATS.map((stat) => (
+      {stats.map((stat) => (
         <div
           key={stat.label}
           className={cn(
@@ -98,12 +154,14 @@ export function StatCardsV2() {
               {stat.value}
             </div>
 
-            {/* Delta */}
-            <div className="mt-1.5 flex items-center gap-1">
-              <span className="text-[11px] font-medium text-emerald-400">
-                {stat.delta}
-              </span>
-            </div>
+            {/* Delta — only shown for mock (backend doesn't return totals delta) */}
+            {stat.delta && (
+              <div className="mt-1.5 flex items-center gap-1">
+                <span className="text-[11px] font-medium text-emerald-400">
+                  {stat.delta}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       ))}

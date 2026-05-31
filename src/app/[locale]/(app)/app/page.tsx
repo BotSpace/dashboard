@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { setRequestLocale } from "next-intl/server";
 import { Bot, Plus, TrendingUp } from "lucide-react";
-import { ProjectsAPI } from "@/shared/api/services";
+import { ProjectsAPI, DashboardAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -21,6 +21,9 @@ export default async function DashboardPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  // Fetch overview — null on any error; widgets fall back to mock
+  const overview = await DashboardAPI.overview().catch(() => null);
 
   return (
     <div className="space-y-6 pb-8">
@@ -53,7 +56,7 @@ export default async function DashboardPage({
       </header>
 
       {/* ── 1. Stat cards ──────────────────────────────── */}
-      <StatCardsV2 />
+      <StatCardsV2 totals={overview?.totals ?? null} />
 
       {/* ── 2. Performance chart + Top bots ───────────── */}
       <div className="grid gap-4 lg:grid-cols-3">
@@ -68,7 +71,7 @@ export default async function DashboardPage({
               Oxirgi 30 kun
             </span>
           </div>
-          <BotPerformanceChart />
+          <BotPerformanceChart data={overview?.performance ?? null} />
         </div>
 
         {/* Top bots — narrow */}
@@ -77,7 +80,7 @@ export default async function DashboardPage({
             <Bot className="h-4 w-4 text-blue-400" />
             <span className="font-semibold">Top Botlar</span>
           </div>
-          <TopBotsList />
+          <TopBotsList bots={overview?.top_bots ?? null} />
         </div>
       </div>
 
@@ -124,7 +127,7 @@ export default async function DashboardPage({
           <div className="mb-4 flex items-center gap-2">
             <span className="font-semibold">Analitika</span>
           </div>
-          <AnalyticsDonut />
+          <AnalyticsDonut distribution={overview?.distribution ?? null} />
         </div>
       </div>
     </div>

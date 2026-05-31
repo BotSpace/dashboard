@@ -17,6 +17,18 @@ function formatY(value: number) {
   return String(value);
 }
 
+/** "2026-05-01" → "1-May" */
+function formatDate(dateStr: string): string {
+  try {
+    const d = new Date(dateStr + "T00:00:00");
+    const day = d.getDate();
+    const month = d.toLocaleString("uz", { month: "short" });
+    return `${day}-${month}`;
+  } catch {
+    return dateStr;
+  }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
@@ -30,10 +42,21 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
-export function BotPerformanceChart() {
+interface BotPerformanceChartProps {
+  /** Backend performance points: {date: "YYYY-MM-DD", value: number}[]. Falls back to mock if absent. */
+  data?: { date: string; value: number }[] | null;
+}
+
+export function BotPerformanceChart({ data }: BotPerformanceChartProps) {
+  // Normalise to {day, messages} shape that recharts already uses
+  const chartData =
+    data && data.length > 0
+      ? data.map((p) => ({ day: formatDate(p.date), messages: p.value }))
+      : PERF_DATA;
+
   return (
     <ResponsiveContainer width="100%" height={220}>
-      <AreaChart data={PERF_DATA} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+      <AreaChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
         <defs>
           <linearGradient id="perfGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.35} />

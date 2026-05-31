@@ -243,6 +243,23 @@ export type CmsDocumentListResponse = {
   skip: number;
 };
 
+// ── Dashboard ──────────────────────────────────────────────────────────────
+
+export type DashboardOverview = {
+  totals: {
+    bots: number;
+    active_bots: number;
+    users: number;
+    messages: number;
+    templates: number;
+    revenue: number;
+    currency: string;
+  };
+  performance: { date: string; value: number }[];
+  top_bots: { id: number | string; name: string; messages: number; delta: number | null }[];
+  distribution: { private: number; group: number; channel: number; other: number };
+};
+
 export type CmsAuditEntry = {
   id: number;
   action: string;

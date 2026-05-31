@@ -19,6 +19,7 @@ import type {
   Ticket,
   Transaction,
   BroadcastMessage,
+  DashboardOverview,
 } from "@/shared/types/api";
 
 // Backend response shape: { status, data: { results: T[], total_items, ... } }  OR  { results: T[] }  OR plain array
@@ -357,6 +358,11 @@ export const CmsAPI = {
     const d = await api<unknown>(cms(projectId, name, "audit") + "/", { query: params });
     return Array.isArray(d) ? (d as CmsAuditEntry[]) : unwrapList<CmsAuditEntry>(d);
   },
+};
+
+// DASHBOARD
+export const DashboardAPI = {
+  overview: () => api<DashboardOverview>("/api/dashboard/overview/"),
 };
 
 // API TOKENS
