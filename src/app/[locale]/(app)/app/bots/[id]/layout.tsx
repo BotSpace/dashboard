@@ -55,7 +55,7 @@ export default async function BotLayout({
       </header>
 
       <BotTabs id={id} />
-      <div className="pt-2">{children}</div>
+      <div className="pt-6">{children}</div>
     </div>
   );
 }
