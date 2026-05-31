@@ -153,4 +153,52 @@ export async function getAgentUsage(): Promise<AgentUsage> {
   return res.json();
 }
 
+// ── Thread history endpoints ──────────────────────────────────────────────────
+
+export type AgentThreadMeta = {
+  thread_id: string;
+  title: string;
+  updated_at: string;
+  run_count: number;
+};
+
+export type AgentThreadTurnUser = { kind: "user"; id: string; text: string };
+export type AgentThreadTurnAssistant = { kind: "assistant"; id: string; text: string };
+export type AgentThreadTurnTool = {
+  kind: "tool";
+  id: string;
+  call: {
+    id: string;
+    name: string;
+    arguments: Record<string, unknown>;
+    result?: string;
+    isError?: boolean;
+  };
+};
+export type AgentThreadTurn =
+  | AgentThreadTurnUser
+  | AgentThreadTurnAssistant
+  | AgentThreadTurnTool;
+
+export async function listAgentThreads(
+  projectId: string
+): Promise<{ threads: AgentThreadMeta[] }> {
+  const res = await agentFetch(
+    `/projects/${encodeURIComponent(projectId)}/threads?limit=50`
+  );
+  if (!res.ok) throw new Error(`agent list_threads failed: ${res.status}`);
+  return res.json();
+}
+
+export async function getAgentThreadHistory(
+  projectId: string,
+  threadId: string
+): Promise<{ thread_id: string; turns: AgentThreadTurn[] }> {
+  const res = await agentFetch(
+    `/projects/${encodeURIComponent(projectId)}/threads/${encodeURIComponent(threadId)}`
+  );
+  if (!res.ok) throw new Error(`agent get_thread failed: ${res.status}`);
+  return res.json();
+}
+
 export { AGENT_BASE, agentFetch };

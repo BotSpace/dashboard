@@ -434,5 +434,17 @@ export function useAgentStream({
     });
   }, []);
 
-  return { ...state, pushUserTurn, close };
+  /**
+   * Seed turns from an external source (e.g. backend history fetch) when the
+   * stream has not yet received any turns and is idle (no live run).
+   * Safe to call multiple times — only applies when turns are empty.
+   */
+  const seedTurnsFromBackend = useCallback((turns: ChatTurn[]) => {
+    setState((s) => {
+      if (s.turns.length > 0 || s.phase !== "idle") return s;
+      return { ...s, turns };
+    });
+  }, []);
+
+  return { ...state, pushUserTurn, close, seedTurnsFromBackend };
 }

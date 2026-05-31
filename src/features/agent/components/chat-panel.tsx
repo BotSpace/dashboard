@@ -8,7 +8,6 @@ import {
   Square,
   User,
   Sparkles,
-  PanelLeftClose,
   PanelLeftOpen,
   Plus,
   ArrowDown,
@@ -16,7 +15,13 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/components/ui/button";
-import { approveRunAction, cancelRunAction, startRunAction } from "../actions";
+import {
+  approveRunAction,
+  cancelRunAction,
+  startRunAction,
+  listThreadsAction,
+  loadThreadHistoryAction,
+} from "../actions";
 import { useAgentStream } from "../use-agent-stream";
 import { ClarifyDialog } from "./clarify-dialog";
 import { MessageMarkdown } from "./message-markdown";
@@ -41,6 +46,33 @@ import {
   upsertThreadMeta,
   type ThreadMeta,
 } from "../storage";
+
+/**
+ * Merges backend thread list with localStorage list.
+ * Backend entries take precedence for title/lastUpdated.
+ * Result is sorted newest-first and deduplicated by id.
+ */
+function mergeThreadLists(
+  local: ThreadMeta[],
+  backendRaw: { thread_id: string; title: string; updated_at: string }[]
+): ThreadMeta[] {
+  const map = new Map<string, ThreadMeta>();
+  // Start with local entries as the base
+  for (const t of local) {
+    map.set(t.id, t);
+  }
+  // Backend entries overwrite local ones (backend is source of truth for title/time)
+  for (const b of backendRaw) {
+    const ts = new Date(b.updated_at).getTime();
+    const existing = map.get(b.thread_id);
+    map.set(b.thread_id, {
+      id: b.thread_id,
+      title: b.title || existing?.title || "Suhbat",
+      lastUpdated: isNaN(ts) ? (existing?.lastUpdated ?? Date.now()) : ts,
+    });
+  }
+  return Array.from(map.values()).sort((a, b) => b.lastUpdated - a.lastUpdated);
+}
 
 type Props = {
   projectId: string;
@@ -118,6 +150,33 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
   const [threads, setThreads] = useState<ThreadMeta[]>(() => loadThreads(projectId));
   const [threadId, setThreadId] = useState<string>(() => pickInitialThreadId(projectId));
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // On mount: fetch backend thread list and merge with localStorage
+  useEffect(() => {
+    let cancelled = false;
+    listThreadsAction(projectId).then((res) => {
+      if (cancelled || !res) return;
+      const local = loadThreads(projectId);
+      const merged = mergeThreadLists(local, res.threads);
+      setThreads(merged);
+      // Persist merged list back to localStorage as write-through cache
+      // (import saveThreads lazily to avoid circular issues — it's already imported via storage)
+      try {
+        localStorage.setItem(
+          `bm.agent.threads:${projectId}`,
+          JSON.stringify(merged.slice(0, 50))
+        );
+      } catch {
+        /* quota — ignore */
+      }
+      // If current threadId is not in merged list and merged list is non-empty,
+      // keep it (the user might have just created it locally).
+    });
+    return () => {
+      cancelled = true;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId]);
 
   const handleNewThread = () => {
     setThreadId(newThreadId());
@@ -225,6 +284,7 @@ function ChatThread({
   const [pending, start] = useTransition();
   const [usageKey, setUsageKey] = useState(0);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
+  const backendLoadedRef = useRef(false);
   const scroller = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -232,7 +292,7 @@ function ChatThread({
     projectId,
     requestId,
     initialTurns: initialThread?.turns,
-    initialSeq: initialThread?.lastSeq,
+    initialSeq: initialThread?.lastSeq ?? 0,
     onPersist: (snapshot) =>
       saveThread(projectId, threadId, {
         turns: snapshot.turns,
@@ -240,6 +300,35 @@ function ChatThread({
         finished: snapshot.finished,
       }),
   });
+
+  // Load history from backend when local turns are absent and there is no
+  // active streaming run in progress (to avoid disturbing live SSE).
+  useEffect(() => {
+    // Skip if: already have local turns, active run exists, already attempted
+    if (backendLoadedRef.current) return;
+    if (initialThread?.turns && initialThread.turns.length > 0) return;
+    if (stored?.requestId) return;
+    backendLoadedRef.current = true;
+
+    let cancelled = false;
+    loadThreadHistoryAction(projectId, threadId).then((res) => {
+      if (cancelled || !res || res.turns.length === 0) return;
+      // Map backend turns to ChatTurn format (they are already compatible)
+      const turns = res.turns as unknown as ChatTurn[];
+      // Inject into stream state (only applies if stream is still idle/empty)
+      stream.seedTurnsFromBackend(turns);
+      // Write-through cache: persist to localStorage so next open is instant
+      saveThread(projectId, threadId, {
+        turns,
+        lastSeq: 0,
+        finished: true,
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, threadId]);
 
   useEffect(() => {
     if (stream.finished && requestId) {

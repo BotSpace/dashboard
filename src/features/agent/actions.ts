@@ -6,8 +6,12 @@ import {
   cancelAgentRun,
   getAgentRun,
   getAgentUsage,
+  listAgentThreads,
+  getAgentThreadHistory,
   type AgentRunStatus,
   type AgentUsage,
+  type AgentThreadMeta,
+  type AgentThreadTurn,
 } from "@/shared/api/agent";
 
 export type RunCreateState = { ok: boolean; request_id?: string; message?: string };
@@ -81,6 +85,27 @@ export async function getRunStatusAction(args: {
 export async function getUsageAction(): Promise<AgentUsage | null> {
   try {
     return await getAgentUsage();
+  } catch {
+    return null;
+  }
+}
+
+export async function listThreadsAction(
+  projectId: string
+): Promise<{ threads: AgentThreadMeta[] } | null> {
+  try {
+    return await listAgentThreads(projectId);
+  } catch {
+    return null;
+  }
+}
+
+export async function loadThreadHistoryAction(
+  projectId: string,
+  threadId: string
+): Promise<{ thread_id: string; turns: AgentThreadTurn[] } | null> {
+  try {
+    return await getAgentThreadHistory(projectId, threadId);
   } catch {
     return null;
   }
