@@ -1,5 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { Activity } from "lucide-react";
+import { Section } from "@/shared/components/common/section";
+
+const METRICS = ["CPU", "RAM", "Traffic", "Disk"] as const;
 
 export default async function MonitoringPage({
   params,
@@ -10,16 +13,11 @@ export default async function MonitoringPage({
   setRequestLocale(locale);
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {(["CPU", "RAM", "Traffic", "Disk"] as const).map((k) => (
-        <Card key={k}>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">{k}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">—</div>
-            <div className="mt-1 text-xs text-muted-foreground">Tez orada</div>
-          </CardContent>
-        </Card>
+      {METRICS.map((k) => (
+        <Section key={k} title={k} icon={<Activity className="h-4 w-4 text-violet-400" />}>
+          <div className="text-3xl font-bold">—</div>
+          <div className="mt-1 text-xs text-muted-foreground">Tez orada</div>
+        </Section>
       ))}
     </div>
   );

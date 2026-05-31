@@ -1,10 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Settings } from "lucide-react";
 import { readSession } from "@/shared/auth/session";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { ProfileForm } from "@/features/settings/components/profile-form";
 import { PasswordForm } from "@/features/settings/components/password-form";
 import { APITokensPanel } from "@/features/settings/components/api-tokens";
+import { PageHeader } from "@/shared/components/common/page-header";
 
 export default async function SettingsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -15,7 +17,11 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+      <PageHeader
+        title={t("title")}
+        icon={<Settings className="h-5 w-5" />}
+      />
+
       <Tabs defaultValue="general">
         <TabsList>
           <TabsTrigger value="general">{t("tabs.general")}</TabsTrigger>

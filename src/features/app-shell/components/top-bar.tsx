@@ -21,20 +21,22 @@ export function TopBar({ user }: { user: UserMenuUser }) {
         >
           <Menu />
         </Button>
-        <div className="relative w-full max-w-xl">
+        <div className="relative w-full max-w-sm lg:max-w-xl">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Qidirish… (⌘K)"
-            className="h-9 w-full pl-9 bg-muted/40"
+            className="h-9 w-full pl-9 bg-muted/40 focus-visible:bg-background"
           />
         </div>
-        <div className="ml-auto flex items-center gap-1.5">
-          <Button variant="ghost" size="icon" aria-label="Notifications">
+        <div className="ml-auto flex items-center gap-1">
+          <Button variant="ghost" size="icon" aria-label="Bildirishnomalar" className="relative">
             <Bell className="h-4 w-4" />
           </Button>
           <LanguageSwitcher />
-          <UserMenu user={user} />
+          <div className="ml-0.5">
+            <UserMenu user={user} />
+          </div>
         </div>
       </header>
       <MobileSidebar open={mobileOpen} onOpenChange={setMobileOpen} />

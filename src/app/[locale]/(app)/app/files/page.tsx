@@ -1,7 +1,9 @@
 import { setRequestLocale } from "next-intl/server";
-import { FileIcon } from "lucide-react";
+import { FileIcon, Files } from "lucide-react";
 import { FilesAPI } from "@/shared/api/services";
 import { Card, CardContent } from "@/shared/components/ui/card";
+import { PageHeader } from "@/shared/components/common/page-header";
+import { EmptyState } from "@/shared/components/common/empty-state";
 import { formatNumber } from "@/shared/lib/utils";
 import { FileUploader } from "@/features/files/components/file-uploader";
 
@@ -24,21 +26,23 @@ export default async function FilesPage({ params }: { params: Promise<{ locale: 
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Fayllar</h1>
-        <p className="text-sm text-muted-foreground">{formatNumber(files.length)} ta fayl</p>
-      </header>
+      <PageHeader
+        title="Fayllar"
+        subtitle={`${formatNumber(files.length)} ta fayl`}
+        icon={<Files className="h-5 w-5" />}
+      />
 
       <FileUploader />
 
-      <Card>
-        <CardContent className="p-0">
-          {files.length === 0 ? (
-            <div className="grid place-items-center py-16 text-center">
-              <FileIcon className="h-10 w-10 text-muted-foreground" />
-              <p className="mt-3 text-sm text-muted-foreground">Hech qanday fayl yo'q</p>
-            </div>
-          ) : (
+      {files.length === 0 ? (
+        <EmptyState
+          icon={<FileIcon className="h-7 w-7" />}
+          title="Hech qanday fayl yo'q"
+          description="Yuqoridagi forma orqali fayl yuklang"
+        />
+      ) : (
+        <Card>
+          <CardContent className="p-0">
             <table className="w-full text-sm">
               <thead className="border-b bg-muted/30 text-xs uppercase text-muted-foreground">
                 <tr>
@@ -50,10 +54,10 @@ export default async function FilesPage({ params }: { params: Promise<{ locale: 
               </thead>
               <tbody>
                 {files.map((f) => (
-                  <tr key={f.id} className="border-b last:border-0">
+                  <tr key={f.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
                     <td className="px-4 py-3 font-medium">
                       {f.url ? (
-                        <a href={f.url} target="_blank" rel="noreferrer" className="hover:underline">
+                        <a href={f.url} target="_blank" rel="noreferrer" className="hover:underline hover:text-violet-400 transition-colors">
                           {f.name}
                         </a>
                       ) : (
@@ -67,9 +71,9 @@ export default async function FilesPage({ params }: { params: Promise<{ locale: 
                 ))}
               </tbody>
             </table>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

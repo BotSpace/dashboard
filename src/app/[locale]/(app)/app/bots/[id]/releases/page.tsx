@@ -1,8 +1,10 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Rocket } from "lucide-react";
 import { ReleasesAPI } from "@/shared/api/services";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { DeployButton } from "@/features/bots/components/deploy-button";
+import { EmptyState } from "@/shared/components/common/empty-state";
 
 const statusToVariant = {
   running: "success",
@@ -26,13 +28,17 @@ export default async function ReleasesPage({
       <div className="flex justify-end">
         <DeployButton projectId={id} />
       </div>
-      <Card>
-        <CardContent className="p-0">
-          {releases.length === 0 ? (
-            <p className="py-12 text-center text-sm text-muted-foreground">
-              Hozircha versiyalar yo'q. Birinchisini deploy qiling.
-            </p>
-          ) : (
+
+      {releases.length === 0 ? (
+        <EmptyState
+          icon={<Rocket className="h-7 w-7" />}
+          title="Hozircha versiyalar yo'q"
+          description="Birinchi relizni deploy qiling"
+          action={<DeployButton projectId={id} />}
+        />
+      ) : (
+        <Card>
+          <CardContent className="p-0">
             <table className="w-full text-sm">
               <thead className="border-b bg-muted/30 text-xs uppercase text-muted-foreground">
                 <tr>
@@ -44,7 +50,7 @@ export default async function ReleasesPage({
               </thead>
               <tbody>
                 {releases.map((r) => (
-                  <tr key={r.id} className="border-b last:border-0">
+                  <tr key={r.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
                     <td className="px-4 py-3 font-medium">{r.version ?? r.id}</td>
                     <td className="px-4 py-3">
                       <Badge variant={statusToVariant[r.status ?? "pending"] ?? "secondary"}>
@@ -57,9 +63,9 @@ export default async function ReleasesPage({
                 ))}
               </tbody>
             </table>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
+import { FileIcon } from "lucide-react";
 import { FilesAPI } from "@/shared/api/services";
 import { Card, CardContent } from "@/shared/components/ui/card";
+import { EmptyState } from "@/shared/components/common/empty-state";
 import { FileUploader } from "@/features/files/components/file-uploader";
 
 function humanSize(bytes?: number) {
@@ -28,21 +30,25 @@ export default async function BotFilesPage({
     <div className="space-y-6">
       <FileUploader projectId={id} />
 
-      <Card>
-        <CardContent className="p-0">
-          {files.length === 0 ? (
-            <p className="py-12 text-center text-sm text-muted-foreground">Bu botda fayllar yo'q</p>
-          ) : (
+      {files.length === 0 ? (
+        <EmptyState
+          icon={<FileIcon className="h-7 w-7" />}
+          title="Bu botda fayllar yo'q"
+          description="Yuqoridagi forma orqali fayl yuklang"
+        />
+      ) : (
+        <Card>
+          <CardContent className="p-0">
             <ul className="divide-y">
               {files.map((f) => (
-                <li key={f.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                <li key={f.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm transition-colors hover:bg-muted/20">
                   <div className="min-w-0 flex-1">
                     {f.url ? (
                       <a
                         href={f.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="block truncate font-medium hover:underline"
+                        className="block truncate font-medium hover:underline hover:text-violet-400 transition-colors"
                       >
                         {f.name}
                       </a>
@@ -57,9 +63,9 @@ export default async function BotFilesPage({
                 </li>
               ))}
             </ul>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

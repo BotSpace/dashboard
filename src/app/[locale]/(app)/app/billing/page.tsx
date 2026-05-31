@@ -1,10 +1,11 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Bot, CheckCircle2, Sparkles, Zap } from "lucide-react";
+import { Bot, CheckCircle2, CreditCard, Sparkles, Zap } from "lucide-react";
 import { SubscriptionAPI, PlansAPI, BillingAPI } from "@/shared/api/services";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
 import { Progress } from "@/shared/components/ui/progress";
+import { PageHeader } from "@/shared/components/common/page-header";
 import { formatCurrency } from "@/shared/lib/utils";
 
 function formatTokens(n: number): string {
@@ -47,14 +48,15 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
 
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-      </header>
+      <PageHeader
+        title={t("title")}
+        icon={<CreditCard className="h-5 w-5" />}
+      />
 
       {/* Stats cards */}
       <div className="grid gap-4 md:grid-cols-3">
         {/* Current plan */}
-        <Card className="border-primary/30">
+        <Card className="border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-transparent">
           <CardHeader className="pb-2">
             <CardDescription>{t("currentPlan")}</CardDescription>
             <CardTitle className="flex items-center gap-2 text-2xl capitalize">
@@ -76,7 +78,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
         {/* Token usage */}
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>AI Token iste'moli (oylik)</CardDescription>
+            <CardDescription>AI Token iste&apos;moli (oylik)</CardDescription>
             <CardTitle className="text-2xl">
               {formatTokens(tokensUsed)} / {formatTokens(tokensLimit)}
             </CardTitle>
@@ -101,7 +103,9 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Button size="sm">{t("addFunds")}</Button>
+            <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white">
+              {t("addFunds")}
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -121,17 +125,21 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
             return (
               <Card
                 key={p.id}
-                className={isCurrent ? "border-primary ring-2 ring-primary/20" : ""}
+                className={
+                  isCurrent
+                    ? "border-violet-500/40 ring-2 ring-violet-500/20 bg-gradient-to-br from-violet-500/5 to-transparent"
+                    : ""
+                }
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
+                      <div className="grid h-8 w-8 place-items-center rounded-lg bg-violet-500/10 text-violet-400">
                         <Icon className="h-4 w-4" />
                       </div>
                       <CardTitle className="text-lg capitalize">{p.name_display ?? p.name}</CardTitle>
                     </div>
-                    {isCurrent && <Badge>Joriy</Badge>}
+                    {isCurrent && <Badge className="bg-violet-600 text-white border-none">Joriy</Badge>}
                   </div>
                   <div className="mt-2 text-3xl font-bold">
                     {p.price > 0 ? `$${p.price}` : "Bepul"}
@@ -141,27 +149,31 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                 <CardContent className="space-y-4">
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
                       <span>{formatTokens(planMaxTokens)} AI token/oy</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
                       <span>{planMaxBots === 0 ? "Cheksiz" : planMaxBots} bot</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
                       <span>Vizual konstruktor</span>
                     </li>
                     {p.name !== "free" && (
                       <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
+                        <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
                         <span>Priority support</span>
                       </li>
                     )}
                   </ul>
                   <Button
                     variant={isCurrent ? "outline" : "default"}
-                    className="w-full"
+                    className={
+                      isCurrent
+                        ? "w-full"
+                        : "w-full bg-violet-600 hover:bg-violet-700 text-white"
+                    }
                     size="sm"
                     disabled={isCurrent}
                   >
@@ -193,7 +205,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                 </thead>
                 <tbody>
                   {history.map((h) => (
-                    <tr key={h.id} className="border-b last:border-0">
+                    <tr key={h.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
                       <td className="px-4 py-3 text-muted-foreground">{h.created_at ?? "—"}</td>
                       <td className="px-4 py-3">{h.type ?? "—"}</td>
                       <td className="px-4 py-3 text-right font-medium">

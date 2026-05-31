@@ -31,8 +31,8 @@ export function BotTabs({ id }: { id: string | number }) {
             className={cn(
               "whitespace-nowrap border-b-2 px-3 py-2.5 text-sm transition-colors",
               active
-                ? "border-primary text-foreground font-medium"
-                : "border-transparent text-muted-foreground hover:text-foreground"
+                ? "border-violet-500 text-foreground font-medium"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border/60"
             )}
           >
             {tab.label}

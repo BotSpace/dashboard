@@ -1,9 +1,11 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Search } from "lucide-react";
+import { PackageOpen, Search } from "lucide-react";
 import { TemplatesAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
+import { PageHeader } from "@/shared/components/common/page-header";
+import { EmptyState } from "@/shared/components/common/empty-state";
 import { TemplatesInfiniteLoader } from "@/features/templates/components/templates-infinite-loader";
 
 type SearchParams = {
@@ -52,12 +54,11 @@ export default async function TemplatesPage({
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
-        </div>
-      </header>
+      <PageHeader
+        title={t("title")}
+        subtitle={t("subtitle")}
+        icon={<PackageOpen className="h-5 w-5" />}
+      />
 
       <form className="grid gap-3 md:grid-cols-[1fr_180px_140px_140px_auto]">
         <div className="relative">
@@ -66,7 +67,7 @@ export default async function TemplatesPage({
             name="search"
             defaultValue={sp.search ?? ""}
             placeholder={t("search")}
-            className="pl-9"
+            className="pl-9 bg-muted/40 focus-visible:bg-background"
           />
         </div>
         <select
@@ -106,9 +107,18 @@ export default async function TemplatesPage({
       </form>
 
       {items.length === 0 ? (
-        <div className="rounded-lg border border-dashed py-16 text-center text-sm text-muted-foreground">
-          {t("notFound")}
-        </div>
+        <EmptyState
+          icon={<PackageOpen className="h-7 w-7" />}
+          title={t("notFound")}
+          description={hasFilters ? "Filtrlarni o'chirib ko'ring" : undefined}
+          action={
+            hasFilters ? (
+              <Button asChild variant="outline">
+                <Link href="/app/templates">{t("reset")}</Link>
+              </Button>
+            ) : undefined
+          }
+        />
       ) : (
         <TemplatesInfiniteLoader
           initialItems={items}
@@ -121,7 +131,6 @@ export default async function TemplatesPage({
           ownedLabel={t("owned")}
         />
       )}
-
     </div>
   );
 }

@@ -27,28 +27,35 @@ export default async function BotLayout({
     <div className="space-y-6">
       <Link
         href="/app/bots"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
-        <ChevronLeft className="h-4 w-4" /> Botlar
+        <ChevronLeft className="h-4 w-4" />
+        Botlar
       </Link>
 
-      <header className="flex items-center gap-4">
-        <Avatar className="h-12 w-12">
+      <header className="flex flex-wrap items-center gap-4 rounded-xl border border-border/60 bg-card p-5">
+        <Avatar className="h-14 w-14 ring-2 ring-violet-500/20 shrink-0">
           {bot.avatar && <AvatarImage src={bot.avatar} alt={bot.name} />}
-          <AvatarFallback>{initials(bot.name)}</AvatarFallback>
+          <AvatarFallback className="text-sm font-semibold">{initials(bot.name)}</AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <EditableBotName id={id} initialName={bot.name} />
-            <Badge variant={bot.status === "active" ? "success" : "secondary"}>{bot.status ?? "draft"}</Badge>
+            <Badge variant={bot.status === "active" ? "success" : "secondary"} className="text-[11px]">
+              {bot.status ?? "draft"}
+            </Badge>
           </div>
-          {bot.username && <p className="text-sm text-muted-foreground">@{bot.username}</p>}
+          {bot.username && (
+            <p className="mt-0.5 text-sm text-muted-foreground">@{bot.username}</p>
+          )}
         </div>
-        <ConstructorButton botId={id} />
+        <div className="shrink-0">
+          <ConstructorButton botId={id} />
+        </div>
       </header>
 
       <BotTabs id={id} />
-      <div className="pt-6">{children}</div>
+      <div className="pt-2">{children}</div>
     </div>
   );
 }

@@ -4,9 +4,10 @@ import { ProjectsAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { Card, CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { PageHeader } from "@/shared/components/common/page-header";
+import { EmptyState } from "@/shared/components/common/empty-state";
 import { initials } from "@/shared/lib/utils";
 
 export default async function BotsPage({
@@ -25,53 +26,53 @@ export default async function BotsPage({
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">
-            {bots.length} {t("title").toLowerCase()}
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/app/bots/new" className="gap-2">
-            <Plus className="h-4 w-4" /> {t("new")}
-          </Link>
-        </Button>
-      </header>
+      <PageHeader
+        title={t("title")}
+        subtitle={`${bots.length} ${t("title").toLowerCase()}`}
+        actions={
+          <Button asChild className="gap-2 bg-violet-600 hover:bg-violet-700 text-white shadow-sm shadow-violet-500/20">
+            <Link href="/app/bots/new">
+              <Plus className="h-4 w-4" /> {t("new")}
+            </Link>
+          </Button>
+        }
+      />
 
       <form className="relative max-w-md">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input name="q" defaultValue={q} placeholder={t("search")} className="pl-9" />
+        <Input name="q" defaultValue={q} placeholder={t("search")} className="pl-9 bg-muted/40 focus-visible:bg-background" />
       </form>
 
       {bots.length === 0 ? (
-        <Card>
-          <CardContent className="grid place-items-center gap-3 py-16 text-center">
-            <div className="grid h-14 w-14 place-items-center rounded-full bg-muted">
-              <Bot className="h-7 w-7 text-muted-foreground" />
-            </div>
-            <p className="text-sm text-muted-foreground">{t("empty")}</p>
-            <Button asChild>
-              <Link href="/app/bots/new">{t("new")}</Link>
+        <EmptyState
+          icon={<Bot className="h-7 w-7" />}
+          title={t("empty")}
+          action={
+            <Button asChild className="gap-2 bg-violet-600 hover:bg-violet-700 text-white">
+              <Link href="/app/bots/new">
+                <Plus className="h-4 w-4" /> {t("new")}
+              </Link>
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {bots.map((b) => (
             <Link
               key={b.id}
               href={`/app/bots/${b.id}`}
-              className="group rounded-xl border bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md"
+              className="group rounded-xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:border-violet-500/30 hover:shadow-md hover:shadow-violet-500/5"
             >
               <div className="flex items-start justify-between">
-                <Avatar className="h-12 w-12">
+                <Avatar className="h-12 w-12 ring-2 ring-border/40 transition-all group-hover:ring-violet-500/20">
                   {b.avatar && <AvatarImage src={b.avatar} alt={b.name} />}
-                  <AvatarFallback>{initials(b.name)}</AvatarFallback>
+                  <AvatarFallback className="text-xs font-semibold">{initials(b.name)}</AvatarFallback>
                 </Avatar>
-                <Badge variant={b.status === "active" ? "success" : "secondary"}>{b.status ?? "draft"}</Badge>
+                <Badge variant={b.status === "active" ? "success" : "secondary"} className="text-[11px]">
+                  {b.status ?? "draft"}
+                </Badge>
               </div>
-              <div className="mt-4 truncate text-base font-semibold">{b.name}</div>
+              <div className="mt-4 truncate text-base font-semibold leading-tight">{b.name}</div>
               <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                 {b.description ?? (b.username ? `@${b.username}` : "—")}
               </div>
