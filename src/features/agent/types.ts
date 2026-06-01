@@ -72,8 +72,13 @@ export type ApprovalPayload = {
   reason?: string;
 };
 
+export type ClarifyInputType = "text" | "select" | "multiselect";
+
 export type ClarifyPayload = {
   tool_call_id?: string;
   question?: string;
+  /** Structured input type; defaults to "text" when absent */
+  input_type?: ClarifyInputType;
   options?: string[];
+  placeholder?: string;
 };
