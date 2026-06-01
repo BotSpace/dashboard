@@ -105,6 +105,16 @@ export function deleteThread(projectId: string, threadId: string): ThreadMeta[] 
   return list;
 }
 
+export function clearAllThreads(projectId: string): void {
+  if (typeof window === "undefined") return;
+  // Remove every per-thread payload + active-run key, then the list itself.
+  for (const t of loadThreads(projectId)) {
+    localStorage.removeItem(threadKey(projectId, t.id));
+    localStorage.removeItem(activeKey(projectId, t.id));
+  }
+  localStorage.removeItem(threadsKey(projectId));
+}
+
 // ── thread data (turns) ──────────────────────────────────────────────────────
 
 export function loadThread(

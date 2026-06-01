@@ -1,8 +1,10 @@
 "use client";
-import { MessageSquare, Plus, Trash2, X, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { MessageSquare, Plus, Trash2, X, Sparkles, Eraser } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/components/ui/button";
 import type { ThreadMeta } from "../storage";
+import { ConfirmDialog } from "./confirm-dialog";
 
 type Props = {
   threads: ThreadMeta[];
@@ -10,10 +12,13 @@ type Props = {
   onSelect: (threadId: string) => void;
   onNew: () => void;
   onDelete: (threadId: string) => void;
+  onClearAll?: () => void;
   onClose?: () => void;
 };
 
-export function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, onClose }: Props) {
+export function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, onClearAll, onClose }: Props) {
+  const [pendingDelete, setPendingDelete] = useState<ThreadMeta | null>(null);
+  const [confirmClearAll, setConfirmClearAll] = useState(false);
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2 border-b px-3 py-2">
@@ -36,15 +41,28 @@ export function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, o
         <span className="hidden text-xs font-medium uppercase tracking-wider text-muted-foreground md:block">
           Suhbatlar
         </span>
-        <Button
-          onClick={onNew}
-          variant="ghost"
-          size="icon"
-          className="ml-auto h-8 w-8"
-          title="Yangi suhbat"
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
+        <div className="ml-auto flex items-center gap-1">
+          {onClearAll && threads.length > 0 && (
+            <Button
+              onClick={() => setConfirmClearAll(true)}
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground/70 hover:text-destructive"
+              title="Barcha suhbatlarni tozalash"
+            >
+              <Eraser className="h-4 w-4" />
+            </Button>
+          )}
+          <Button
+            onClick={onNew}
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            title="Yangi suhbat"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-2">
@@ -85,7 +103,7 @@ export function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, o
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (confirm(`"${t.title}" o'chirilsinmi?`)) onDelete(t.id);
+                    setPendingDelete(t);
                   }}
                   className="rounded-md p-1 text-muted-foreground/60 opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
                   aria-label="O'chirish"
@@ -97,6 +115,27 @@ export function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, o
           })}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        onOpenChange={(o) => !o && setPendingDelete(null)}
+        title="Suhbatni o'chirish"
+        description={pendingDelete ? `"${pendingDelete.title}" suhbati butunlay o'chiriladi. Bu amalni qaytarib bo'lmaydi.` : undefined}
+        confirmLabel="O'chirish"
+        destructive
+        onConfirm={() => {
+          if (pendingDelete) onDelete(pendingDelete.id);
+        }}
+      />
+      <ConfirmDialog
+        open={confirmClearAll}
+        onOpenChange={setConfirmClearAll}
+        title="Barcha suhbatlarni tozalash"
+        description="Bu loyihadagi BARCHA suhbatlar butunlay o'chiriladi. Bu amalni qaytarib bo'lmaydi."
+        confirmLabel="Hammasini tozalash"
+        destructive
+        onConfirm={() => onClearAll?.()}
+      />
     </div>
   );
 }
