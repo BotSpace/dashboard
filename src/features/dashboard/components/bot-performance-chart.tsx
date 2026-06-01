@@ -9,7 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { PERF_DATA } from "./mock-data";
+import { TrendingUp } from "lucide-react";
 
 function formatY(value: number) {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
@@ -48,11 +48,21 @@ interface BotPerformanceChartProps {
 }
 
 export function BotPerformanceChart({ data }: BotPerformanceChartProps) {
-  // Normalise to {day, messages} shape that recharts already uses
   const chartData =
     data && data.length > 0
       ? data.map((p) => ({ day: formatDate(p.date), messages: p.value }))
-      : PERF_DATA;
+      : [];
+
+  if (chartData.length === 0) {
+    return (
+      <div className="flex h-[220px] flex-col items-center justify-center gap-3 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40">
+          <TrendingUp className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <p className="text-sm text-muted-foreground">Ma&apos;lumot yo&apos;q</p>
+      </div>
+    );
+  }
 
   return (
     <ResponsiveContainer width="100%" height={220}>

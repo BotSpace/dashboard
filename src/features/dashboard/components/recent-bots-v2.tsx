@@ -1,9 +1,8 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Bot } from "lucide-react";
 import { Link } from "@/shared/i18n/routing";
 import { Badge } from "@/shared/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { initials } from "@/shared/lib/utils";
-import { MOCK_BOTS } from "./mock-data";
 import type { Project } from "@/shared/types/api";
 
 type BotItem = {
@@ -32,7 +31,24 @@ function toBotItems(bots: Project[]): BotItem[] {
 }
 
 export function RecentBotsV2({ bots }: { bots: Project[] }) {
-  const items: BotItem[] = bots.length > 0 ? toBotItems(bots).slice(0, 5) : MOCK_BOTS;
+  const items: BotItem[] = toBotItems(bots).slice(0, 5);
+
+  if (items.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40">
+          <Bot className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <p className="text-sm text-muted-foreground">Hali bot yo&apos;q</p>
+        <Link
+          href="/app/bots/new"
+          className="text-xs font-medium text-blue-400 hover:text-blue-300"
+        >
+          Birinchi botni yarating
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <ul className="space-y-2.5">

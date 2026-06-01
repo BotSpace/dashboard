@@ -66,55 +66,22 @@ function buildStats(totals: Totals): StatItem[] {
   ];
 }
 
-const MOCK_STATS: StatItem[] = [
-  {
-    label: "Jami Botlar",
-    value: "128",
-    delta: "+12 shu oy",
-    icon: Bot,
-    gradient: "from-blue-500/20 to-blue-600/5",
-    iconColor: "text-blue-400",
-  },
-  {
-    label: "Foydalanuvchilar",
-    value: "45,678",
-    delta: "+18.2%",
-    icon: Users,
-    gradient: "from-indigo-500/20 to-indigo-600/5",
-    iconColor: "text-indigo-400",
-  },
-  {
-    label: "Xabarlar",
-    value: "2.4M",
-    delta: "+23.7%",
-    icon: MessageSquare,
-    gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
-    iconColor: "text-fuchsia-400",
-  },
-  {
-    label: "Daromad",
-    value: "$12,540",
-    delta: "+31.4%",
-    icon: DollarSign,
-    gradient: "from-emerald-500/20 to-emerald-600/5",
-    iconColor: "text-emerald-400",
-  },
-  {
-    label: "Shablonlar",
-    value: "86",
-    delta: "+6 yangi",
-    icon: LayoutTemplate,
-    gradient: "from-amber-500/20 to-amber-600/5",
-    iconColor: "text-amber-400",
-  },
-];
+const ZERO_TOTALS: Totals = {
+  bots: 0,
+  active_bots: 0,
+  users: 0,
+  messages: 0,
+  templates: 0,
+  revenue: 0,
+  currency: "UZS",
+};
 
 interface StatCardsV2Props {
   totals?: Totals | null;
 }
 
 export function StatCardsV2({ totals }: StatCardsV2Props) {
-  const stats: StatItem[] = totals ? buildStats(totals) : MOCK_STATS;
+  const stats: StatItem[] = buildStats(totals ?? ZERO_TOTALS);
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">
@@ -154,7 +121,6 @@ export function StatCardsV2({ totals }: StatCardsV2Props) {
               {stat.value}
             </div>
 
-            {/* Delta — only shown for mock (backend doesn't return totals delta) */}
             {stat.delta && (
               <div className="mt-1.5 flex items-center gap-1">
                 <span className="text-[11px] font-medium text-emerald-400">

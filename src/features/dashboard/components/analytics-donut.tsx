@@ -1,7 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { DONUT_DATA } from "./mock-data";
+import { PieChart as PieChartIcon } from "lucide-react";
 import type { DashboardOverview } from "@/shared/types/api";
 
 type Distribution = DashboardOverview["distribution"];
@@ -42,15 +42,25 @@ interface AnalyticsDonutProps {
   distribution?: Distribution | null;
 }
 
+const ZERO_DISTRIBUTION: Distribution = { private: 0, group: 0, channel: 0, other: 0 };
+
 export function AnalyticsDonut({ distribution }: AnalyticsDonutProps) {
-  const useReal = distribution != null;
-  const chartData = useReal ? buildChartData(distribution) : DONUT_DATA;
+  const dist = distribution ?? ZERO_DISTRIBUTION;
+  const total = dist.private + dist.group + dist.channel + dist.other;
 
-  const total = useReal
-    ? distribution.private + distribution.group + distribution.channel + distribution.other
-    : null;
+  if (total === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40">
+          <PieChartIcon className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <p className="text-sm text-muted-foreground">Analitika ma&apos;lumoti yo&apos;q</p>
+      </div>
+    );
+  }
 
-  const centerLabel = total !== null ? formatCompact(total) : "2.4M";
+  const chartData = buildChartData(dist);
+  const centerLabel = formatCompact(total);
 
   return (
     <div className="flex flex-col gap-4">

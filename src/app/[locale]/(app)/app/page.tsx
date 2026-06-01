@@ -21,7 +21,7 @@ export default async function DashboardPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  // Fetch overview — null on any error; widgets fall back to mock
+  // Fetch overview — null on any error; widgets show empty state
   const overview = await DashboardAPI.overview().catch(() => null);
 
   return (
@@ -123,7 +123,7 @@ async function BotsSection() {
   try {
     bots = await ProjectsAPI.list();
   } catch {
-    // fallback to mock inside component
+    // empty list shown as empty state inside component
   }
   return <RecentBotsV2 bots={bots} />;
 }
