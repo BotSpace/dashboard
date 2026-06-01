@@ -19,6 +19,7 @@ import {
   cancelRunAction,
   startRunAction,
   listThreadsAction,
+  deleteThreadAction,
   loadThreadHistoryAction,
 } from "../actions";
 import { useAgentStream } from "../use-agent-stream";
@@ -194,6 +195,9 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
     if (id === threadId) {
       setThreadId(next[0]?.id ?? newThreadId());
     }
+    // Also delete on the backend — otherwise the next mount's listThreadsAction
+    // merge re-adds it and the deletion "comes back" on refresh.
+    void deleteThreadAction(projectId, id);
   };
 
   return (

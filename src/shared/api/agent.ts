@@ -202,4 +202,18 @@ export async function getAgentThreadHistory(
   return res.json();
 }
 
+export async function deleteAgentThread(
+  projectId: string,
+  threadId: string
+): Promise<void> {
+  const res = await agentFetch(
+    `/projects/${encodeURIComponent(projectId)}/threads/${encodeURIComponent(threadId)}`,
+    { method: "DELETE" }
+  );
+  // 404 = already gone on the backend; treat as success.
+  if (!res.ok && res.status !== 404) {
+    throw new Error(`agent delete_thread failed: ${res.status}`);
+  }
+}
+
 export { AGENT_BASE, agentFetch };
