@@ -16,13 +16,13 @@ import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/components/ui/button";
 import {
-  approveRunAction,
   cancelRunAction,
   startRunAction,
   listThreadsAction,
   loadThreadHistoryAction,
 } from "../actions";
 import { useAgentStream } from "../use-agent-stream";
+import { ApprovalDialog } from "./approval-dialog";
 import { ClarifyDialog } from "./clarify-dialog";
 import { MessageMarkdown } from "./message-markdown";
 import { PlanPanel } from "./plan-panel";
@@ -344,17 +344,6 @@ function ChatThread({
     if (stream.usageRefreshTick > 0) setUsageKey((k) => k + 1);
   }, [stream.usageRefreshTick]);
 
-  const approvedRef = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    if (!stream.approval || !requestId) return;
-    const id = String(
-      (stream.approval as { tool_call_id?: string }).tool_call_id ?? "anon"
-    );
-    if (approvedRef.current.has(id)) return;
-    approvedRef.current.add(id);
-    approveRunAction({ projectId, requestId, approved: true }).catch(() => {});
-  }, [stream.approval, requestId, projectId]);
-
   // Foydalanuvchi pastda turgan bo'lsagina avto-scroll qilamiz. Tepaga
   // chiqib o'qish paytida yangi xabar kelganda joyini "yutib qo'ymaymiz".
   const stickToBottomRef = useRef(true);
@@ -520,6 +509,24 @@ function ChatThread({
                 currentSubAgent={stream.currentSubAgent}
               />
 
+              {/* Inline approval prompt — renders when agent gates a destructive action */}
+              {stream.approval && requestId && (
+                <ApprovalDialog
+                  projectId={projectId}
+                  requestId={requestId}
+                  payload={stream.approval}
+                />
+              )}
+
+              {/* Inline clarification prompt — renders when agent asks for info */}
+              {stream.clarify && requestId && (
+                <ClarifyDialog
+                  projectId={projectId}
+                  requestId={requestId}
+                  payload={stream.clarify}
+                />
+              )}
+
               {stream.error && (
                 <div className="mx-auto max-w-xl rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
                   {stream.error}
@@ -581,7 +588,9 @@ function ChatThread({
               }}
               rows={1}
               placeholder={
-                isRunning
+                stream.phase === "waiting"
+                  ? "Yuqoridagi savolga javob bering…"
+                  : isRunning
                   ? "Agent ishlamoqda…"
                   : "Xabar yozing…"
               }
@@ -615,7 +624,7 @@ function ChatThread({
               </Button>
             )}
           </div>
-          {isRunning && (
+          {isRunning && stream.phase !== "waiting" && (
             <div className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
               <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
               <span>Agent javob tayyorlamoqda</span>
@@ -624,9 +633,6 @@ function ChatThread({
         </div>
       </div>
 
-      {requestId && (
-        <ClarifyDialog projectId={projectId} requestId={requestId} payload={stream.clarify} />
-      )}
     </>
   );
 }
