@@ -1,7 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
-import { Info, Activity } from "lucide-react";
+import { Info, Activity, AlertTriangle } from "lucide-react";
 import { ProjectsAPI } from "@/shared/api/services";
 import { Section } from "@/shared/components/common/section";
+import { DeleteBotButton } from "@/features/bots/components/delete-bot-button";
 
 export default async function BotOverviewPage({
   params,
@@ -33,6 +34,20 @@ export default async function BotOverviewPage({
         <Row label="Status" value={bot?.status ?? "draft"} />
         <Row label="ID" value={String(bot?.id ?? id)} />
       </Section>
+
+      <div className="lg:col-span-2">
+        <Section
+          title="Xavfli hudud"
+          icon={<AlertTriangle className="h-4 w-4 text-destructive" />}
+          contentClassName="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p className="text-sm text-muted-foreground">
+            Botni o&apos;chirish — bot, uning oqimi va barcha ma&apos;lumotlari
+            butunlay yo&apos;qoladi. Qaytarib bo&apos;lmaydi.
+          </p>
+          <DeleteBotButton id={id} locale={locale} name={bot?.name} />
+        </Section>
+      </div>
     </div>
   );
 }
