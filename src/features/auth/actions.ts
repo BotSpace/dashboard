@@ -1,6 +1,8 @@
 "use server";
+import { redirect } from "next/navigation";
 import { apiFetch, isApiError } from "@/shared/api/client";
 import { setSessionCookie, clearSessionCookie, type SessionUser } from "@/shared/auth/session";
+import { routing } from "@/shared/i18n/routing";
 
 export type ActionState = {
   ok: boolean;
@@ -84,6 +86,8 @@ export async function googleLoginAction(idToken: string): Promise<ActionState> {
   }
 }
 
-export async function logoutAction(): Promise<void> {
+export async function logoutAction(locale?: string): Promise<void> {
   await clearSessionCookie();
+  const loc = locale ?? routing.defaultLocale;
+  redirect(`/${loc}/login`);
 }

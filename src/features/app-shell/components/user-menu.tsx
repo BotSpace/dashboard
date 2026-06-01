@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { LogOut, Settings, CreditCard, UserCircle } from "lucide-react";
 import { logoutAction } from "@/features/auth/actions";
@@ -31,14 +30,11 @@ function fullName(u: UserMenuUser): string {
 
 export function UserMenu({ user }: { user: UserMenuUser }) {
   const t = useTranslations("common");
-  const router = useRouter();
   const locale = useLocale();
   const display = fullName(user) || user.email || user.phone || "—";
 
   const handleLogout = async () => {
-    await logoutAction();
-    router.push(`/${locale}/login`);
-    router.refresh();
+    await logoutAction(locale);
   };
 
   return (
