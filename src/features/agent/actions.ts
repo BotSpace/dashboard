@@ -35,7 +35,8 @@ export async function startRunAction(args: {
 export async function clarifyRunAction(args: {
   projectId: string;
   requestId: string;
-  answer: string;
+  /** text / select → string; multiselect → string[] */
+  answer: string | string[];
 }): Promise<{ ok: boolean; message?: string }> {
   try {
     await clarifyAgentRun(args.projectId, args.requestId, args.answer);

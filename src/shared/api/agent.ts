@@ -93,7 +93,8 @@ export async function getAgentRun(
 export async function clarifyAgentRun(
   projectId: string,
   requestId: string,
-  answer: string
+  /** text / select → string; multiselect → string[] */
+  answer: string | string[]
 ): Promise<void> {
   const res = await agentFetch(
     `/projects/${encodeURIComponent(projectId)}/runs/${encodeURIComponent(requestId)}/clarify`,
