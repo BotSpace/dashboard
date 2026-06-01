@@ -20,6 +20,7 @@ import {
   startRunAction,
   listThreadsAction,
   deleteThreadAction,
+  clearAllThreadsAction,
   loadThreadHistoryAction,
 } from "../actions";
 import { useAgentStream } from "../use-agent-stream";
@@ -37,6 +38,7 @@ import type { ChatTurn, ToolCallView } from "../types";
 import type { Project } from "@/shared/types/api";
 import {
   deleteThread,
+  clearAllThreads,
   loadActiveRun,
   loadThread,
   loadThreads,
@@ -200,6 +202,14 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
     void deleteThreadAction(projectId, id);
   };
 
+  const handleClearAllThreads = () => {
+    clearAllThreads(projectId);
+    setThreads([]);
+    setThreadId(newThreadId());
+    // Wipe on the backend too so the merge on next mount doesn't restore them.
+    void clearAllThreadsAction(projectId);
+  };
+
   return (
     <div className="relative flex h-full overflow-hidden rounded-xl border bg-background">
       {/* Desktop sidebar */}
@@ -210,6 +220,7 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
           onSelect={handleSelectThread}
           onNew={handleNewThread}
           onDelete={handleDeleteThread}
+          onClearAll={handleClearAllThreads}
         />
       </div>
 
@@ -238,6 +249,7 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
                 onSelect={handleSelectThread}
                 onNew={handleNewThread}
                 onDelete={handleDeleteThread}
+                onClearAll={handleClearAllThreads}
                 onClose={() => setSidebarOpen(false)}
               />
             </motion.div>

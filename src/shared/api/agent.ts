@@ -216,4 +216,14 @@ export async function deleteAgentThread(
   }
 }
 
+export async function deleteAllAgentThreads(projectId: string): Promise<void> {
+  const res = await agentFetch(
+    `/projects/${encodeURIComponent(projectId)}/threads`,
+    { method: "DELETE" }
+  );
+  if (!res.ok && res.status !== 404) {
+    throw new Error(`agent delete_all_threads failed: ${res.status}`);
+  }
+}
+
 export { AGENT_BASE, agentFetch };

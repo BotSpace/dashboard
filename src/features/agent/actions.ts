@@ -9,6 +9,7 @@ import {
   listAgentThreads,
   getAgentThreadHistory,
   deleteAgentThread,
+  deleteAllAgentThreads,
   type AgentRunStatus,
   type AgentUsage,
   type AgentThreadMeta,
@@ -108,6 +109,17 @@ export async function deleteThreadAction(
 ): Promise<{ ok: boolean }> {
   try {
     await deleteAgentThread(projectId, threadId);
+    return { ok: true };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function clearAllThreadsAction(
+  projectId: string
+): Promise<{ ok: boolean }> {
+  try {
+    await deleteAllAgentThreads(projectId);
     return { ok: true };
   } catch {
     return { ok: false };
