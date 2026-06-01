@@ -293,6 +293,7 @@ function ChatThread({
     requestId,
     initialTurns: initialThread?.turns,
     initialSeq: initialThread?.lastSeq ?? 0,
+    initialFinished: initialThread?.finished ?? false,
     onPersist: (snapshot) =>
       saveThread(projectId, threadId, {
         turns: snapshot.turns,

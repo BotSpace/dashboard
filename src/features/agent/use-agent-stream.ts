@@ -16,6 +16,8 @@ type Args = {
   requestId: string | null;
   initialTurns?: ChatTurn[];
   initialSeq?: number;
+  /** Persisted "run finished" flag from the previous session (refresh). */
+  initialFinished?: boolean;
   onPersist?: (snapshot: { turns: ChatTurn[]; lastSeq: number; finished: boolean }) => void;
 };
 
@@ -40,28 +42,54 @@ type State = {
   currentSubAgent: CurrentSubAgent | null;
 };
 
+/**
+ * Marks any unfinished sub-agent turns as finished so the UI stops showing
+ * "ishlamoqda" after the run terminated/aborted. Steps still in-flight
+ * (result === undefined) are left as-is; the accordion treats a finished
+ * turn with no summary as "bajarildi" (ok=true by default unless already set).
+ * Returns the same array reference when nothing changed.
+ */
+function closeDanglingSubAgents(turns: ChatTurn[]): ChatTurn[] {
+  let changed = false;
+  const out = turns.map((t) => {
+    if (t.kind === "sub_agent" && !t.finished) {
+      changed = true;
+      return { ...t, finished: true, ok: t.ok ?? true };
+    }
+    return t;
+  });
+  return changed ? out : turns;
+}
+
 export function useAgentStream({
   projectId,
   requestId,
   initialTurns,
   initialSeq,
+  initialFinished,
   onPersist,
 }: Args) {
+  // Refresh paytida oldingi sessiya "tugagan" bo'lsa, tugallanmagan
+  // sub_agent turn'larni darhol yopamiz — aks holda accordion "ishlamoqda"
+  // holatida osilib qoladi (backend run allaqachon tugagan, yangi event yo'q).
+  const restoredTurns = initialFinished
+    ? closeDanglingSubAgents(initialTurns ?? [])
+    : (initialTurns ?? []);
   const [state, setState] = useState<State>({
-    turns: initialTurns ?? [],
+    turns: restoredTurns,
     plan: [],
     approval: null,
     clarify: null,
     usageRefreshTick: 0,
-    finished: false,
+    finished: Boolean(initialFinished),
     error: null,
     thinking: "",
-    phase: "idle",
+    phase: initialFinished ? "done" : "idle",
     currentTool: null,
     currentSubAgent: null,
   });
   const esRef = useRef<EventSource | null>(null);
-  const finishedRef = useRef(false);
+  const finishedRef = useRef(Boolean(initialFinished));
   const toolViewMap = useRef<Record<string, ToolCallView>>({});
   // Map sub_agent_id → ChatTurn id (so child tool_call/result events can be
   // routed into the SubAgentAccordion they belong to instead of bubbling up
@@ -78,6 +106,9 @@ export function useAgentStream({
 
   useEffect(() => {
     if (!requestId) return;
+    // Oldingi sessiya allaqachon tugagan (refresh + run finished/abort) — o'lik
+    // run'ning SSE'siga ulanmaymiz. Aks holda phase "queued"ga o'tib osilardi.
+    if (finishedRef.current) return;
     const sinceSeq = lastSeqRef.current ?? 0;
     const url =
       `/api/agent/${encodeURIComponent(projectId)}/runs/${encodeURIComponent(requestId)}/events` +
@@ -146,9 +177,12 @@ export function useAgentStream({
             break;
           }
           case "assistant_message": {
-            const p = ev.payload as { text?: string };
+            const p = ev.payload as { text?: string; sub_agent_id?: string };
             const text = p.text ?? "";
-            if (text) {
+            // Sub-agent ichki assistant matni asosiy chatga KO'TARILMAYDI —
+            // u sub_agent_finished summary'sida (accordion'da) ko'rinadi.
+            // Faqat main agent (sub_agent_id YO'Q) matnini turns'ga qo'shamiz.
+            if (text && !p.sub_agent_id) {
               next.turns = [
                 ...s.turns,
                 {
@@ -349,6 +383,9 @@ export function useAgentStream({
             finishedRef.current = true;
             next.currentTool = null;
             next.currentSubAgent = null;
+            // Run tugadi/to'xtadi — tugallanmagan sub_agent turn'larni yopamiz,
+            // aks holda accordion abadiy "ishlamoqda" bo'lib qoladi.
+            next.turns = closeDanglingSubAgents(s.turns);
             if (ev.type === "run_failed") {
               const p = ev.payload as { error?: string };
               next.error = p.error ?? "Run failed";
@@ -398,7 +435,13 @@ export function useAgentStream({
       if (finishedRef.current) return;
       // CONNECTING means the browser is still trying to (re)connect — also benign.
       if (es.readyState === EventSource.CONNECTING) return;
-      setState((s) => ({ ...s, error: s.error ?? "Stream connection lost" }));
+      // Ulanish uzildi va qayta urinmayapti — tugallanmagan sub_agent
+      // turn'larni yopamiz, "ishlamoqda" abadiy spin bo'lib qolmasin.
+      setState((s) => ({
+        ...s,
+        error: s.error ?? "Stream connection lost",
+        turns: closeDanglingSubAgents(s.turns),
+      }));
     };
 
     return () => {
