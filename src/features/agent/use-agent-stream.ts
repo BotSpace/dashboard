@@ -126,7 +126,10 @@ export function useAgentStream({
           toolViewMap.current[t.call.id] = t.call;
         } else if (t.kind === "sub_agent") {
           subAgentTurnIdMap.current[t.sub_agent_id] = t.id;
-          for (const step of t.steps) toolViewMap.current[step.id] = step;
+          for (const step of t.steps) {
+            // Only tool steps go in the result-match map (narration has no name).
+            if (!("narration" in step)) toolViewMap.current[step.id] = step;
+          }
         }
       }
       return {
@@ -179,10 +182,21 @@ export function useAgentStream({
           case "assistant_message": {
             const p = ev.payload as { text?: string; sub_agent_id?: string };
             const text = p.text ?? "";
-            // Sub-agent ichki assistant matni asosiy chatga KO'TARILMAYDI —
-            // u sub_agent_finished summary'sida (accordion'da) ko'rinadi.
-            // Faqat main agent (sub_agent_id YO'Q) matnini turns'ga qo'shamiz.
-            if (text && !p.sub_agent_id) {
+            if (text && p.sub_agent_id && subAgentTurnIdMap.current[p.sub_agent_id]) {
+              // Sub-agent narrate matni — accordion ichida tool qadamlari
+              // orasida (xronologik) ko'rsatamiz.
+              const turnId = subAgentTurnIdMap.current[p.sub_agent_id];
+              const narration = {
+                id: `narr-${ev.seq ?? Date.now()}`,
+                narration: text,
+              };
+              next.turns = s.turns.map((t) =>
+                t.kind === "sub_agent" && t.id === turnId
+                  ? { ...t, steps: [...t.steps, narration] }
+                  : t,
+              );
+            } else if (text && !p.sub_agent_id) {
+              // Main agent matni — asosiy chatga.
               next.turns = [
                 ...s.turns,
                 {

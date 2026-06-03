@@ -184,6 +184,16 @@ type StepProps = {
 
 function SubAgentStep({ step, index }: StepProps) {
   const [open, setOpen] = useState(false);
+
+  // Narrate matni — tool emas, matn qatori sifatida ko'rsatamiz.
+  if ("narration" in step) {
+    return (
+      <li className="px-1 py-0.5 text-[11px] leading-relaxed text-muted-foreground/90 whitespace-pre-wrap">
+        {step.narration}
+      </li>
+    );
+  }
+
   const label = summarizeName(step.name);
   const argLine = summarizeArgs(step.name, step.arguments);
   const resLine = summarizeResult(step.result);

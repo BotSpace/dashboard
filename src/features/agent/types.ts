@@ -45,6 +45,11 @@ export type ToolCallView = {
   hidden?: boolean;
 };
 
+// Sub-agent narrate text (assistant_message) shown inline among tool steps.
+export type NarrationStep = { id: string; narration: string };
+
+export type SubAgentStepView = ToolCallView | NarrationStep;
+
 export type SubAgentTurn = {
   kind: "sub_agent";
   id: string;
@@ -52,7 +57,7 @@ export type SubAgentTurn = {
   name: string;
   description?: string;
   prompt: string;
-  steps: ToolCallView[];
+  steps: SubAgentStepView[];
   toolCalls: number;
   summary?: string;
   ok?: boolean;
