@@ -358,5 +358,19 @@
     "closed": "Closed",
     "reply": "Reply",
     "empty": "You have no tickets yet"
+  },
+  "oauth": {
+    "title": "Authorization request",
+    "subtitle": "{clientName} is requesting access to your account",
+    "loggedInAs": "Signed in as",
+    "permissionsTitle": "The following permissions will be granted:",
+    "perm1": "View and manage your bots",
+    "perm2": "Create and edit flows",
+    "perm3": "Deploy bots",
+    "perm4": "Manage your projects and data",
+    "approve": "Allow access",
+    "deny": "Deny",
+    "redirecting": "Authorized. Redirecting...",
+    "redirectNote": "You will be redirected to {uri} upon approval"
   }
 }
