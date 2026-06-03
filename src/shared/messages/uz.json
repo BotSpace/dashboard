@@ -372,5 +372,19 @@
     "closed": "Yopiq",
     "reply": "Javob berish",
     "empty": "Hozircha murojaatingiz yo'q"
+  },
+  "oauth": {
+    "title": "Ulanish so'rovi",
+    "subtitle": "{clientName} akkauntingizga ulanish uchun ruxsat so'ramoqda",
+    "loggedInAs": "Siz sifatida kirilgan",
+    "permissionsTitle": "Quyidagi ruxsatlar beriladi:",
+    "perm1": "Botlaringizni ko'rish va boshqarish",
+    "perm2": "Flow yaratish va tahrirlash",
+    "perm3": "Botlarni deploy qilish",
+    "perm4": "Loyihalar va ma'lumotlaringizni boshqarish",
+    "approve": "Ruxsat berish",
+    "deny": "Rad etish",
+    "redirecting": "Tasdiqlandi. Qaytish...",
+    "redirectNote": "Tasdiqlangach {uri} manziliga qaytarilasiz"
   }
 }
