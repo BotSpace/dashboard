@@ -2,7 +2,10 @@
 FROM node:24-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci --no-audit --no-fund
+# npm ci is strict about the lock; cross-platform optional deps (sharp's
+# @emnapi/* wasm fallbacks) can be missing from a lock generated on macOS.
+# Fall back to npm install so a linux build self-heals the platform deps.
+RUN npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 
 FROM node:24-alpine AS builder
 WORKDIR /app
