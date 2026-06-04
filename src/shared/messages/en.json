@@ -66,12 +66,30 @@
       "title": "Everything your bot needs",
       "subtitle": "From the builder to analytics — a complete platform",
       "items": [
-        { "title": "Visual builder", "desc": "Build complex flows with nodes and edges in 5 minutes" },
-        { "title": "AI agent", "desc": "LangGraph-powered AI assistant: natural conversations with customers" },
-        { "title": "Templates marketplace", "desc": "Buy ready-made bots or sell yours and earn" },
-        { "title": "Multi-channel", "desc": "One codebase for Telegram, web and more" },
-        { "title": "Built-in database", "desc": "Built-in collections — no DBA required" },
-        { "title": "Analytics", "desc": "Real-time monitoring of CPU, RAM, traffic and user behavior" }
+        {
+          "title": "Visual builder",
+          "desc": "Build complex flows with nodes and edges in 5 minutes"
+        },
+        {
+          "title": "AI agent",
+          "desc": "LangGraph-powered AI assistant: natural conversations with customers"
+        },
+        {
+          "title": "Templates marketplace",
+          "desc": "Buy ready-made bots or sell yours and earn"
+        },
+        {
+          "title": "Multi-channel",
+          "desc": "One codebase for Telegram, web and more"
+        },
+        {
+          "title": "Built-in database",
+          "desc": "Built-in collections — no DBA required"
+        },
+        {
+          "title": "Analytics",
+          "desc": "Real-time monitoring of CPU, RAM, traffic and user behavior"
+        }
       ]
     },
     "flow": {
@@ -84,19 +102,43 @@
         "Versioning and one-click rollback"
       ],
       "nodes": {
-        "trigger": { "type": "Trigger", "label": "/start" },
-        "msg": { "type": "Message", "label": "Greeting" },
-        "menu": { "type": "Keyboard", "label": "Menu" },
-        "cond": { "type": "Condition", "label": "Check" },
-        "ai": { "type": "AI", "label": "AI Agent" },
-        "save": { "type": "State", "label": "Save" }
+        "trigger": {
+          "type": "Trigger",
+          "label": "/start"
+        },
+        "msg": {
+          "type": "Message",
+          "label": "Greeting"
+        },
+        "menu": {
+          "type": "Keyboard",
+          "label": "Menu"
+        },
+        "cond": {
+          "type": "Condition",
+          "label": "Check"
+        },
+        "ai": {
+          "type": "AI",
+          "label": "AI Agent"
+        },
+        "save": {
+          "type": "State",
+          "label": "Save"
+        }
       }
     },
     "agent": {
       "eyebrow": "AI Agent",
       "title": "Build a bot by chatting",
       "subtitle": "Talk to the agent in plain language — it builds the flow, adds nodes and deploys for you.",
-      "tags": ["Flow building", "Deploy", "CRM", "Broadcast", "Analytics"],
+      "tags": [
+        "Flow building",
+        "Deploy",
+        "CRM",
+        "Broadcast",
+        "Analytics"
+      ],
       "chat": {
         "headerTitle": "BotSpace AI",
         "headerStatus": "Online · Telegram bot builder",
@@ -114,12 +156,30 @@
       "eyebrow": "FAQ",
       "title": "Frequently asked",
       "items": [
-        { "q": "Is BotSpace free?", "a": "Yes. The Free plan gives you 1 bot and 200K AI tokens per month. No card required." },
-        { "q": "Do I need to write code?", "a": "No. You can use the visual builder or describe what you need in natural language to the AI agent." },
-        { "q": "Which payment methods are supported?", "a": "Payme, Click and international cards (Visa / Mastercard)." },
-        { "q": "What can the AI agent do?", "a": "It builds flows, adds nodes, deploys, manages CRM, sends broadcasts — all in natural language." },
-        { "q": "Can I connect other platforms?", "a": "Telegram is fully supported today. WhatsApp and web channels are coming soon." },
-        { "q": "What is the MCP server?", "a": "It lets AI agents like Claude Desktop or Cursor control your BotSpace projects directly." }
+        {
+          "q": "Is BotSpace free?",
+          "a": "Yes. The Free plan gives you 1 bot and 200K AI tokens per month. No card required."
+        },
+        {
+          "q": "Do I need to write code?",
+          "a": "No. You can use the visual builder or describe what you need in natural language to the AI agent."
+        },
+        {
+          "q": "Which payment methods are supported?",
+          "a": "Payme, Click and international cards (Visa / Mastercard)."
+        },
+        {
+          "q": "What can the AI agent do?",
+          "a": "It builds flows, adds nodes, deploys, manages CRM, sends broadcasts — all in natural language."
+        },
+        {
+          "q": "Can I connect other platforms?",
+          "a": "Telegram is fully supported today. WhatsApp and web channels are coming soon."
+        },
+        {
+          "q": "What is the MCP server?",
+          "a": "It lets AI agents like Claude Desktop or Cursor control your BotSpace projects directly."
+        }
       ]
     },
     "pricing": {
@@ -133,17 +193,35 @@
         "free": {
           "name": "Free",
           "tagBots": "1 bot",
-          "features": ["Visual builder", "AI agent (limited)", "Marketplace", "Community support"]
+          "features": [
+            "Visual builder",
+            "AI agent (limited)",
+            "Marketplace",
+            "Community support"
+          ]
         },
         "pro": {
           "name": "Pro",
           "tagBots": "10 bots",
-          "features": ["Everything in Free", "Advanced AI", "Priority support", "Custom domain", "Analytics"]
+          "features": [
+            "Everything in Free",
+            "Advanced AI",
+            "Priority support",
+            "Custom domain",
+            "Analytics"
+          ]
         },
         "max": {
           "name": "Max",
           "tagBots": "Unlimited",
-          "features": ["Everything in Pro", "Unlimited bots", "Custom integrations", "99.9% SLA", "Dedicated manager", "API access"]
+          "features": [
+            "Everything in Pro",
+            "Unlimited bots",
+            "Custom integrations",
+            "99.9% SLA",
+            "Dedicated manager",
+            "API access"
+          ]
         }
       }
     },
@@ -237,7 +315,33 @@
     "newTitle": "New collection",
     "newSubtitle": "Create schema, then add fields",
     "newDoc": "New document",
-    "editDoc": "Edit document"
+    "editDoc": "Edit document",
+    "export": "Export",
+    "exportXlsx": "Download Excel (.xlsx)",
+    "exportProgress": "Loading {done}/{total} documents…",
+    "exportTooMany": "{total} documents found — only the first {max} will be exported",
+    "exportDone": "{count} documents exported",
+    "exportError": "Export failed",
+    "import": "Import",
+    "importXlsx": "Upload Excel/.csv file",
+    "importSelectFile": "Select file (.xlsx or .csv)",
+    "importPreview": "Preview ({count} rows)",
+    "importMapping": "Column mapping",
+    "importUnmapped": "Unmatched columns",
+    "importConfirm": "Confirm import",
+    "importProgress": "Inserting {done}/{total} documents…",
+    "importDone": "{ok} inserted{failed}",
+    "importFailed": ", {n} failed",
+    "importError": "Import failed",
+    "importErrors": "Failed rows",
+    "viewDoc": "View document",
+    "viewDocTitle": "Document",
+    "deleteDoc": "Delete",
+    "deleteDocConfirm": "Are you sure you want to delete this document?",
+    "noValue": "—",
+    "fieldId": "_id",
+    "fieldCreatedAt": "Created at",
+    "fieldUpdatedAt": "Updated at"
   },
   "bots": {
     "title": "Bots",

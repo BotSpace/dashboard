@@ -180,3 +180,49 @@ export async function restoreDocumentAction(args: {
     return fail(e);
   }
 }
+
+export async function bulkInsertDocumentsAction(args: {
+  projectId: string | number;
+  name: string;
+  documents: Record<string, unknown>[];
+}): Promise<{ ok: true; count: number } | { ok: false; message: string }> {
+  try {
+    const result = await CmsAPI.bulkInsert(args.projectId, args.name, args.documents);
+    return { ok: true, count: result.count };
+  } catch (e) {
+    const r = fail(e);
+    return { ok: false, message: r.message ?? "Bulk insert xato" };
+  }
+}
+
+export async function listAllDocumentsAction(args: {
+  projectId: string | number;
+  name: string;
+  maxDocs?: number;
+}): Promise<{ ok: true; data: import("@/shared/types/api").CmsDocument[]; total: number } | { ok: false; message: string }> {
+  const max = args.maxDocs ?? 500;
+  const batchSize = 100;
+  try {
+    const first = await CmsAPI.listDocuments(args.projectId, args.name, {
+      limit: batchSize,
+      skip: 0,
+      sort: "-_created_at",
+    });
+    const total = first.total;
+    const all = [...first.results];
+    const batches = Math.ceil(Math.min(total, max) / batchSize);
+    for (let i = 1; i < batches; i++) {
+      const batch = await CmsAPI.listDocuments(args.projectId, args.name, {
+        limit: batchSize,
+        skip: i * batchSize,
+        sort: "-_created_at",
+      });
+      all.push(...batch.results);
+      if (all.length >= max) break;
+    }
+    return { ok: true, data: all.slice(0, max), total };
+  } catch (e) {
+    const r = fail(e);
+    return { ok: false, message: r.message ?? "Error" };
+  }
+}
