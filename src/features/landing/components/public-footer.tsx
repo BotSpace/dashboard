@@ -13,6 +13,7 @@ export function PublicFooter() {
       title: t("product"),
       items: [
         { label: t("docs"), href: "/docs" },
+        { label: tn("navMcp"), href: "/docs/mcp" },
         { label: tn("navTemplates"), href: "/templates" },
       ],
     },

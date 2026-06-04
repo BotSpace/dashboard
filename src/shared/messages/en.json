@@ -40,9 +40,11 @@
     "tickets": "Support",
     "settings": "Settings",
     "submissions": "Submissions",
-    "earnings": "Earnings"
+    "earnings": "Earnings",
+    "mcp": "MCP"
   },
   "landing": {
+    "navMcp": "MCP",
     "navHome": "Home",
     "navFeatures": "Features",
     "navPricing": "Pricing",
@@ -462,6 +464,39 @@
     "closed": "Closed",
     "reply": "Reply",
     "empty": "You have no tickets yet"
+  },
+  "mcpDocs": {
+    "nav": "MCP",
+    "pageTitle": "Botspace MCP Server",
+    "pageSubtitle": "Connect AI coding agents — Claude Code, Cursor, Cline — and build bots directly from your terminal or IDE.",
+    "whatTitle": "What is MCP?",
+    "whatBody": "MCP (Model Context Protocol) is an open standard that lets AI agents call tools on external services. The Botspace MCP server exposes the full platform — project management, flow builder (80+ tools), CMS collections, debug/deploy, and CRM broadcasts — so any MCP client can drive your bots programmatically.",
+    "capabilitiesTitle": "What you can do",
+    "capabilities": [
+      { "name": "Project management", "desc": "Create, list, and configure projects" },
+      { "name": "Flow builder (80+ tools)", "desc": "Add nodes, connect edges, validate and save flows" },
+      { "name": "CMS / Collections", "desc": "Create schemas, insert and query documents" },
+      { "name": "Debug & deploy", "desc": "Start debug containers and push production releases" },
+      { "name": "Bot simulation", "desc": "Simulate flow execution and run regression tests" },
+      { "name": "CRM & broadcast", "desc": "Browse chat history and send bulk messages" }
+    ],
+    "connectTitle": "Connect",
+    "claudeCodeTitle": "Claude Code (OAuth — recommended)",
+    "claudeCodeStep1": "Add the server:",
+    "claudeCodeStep2": "Open the MCP menu in Claude Code:",
+    "claudeCodeStep3": "Authenticate in the browser (login + grant access). Done.",
+    "tokenTitle": "Token / CI / headless",
+    "tokenStep1": "Generate an API token: Profile → API tokens → New token (starts with bsp_…)",
+    "tokenStep2": "Add the server with a Bearer header:",
+    "otherClientsTitle": "Other MCP clients (Cursor, Cline, etc.)",
+    "otherClientsBody": "Any MCP client that supports Streamable HTTP transport works. Use the URL below with OAuth or a Bearer header:",
+    "quickstartTitle": "Quickstart example",
+    "quickstartBody": "Once connected, tell Claude:",
+    "quickstartPrompt": "Build me a simple shop bot — product catalog, cart, and a payment step",
+    "quickstartResult": "The agent will create a project, build the flow, simulate it, and return a debug link — all automatically.",
+    "securityTitle": "Security note",
+    "securityBody": "Each OAuth client receives its own scoped token. Never share your bsp_ API token. Revoke tokens any time from Profile → API tokens.",
+    "copyTooltip": "Copy"
   },
   "oauth": {
     "title": "Authorization request",

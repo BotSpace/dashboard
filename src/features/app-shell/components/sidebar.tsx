@@ -11,6 +11,7 @@ import {
   Settings,
   Sparkles,
   Wand2,
+  Plug,
 } from "lucide-react";
 import { Link } from "@/shared/i18n/routing";
 import { Logo } from "@/shared/components/common/logo";
@@ -76,6 +77,44 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               onClick={onNavigate}
             />
           ))}
+        </div>
+
+        {/* MCP section — separated, near the bottom */}
+        <div className="mt-4 border-t border-border/60 pt-3">
+          <Link
+            href="/docs/mcp"
+            onClick={onNavigate}
+            className={cn(
+              "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+              pathname.includes("/docs/mcp")
+                ? "bg-violet-500/10 text-violet-400 font-medium"
+                : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground"
+            )}
+          >
+            {pathname.includes("/docs/mcp") && (
+              <span
+                className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-violet-500"
+                aria-hidden="true"
+              />
+            )}
+            <Plug
+              className={cn(
+                "h-4 w-4 shrink-0",
+                pathname.includes("/docs/mcp") ? "text-violet-400" : ""
+              )}
+            />
+            {t("mcp")}
+            <span
+              className="ml-auto rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider"
+              style={{
+                background: "rgba(139,92,246,0.15)",
+                color: "rgba(167,139,250,0.9)",
+                border: "1px solid rgba(139,92,246,0.25)",
+              }}
+            >
+              MCP
+            </span>
+          </Link>
         </div>
       </nav>
       <div className="px-3 pb-4">

@@ -7,7 +7,7 @@ import { Link } from "@/shared/i18n/routing";
 import { Logo } from "@/shared/components/common/logo";
 import { LanguageSwitcher } from "@/shared/components/common/language-switcher";
 
-type NavLink = { href: string; label: string; internal?: boolean };
+type NavLink = { href: string; label: string; internal?: boolean; highlight?: boolean };
 
 export function PublicHeader() {
   const t = useTranslations("landing");
@@ -25,6 +25,7 @@ export function PublicHeader() {
     { href: "/#features", label: t("navFeatures") },
     { href: "/#pricing", label: t("navPricing") },
     { href: "/templates", label: t("navTemplates"), internal: true },
+    { href: "/docs/mcp", label: t("navMcp"), internal: true, highlight: true },
   ];
 
   return (
@@ -59,7 +60,11 @@ export function PublicHeader() {
                   <Link
                     key={l.href}
                     href={l.href}
-                    className="relative text-[13px] font-medium text-white/55 transition-colors hover:text-white"
+                    className={
+                      l.highlight
+                        ? "inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-0.5 text-[12px] font-semibold text-violet-300 transition-colors hover:bg-violet-500/20 hover:text-violet-200"
+                        : "relative text-[13px] font-medium text-white/55 transition-colors hover:text-white"
+                    }
                   >
                     {l.label}
                   </Link>
@@ -119,7 +124,11 @@ export function PublicHeader() {
                     <Link
                       key={l.href}
                       href={l.href}
-                      className="rounded-lg px-3 py-2.5 text-sm text-white/70 transition-colors hover:bg-white/[0.05] hover:text-white"
+                      className={
+                        l.highlight
+                          ? "inline-flex items-center gap-1.5 rounded-lg border border-violet-500/25 bg-violet-500/10 px-3 py-2.5 text-sm font-semibold text-violet-300 transition-colors hover:bg-violet-500/20"
+                          : "rounded-lg px-3 py-2.5 text-sm text-white/70 transition-colors hover:bg-white/[0.05] hover:text-white"
+                      }
                       onClick={() => setOpen(false)}
                     >
                       {l.label}

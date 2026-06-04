@@ -40,7 +40,8 @@
     "tickets": "Murojaatlar",
     "settings": "Sozlamalar",
     "submissions": "Topshirilganlar",
-    "earnings": "Daromad"
+    "earnings": "Daromad",
+    "mcp": "MCP"
   },
   "agent": {
     "title": "AI Agent",
@@ -92,6 +93,7 @@
     "fieldUpdatedAt": "O'zgartirilgan vaqt"
   },
   "landing": {
+    "navMcp": "MCP",
     "navHome": "Bosh sahifa",
     "navFeatures": "Imkoniyatlar",
     "navPricing": "Narxlar",
@@ -398,6 +400,39 @@
     "closed": "Yopiq",
     "reply": "Javob berish",
     "empty": "Hozircha murojaatingiz yo'q"
+  },
+  "mcpDocs": {
+    "nav": "MCP",
+    "pageTitle": "Botspace MCP Server",
+    "pageSubtitle": "Claude Code, Cursor, Cline kabi AI agentlarni ulang va terminaldan yoki IDE'dan to'g'ridan-to'g'ri bot quring.",
+    "whatTitle": "MCP nima?",
+    "whatBody": "MCP (Model Context Protocol) — AI agentlarga tashqi xizmatlarda tool'larni chaqirish imkonini beruvchi ochiq standart. Botspace MCP serveri to'liq platformani ochib beradi: loyiha boshqaruvi, flow quruvchi (80+ tool), CMS kolleksiyalari, debug/deploy va CRM broadcastlar — har qanday MCP klient botlaringizni dasturiy boshqara oladi.",
+    "capabilitiesTitle": "Nimalari qila olasiz",
+    "capabilities": [
+      { "name": "Loyiha boshqaruvi", "desc": "Loyiha yaratish, ro'yxatga olish va sozlash" },
+      { "name": "Flow quruvchi (80+ tool)", "desc": "Node qo'shish, edge ulash, tekshirish va saqlash" },
+      { "name": "CMS / Kolleksiyalar", "desc": "Schema yaratish, hujjat kiritish va so'rov yuborish" },
+      { "name": "Debug va deploy", "desc": "Debug konteyner ishga tushirish va production release chiqarish" },
+      { "name": "Bot simulyatsiyasi", "desc": "Flow bajarilishini simulyatsiya qilish va regression test o'tkazish" },
+      { "name": "CRM va broadcast", "desc": "Chat tarixini ko'rish va ommaviy xabar yuborish" }
+    ],
+    "connectTitle": "Ulanish",
+    "claudeCodeTitle": "Claude Code (OAuth — tavsiya etiladi)",
+    "claudeCodeStep1": "Serverni qo'shing:",
+    "claudeCodeStep2": "Claude Code'da MCP menyusini oching:",
+    "claudeCodeStep3": "Brauzerda autentifikatsiya qiling (kirish + ruxsat bering). Tayyor.",
+    "tokenTitle": "Token / CI / headless",
+    "tokenStep1": "API token yarating: Profil → API tokenlar → Yangi token (bsp_... bilan boshlanadi)",
+    "tokenStep2": "Bearer header bilan serverni qo'shing:",
+    "otherClientsTitle": "Boshqa MCP klientlar (Cursor, Cline va b.)",
+    "otherClientsBody": "Streamable HTTP transportni qo'llaydigan har qanday MCP klient ishlaydi. Quyidagi URL'ni OAuth yoki Bearer header bilan ishlating:",
+    "quickstartTitle": "Tezkor boshlash misoli",
+    "quickstartBody": "Ulangach, Claude'ga yozing:",
+    "quickstartPrompt": "Menga oddiy do'kon boti qur — mahsulot katalogi, savatcha va to'lov bosqichi bilan",
+    "quickstartResult": "Agent loyiha yaratadi, flow tuzadi, simulyatsiya qilib tekshiradi va debug havolasini beradi — barchasi avtomatik.",
+    "securityTitle": "Xavfsizlik eslatmasi",
+    "securityBody": "Har bir OAuth klient o'z tokenini oladi. bsp_... API tokeningizni hech kim bilan ulashmang. Tokenlarni istalgan vaqt Profil → API tokenlar bo'limidan bekor qilishingiz mumkin.",
+    "copyTooltip": "Nusxa olish"
   },
   "oauth": {
     "title": "Ulanish so'rovi",
