@@ -384,7 +384,20 @@
       "status": "Статус",
       "running": "Работает",
       "stopped": "Остановлен",
-      "failed": "Ошибка"
+      "failed": "Ошибка",
+      "deployStarted": "Deploy запущен",
+      "deployFailed": "Deploy не удался"
+    },
+    "runningLimit": {
+      "title": "Лимит ботов достигнут",
+      "description": "Одновременно можно запустить не более {limit} ботов. Остановите один, чтобы продолжить:",
+      "stopAndDeploy": "Остановить и продолжить",
+      "cancel": "Отмена",
+      "release": "релиз",
+      "debug": "отладка",
+      "stopError": "Ошибка при остановке бота",
+      "deployError": "Deploy не удался",
+      "deployStarted": "Deploy запущен"
     }
   },
   "templates": {

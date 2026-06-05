@@ -384,7 +384,20 @@
       "status": "Status",
       "running": "Running",
       "stopped": "Stopped",
-      "failed": "Failed"
+      "failed": "Failed",
+      "deployStarted": "Deploy started",
+      "deployFailed": "Deploy failed"
+    },
+    "runningLimit": {
+      "title": "Bot limit reached",
+      "description": "You can run at most {limit} bots at a time. Stop one to continue:",
+      "stopAndDeploy": "Stop & deploy",
+      "cancel": "Cancel",
+      "release": "release",
+      "debug": "debug",
+      "stopError": "Failed to stop the bot",
+      "deployError": "Deploy failed",
+      "deployStarted": "Deploy started"
     }
   },
   "templates": {

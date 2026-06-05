@@ -4,6 +4,17 @@ import { redirect } from "next/navigation";
 import { ProjectsAPI, ReleasesAPI, EnvAPI } from "@/shared/api/services";
 import { isApiError } from "@/shared/api/client";
 
+export type RunningBot = {
+  project_id: number;
+  name: string;
+  kind: "debug" | "release";
+  release_id?: number;
+};
+
+export type DeployResult =
+  | { ok: true }
+  | { ok: false; message: string; code?: string; limit?: number; running?: RunningBot[] };
+
 export async function createBotAction(_prev: unknown, formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
@@ -51,10 +62,50 @@ export async function deleteBotAction(id: string | number, locale: string) {
   redirect(`/${locale}/app/bots`);
 }
 
-export async function deployReleaseAction(projectId: string | number) {
-  await ReleasesAPI.create(projectId);
-  revalidatePath(`/app/bots/${projectId}/releases`);
-  return { ok: true };
+export async function deployReleaseAction(projectId: string | number): Promise<DeployResult> {
+  try {
+    await ReleasesAPI.create(projectId);
+    revalidatePath(`/app/bots/${projectId}/releases`);
+    return { ok: true };
+  } catch (e) {
+    if (isApiError(e) && e.status === 409) {
+      // Backend envelope: {"status": false, "data": {code, limit, running, detail}}
+      const raw = e.details as Record<string, unknown> | null;
+      const d = (raw && typeof raw.data === "object" && raw.data !== null
+        ? (raw.data as Record<string, unknown>)
+        : raw) as Record<string, unknown> | null;
+      if (d && d.code === "running_bot_limit") {
+        return {
+          ok: false,
+          message: String(d.detail ?? "Running bot limit reached"),
+          code: "running_bot_limit",
+          limit: typeof d.limit === "number" ? d.limit : undefined,
+          running: Array.isArray(d.running) ? (d.running as RunningBot[]) : [],
+        };
+      }
+    }
+    return { ok: false, message: isApiError(e) ? e.message : "Deploy muvaffaqiyatsiz" };
+  }
+}
+
+export async function stopDebugAction(projectId: number): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await ProjectsAPI.stopDebug(projectId);
+    revalidatePath(`/app/bots/${projectId}/releases`);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: isApiError(e) ? e.message : "To'xtatishda xatolik" };
+  }
+}
+
+export async function stopReleaseAction(releaseId: number): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await ReleasesAPI.stop(releaseId);
+    revalidatePath("/app/bots");
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: isApiError(e) ? e.message : "To'xtatishda xatolik" };
+  }
 }
 
 export async function addEnvAction(_prev: unknown, formData: FormData) {
