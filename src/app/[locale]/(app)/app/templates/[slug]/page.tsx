@@ -7,8 +7,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Separator } from "@/shared/components/ui/separator";
 import { Link } from "@/shared/i18n/routing";
 import { formatCurrency, formatNumber } from "@/shared/lib/utils";
-import { OrderButton } from "@/features/templates/components/order-button";
-import { CreateProjectButton } from "@/features/templates/components/create-project-button";
+import { TemplateActions } from "@/features/templates/components/template-actions";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { Section } from "@/shared/components/common/section";
 
@@ -143,43 +142,37 @@ export default async function TemplateDetailPage({
                 )}
               </div>
 
-              <OrderButton
+              <TemplateActions
                 templateId={tpl.id}
+                templateName={tpl.name}
                 isFree={isFree}
                 isOwned={isOwned}
-                labels={{
+                requiredEnvs={tpl.required_envs}
+                orderLabels={{
                   buy: t("buy"),
                   use: t("use"),
                   owned: t("owned"),
                   success: t("orderSuccess"),
                   error: t("orderError"),
                 }}
+                createLabels={{
+                  cta: t("createProject"),
+                  title: t("createProjectTitle"),
+                  description: t("createProjectDescription"),
+                  nameLabel: t("projectNameLabel"),
+                  namePlaceholder: t("projectNamePlaceholder"),
+                  tokenLabel: t("botTokenLabel"),
+                  tokenPlaceholder: t("botTokenPlaceholder"),
+                  tokenHelp: t("botTokenHelp"),
+                  botFatherLink: "@BotFather",
+                  submit: t("createSubmit"),
+                  success: t("createSuccess"),
+                  cancel: t("cancel"),
+                  requiredEnvsTitle: t("requiredEnvsTitle"),
+                  envPlaceholder: t("envPlaceholder"),
+                  envRequired: t("envRequired"),
+                }}
               />
-
-              {isOwned && (
-                <CreateProjectButton
-                  templateId={tpl.id}
-                  defaultName={tpl.name}
-                  requiredEnvs={tpl.required_envs}
-                  labels={{
-                    cta: t("createProject"),
-                    title: t("createProjectTitle"),
-                    description: t("createProjectDescription"),
-                    nameLabel: t("projectNameLabel"),
-                    namePlaceholder: t("projectNamePlaceholder"),
-                    tokenLabel: t("botTokenLabel"),
-                    tokenPlaceholder: t("botTokenPlaceholder"),
-                    tokenHelp: t("botTokenHelp"),
-                    botFatherLink: "@BotFather",
-                    submit: t("createSubmit"),
-                    success: t("createSuccess"),
-                    cancel: t("cancel"),
-                    requiredEnvsTitle: t("requiredEnvsTitle"),
-                    envPlaceholder: t("envPlaceholder"),
-                    envRequired: t("envRequired"),
-                  }}
-                />
-              )}
 
               {tpl.demo_url && (
                 <Button asChild variant="outline" className="w-full" size="lg">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Rocket, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
@@ -49,16 +49,33 @@ export function CreateProjectButton({
   defaultName,
   requiredEnvs,
   labels,
-  constructorBasePath = "/app/projects",
-}: Props) {
+  constructorBasePath = "/app/bots",
+  open: openProp,
+  onOpenChange: onOpenChangeProp,
+}: Props & { open?: boolean; onOpenChange?: (v: boolean) => void }) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [openInternal, setOpenInternal] = useState(false);
+  const open = openProp !== undefined ? openProp : openInternal;
+  const setOpen = (v: boolean) => {
+    setOpenInternal(v);
+    onOpenChangeProp?.(v);
+  };
   const [name, setName] = useState(defaultName);
   const [token, setToken] = useState("");
   const [envValues, setEnvValues] = useState<Record<string, string>>(() =>
     Object.fromEntries((requiredEnvs ?? []).map((e) => [e.key, ""]))
   );
   const [pending, start] = useTransition();
+
+  // Reset form when dialog opens via external control (openProp)
+  useEffect(() => {
+    if (open) {
+      setName(defaultName);
+      setToken("");
+      setEnvValues(Object.fromEntries((requiredEnvs ?? []).map((e) => [e.key, ""])));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const hasEnvs = (requiredEnvs?.length ?? 0) > 0;
   const allEnvsFilled = !hasEnvs || (requiredEnvs ?? []).every((e) => envValues[e.key]?.trim());
@@ -81,7 +98,8 @@ export function CreateProjectButton({
       if (res.ok && res.project_id) {
         toast.success(labels.success);
         setOpen(false);
-        router.push(`${constructorBasePath}/${res.project_id}`);
+        const botId = res.project_uuid ?? res.project_id;
+        router.push(`${constructorBasePath}/${botId}`);
         router.refresh();
       } else {
         toast.error(res.message ?? "Loyiha yaratishda xatolik");
