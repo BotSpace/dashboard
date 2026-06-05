@@ -16,9 +16,10 @@ type Props = {
     success: string;
     error: string;
   };
+  onOrdered?: () => void;
 };
 
-export function OrderButton({ templateId, isFree, isOwned, labels }: Props) {
+export function OrderButton({ templateId, isFree, isOwned, labels, onOrdered }: Props) {
   const [pending, start] = useTransition();
 
   if (isOwned) {
@@ -35,6 +36,7 @@ export function OrderButton({ templateId, isFree, isOwned, labels }: Props) {
       const res = await orderTemplateAction(templateId);
       if (res.ok) {
         toast.success(labels.success);
+        onOrdered?.();
       } else {
         toast.error(res.message || labels.error);
       }

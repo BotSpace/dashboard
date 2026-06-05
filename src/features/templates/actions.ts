@@ -7,6 +7,7 @@ export type OrderResult = { ok: boolean; message?: string };
 export type CreateFromTemplateResult = {
   ok: boolean;
   project_id?: number | string;
+  project_uuid?: string;
   message?: string;
 };
 
@@ -51,7 +52,7 @@ export async function createProjectFromTemplateAction(
 ): Promise<CreateFromTemplateResult> {
   try {
     const project = await ProjectsAPI.createFromTemplate(body);
-    return { ok: true, project_id: project.id };
+    return { ok: true, project_id: project.id, project_uuid: project.uuid };
   } catch (e) {
     if (isApiError(e)) {
       const details = e.details as
