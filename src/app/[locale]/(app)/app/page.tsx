@@ -121,7 +121,8 @@ export default async function DashboardPage({
 async function BotsSection() {
   let bots: Awaited<ReturnType<typeof ProjectsAPI.list>> = [];
   try {
-    bots = await ProjectsAPI.list();
+    const paged = await ProjectsAPI.listPaged({ page: 1, page_size: 5 });
+    bots = paged.results;
   } catch {
     // empty list shown as empty state inside component
   }

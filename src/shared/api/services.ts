@@ -56,11 +56,40 @@ function unwrapItem<T>(d: unknown): T {
   return d as T;
 }
 
+export type PaginatedResult<T> = {
+  results: T[];
+  total_items: number;
+  total_pages: number;
+  current_page: number;
+  page_size: number;
+};
+
+function unwrapPaginated<T>(d: unknown): PaginatedResult<T> {
+  const results = unwrapList<T>(d);
+  if (d && typeof d === "object") {
+    type P = { total_items?: number; total_pages?: number; current_page?: number; page_size?: number };
+    const root = d as { data?: P } & P;
+    const src: P = root.data ?? root;
+    return {
+      results,
+      total_items: Number(src.total_items) || results.length,
+      total_pages: Number(src.total_pages) || 1,
+      current_page: Number(src.current_page) || 1,
+      page_size: Number(src.page_size) || results.length,
+    };
+  }
+  return { results, total_items: results.length, total_pages: 1, current_page: 1, page_size: results.length };
+}
+
 // PROJECTS — admin-panel ham `/api/project/`
 export const ProjectsAPI = {
   list: async (search?: string) => {
     const d = await api<unknown>("/api/project/", { query: { search } });
     return unwrapList<Project>(d);
+  },
+  listPaged: async (params: { search?: string; page?: number; page_size?: number } = {}): Promise<PaginatedResult<Project>> => {
+    const d = await api<unknown>("/api/project/", { query: params });
+    return unwrapPaginated<Project>(d);
   },
   get: async (id: string | number) => unwrapItem<Project>(await api<unknown>(`/api/project/${id}/`)),
   create: (body: Partial<Project>) =>
@@ -72,6 +101,7 @@ export const ProjectsAPI = {
   update: (id: string | number, body: Partial<Project>) =>
     api<Project>(`/api/project/${id}/`, { method: "PATCH", json: body }).then(unwrapItem<Project>),
   remove: (id: string | number) => api<void>(`/api/project/${id}/`, { method: "DELETE" }),
+  stopDebug: (id: string | number) => api<void>(`/api/project/${id}/stop/`),
 };
 
 // RELEASES
@@ -82,6 +112,7 @@ export const ReleasesAPI = {
   },
   create: (project: string | number) =>
     api<Release>("/api/relase/", { method: "POST", json: { project } }).then(unwrapItem<Release>),
+  stop: (releaseId: string | number) => api<void>(`/api/relase/${releaseId}/stop/`),
 };
 
 // ENV VARS

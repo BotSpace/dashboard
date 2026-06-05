@@ -380,7 +380,20 @@
       "status": "Holat",
       "running": "Ishlamoqda",
       "stopped": "To'xtatilgan",
-      "failed": "Xatolik"
+      "failed": "Xatolik",
+      "deployStarted": "Deploy boshlandi",
+      "deployFailed": "Deploy muvaffaqiyatsiz"
+    },
+    "runningLimit": {
+      "title": "Bot limiti to'ldi",
+      "description": "Bir vaqtda ko'pi bilan {limit} ta bot ishlaydi. Birini to'xtatib davom eting:",
+      "stopAndDeploy": "To'xtatib davom etish",
+      "cancel": "Bekor qilish",
+      "release": "release",
+      "debug": "debug",
+      "stopError": "To'xtatishda xatolik",
+      "deployError": "Deploy muvaffaqiyatsiz",
+      "deployStarted": "Deploy boshlandi"
     }
   },
   "templates": {
