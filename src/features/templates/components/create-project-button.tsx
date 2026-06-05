@@ -18,9 +18,12 @@ import {
   DialogTrigger,
 } from "@/shared/components/ui/dialog";
 
+type RequiredEnv = { key: string; description?: string };
+
 type Props = {
   templateId: number | string;
   defaultName: string;
+  requiredEnvs?: RequiredEnv[];
   labels: {
     cta: string;
     title: string;
@@ -34,6 +37,9 @@ type Props = {
     submit: string;
     success: string;
     cancel: string;
+    requiredEnvsTitle: string;
+    envPlaceholder: string;
+    envRequired: string;
   };
   constructorBasePath?: string;
 };
@@ -41,6 +47,7 @@ type Props = {
 export function CreateProjectButton({
   templateId,
   defaultName,
+  requiredEnvs,
   labels,
   constructorBasePath = "/app/projects",
 }: Props) {
@@ -48,15 +55,28 @@ export function CreateProjectButton({
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(defaultName);
   const [token, setToken] = useState("");
+  const [envValues, setEnvValues] = useState<Record<string, string>>(() =>
+    Object.fromEntries((requiredEnvs ?? []).map((e) => [e.key, ""]))
+  );
   const [pending, start] = useTransition();
+
+  const hasEnvs = (requiredEnvs?.length ?? 0) > 0;
+  const allEnvsFilled = !hasEnvs || (requiredEnvs ?? []).every((e) => envValues[e.key]?.trim());
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!allEnvsFilled) return;
     start(async () => {
+      const envs = hasEnvs
+        ? Object.fromEntries(
+            Object.entries(envValues).map(([k, v]) => [k, v.trim()])
+          )
+        : undefined;
       const res = await createProjectFromTemplateAction({
         template: templateId,
         name: name.trim(),
         token: token.trim(),
+        ...(envs ? { envs } : {}),
       });
       if (res.ok && res.project_id) {
         toast.success(labels.success);
@@ -69,15 +89,24 @@ export function CreateProjectButton({
     });
   };
 
+  function handleOpenChange(val: boolean) {
+    setOpen(val);
+    if (val) {
+      setName(defaultName);
+      setToken("");
+      setEnvValues(Object.fromEntries((requiredEnvs ?? []).map((e) => [e.key, ""])));
+    }
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="w-full" size="lg">
           <Rocket className="h-4 w-4" />
           {labels.cta}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto">
         <form onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle>{labels.title}</DialogTitle>
@@ -120,6 +149,36 @@ export function CreateProjectButton({
                 </a>
               </p>
             </div>
+
+            {hasEnvs && (
+              <div className="space-y-3 rounded-lg border border-border/60 bg-muted/30 p-4">
+                <p className="text-sm font-medium">{labels.requiredEnvsTitle}</p>
+                {(requiredEnvs ?? []).map((env) => (
+                  <div key={env.key} className="space-y-1.5">
+                    <Label htmlFor={`env-${env.key}`}>
+                      <code className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">
+                        {env.key}
+                      </code>
+                    </Label>
+                    <Input
+                      id={`env-${env.key}`}
+                      value={envValues[env.key] ?? ""}
+                      onChange={(e) =>
+                        setEnvValues((prev) => ({ ...prev, [env.key]: e.target.value }))
+                      }
+                      placeholder={labels.envPlaceholder}
+                      required
+                      disabled={pending}
+                      spellCheck={false}
+                      autoComplete="off"
+                    />
+                    {env.description && (
+                      <p className="text-xs text-muted-foreground">{env.description}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button
@@ -130,7 +189,10 @@ export function CreateProjectButton({
             >
               {labels.cancel}
             </Button>
-            <Button type="submit" disabled={pending || !name.trim() || !token.trim()}>
+            <Button
+              type="submit"
+              disabled={pending || !name.trim() || !token.trim() || !allEnvsFilled}
+            >
               {pending && <Loader2 className="h-4 w-4 animate-spin" />}
               {labels.submit}
             </Button>

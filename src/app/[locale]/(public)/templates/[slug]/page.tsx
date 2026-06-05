@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft, Eye, Heart, ExternalLink, LogIn, LayoutDashboard, Tag } from "lucide-react";
+import { ArrowLeft, Eye, Heart, ExternalLink, LogIn, LayoutDashboard, Tag, KeyRound } from "lucide-react";
 import { TemplatesAPI } from "@/shared/api/services";
 import { readSession } from "@/shared/auth/session";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -108,6 +108,29 @@ export default async function PublicTemplateDetailPage({
                       <div className="text-sm font-medium">{f.name}</div>
                       {f.value && (
                         <div className="mt-1 text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: f.value }} />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+
+          {(tpl.required_envs?.length ?? 0) > 0 && (
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="flex items-center gap-2 text-lg font-semibold">
+                  <KeyRound className="h-4 w-4" />
+                  {t("requiredEnvsTitle")}
+                </h2>
+                <ul className="mt-4 space-y-2">
+                  {(tpl.required_envs ?? []).map((env) => (
+                    <li key={env.key} className="flex flex-col gap-0.5">
+                      <code className="text-sm font-mono bg-muted px-2 py-1 rounded self-start">
+                        {env.key}
+                      </code>
+                      {env.description && (
+                        <span className="text-xs text-muted-foreground">{env.description}</span>
                       )}
                     </li>
                   ))}
