@@ -61,7 +61,7 @@ export async function createProjectFromTemplateAction(
             name?: string[];
             token?: string[];
             message?: string;
-            envs?: Record<string, string[]> | string;
+            envs?: string[] | Record<string, string[]> | string;
           }
         | undefined;
       let msg: string | undefined;
@@ -71,6 +71,7 @@ export async function createProjectFromTemplateAction(
       else if (Array.isArray(details?.name)) msg = details.name[0];
       else if (Array.isArray(details?.token)) msg = details.token[0];
       else if (typeof details?.envs === "string") msg = details.envs;
+      else if (Array.isArray(details?.envs)) msg = (details.envs as string[]).join("; ");
       else if (details?.envs && typeof details.envs === "object") {
         const envErrors = Object.entries(details.envs as Record<string, string[]>)
           .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`)
