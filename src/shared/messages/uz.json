@@ -153,19 +153,43 @@
         "Versiyalar va bir bosishda rollback"
       ],
       "nodes": {
-        "trigger": { "type": "Trigger", "label": "/start" },
-        "msg": { "type": "Message", "label": "Salomlashish" },
-        "menu": { "type": "Keyboard", "label": "Menyu" },
-        "cond": { "type": "Shart", "label": "Tekshirish" },
-        "ai": { "type": "AI", "label": "AI Agent" },
-        "save": { "type": "Holat", "label": "Saqlash" }
+        "trigger": {
+          "type": "Trigger",
+          "label": "/start"
+        },
+        "msg": {
+          "type": "Message",
+          "label": "Salomlashish"
+        },
+        "menu": {
+          "type": "Keyboard",
+          "label": "Menyu"
+        },
+        "cond": {
+          "type": "Shart",
+          "label": "Tekshirish"
+        },
+        "ai": {
+          "type": "AI",
+          "label": "AI Agent"
+        },
+        "save": {
+          "type": "Holat",
+          "label": "Saqlash"
+        }
       }
     },
     "agent": {
       "eyebrow": "AI Agent",
       "title": "Bot yaratish — suhbat orqali",
       "subtitle": "Agent bilan tabiiy tilda gaplashing — u flow tuzadi, node qo'shadi va deploy qiladi.",
-      "tags": ["Flow tuzish", "Deploy", "CRM", "Broadcast", "Analitika"],
+      "tags": [
+        "Flow tuzish",
+        "Deploy",
+        "CRM",
+        "Broadcast",
+        "Analitika"
+      ],
       "chat": {
         "headerTitle": "BotSpace AI",
         "headerStatus": "Onlayn · Telegram bot quruvchi",
@@ -183,12 +207,30 @@
       "eyebrow": "FAQ",
       "title": "Ko'p beriladigan savollar",
       "items": [
-        { "q": "BotSpace bepulmi?", "a": "Ha, Free tarif bilan 1 ta bot va oyiga 200K AI token bepul. Karta talab qilinmaydi." },
-        { "q": "Kod yozish kerakmi?", "a": "Yo'q. Vizual konstruktor yoki AI agent bilan tabiiy tilda bot yaratishingiz mumkin." },
-        { "q": "Qanday to'lov usullari bor?", "a": "Payme, Click va xalqaro kartalar (Visa / Mastercard) orqali to'lash mumkin." },
-        { "q": "AI agent nima qila oladi?", "a": "Flow tuzadi, node qo'shadi, deploy qiladi, CRM boshqaradi, broadcast yuboradi — barchasi tabiiy tilda." },
-        { "q": "Botni boshqa platformalarga ulasa bo'ladimi?", "a": "Hozircha Telegram to'liq qo'llab-quvvatlanadi. WhatsApp va web kanallar tez orada qo'shiladi." },
-        { "q": "MCP server nima?", "a": "Claude Desktop yoki Cursor kabi AI agentlar orqali BotSpace platformasini boshqarish imkonini beradi." }
+        {
+          "q": "BotSpace bepulmi?",
+          "a": "Ha, Free tarif bilan 1 ta bot va oyiga 200K AI token bepul. Karta talab qilinmaydi."
+        },
+        {
+          "q": "Kod yozish kerakmi?",
+          "a": "Yo'q. Vizual konstruktor yoki AI agent bilan tabiiy tilda bot yaratishingiz mumkin."
+        },
+        {
+          "q": "Qanday to'lov usullari bor?",
+          "a": "Payme, Click va xalqaro kartalar (Visa / Mastercard) orqali to'lash mumkin."
+        },
+        {
+          "q": "AI agent nima qila oladi?",
+          "a": "Flow tuzadi, node qo'shadi, deploy qiladi, CRM boshqaradi, broadcast yuboradi — barchasi tabiiy tilda."
+        },
+        {
+          "q": "Botni boshqa platformalarga ulasa bo'ladimi?",
+          "a": "Hozircha Telegram to'liq qo'llab-quvvatlanadi. WhatsApp va web kanallar tez orada qo'shiladi."
+        },
+        {
+          "q": "MCP server nima?",
+          "a": "Claude Desktop yoki Cursor kabi AI agentlar orqali BotSpace platformasini boshqarish imkonini beradi."
+        }
       ]
     },
     "pricing": {
@@ -202,17 +244,35 @@
         "free": {
           "name": "Free",
           "tagBots": "1 bot",
-          "features": ["Vizual konstruktor", "AI agent (limitli)", "Marketplace", "Hamjamiyat yordami"]
+          "features": [
+            "Vizual konstruktor",
+            "AI agent (limitli)",
+            "Marketplace",
+            "Hamjamiyat yordami"
+          ]
         },
         "pro": {
           "name": "Pro",
           "tagBots": "10 bot",
-          "features": ["Free'ning barchasi", "Kengaytirilgan AI", "Priority yordam", "Custom domen", "Analitika"]
+          "features": [
+            "Free'ning barchasi",
+            "Kengaytirilgan AI",
+            "Priority yordam",
+            "Custom domen",
+            "Analitika"
+          ]
         },
         "max": {
           "name": "Max",
           "tagBots": "Cheksiz",
-          "features": ["Pro'ning barchasi", "Cheksiz botlar", "Maxsus integratsiyalar", "SLA 99.9%", "Shaxsiy menejer", "API access"]
+          "features": [
+            "Pro'ning barchasi",
+            "Cheksiz botlar",
+            "Maxsus integratsiyalar",
+            "SLA 99.9%",
+            "Shaxsiy menejer",
+            "API access"
+          ]
         }
       }
     },
@@ -363,7 +423,10 @@
     "botTokenHelp": "Token olish uchun:",
     "createSubmit": "Loyiha yaratish",
     "createSuccess": "Loyiha yaratildi, konstruktorga o'tilmoqda...",
-    "cancel": "Bekor qilish"
+    "cancel": "Bekor qilish",
+    "requiredEnvsTitle": "Kerakli sozlamalar",
+    "envPlaceholder": "Qiymat kiriting",
+    "envRequired": "Barcha kerakli sozlamalarni to'ldiring"
   },
   "billing": {
     "title": "To'lov va tariflar",
@@ -409,12 +472,30 @@
     "whatBody": "MCP (Model Context Protocol) — AI agentlarga tashqi xizmatlarda tool'larni chaqirish imkonini beruvchi ochiq standart. Botspace MCP serveri to'liq platformani ochib beradi: loyiha boshqaruvi, flow quruvchi (80+ tool), CMS kolleksiyalari, debug/deploy va CRM broadcastlar — har qanday MCP klient botlaringizni dasturiy boshqara oladi.",
     "capabilitiesTitle": "Nimalari qila olasiz",
     "capabilities": [
-      { "name": "Loyiha boshqaruvi", "desc": "Loyiha yaratish, ro'yxatga olish va sozlash" },
-      { "name": "Flow quruvchi (80+ tool)", "desc": "Node qo'shish, edge ulash, tekshirish va saqlash" },
-      { "name": "CMS / Kolleksiyalar", "desc": "Schema yaratish, hujjat kiritish va so'rov yuborish" },
-      { "name": "Debug va deploy", "desc": "Debug konteyner ishga tushirish va production release chiqarish" },
-      { "name": "Bot simulyatsiyasi", "desc": "Flow bajarilishini simulyatsiya qilish va regression test o'tkazish" },
-      { "name": "CRM va broadcast", "desc": "Chat tarixini ko'rish va ommaviy xabar yuborish" }
+      {
+        "name": "Loyiha boshqaruvi",
+        "desc": "Loyiha yaratish, ro'yxatga olish va sozlash"
+      },
+      {
+        "name": "Flow quruvchi (80+ tool)",
+        "desc": "Node qo'shish, edge ulash, tekshirish va saqlash"
+      },
+      {
+        "name": "CMS / Kolleksiyalar",
+        "desc": "Schema yaratish, hujjat kiritish va so'rov yuborish"
+      },
+      {
+        "name": "Debug va deploy",
+        "desc": "Debug konteyner ishga tushirish va production release chiqarish"
+      },
+      {
+        "name": "Bot simulyatsiyasi",
+        "desc": "Flow bajarilishini simulyatsiya qilish va regression test o'tkazish"
+      },
+      {
+        "name": "CRM va broadcast",
+        "desc": "Chat tarixini ko'rish va ommaviy xabar yuborish"
+      }
     ],
     "connectTitle": "Ulanish",
     "claudeCodeTitle": "Claude Code (OAuth — tavsiya etiladi)",

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft, Eye, Heart, ExternalLink, Tag, Info, Sparkles } from "lucide-react";
+import { ArrowLeft, Eye, Heart, ExternalLink, Tag, Info, Sparkles, KeyRound } from "lucide-react";
 import { TemplatesAPI } from "@/shared/api/services";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -110,6 +110,23 @@ export default async function TemplateDetailPage({
               </ul>
             </Section>
           )}
+
+          {(tpl.required_envs?.length ?? 0) > 0 && (
+            <Section title={t("requiredEnvsTitle")} icon={<KeyRound className="h-4 w-4" />}>
+              <ul className="space-y-2">
+                {(tpl.required_envs ?? []).map((env) => (
+                  <li key={env.key} className="flex flex-col gap-0.5">
+                    <code className="text-sm font-mono bg-muted px-2 py-1 rounded self-start">
+                      {env.key}
+                    </code>
+                    {env.description && (
+                      <span className="text-xs text-muted-foreground">{env.description}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
         </div>
 
         <aside className="lg:sticky lg:top-20 lg:self-start">
@@ -143,6 +160,7 @@ export default async function TemplateDetailPage({
                 <CreateProjectButton
                   templateId={tpl.id}
                   defaultName={tpl.name}
+                  requiredEnvs={tpl.required_envs}
                   labels={{
                     cta: t("createProject"),
                     title: t("createProjectTitle"),
@@ -156,6 +174,9 @@ export default async function TemplateDetailPage({
                     submit: t("createSubmit"),
                     success: t("createSuccess"),
                     cancel: t("cancel"),
+                    requiredEnvsTitle: t("requiredEnvsTitle"),
+                    envPlaceholder: t("envPlaceholder"),
+                    envRequired: t("envRequired"),
                   }}
                 />
               )}

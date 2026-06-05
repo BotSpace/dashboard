@@ -124,6 +124,7 @@ export type Template = {
   likes?: number;
   is_order?: boolean;
   demo_url?: string | null;
+  required_envs?: { key: string; description?: string }[];
 };
 
 export type Ticket = {

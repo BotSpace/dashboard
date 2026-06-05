@@ -427,7 +427,10 @@
     "botTokenHelp": "Get a token from:",
     "createSubmit": "Create project",
     "createSuccess": "Project created — opening the constructor…",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "requiredEnvsTitle": "Required settings",
+    "envPlaceholder": "Enter value",
+    "envRequired": "Fill in all required settings"
   },
   "billing": {
     "title": "Billing & plans",
@@ -473,12 +476,30 @@
     "whatBody": "MCP (Model Context Protocol) is an open standard that lets AI agents call tools on external services. The Botspace MCP server exposes the full platform — project management, flow builder (80+ tools), CMS collections, debug/deploy, and CRM broadcasts — so any MCP client can drive your bots programmatically.",
     "capabilitiesTitle": "What you can do",
     "capabilities": [
-      { "name": "Project management", "desc": "Create, list, and configure projects" },
-      { "name": "Flow builder (80+ tools)", "desc": "Add nodes, connect edges, validate and save flows" },
-      { "name": "CMS / Collections", "desc": "Create schemas, insert and query documents" },
-      { "name": "Debug & deploy", "desc": "Start debug containers and push production releases" },
-      { "name": "Bot simulation", "desc": "Simulate flow execution and run regression tests" },
-      { "name": "CRM & broadcast", "desc": "Browse chat history and send bulk messages" }
+      {
+        "name": "Project management",
+        "desc": "Create, list, and configure projects"
+      },
+      {
+        "name": "Flow builder (80+ tools)",
+        "desc": "Add nodes, connect edges, validate and save flows"
+      },
+      {
+        "name": "CMS / Collections",
+        "desc": "Create schemas, insert and query documents"
+      },
+      {
+        "name": "Debug & deploy",
+        "desc": "Start debug containers and push production releases"
+      },
+      {
+        "name": "Bot simulation",
+        "desc": "Simulate flow execution and run regression tests"
+      },
+      {
+        "name": "CRM & broadcast",
+        "desc": "Browse chat history and send bulk messages"
+      }
     ],
     "connectTitle": "Connect",
     "claudeCodeTitle": "Claude Code (OAuth — recommended)",

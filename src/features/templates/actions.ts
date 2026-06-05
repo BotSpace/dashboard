@@ -47,7 +47,7 @@ export async function orderTemplateAction(templateId: number | string): Promise<
 }
 
 export async function createProjectFromTemplateAction(
-  body: { template: number | string; name: string; token: string }
+  body: { template: number | string; name: string; token: string; envs?: Record<string, string> }
 ): Promise<CreateFromTemplateResult> {
   try {
     const project = await ProjectsAPI.createFromTemplate(body);
@@ -55,7 +55,14 @@ export async function createProjectFromTemplateAction(
   } catch (e) {
     if (isApiError(e)) {
       const details = e.details as
-        | { detail?: string; template?: string[] | string; name?: string[]; token?: string[]; message?: string }
+        | {
+            detail?: string;
+            template?: string[] | string;
+            name?: string[];
+            token?: string[];
+            message?: string;
+            envs?: Record<string, string[]> | string;
+          }
         | undefined;
       let msg: string | undefined;
       if (typeof details?.detail === "string") msg = details.detail;
@@ -63,7 +70,13 @@ export async function createProjectFromTemplateAction(
       else if (Array.isArray(details?.template)) msg = details.template[0];
       else if (Array.isArray(details?.name)) msg = details.name[0];
       else if (Array.isArray(details?.token)) msg = details.token[0];
-      else if (typeof details?.message === "string") msg = details.message;
+      else if (typeof details?.envs === "string") msg = details.envs;
+      else if (details?.envs && typeof details.envs === "object") {
+        const envErrors = Object.entries(details.envs as Record<string, string[]>)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`)
+          .join("; ");
+        msg = envErrors || undefined;
+      } else if (typeof details?.message === "string") msg = details.message;
       return { ok: false, message: msg ?? e.message };
     }
     return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
