@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import { Switch } from "@/shared/components/ui/switch";
 import { updateDocumentAction } from "../actions";
 import type { CmsCollection, CmsDocument, CmsField, CmsFieldKind } from "@/shared/types/api";
 import { RelationSelect } from "./relation-select";
@@ -92,10 +93,9 @@ export function DocumentEditForm({ projectId, collectionName, fields, collection
             {f.required && <span className="ml-1 text-destructive">*</span>}
           </label>
           {f.kind === "bool" ? (
-            <input
-              type="checkbox"
+            <Switch
               checked={Boolean(values[f.name])}
-              onChange={(e) => setValues({ ...values, [f.name]: e.target.checked })}
+              onCheckedChange={(checked) => setValues({ ...values, [f.name]: checked })}
             />
           ) : f.kind === "longtext" || f.kind === "json" ? (
             <textarea

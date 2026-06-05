@@ -5,6 +5,7 @@ import { Plus, Trash2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import { Switch } from "@/shared/components/ui/switch";
 import { addFieldAction, removeFieldAction, updateFieldAction, updateCollectionAction } from "../actions";
 import type { CmsCascadeMode, CmsCollection, CmsField, CmsFieldKind, CmsIndexKind } from "@/shared/types/api";
 
@@ -190,13 +191,12 @@ export function FieldEditor({ projectId, collectionName, initialFields, collecti
                 placeholder="Label"
                 className="h-8"
               />
-              <label className="flex items-center gap-1 text-xs">
-                <input
-                  type="checkbox"
+              <label className="flex items-center gap-1.5 text-xs">
+                <Switch
                   checked={f.required}
-                  onChange={(e) =>
+                  onCheckedChange={(checked) =>
                     setFields((arr) =>
-                      arr.map((x, idx) => (idx === i ? { ...x, required: e.target.checked } : x))
+                      arr.map((x, idx) => (idx === i ? { ...x, required: checked } : x))
                     )
                   }
                 />
@@ -294,11 +294,10 @@ export function FieldEditor({ projectId, collectionName, initialFields, collecti
               placeholder="Label"
               className="h-8"
             />
-            <label className="flex items-center gap-1 text-xs">
-              <input
-                type="checkbox"
+            <label className="flex items-center gap-1.5 text-xs">
+              <Switch
                 checked={newField.required}
-                onChange={(e) => setNewField({ ...newField, required: e.target.checked })}
+                onCheckedChange={(checked) => setNewField({ ...newField, required: checked })}
               />
               required
             </label>
