@@ -69,7 +69,11 @@ export async function deployReleaseAction(projectId: string | number): Promise<D
     return { ok: true };
   } catch (e) {
     if (isApiError(e) && e.status === 409) {
-      const d = e.details as Record<string, unknown> | null;
+      // Backend envelope: {"status": false, "data": {code, limit, running, detail}}
+      const raw = e.details as Record<string, unknown> | null;
+      const d = (raw && typeof raw.data === "object" && raw.data !== null
+        ? (raw.data as Record<string, unknown>)
+        : raw) as Record<string, unknown> | null;
       if (d && d.code === "running_bot_limit") {
         return {
           ok: false,
