@@ -41,7 +41,8 @@
     "settings": "Sozlamalar",
     "submissions": "Topshirilganlar",
     "earnings": "Daromad",
-    "mcp": "MCP"
+    "mcp": "MCP",
+    "withdraw": "Pul yechish"
   },
   "agent": {
     "title": "AI Agent",
@@ -541,5 +542,22 @@
     "deny": "Rad etish",
     "redirecting": "Tasdiqlandi. Qaytish...",
     "redirectNote": "Tasdiqlangach {uri} manziliga qaytarilasiz"
+  },
+  "earnings": {
+    "title": "Daromad",
+    "balance": "Balans",
+    "withdraw": "Pul yechish",
+    "totalEarned": "Jami daromad",
+    "totalCommission": "Jami komissiya",
+    "byBot": "Bot bo'yicha daromad",
+    "noEarnings": "Hozircha daromad yo'q",
+    "paymentsCount": "to'lov",
+    "transactions": "Tranzaksiyalar",
+    "noTransactions": "Tranzaksiyalar yo'q",
+    "date": "Sana",
+    "bot": "Bot",
+    "amount": "Summa",
+    "net": "Sof",
+    "provider": "To'lov turi"
   }
 }

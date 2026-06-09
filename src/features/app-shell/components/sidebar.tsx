@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import {
+  Banknote,
   Bot,
   CreditCard,
   Files,
@@ -10,6 +11,7 @@ import {
   PackageOpen,
   Settings,
   Sparkles,
+  TrendingUp,
   Wand2,
   Plug,
 } from "lucide-react";
@@ -33,6 +35,8 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     { href: "/app/files", icon: Files, key: "files" },
   ];
   const secondary: Item[] = [
+    { href: "/app/earnings", icon: TrendingUp, key: "earnings" },
+    { href: "/app/withdraw", icon: Banknote, key: "withdraw" },
     { href: "/app/billing", icon: CreditCard, key: "billing" },
     { href: "/app/tickets", icon: LifeBuoy, key: "tickets" },
     { href: "/app/settings", icon: Settings, key: "settings" },

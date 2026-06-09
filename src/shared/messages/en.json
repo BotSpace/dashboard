@@ -41,7 +41,8 @@
     "settings": "Settings",
     "submissions": "Submissions",
     "earnings": "Earnings",
-    "mcp": "MCP"
+    "mcp": "MCP",
+    "withdraw": "Withdraw"
   },
   "landing": {
     "navMcp": "MCP",
@@ -545,5 +546,22 @@
     "deny": "Deny",
     "redirecting": "Authorized. Redirecting...",
     "redirectNote": "You will be redirected to {uri} upon approval"
+  },
+  "earnings": {
+    "title": "Earnings",
+    "balance": "Balance",
+    "withdraw": "Withdraw",
+    "totalEarned": "Total earned",
+    "totalCommission": "Total commission",
+    "byBot": "Earnings by bot",
+    "noEarnings": "No earnings yet",
+    "paymentsCount": "payments",
+    "transactions": "Transactions",
+    "noTransactions": "No transactions",
+    "date": "Date",
+    "bot": "Bot",
+    "amount": "Amount",
+    "net": "Net",
+    "provider": "Provider"
   }
 }

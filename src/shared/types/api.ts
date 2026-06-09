@@ -272,3 +272,73 @@ export type CmsAuditEntry = {
   meta: Record<string, unknown>;
   created_at: string;
 };
+
+// EARNINGS (bot to'lov daromadlari)
+export type BotEarning = {
+  project_id: number | string;
+  project_name: string;
+  total_earned: string;
+  count: number;
+};
+
+export type EarningsOrder = {
+  id: number | string;
+  project_id: number | string;
+  project_name?: string;
+  payer_chat_id?: number | string;
+  amount: string;
+  commission: string;
+  net_amount: string;
+  status: string;
+  provider: string;
+  comment?: string;
+  created_at?: string;
+  paid_at?: string;
+};
+
+export type EarningsSummary = {
+  balance: number;
+  total_earned: string;
+  total_commission: string;
+  by_bot: BotEarning[];
+  orders: EarningsOrder[];
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
+};
+
+// WITHDRAWAL (pul yechish)
+export type WithdrawalStatus = "pending" | "approved" | "rejected";
+
+export type WithdrawalRequest = {
+  id: number | string;
+  project: number | string | null;
+  project_name?: string | null;
+  amount: string;
+  card_number: string;
+  card_owner: string;
+  status: WithdrawalStatus;
+  rejection_reason?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+// KYC verifikatsiya
+export type KycStatus = "pending" | "approved" | "rejected";
+
+export type KycVerification = {
+  id: number | string;
+  full_name: string;
+  passport_image: string;
+  selfie_image: string;
+  residence_reference: string;
+  status: KycStatus;
+  rejection_reason?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type KycStatusResponse = {
+  is_verified: boolean;
+  verification: KycVerification | null;
+};

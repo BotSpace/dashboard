@@ -41,7 +41,8 @@
     "settings": "Настройки",
     "submissions": "Заявки",
     "earnings": "Доход",
-    "mcp": "MCP"
+    "mcp": "MCP",
+    "withdraw": "Вывод средств"
   },
   "landing": {
     "navMcp": "MCP",
@@ -545,5 +546,22 @@
     "deny": "Отказать",
     "redirecting": "Разрешено. Перенаправление...",
     "redirectNote": "После подтверждения вы будете перенаправлены на {uri}"
+  },
+  "earnings": {
+    "title": "Доход",
+    "balance": "Баланс",
+    "withdraw": "Вывод",
+    "totalEarned": "Всего заработано",
+    "totalCommission": "Всего комиссия",
+    "byBot": "Доход по ботам",
+    "noEarnings": "Пока нет дохода",
+    "paymentsCount": "платежей",
+    "transactions": "Транзакции",
+    "noTransactions": "Нет транзакций",
+    "date": "Дата",
+    "bot": "Бот",
+    "amount": "Сумма",
+    "net": "Чистыми",
+    "provider": "Способ"
   }
 }

@@ -20,6 +20,10 @@ import type {
   Transaction,
   BroadcastMessage,
   DashboardOverview,
+  EarningsSummary,
+  WithdrawalRequest,
+  KycStatusResponse,
+  KycVerification,
 } from "@/shared/types/api";
 
 // Backend response shape: { status, data: { results: T[], total_items, ... } }  OR  { results: T[] }  OR plain array
@@ -248,6 +252,46 @@ export const BillingAPI = {
   balance: async () => {
     const d = await api<unknown>("/api/user/balance/");
     return unwrapItem<{ balance: number; template_balance?: number; currency?: string }>(d);
+  },
+};
+
+// EARNINGS — bot to'lov daromadlari (balans + bot bo'yicha taqsimot + orderlar)
+export const EarningsAPI = {
+  summary: async (
+    params: { project_in?: string; status?: string; provider?: string; page?: number } = {}
+  ): Promise<EarningsSummary> => {
+    const d = await api<unknown>("/api/earnings/", { query: params });
+    return unwrapItem<EarningsSummary>(d);
+  },
+};
+
+// WITHDRAWAL — bot daromadlaridan pul yechish
+export const WithdrawalAPI = {
+  list: async () => {
+    const d = await api<unknown>("/api/withdrawal/");
+    return unwrapList<WithdrawalRequest>(d);
+  },
+  create: (body: {
+    project?: number | string | null;
+    amount: number | string;
+    card_number: string;
+    card_owner: string;
+  }) =>
+    api<WithdrawalRequest>("/api/withdrawal/", { method: "POST", json: body }).then(
+      unwrapItem<WithdrawalRequest>
+    ),
+  remove: (id: number | string) => api<void>(`/api/withdrawal/${id}/`, { method: "DELETE" }),
+};
+
+// KYC — verifikatsiya (pasport, rasm, ma'lumotnoma)
+export const KycAPI = {
+  status: async () => {
+    const d = await api<unknown>("/api/kyc/status/");
+    return unwrapItem<KycStatusResponse>(d);
+  },
+  submit: async (body: FormData) => {
+    const d = await api<unknown>("/api/kyc/", { method: "POST", body });
+    return unwrapItem<KycVerification>(d);
   },
 };
 
