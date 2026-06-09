@@ -42,7 +42,8 @@
     "submissions": "Topshirilganlar",
     "earnings": "Daromad",
     "mcp": "MCP",
-    "withdraw": "Pul yechish"
+    "withdraw": "Pul yechish",
+    "verification": "Verifikatsiya"
   },
   "agent": {
     "title": "AI Agent",

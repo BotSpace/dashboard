@@ -44,6 +44,7 @@ export async function submitKycAction(_prev: Result | undefined, formData: FormD
 
   try {
     await KycAPI.submit(out);
+    revalidatePath("/app/verification");
     revalidatePath("/app/withdraw");
     return { ok: true };
   } catch (e) {

@@ -42,7 +42,8 @@
     "submissions": "Заявки",
     "earnings": "Доход",
     "mcp": "MCP",
-    "withdraw": "Вывод средств"
+    "withdraw": "Вывод средств",
+    "verification": "Верификация"
   },
   "landing": {
     "navMcp": "MCP",
