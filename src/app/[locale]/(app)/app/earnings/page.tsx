@@ -12,6 +12,7 @@ import type { EarningsSummary } from "@/shared/types/api";
 
 const EMPTY: EarningsSummary = {
   balance: 0,
+  withdrawable: "0",
   total_earned: "0",
   total_commission: "0",
   by_bot: [],

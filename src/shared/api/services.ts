@@ -285,12 +285,14 @@ export const WithdrawalAPI = {
 
 // KYC — verifikatsiya (pasport, rasm, ma'lumotnoma)
 export const KycAPI = {
+  // accounts app legacy rejimda root'da mount qilingan (/api/ ostida emas),
+  // shuning uchun KYC uchun kanonik /api/v1/ surface ishlatiladi.
   status: async () => {
-    const d = await api<unknown>("/api/kyc/status/");
+    const d = await api<unknown>("/api/v1/kyc/status/");
     return unwrapItem<KycStatusResponse>(d);
   },
   submit: async (body: FormData) => {
-    const d = await api<unknown>("/api/kyc/", { method: "POST", body });
+    const d = await api<unknown>("/api/v1/kyc/", { method: "POST", body });
     return unwrapItem<KycVerification>(d);
   },
 };
