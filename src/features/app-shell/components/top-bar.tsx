@@ -16,7 +16,7 @@ export function TopBar({ user }: { user: UserMenuUser }) {
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const q = query.trim();
-    router.push(q ? `/app/bots?search=${encodeURIComponent(q)}` : "/app/bots");
+    router.push(q ? `/app/bots?q=${encodeURIComponent(q)}` : "/app/bots");
   };
 
   return (
