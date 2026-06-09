@@ -34,7 +34,12 @@ export function UserMenu({ user }: { user: UserMenuUser }) {
   const display = fullName(user) || user.email || user.phone || "—";
 
   const handleLogout = async () => {
-    await logoutAction(locale);
+    try {
+      await logoutAction();
+    } finally {
+      // Qattiq navigatsiya: middleware qayta ishlaydi, klient holati tozalanadi.
+      window.location.href = `/${locale}/login`;
+    }
   };
 
   return (

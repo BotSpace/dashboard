@@ -1,8 +1,6 @@
 "use server";
-import { redirect } from "next/navigation";
 import { apiFetch, isApiError } from "@/shared/api/client";
 import { setSessionCookie, clearSessionCookie, type SessionUser } from "@/shared/auth/session";
-import { routing } from "@/shared/i18n/routing";
 
 export type ActionState = {
   ok: boolean;
@@ -86,8 +84,8 @@ export async function googleLoginAction(idToken: string): Promise<ActionState> {
   }
 }
 
-export async function logoutAction(locale?: string): Promise<void> {
+// Sessiya cookie'sini tozalaydi. Navigatsiyani klient qiladi (window.location)
+// — server redirect Radix onSelect ichida ishonchli ishlamaydi.
+export async function logoutAction(): Promise<void> {
   await clearSessionCookie();
-  const loc = locale ?? routing.defaultLocale;
-  redirect(`/${loc}/login`);
 }

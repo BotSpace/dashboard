@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import { env } from "@/shared/lib/env";
 import { ACCESS_TOKEN_TTL_SEC, REFRESH_TOKEN_TTL_SEC } from "@/shared/lib/constants";
@@ -60,22 +60,51 @@ export async function setSessionCookie(payload: SessionPayload) {
   });
 }
 
+/** Registrable parent domain derived from the request host, e.g.
+ *  `app.botmother.uz` → `.botmother.uz`. Returns null for localhost/IPs. */
+async function parentDomainFromHost(): Promise<string | null> {
+  try {
+    const h = await headers();
+    const host = (h.get("x-forwarded-host") || h.get("host") || "").split(":")[0].trim().toLowerCase();
+    if (!host || host === "localhost" || /^\d+\.\d+\.\d+\.\d+$/.test(host)) return null;
+    const labels = host.split(".");
+    if (labels.length < 2) return null;
+    return "." + labels.slice(-2).join(".");
+  } catch {
+    return null;
+  }
+}
+
 export async function clearSessionCookie() {
   const store = await cookies();
-  // The session cookie is set with an explicit `domain` (e.g. ".botspace.uz")
-  // and `path: "/"`. A bare `delete(name)` is scoped to the current host and
-  // does NOT match the domain-scoped cookie, so it would never get removed in
-  // production. Overwrite it as expired with the SAME attributes instead.
-  store.set(env.SESSION_COOKIE_NAME, "", {
+  const name = env.SESSION_COOKIE_NAME;
+  // The session cookie is shared across several frontends on one parent domain
+  // (e.g. ".botmother.uz") via a domain-scoped cookie. A clear only works if the
+  // expiring Set-Cookie matches the SAME domain + path. We therefore expire it
+  // under every plausible scope so logout works regardless of how it was set:
+  //   1) host-scoped (no domain) — local dev / legacy single-frontend cookie
+  //   2) the configured SESSION_COOKIE_DOMAIN
+  //   3) the registrable parent domain derived from the request host — covers
+  //      the shared multi-frontend cookie even if this service's env is unset.
+  const base = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "lax" as const,
     path: "/",
     maxAge: 0,
-    ...(env.SESSION_COOKIE_DOMAIN ? { domain: env.SESSION_COOKIE_DOMAIN } : {}),
-  });
-  // Also drop a host-scoped variant if one exists (e.g. local dev).
-  store.delete(env.SESSION_COOKIE_NAME);
+  };
+
+  store.set(name, "", base);
+  store.delete(name);
+
+  const domains = new Set<string>();
+  if (env.SESSION_COOKIE_DOMAIN) domains.add(env.SESSION_COOKIE_DOMAIN);
+  const parent = await parentDomainFromHost();
+  if (parent) domains.add(parent);
+
+  for (const domain of domains) {
+    store.set(name, "", { ...base, domain });
+  }
 }
 
 export async function readSession(): Promise<SessionPayload | null> {
