@@ -8,10 +8,19 @@ type Result = { ok: boolean; message?: string };
 export async function createTicketAction(_prev: Result | undefined, formData: FormData): Promise<Result> {
   const subject = String(formData.get("subject") ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
+  const file = formData.get("attachment");
   if (!subject) return { ok: false, message: "Mavzuni kiriting" };
   if (!message) return { ok: false, message: "Xabarni kiriting" };
+
+  const out = new FormData();
+  out.append("subject", subject);
+  out.append("message", message);
+  if (file instanceof File && file.size > 0) {
+    out.append("attachment", file, file.name);
+  }
+
   try {
-    await TicketsAPI.create({ subject, message });
+    await TicketsAPI.create(out);
     revalidatePath("/app/tickets");
     return { ok: true };
   } catch (e) {

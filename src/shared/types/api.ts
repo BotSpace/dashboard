@@ -132,7 +132,10 @@ export type Ticket = {
   subject: string;
   status: "open" | "closed" | "pending";
   message?: string;
+  attachment?: string | null;
+  admin_reply?: string | null;
   created_at?: string;
+  updated_at?: string;
 };
 
 export type Transaction = {

@@ -236,8 +236,8 @@ export const TicketsAPI = {
     return unwrapList<Ticket>(d);
   },
   get: (id: string | number) => api<Ticket>(`/api/ticket/${id}/`).then(unwrapItem<Ticket>),
-  create: (body: Pick<Ticket, "subject" | "message">) =>
-    api<Ticket>("/api/ticket/", { method: "POST", json: body }),
+  create: (body: FormData) =>
+    api<Ticket>("/api/ticket/", { method: "POST", body }).then(unwrapItem<Ticket>),
 };
 
 // BILLING
