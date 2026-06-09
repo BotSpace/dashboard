@@ -112,7 +112,7 @@ export function RunningBotLimitDialog({ open, onClose, limit, running, projectId
           <Button
             onClick={handleStop}
             disabled={pending || selected === null}
-            className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+            className="gap-2"
           >
             {pending ? (
               <Loader2 className="h-4 w-4 animate-spin" />

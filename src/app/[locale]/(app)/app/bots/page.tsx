@@ -57,7 +57,7 @@ export default async function BotsPage({
         title={t("title")}
         subtitle={`${totalItems} ${t("title").toLowerCase()}`}
         actions={
-          <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-500/20">
+          <Button asChild className="gap-2 shadow-sm shadow-blue-500/20">
             <Link href="/app/bots/new">
               <Plus className="h-4 w-4" /> {t("new")}
             </Link>
@@ -77,7 +77,7 @@ export default async function BotsPage({
           icon={<Bot className="h-7 w-7" />}
           title={t("empty")}
           action={
-            <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
+            <Button asChild className="gap-2">
               <Link href="/app/bots/new">
                 <Plus className="h-4 w-4" /> {t("new")}
               </Link>

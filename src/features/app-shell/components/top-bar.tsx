@@ -1,6 +1,7 @@
 "use client";
 import { Bell, Menu, Search } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { LanguageSwitcher } from "@/shared/components/common/language-switcher";
@@ -9,6 +10,15 @@ import { MobileSidebar } from "./mobile-sidebar";
 
 export function TopBar({ user }: { user: UserMenuUser }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const router = useRouter();
+
+  const onSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = query.trim();
+    router.push(q ? `/app/bots?search=${encodeURIComponent(q)}` : "/app/bots");
+  };
+
   return (
     <>
       <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-6">
@@ -21,14 +31,17 @@ export function TopBar({ user }: { user: UserMenuUser }) {
         >
           <Menu />
         </Button>
-        <div className="relative w-full max-w-sm lg:max-w-xl">
+        <form onSubmit={onSearch} role="search" className="relative w-full max-w-sm lg:max-w-xl">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Qidirish… (⌘K)"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Botlarni qidirish…"
+            aria-label="Botlarni qidirish"
             className="h-9 w-full pl-9 bg-muted/40 focus-visible:bg-background"
           />
-        </div>
+        </form>
         <div className="ml-auto flex items-center gap-1">
           <Button variant="ghost" size="icon" aria-label="Bildirishnomalar" className="relative">
             <Bell className="h-4 w-4" />

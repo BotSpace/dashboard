@@ -46,7 +46,7 @@ export default async function DashboardPage({
           </div>
         </div>
 
-        <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
+        <Button asChild className="gap-2 shadow-lg shadow-blue-500/20">
           <Link href="/app/bots/new">
             <Plus className="h-4 w-4" />
             Yangi bot

@@ -103,7 +103,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button size="sm" className="">
               {t("addFunds")}
             </Button>
           </CardContent>
@@ -172,7 +172,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                     className={
                       isCurrent
                         ? "w-full"
-                        : "w-full bg-blue-600 hover:bg-blue-700 text-white"
+                        : "w-full"
                     }
                     size="sm"
                     disabled={isCurrent}
@@ -194,7 +194,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
             {history.length === 0 ? (
               <p className="py-12 text-center text-sm text-muted-foreground">{t("noHistory")}</p>
             ) : (
-              <table className="w-full text-sm">
+              <div className="overflow-x-auto"><table className="w-full min-w-[600px] text-sm">
                 <thead className="border-b bg-muted/30 text-xs uppercase text-muted-foreground">
                   <tr>
                     <th className="px-4 py-3 text-left">Sana</th>
@@ -217,7 +217,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </CardContent>
         </Card>

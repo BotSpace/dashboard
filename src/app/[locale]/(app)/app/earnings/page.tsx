@@ -127,7 +127,7 @@ export default async function EarningsPage({
             {summary.orders.length === 0 ? (
               <p className="py-12 text-center text-sm text-muted-foreground">{t("noTransactions")}</p>
             ) : (
-              <table className="w-full text-sm">
+              <div className="overflow-x-auto"><table className="w-full min-w-[600px] text-sm">
                 <thead className="border-b bg-muted/30 text-xs uppercase text-muted-foreground">
                   <tr>
                     <th className="px-4 py-3 text-left">{t("date")}</th>
@@ -169,7 +169,7 @@ export default async function EarningsPage({
                     );
                   })}
                 </tbody>
-              </table>
+              </table></div>
             )}
           </CardContent>
         </Card>

@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { Info, Activity, AlertTriangle } from "lucide-react";
 import { ProjectsAPI } from "@/shared/api/services";
 import { Section } from "@/shared/components/common/section";
+import { CopyButton } from "@/shared/components/common/copy-button";
 import { DeleteBotButton } from "@/features/bots/components/delete-bot-button";
 
 export default async function BotOverviewPage({
@@ -32,7 +33,7 @@ export default async function BotOverviewPage({
         contentClassName="space-y-3 text-sm"
       >
         <Row label="Status" value={bot?.status ?? "draft"} />
-        <Row label="ID" value={String(bot?.id ?? id)} />
+        <Row label="ID" value={String(bot?.id ?? id)} copy />
       </Section>
 
       <div className="lg:col-span-2">
@@ -52,11 +53,14 @@ export default async function BotOverviewPage({
   );
 }
 
-function Row({ label, value }: { label: string; value?: string }) {
+function Row({ label, value, copy }: { label: string; value?: string; copy?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-3 border-b border-border/50 pb-2 last:border-0 last:pb-0">
       <span className="text-muted-foreground">{label}</span>
-      <span className="truncate font-medium">{value || "—"}</span>
+      <span className="flex min-w-0 items-center gap-1.5">
+        <span className="truncate font-medium">{value || "—"}</span>
+        {copy && value ? <CopyButton value={value} className="p-1" /> : null}
+      </span>
     </div>
   );
 }

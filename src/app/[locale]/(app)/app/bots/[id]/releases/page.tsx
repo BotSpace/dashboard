@@ -39,7 +39,7 @@ export default async function ReleasesPage({
       ) : (
         <Card>
           <CardContent className="p-0">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto"><table className="w-full min-w-[600px] text-sm">
               <thead className="border-b bg-muted/30 text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 text-left">{t("version")}</th>
@@ -62,7 +62,7 @@ export default async function ReleasesPage({
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           </CardContent>
         </Card>
       )}
