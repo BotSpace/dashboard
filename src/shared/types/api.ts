@@ -286,12 +286,16 @@ export type EarningsOrder = {
   project_id: number | string;
   project_name?: string;
   payer_chat_id?: number | string;
+  payer_first_name?: string | null;
+  payer_last_name?: string | null;
+  payer_username?: string | null;
   amount: string;
   commission: string;
   net_amount: string;
   status: string;
   provider: string;
   comment?: string;
+  external_id?: string | null;
   created_at?: string;
   paid_at?: string;
 };

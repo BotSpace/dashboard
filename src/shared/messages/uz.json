@@ -559,6 +559,7 @@
     "bot": "Bot",
     "amount": "Summa",
     "net": "Sof",
-    "provider": "To'lov turi"
+    "provider": "To'lov turi",
+    "payer": "To'lovchi"
   }
 }

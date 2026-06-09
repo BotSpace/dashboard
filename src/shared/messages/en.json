@@ -563,6 +563,7 @@
     "bot": "Bot",
     "amount": "Amount",
     "net": "Net",
-    "provider": "Provider"
+    "provider": "Provider",
+    "payer": "Payer"
   }
 }

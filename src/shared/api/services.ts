@@ -21,6 +21,7 @@ import type {
   BroadcastMessage,
   DashboardOverview,
   EarningsSummary,
+  EarningsOrder,
   WithdrawalRequest,
   KycStatusResponse,
   KycVerification,
@@ -262,6 +263,10 @@ export const EarningsAPI = {
   ): Promise<EarningsSummary> => {
     const d = await api<unknown>("/api/earnings/", { query: params });
     return unwrapItem<EarningsSummary>(d);
+  },
+  detail: async (id: number | string): Promise<EarningsOrder> => {
+    const d = await api<unknown>(`/api/earnings/${id}/`);
+    return unwrapItem<EarningsOrder>(d);
   },
 };
 

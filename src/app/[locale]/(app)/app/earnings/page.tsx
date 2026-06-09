@@ -130,31 +130,42 @@ export default async function EarningsPage({
                   <tr>
                     <th className="px-4 py-3 text-left">{t("date")}</th>
                     <th className="px-4 py-3 text-left">{t("bot")}</th>
+                    <th className="px-4 py-3 text-left">{t("payer")}</th>
                     <th className="px-4 py-3 text-right">{t("amount")}</th>
                     <th className="px-4 py-3 text-right">{t("net")}</th>
                     <th className="px-4 py-3 text-left">{t("provider")}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {summary.orders.map((o) => (
-                    <tr key={o.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
-                      <td className="px-4 py-3 text-muted-foreground">
-                        {o.paid_at ?? o.created_at ?? "—"}
-                      </td>
-                      <td className="px-4 py-3">{o.project_name ?? `#${o.project_id}`}</td>
-                      <td className="px-4 py-3 text-right">
-                        {formatCurrency(Number(o.amount), "UZS", locale)}
-                      </td>
-                      <td className="px-4 py-3 text-right font-medium text-emerald-500">
-                        {formatCurrency(Number(o.net_amount), "UZS", locale)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge variant="secondary" className="uppercase">
-                          {o.provider}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
+                  {summary.orders.map((o) => {
+                    const payerName = [o.payer_first_name, o.payer_last_name].filter(Boolean).join(" ");
+                    return (
+                      <tr key={o.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 text-muted-foreground">
+                          <Link href={`/app/earnings/${o.id}`} className="block hover:text-foreground">
+                            {o.paid_at ?? o.created_at ?? "—"}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-3">{o.project_name ?? `#${o.project_id}`}</td>
+                        <td className="px-4 py-3">
+                          {payerName || (o.payer_username ? `@${o.payer_username}` : `#${o.payer_chat_id ?? "—"}`)}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {formatCurrency(Number(o.amount), "UZS", locale)}
+                        </td>
+                        <td className="px-4 py-3 text-right font-medium text-emerald-500">
+                          {formatCurrency(Number(o.net_amount), "UZS", locale)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Link href={`/app/earnings/${o.id}`}>
+                            <Badge variant="secondary" className="uppercase">
+                              {o.provider}
+                            </Badge>
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
