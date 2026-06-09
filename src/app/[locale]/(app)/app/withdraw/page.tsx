@@ -1,6 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { Banknote, CheckCircle2, ShieldAlert, ShieldCheck } from "lucide-react";
-import { BillingAPI, KycAPI, ProjectsAPI, WithdrawalAPI } from "@/shared/api/services";
+import { EarningsAPI, KycAPI, ProjectsAPI, WithdrawalAPI } from "@/shared/api/services";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -20,14 +20,15 @@ export default async function WithdrawPage({ params }: { params: Promise<{ local
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [kyc, balanceRes, withdrawals, projects] = await Promise.all([
+  const [kyc, earnings, withdrawals, projects] = await Promise.all([
     KycAPI.status().catch(() => ({ is_verified: false, verification: null })),
-    BillingAPI.balance().catch(() => ({ balance: 0 })),
+    EarningsAPI.summary().catch(() => null),
     WithdrawalAPI.list().catch(() => []),
     ProjectsAPI.list().catch(() => []),
   ]);
 
-  const balance = balanceRes.balance ?? 0;
+  // Faqat bot daromadi yechiladi (o'zi to'ldirgan pul emas).
+  const withdrawable = Number(earnings?.withdrawable ?? 0);
   const botOptions = projects.map((p) => ({ id: String(p.id), name: p.name }));
   const verification = kyc.verification;
   const isPending = verification?.status === "pending";
@@ -44,12 +45,12 @@ export default async function WithdrawPage({ params }: { params: Promise<{ local
               <ShieldCheck className="h-5 w-5 text-emerald-500" /> Pul yechish so&apos;rovi
             </CardTitle>
             <CardDescription>
-              Hisobingiz tasdiqlangan. Pul umumiy balansdan ayriladi va admin tasdiqlagach kartangizga
-              o&apos;tkaziladi.
+              Hisobingiz tasdiqlangan. Faqat botlardan tushgan daromadni yechishingiz mumkin; admin
+              tasdiqlagach kartangizga o&apos;tkaziladi.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <WithdrawForm bots={botOptions} balance={balance} />
+            <WithdrawForm bots={botOptions} withdrawable={withdrawable} />
           </CardContent>
         </Card>
       ) : (

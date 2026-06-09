@@ -298,6 +298,7 @@ export type EarningsOrder = {
 
 export type EarningsSummary = {
   balance: number;
+  withdrawable: string;
   total_earned: string;
   total_commission: string;
   by_bot: BotEarning[];

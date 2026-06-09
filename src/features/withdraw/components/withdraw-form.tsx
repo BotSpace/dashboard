@@ -11,9 +11,9 @@ type BotOption = { id: string; name: string };
 
 /**
  * Pul yechish formasi: bot tanlash (ixtiyoriy), summa, karta raqami va egasi.
- * Pul umumiy balansdan ayriladi.
+ * Faqat botlardan tushgan daromad yechiladi.
  */
-export function WithdrawForm({ bots, balance }: { bots: BotOption[]; balance: number }) {
+export function WithdrawForm({ bots, withdrawable }: { bots: BotOption[]; withdrawable: number }) {
   const [state, action, pending] = useActionState(createWithdrawalAction, undefined);
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export function WithdrawForm({ bots, balance }: { bots: BotOption[]; balance: nu
         <Label htmlFor="amount">Summa (so&apos;m)</Label>
         <Input id="amount" name="amount" type="number" min={1000} step={1000} placeholder="50000" required />
         <p className="text-xs text-muted-foreground">
-          Mavjud balans: {new Intl.NumberFormat("uz-UZ").format(balance)} so&apos;m
+          Yechish mumkin (bot daromadi): {new Intl.NumberFormat("uz-UZ").format(withdrawable)} so&apos;m
         </p>
       </div>
 
