@@ -1,7 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
-import { Banknote, CheckCircle2, ShieldAlert, ShieldCheck } from "lucide-react";
-import { EarningsAPI, KycAPI, ProjectsAPI, WithdrawalAPI } from "@/shared/api/services";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { Banknote, CheckCircle2, ShieldAlert, ShieldCheck, Wallet } from "lucide-react";
+import { EarningsAPI, KycAPI, WithdrawalAPI } from "@/shared/api/services";
+import { Card, CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { PageHeader } from "@/shared/components/common/page-header";
@@ -20,102 +20,100 @@ export default async function WithdrawPage({ params }: { params: Promise<{ local
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [kyc, earnings, withdrawals, projects] = await Promise.all([
+  const [kyc, earnings, withdrawals] = await Promise.all([
     KycAPI.status().catch(() => ({ is_verified: false, verification: null })),
     EarningsAPI.summary().catch(() => null),
     WithdrawalAPI.list().catch(() => []),
-    ProjectsAPI.list().catch(() => []),
   ]);
 
   // Faqat bot daromadi yechiladi (o'zi to'ldirgan pul emas).
   const withdrawable = Number(earnings?.withdrawable ?? 0);
-  const botOptions = projects.map((p) => ({ id: String(p.id), name: p.name }));
-  const verification = kyc.verification;
-  const isPending = verification?.status === "pending";
+  const isPending = kyc.verification?.status === "pending";
 
   return (
-    <div className="space-y-8">
-      <PageHeader title="Pul yechish" icon={<Banknote className="h-5 w-5" />} />
+    <div className="mx-auto max-w-2xl space-y-6">
+      <PageHeader title="Pul yechish" subtitle="Bot daromadini kartangizga chiqaring" icon={<Banknote className="h-5 w-5" />} />
 
-      {/* Verifikatsiya qilinmagan bo'lsa — alohida sahifaga yo'naltirish */}
-      {kyc.is_verified ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <ShieldCheck className="h-5 w-5 text-emerald-500" /> Pul yechish so&apos;rovi
-            </CardTitle>
-            <CardDescription>
-              Hisobingiz tasdiqlangan. Faqat botlardan tushgan daromadni yechishingiz mumkin; admin
-              tasdiqlagach kartangizga o&apos;tkaziladi.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <WithdrawForm bots={botOptions} withdrawable={withdrawable} />
-          </CardContent>
-        </Card>
-      ) : (
+      {!kyc.is_verified ? (
+        /* Verifikatsiya qilinmagan — alohida sahifaga yo'naltirish */
         <Card className="border-amber-500/30 bg-amber-500/5">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <ShieldAlert className="h-5 w-5 text-amber-500" /> Siz verifikatsiyadan o&apos;tmagansiz
-            </CardTitle>
-            <CardDescription>
-              {isPending
-                ? "Hujjatlaringiz tekshirilmoqda. Admin tasdiqlagach pul yecha olasiz."
-                : "Pul yechish uchun avval shaxsingizni tasdiqlang — pasport, shaxsiy rasm va yashash joyidan ma'lumotnoma yuboring."}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
+            <div className="grid h-14 w-14 place-items-center rounded-full bg-amber-500/10">
+              <ShieldAlert className="h-7 w-7 text-amber-500" />
+            </div>
+            <div>
+              <p className="text-lg font-semibold">Siz verifikatsiyadan o&apos;tmagansiz</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {isPending
+                  ? "Hujjatlaringiz tekshirilmoqda. Admin tasdiqlagach pul yecha olasiz."
+                  : "Pul yechishdan oldin shaxsingizni tasdiqlashingiz kerak."}
+              </p>
+            </div>
             <Button asChild className="bg-amber-600 hover:bg-amber-700 text-white">
               <Link href="/app/verification">
                 <ShieldCheck className="h-4 w-4" />
-                {isPending ? "Verifikatsiya holatini ko'rish" : "Verifikatsiya sahifasiga o'tish"}
+                {isPending ? "Holatni ko'rish" : "Verifikatsiyadan o'tish"}
               </Link>
             </Button>
           </CardContent>
         </Card>
+      ) : (
+        <>
+          {/* Yechiladigan balans */}
+          <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-transparent">
+            <CardContent className="flex items-center gap-4 py-6">
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-emerald-500/15">
+                <Wallet className="h-6 w-6 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Yechish mumkin (bot daromadi)</p>
+                <p className="text-2xl font-bold">{formatCurrency(withdrawable, "UZS", locale)}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Forma */}
+          <Card>
+            <CardContent className="py-6">
+              {withdrawable < 1000 ? (
+                <p className="py-6 text-center text-sm text-muted-foreground">
+                  Hozircha yechish uchun yetarli bot daromadi yo&apos;q (minimal 1 000 so&apos;m).
+                </p>
+              ) : (
+                <WithdrawForm withdrawable={withdrawable} />
+              )}
+            </CardContent>
+          </Card>
+        </>
       )}
 
       {/* Pul yechish tarixi */}
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">So&apos;rovlar tarixi</h2>
+        <h2 className="text-base font-semibold">So&apos;rovlar tarixi</h2>
         <Card>
           <CardContent className="p-0">
             {withdrawals.length === 0 ? (
-              <p className="py-12 text-center text-sm text-muted-foreground">Hozircha so&apos;rovlar yo&apos;q</p>
+              <p className="py-10 text-center text-sm text-muted-foreground">Hozircha so&apos;rovlar yo&apos;q</p>
             ) : (
-              <table className="w-full text-sm">
-                <thead className="border-b bg-muted/30 text-xs uppercase text-muted-foreground">
-                  <tr>
-                    <th className="px-4 py-3 text-left">Sana</th>
-                    <th className="px-4 py-3 text-left">Bot</th>
-                    <th className="px-4 py-3 text-right">Summa</th>
-                    <th className="px-4 py-3 text-left">Karta</th>
-                    <th className="px-4 py-3 text-left">Holat</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {withdrawals.map((w) => {
-                    const meta = STATUS_META[w.status] ?? STATUS_META.pending;
-                    return (
-                      <tr key={w.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 text-muted-foreground">{w.created_at ?? "—"}</td>
-                        <td className="px-4 py-3">{w.project_name ?? "—"}</td>
-                        <td className="px-4 py-3 text-right font-medium">
-                          {formatCurrency(Number(w.amount), "UZS", locale)}
-                        </td>
-                        <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{w.card_number}</td>
-                        <td className="px-4 py-3">
-                          <span className="flex items-center gap-1.5">
-                            {w.status === "approved" && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
-                            <Badge variant={meta.variant}>{meta.label}</Badge>
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <ul className="divide-y">
+                {withdrawals.map((w) => {
+                  const meta = STATUS_META[w.status] ?? STATUS_META.pending;
+                  return (
+                    <li key={w.id} className="flex items-center justify-between gap-4 px-4 py-3">
+                      <div className="min-w-0">
+                        <p className="font-medium">{formatCurrency(Number(w.amount), "UZS", locale)}</p>
+                        <p className="truncate font-mono text-xs text-muted-foreground">
+                          {w.card_number} · {w.created_at ?? "—"}
+                        </p>
+                      </div>
+                      <span className="flex shrink-0 items-center gap-1.5">
+                        {w.status === "approved" && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
+                        <Badge variant={meta.variant}>{meta.label}</Badge>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
             )}
           </CardContent>
         </Card>

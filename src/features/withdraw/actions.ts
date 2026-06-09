@@ -5,21 +5,30 @@ import { isApiError } from "@/shared/api/client";
 
 type Result = { ok: boolean; message?: string };
 
+// DRF xato javoblari ikki qavat envelope ichida keladi:
+//   { status:false, data:{ status:false, detail:"ValidationError", errors:{field:[msg]}, codes:{...} } }
+// Bu yordamchi ichidagi `errors` lug'atini topib, faqat xabar matnlarini chiqaradi.
+function collectMessages(node: unknown): string[] {
+  if (typeof node === "string") return [node];
+  if (Array.isArray(node)) return node.flatMap(collectMessages);
+  if (node && typeof node === "object") return Object.values(node as Record<string, unknown>).flatMap(collectMessages);
+  return [];
+}
+
+function findErrors(node: unknown, depth = 0): unknown {
+  if (!node || typeof node !== "object" || depth > 5) return null;
+  const obj = node as Record<string, unknown>;
+  if (obj.errors && typeof obj.errors === "object") return obj.errors;
+  if (obj.data && typeof obj.data === "object") return findErrors(obj.data, depth + 1);
+  return null;
+}
+
 function fail(e: unknown): Result {
-  if (isApiError(e)) {
-    const details = e.details as
-      | { errors?: Record<string, unknown>; detail?: string; data?: Record<string, unknown> }
-      | undefined;
-    const bag = details?.errors ?? details?.data;
-    if (bag && typeof bag === "object") {
-      const flat = Object.entries(bag)
-        .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
-        .join("; ");
-      if (flat) return { ok: false, message: flat };
-    }
-    return { ok: false, message: details?.detail || e.message };
-  }
-  return { ok: false, message: (e as Error).message || "Xatolik yuz berdi" };
+  if (!isApiError(e)) return { ok: false, message: (e as Error).message || "Xatolik yuz berdi" };
+  const errors = findErrors(e.details);
+  const msgs = collectMessages(errors).filter((m) => m && m !== "ValidationError");
+  if (msgs.length) return { ok: false, message: msgs.join("; ") };
+  return { ok: false, message: e.message || "Xatolik yuz berdi" };
 }
 
 export async function submitKycAction(_prev: Result | undefined, formData: FormData): Promise<Result> {
@@ -53,7 +62,6 @@ export async function submitKycAction(_prev: Result | undefined, formData: FormD
 }
 
 export async function createWithdrawalAction(_prev: Result | undefined, formData: FormData): Promise<Result> {
-  const projectRaw = String(formData.get("project") ?? "").trim();
   const amount = String(formData.get("amount") ?? "").trim();
   const cardNumber = String(formData.get("card_number") ?? "").trim();
   const cardOwner = String(formData.get("card_owner") ?? "").trim();
@@ -63,12 +71,7 @@ export async function createWithdrawalAction(_prev: Result | undefined, formData
   if (!cardOwner) return { ok: false, message: "Karta egasini kiriting" };
 
   try {
-    await WithdrawalAPI.create({
-      project: projectRaw ? Number(projectRaw) : null,
-      amount,
-      card_number: cardNumber,
-      card_owner: cardOwner,
-    });
+    await WithdrawalAPI.create({ amount, card_number: cardNumber, card_owner: cardOwner });
     revalidatePath("/app/withdraw");
     return { ok: true };
   } catch (e) {
