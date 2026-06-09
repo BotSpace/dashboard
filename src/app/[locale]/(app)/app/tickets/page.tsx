@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { CheckCircle2, Clock, LifeBuoy, MessageSquare, Paperclip, Plus } from "lucide-react";
+import { CheckCircle2, Clock, LifeBuoy, MessageSquare, Plus } from "lucide-react";
 import { TicketsAPI } from "@/shared/api/services";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
@@ -63,12 +63,14 @@ export default async function TicketsPage({ params }: { params: Promise<{ locale
                         <MessageSquare className="h-4 w-4" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="truncate font-medium">{tk.subject}</span>
-                          {tk.attachment && <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
-                        </div>
-                        {tk.message && (
-                          <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{tk.message}</p>
+                        <span className="truncate font-medium">{tk.subject}</span>
+                        {tk.last_message && (
+                          <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
+                            {tk.last_message.sender === "admin" && (
+                              <span className="font-medium text-blue-500">Support: </span>
+                            )}
+                            {tk.last_message.message}
+                          </p>
                         )}
                         <p className="mt-0.5 text-xs text-muted-foreground">{tk.created_at ?? "—"}</p>
                       </div>

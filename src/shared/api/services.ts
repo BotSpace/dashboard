@@ -238,6 +238,8 @@ export const TicketsAPI = {
   get: (id: string | number) => api<Ticket>(`/api/ticket/${id}/`).then(unwrapItem<Ticket>),
   create: (body: FormData) =>
     api<Ticket>("/api/ticket/", { method: "POST", body }).then(unwrapItem<Ticket>),
+  reply: (id: string | number, body: FormData) =>
+    api<Ticket>(`/api/ticket/${id}/reply/`, { method: "POST", body }).then(unwrapItem<Ticket>),
 };
 
 // BILLING

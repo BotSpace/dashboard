@@ -127,13 +127,20 @@ export type Template = {
   required_envs?: { key: string; description?: string }[];
 };
 
+export type TicketMessage = {
+  id: number | string;
+  sender: "user" | "admin";
+  message: string;
+  attachment?: string | null;
+  created_at?: string;
+};
+
 export type Ticket = {
   id: number | string;
   subject: string;
   status: "open" | "closed" | "pending";
-  message?: string;
-  attachment?: string | null;
-  admin_reply?: string | null;
+  last_message?: { sender: string; message: string } | null;
+  messages?: TicketMessage[];
   created_at?: string;
   updated_at?: string;
 };
