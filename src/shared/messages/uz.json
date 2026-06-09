@@ -477,7 +477,8 @@
     "open": "Ochiq",
     "closed": "Yopiq",
     "reply": "Javob berish",
-    "empty": "Hozircha murojaatingiz yo'q"
+    "empty": "Hozircha murojaatingiz yo'q",
+    "pending": "Kutilmoqda"
   },
   "mcpDocs": {
     "nav": "MCP",
