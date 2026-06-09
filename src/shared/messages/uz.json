@@ -560,6 +560,7 @@
     "amount": "Summa",
     "net": "Sof",
     "provider": "To'lov turi",
-    "payer": "To'lovchi"
+    "payer": "To'lovchi",
+    "withdrawable": "Yechish mumkin"
   }
 }

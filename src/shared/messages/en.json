@@ -564,6 +564,7 @@
     "amount": "Amount",
     "net": "Net",
     "provider": "Provider",
-    "payer": "Payer"
+    "payer": "Payer",
+    "withdrawable": "Withdrawable"
   }
 }

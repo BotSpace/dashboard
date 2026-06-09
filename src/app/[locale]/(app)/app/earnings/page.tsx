@@ -50,9 +50,11 @@ export default async function EarningsPage({
         <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-transparent">
           <CardHeader className="pb-2">
             <CardDescription className="flex items-center gap-1.5">
-              <Wallet className="h-3.5 w-3.5" /> {t("balance")}
+              <Wallet className="h-3.5 w-3.5" /> {t("withdrawable")}
             </CardDescription>
-            <CardTitle className="text-2xl">{formatCurrency(summary.balance, "UZS", locale)}</CardTitle>
+            <CardTitle className="text-2xl">
+              {formatCurrency(Number(summary.withdrawable), "UZS", locale)}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
