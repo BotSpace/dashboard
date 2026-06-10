@@ -1,7 +1,7 @@
 "use client";
 import { useActionState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { updateProfileAction } from "@/features/settings/actions";
 import { Button } from "@/shared/components/ui/button";
@@ -45,13 +45,19 @@ export function ProfileForm({
       </div>
       <div className="space-y-2">
         <Label htmlFor="email">{t("email")}</Label>
-        <Input id="email" name="email" type="email" defaultValue={defaultEmail} />
+        <div className="relative">
+          <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input id="email" name="email" type="email" defaultValue={defaultEmail} className="pl-9" placeholder="email@example.com" />
+        </div>
       </div>
       <div className="space-y-2">
         <Label htmlFor="phone">{t("phone")}</Label>
-        <Input id="phone" name="phone" defaultValue={defaultPhone} disabled />
+        <div className="relative">
+          <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input id="phone" name="phone" defaultValue={defaultPhone} disabled className="pl-9" />
+        </div>
         <p className="text-xs text-muted-foreground">
-          Telefon raqamini o'zgartirish uchun support'ga murojaat qiling
+          Telefon raqamini o&apos;zgartirish uchun support&apos;ga murojaat qiling
         </p>
       </div>
       <div>
