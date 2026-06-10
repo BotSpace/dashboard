@@ -33,17 +33,22 @@ const parsed = schema.safeParse({
 // `next build` modullarni baholaydi, lekin runtime sirlar (SESSION_SECRET) o'sha
 // paytda mavjud emas — shuning uchun build fazasida throw qilmaymiz.
 const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
+// Bu modul client bundle'ga ham kiradi. Brauzerda SESSION_SECRET kabi server
+// sirlari HECH QACHON mavjud bo'lmaydi (NEXT_PUBLIC_ emas) — shuning uchun
+// brauzerda throw qilmaymiz, aks holda sahifa oq ekran bilan yiqiladi. Validatsiya
+// va throw faqat serverda (SSR / middleware / server action) ishlaydi.
+const isServer = typeof window === "undefined";
 
 if (!parsed.success) {
-  if (process.env.NODE_ENV === "production" && !isBuildPhase) {
-    // Production runtime'da noto'g'ri/yo'q env bilan ishlamaymiz — forge
+  if (isServer && process.env.NODE_ENV === "production" && !isBuildPhase) {
+    // Production runtime'da (server) noto'g'ri/yo'q env bilan ishlamaymiz — forge
     // qilinadigan default sir bilan jim ishga tushishdan ko'ra tez xato beramiz.
     throw new Error(
       "[env] missing/invalid required env vars: " +
         JSON.stringify(parsed.error.flatten().fieldErrors)
     );
   }
-  if (process.env.NODE_ENV !== "production") {
+  if (isServer && process.env.NODE_ENV !== "production") {
     console.warn("[env] missing/invalid env vars:", parsed.error.flatten().fieldErrors);
   }
 }
