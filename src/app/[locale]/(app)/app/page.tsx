@@ -60,7 +60,7 @@ export default async function DashboardPage({
       {/* ── 2. Performance chart + Top bots ───────────── */}
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Bot Performance — wide */}
-        <div className="rounded-xl border border-border/60 bg-card p-5 lg:col-span-2">
+        <div className="min-w-0 rounded-xl border border-border/60 bg-card p-5 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-blue-400" />
@@ -74,7 +74,7 @@ export default async function DashboardPage({
         </div>
 
         {/* Top bots — narrow */}
-        <div className="rounded-xl border border-border/60 bg-card p-5">
+        <div className="min-w-0 rounded-xl border border-border/60 bg-card p-5">
           <div className="mb-4 flex items-center gap-2">
             <Bot className="h-4 w-4 text-blue-400" />
             <span className="font-semibold">Top Botlar</span>
@@ -86,7 +86,7 @@ export default async function DashboardPage({
       {/* ── 3. Bottom row — 3 panels ───────────────────── */}
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Recent Bots */}
-        <div className="rounded-xl border border-border/60 bg-card p-5">
+        <div className="min-w-0 rounded-xl border border-border/60 bg-card p-5">
           <div className="mb-4 flex items-center justify-between">
             <span className="font-semibold">So&apos;nggi Botlar</span>
             <Button variant="ghost" size="sm" asChild className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground">
@@ -99,7 +99,7 @@ export default async function DashboardPage({
         </div>
 
         {/* Quick Actions */}
-        <div className="rounded-xl border border-border/60 bg-card p-5">
+        <div className="min-w-0 rounded-xl border border-border/60 bg-card p-5">
           <div className="mb-4">
             <span className="font-semibold">Tezkor Harakatlar</span>
           </div>
@@ -107,7 +107,7 @@ export default async function DashboardPage({
         </div>
 
         {/* Analytics Donut */}
-        <div className="rounded-xl border border-border/60 bg-card p-5">
+        <div className="min-w-0 rounded-xl border border-border/60 bg-card p-5">
           <div className="mb-4 flex items-center gap-2">
             <span className="font-semibold">Analitika</span>
           </div>
