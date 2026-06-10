@@ -51,6 +51,7 @@
     "navFeatures": "Возможности",
     "navPricing": "Цены",
     "navTemplates": "Шаблоны",
+    "navBlog": "Блог",
     "navContact": "Контакты",
     "navLogin": "Войти",
     "navStart": "Начать",
@@ -567,5 +568,14 @@
     "provider": "Способ",
     "payer": "Плательщик",
     "withdrawable": "Доступно к выводу"
+  },
+  "blog": {
+    "title": "Блог",
+    "subtitle": "Новости, руководства и советы о BotSpace",
+    "notFound": "Посты не найдены",
+    "backToList": "Назад в блог",
+    "readingTime": "{min} мин чтения",
+    "publishedOn": "Опубликовано",
+    "metaDescriptionFallback": "Блог BotSpace — руководства по созданию Telegram-ботов."
   }
 }

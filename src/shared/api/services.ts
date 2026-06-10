@@ -25,6 +25,8 @@ import type {
   WithdrawalRequest,
   KycStatusResponse,
   KycVerification,
+  BlogPost,
+  BlogPostListItem,
 } from "@/shared/types/api";
 
 // Backend response shape: { status, data: { results: T[], total_items, ... } }  OR  { results: T[] }  OR plain array
@@ -227,6 +229,15 @@ export const TemplatesAPI = {
   },
   order: (templateId: string | number) =>
     api("/api/template/order/", { method: "POST", json: { template: templateId } }),
+};
+
+// BLOG (publik — login talab qilinmaydi)
+export const BlogAPI = {
+  list: async (params: { page?: number } = {}): Promise<PaginatedResult<BlogPostListItem>> => {
+    const d = await api<unknown>("/api/blog/", { query: params });
+    return unwrapPaginated<BlogPostListItem>(d);
+  },
+  get: (slug: string) => api<BlogPost>(`/api/blog/${slug}/`).then(unwrapItem<BlogPost>),
 };
 
 // TICKETS

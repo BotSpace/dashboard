@@ -51,6 +51,7 @@
     "navFeatures": "Features",
     "navPricing": "Pricing",
     "navTemplates": "Templates",
+    "navBlog": "Blog",
     "navContact": "Contact",
     "navLogin": "Log in",
     "navStart": "Get started",
@@ -567,5 +568,14 @@
     "provider": "Provider",
     "payer": "Payer",
     "withdrawable": "Withdrawable"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "News, guides and tips about BotSpace",
+    "notFound": "No posts found",
+    "backToList": "Back to blog",
+    "readingTime": "{min} min read",
+    "publishedOn": "Published",
+    "metaDescriptionFallback": "BotSpace blog — guides on building Telegram bots."
   }
 }

@@ -357,3 +357,21 @@ export type KycStatusResponse = {
   is_verified: boolean;
   verification: KycVerification | null;
 };
+
+// Blog (publik)
+export type BlogPostListItem = {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  cover_image: string | null;
+  reading_time: number;
+  published_at: string | null;
+};
+
+export type BlogPost = BlogPostListItem & {
+  content: string;
+  author_name: string | null;
+  created_at: string;
+  updated_at: string;
+};

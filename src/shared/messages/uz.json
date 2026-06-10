@@ -100,6 +100,7 @@
     "navFeatures": "Imkoniyatlar",
     "navPricing": "Narxlar",
     "navTemplates": "Shablonlar",
+    "navBlog": "Blog",
     "navContact": "Aloqa",
     "navLogin": "Kirish",
     "navStart": "Boshlash",
@@ -563,5 +564,14 @@
     "provider": "To'lov turi",
     "payer": "To'lovchi",
     "withdrawable": "Yechish mumkin"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "BotSpace haqida yangiliklar, qo'llanmalar va maslahatlar",
+    "notFound": "Postlar topilmadi",
+    "backToList": "Blogga qaytish",
+    "readingTime": "{min} daqiqa o'qish",
+    "publishedOn": "Chop etilgan",
+    "metaDescriptionFallback": "BotSpace blogi — Telegram botlarini yaratish bo'yicha qo'llanmalar."
   }
 }

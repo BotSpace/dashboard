@@ -25,6 +25,7 @@ export function PublicHeader() {
     { href: "/#features", label: t("navFeatures") },
     { href: "/#pricing", label: t("navPricing") },
     { href: "/templates", label: t("navTemplates"), internal: true },
+    { href: "/blog", label: t("navBlog"), internal: true },
     { href: "/docs/mcp", label: t("navMcp"), internal: true, highlight: true },
   ];
 
