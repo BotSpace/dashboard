@@ -30,8 +30,22 @@ const parsed = schema.safeParse({
   AGENT_INTERNAL_API_TOKEN: process.env.AGENT_INTERNAL_API_TOKEN,
 });
 
-if (!parsed.success && process.env.NODE_ENV !== "production") {
-  console.warn("[env] missing/invalid env vars:", parsed.error.flatten().fieldErrors);
+// `next build` modullarni baholaydi, lekin runtime sirlar (SESSION_SECRET) o'sha
+// paytda mavjud emas — shuning uchun build fazasida throw qilmaymiz.
+const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
+
+if (!parsed.success) {
+  if (process.env.NODE_ENV === "production" && !isBuildPhase) {
+    // Production runtime'da noto'g'ri/yo'q env bilan ishlamaymiz — forge
+    // qilinadigan default sir bilan jim ishga tushishdan ko'ra tez xato beramiz.
+    throw new Error(
+      "[env] missing/invalid required env vars: " +
+        JSON.stringify(parsed.error.flatten().fieldErrors)
+    );
+  }
+  if (process.env.NODE_ENV !== "production") {
+    console.warn("[env] missing/invalid env vars:", parsed.error.flatten().fieldErrors);
+  }
 }
 
 export const env = parsed.success
@@ -46,7 +60,11 @@ export const env = parsed.success
       NEXT_PUBLIC_DEFAULT_LOCALE: (process.env.NEXT_PUBLIC_DEFAULT_LOCALE ?? "uz") as "uz" | "en" | "ru",
       SESSION_COOKIE_NAME: process.env.SESSION_COOKIE_NAME ?? "bm_session",
       SESSION_COOKIE_DOMAIN: process.env.SESSION_COOKIE_DOMAIN,
-      SESSION_SECRET: process.env.SESSION_SECRET ?? "dev-secret-change-me-please-32chars",
+      // Production'da forge qilinadigan ma'lum default ishlatilmaydi (yuqorida
+      // throw qilinadi). Faqat dev qulaylik uchun default beriladi.
+      SESSION_SECRET:
+        process.env.SESSION_SECRET ??
+        (process.env.NODE_ENV === "production" ? "" : "dev-secret-change-me-please-32chars"),
       HANDOVER_SECRET: process.env.HANDOVER_SECRET,
       AGENT_INTERNAL_API_TOKEN: process.env.AGENT_INTERNAL_API_TOKEN,
     };

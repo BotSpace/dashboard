@@ -7,6 +7,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Separator } from "@/shared/components/ui/separator";
 import { Link } from "@/shared/i18n/routing";
 import { formatCurrency, formatNumber } from "@/shared/lib/utils";
+import { sanitizeRichText } from "@/shared/lib/sanitize";
 import { TemplateActions } from "@/features/templates/components/template-actions";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { Section } from "@/shared/components/common/section";
@@ -75,7 +76,7 @@ export default async function TemplateDetailPage({
           {tpl.short_description && (
             <p
               className="text-base text-muted-foreground leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: tpl.short_description }}
+              dangerouslySetInnerHTML={{ __html: sanitizeRichText(tpl.short_description) }}
             />
           )}
 
@@ -90,7 +91,7 @@ export default async function TemplateDetailPage({
             <Section title={t("about")} icon={<Info className="h-4 w-4" />}>
               <div
                 className="text-sm leading-relaxed text-muted-foreground"
-                dangerouslySetInnerHTML={{ __html: tpl.description }}
+                dangerouslySetInnerHTML={{ __html: sanitizeRichText(tpl.description) }}
               />
             </Section>
           )}
@@ -102,7 +103,7 @@ export default async function TemplateDetailPage({
                   <li key={f.id} className="rounded-lg border border-border/60 p-3 bg-muted/30">
                     <div className="text-sm font-medium">{f.name}</div>
                     {f.value && (
-                      <div className="mt-1 text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: f.value }} />
+                      <div className="mt-1 text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: sanitizeRichText(f.value) }} />
                     )}
                   </li>
                 ))}

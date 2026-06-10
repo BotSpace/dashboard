@@ -8,6 +8,22 @@ type Props = {
   className?: string;
 };
 
+// Faqat xavfsiz href sxemalariga ruxsat — javascript:/data:/vbscript: kabi
+// XSS vektorlarini bloklaymiz (markdown matni AI yoki foydalanuvchidan keladi).
+function safeHref(href: string | undefined): string | undefined {
+  if (!href) return undefined;
+  // Bo'sh joy/control belgilarni olib tashlab sxemani tekshiramiz (obfuskatsiyaga qarshi).
+  const scheme = href
+    .split("")
+    .filter((ch) => ch.charCodeAt(0) > 32)
+    .join("")
+    .toLowerCase();
+  if (scheme.startsWith("javascript:") || scheme.startsWith("data:") || scheme.startsWith("vbscript:")) {
+    return undefined;
+  }
+  return href;
+}
+
 export function MessageMarkdown({ children, className }: Props) {
   return (
     <div className={cn("text-sm leading-relaxed [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)}>
@@ -19,7 +35,7 @@ export function MessageMarkdown({ children, className }: Props) {
           em: ({ children }) => <em className="italic">{children}</em>,
           a: ({ href, children }) => (
             <a
-              href={href}
+              href={safeHref(href)}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary underline-offset-2 hover:underline"
