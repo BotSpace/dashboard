@@ -7,6 +7,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { Progress } from "@/shared/components/ui/progress";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { formatCurrency } from "@/shared/lib/utils";
+import { AddFundsDialog } from "@/features/billing/components/add-funds-dialog";
 
 function formatTokens(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -103,9 +104,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Button size="sm" className="">
-              {t("addFunds")}
-            </Button>
+            <AddFundsDialog label={t("addFunds")} />
           </CardContent>
         </Card>
       </div>

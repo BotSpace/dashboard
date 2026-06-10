@@ -256,6 +256,13 @@ export const BillingAPI = {
     const d = await api<unknown>("/api/user/balance/");
     return unwrapItem<{ balance: number; template_balance?: number; currency?: string }>(d);
   },
+  // Balansni to'ldirish — Click/Payme pay link qaytaradi.
+  createTopUp: async (body: { method: "click" | "payme"; amount: number }): Promise<{ link: string }> => {
+    const d = await api<unknown>("/api/payment/create-transaction/", { method: "POST", json: body });
+    // Javob bir yoki ikki qavat {status,data} envelope ichida bo'lishi mumkin.
+    const inner = unwrapItem<{ link?: string; data?: { link?: string } }>(d);
+    return { link: inner?.link ?? inner?.data?.link ?? "" };
+  },
 };
 
 // EARNINGS — bot to'lov daromadlari (balans + bot bo'yicha taqsimot + orderlar)
