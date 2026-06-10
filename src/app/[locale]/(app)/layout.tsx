@@ -21,7 +21,7 @@ export default async function AppLayout({
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar user={session.user} />
-        <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">
+        <main className="flex-1 overflow-x-clip px-4 py-6 lg:px-8 lg:py-8">
           <PageTransition>{children}</PageTransition>
         </main>
       </div>
