@@ -25,7 +25,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: post.title,
       description: post.excerpt || t("metaDescriptionFallback"),
       type: "article",
-      images: post.cover_image ? [post.cover_image] : undefined,
     },
   };
 }
@@ -65,12 +64,6 @@ export default async function BlogDetailPage({ params }: PageProps) {
           {post.published_at && <span>·</span>}
           <span>{t("readingTime", { min: post.reading_time })}</span>
         </div>
-        {post.cover_image && (
-          <div className="overflow-hidden rounded-xl border border-white/10">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={post.cover_image} alt={post.title} className="w-full object-cover" />
-          </div>
-        )}
       </header>
 
       <BlogMarkdown>{post.content}</BlogMarkdown>

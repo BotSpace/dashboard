@@ -364,7 +364,6 @@ export type BlogPostListItem = {
   title: string;
   slug: string;
   excerpt: string;
-  cover_image: string | null;
   reading_time: number;
   published_at: string | null;
 };

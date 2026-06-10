@@ -56,30 +56,18 @@ export default async function BlogListPage({ params, searchParams }: PageProps) 
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
-              className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-colors hover:border-white/20"
+              className="group flex flex-col rounded-xl border border-white/10 bg-white/5 p-6 transition-colors hover:border-white/20 hover:bg-white/[0.07]"
             >
-              <div className="aspect-[16/9] overflow-hidden bg-gradient-to-br from-primary/15 to-fuchsia-500/15">
-                {post.cover_image ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={post.cover_image}
-                    alt={post.title}
-                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="grid h-full place-items-center text-white/20">BotSpace</div>
-                )}
-              </div>
-              <div className="flex flex-1 flex-col p-5">
-                <h2 className="text-lg font-semibold leading-snug text-white">{post.title}</h2>
-                {post.excerpt && (
-                  <p className="mt-2 line-clamp-3 text-sm text-white/60">{post.excerpt}</p>
-                )}
-                <div className="mt-4 flex items-center gap-2 text-xs text-white/40">
-                  {post.published_at && <span>{formatDate(post.published_at, locale)}</span>}
-                  {post.published_at && <span>·</span>}
-                  <span>{t("readingTime", { min: post.reading_time })}</span>
-                </div>
+              <h2 className="text-lg font-semibold leading-snug text-white transition-colors group-hover:text-primary">
+                {post.title}
+              </h2>
+              {post.excerpt && (
+                <p className="mt-2 line-clamp-3 flex-1 text-sm text-white/60">{post.excerpt}</p>
+              )}
+              <div className="mt-4 flex items-center gap-2 text-xs text-white/40">
+                {post.published_at && <span>{formatDate(post.published_at, locale)}</span>}
+                {post.published_at && <span>·</span>}
+                <span>{t("readingTime", { min: post.reading_time })}</span>
               </div>
             </Link>
           ))}

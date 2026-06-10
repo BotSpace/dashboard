@@ -41,6 +41,21 @@ export function BlogMarkdown({ children, className }: Props) {
           p: ({ children }) => <p className="my-4">{children}</p>,
           strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
           em: ({ children }) => <em className="italic">{children}</em>,
+          // Post ichidagi rasmlar (markdown ![alt](url)). Faqat xavfsiz
+          // http/https manbalar; javascript:/data: bloklanadi.
+          img: ({ src, alt }) => {
+            const safe = safeHref(typeof src === "string" ? src : undefined);
+            if (!safe) return null;
+            // eslint-disable-next-line @next/next/no-img-element
+            return (
+              <img
+                src={safe}
+                alt={alt ?? ""}
+                loading="lazy"
+                className="my-6 w-full rounded-xl border border-white/10"
+              />
+            );
+          },
           a: ({ href, children }) => (
             <a
               href={safeHref(href)}
