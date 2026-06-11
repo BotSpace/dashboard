@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { upgradePlanAction } from "@/features/billing/actions";
+import { formatCurrency } from "@/shared/lib/utils";
 import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
@@ -82,7 +83,8 @@ export function PlanUpgradeButton({
             {price > 0 ? (
               <p>
                 Bu tarifga o&apos;tish uchun balansingizdan{" "}
-                <strong className="text-foreground">${price}</strong> yechiladi (1 oy).
+                <strong className="text-foreground">{formatCurrency(Number(price), "UZS")}</strong>{" "}
+                yechiladi (1 oy).
               </p>
             ) : (
               <p>

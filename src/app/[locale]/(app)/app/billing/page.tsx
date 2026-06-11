@@ -141,8 +141,8 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                     {isCurrent && <Badge className="bg-blue-600 text-white border-none">Joriy</Badge>}
                   </div>
                   <div className="mt-2 text-3xl font-bold">
-                    {p.price > 0 ? `$${p.price}` : "Bepul"}
-                    {p.price > 0 && <span className="text-sm font-normal text-muted-foreground">/oy</span>}
+                    {Number(p.price) > 0 ? formatCurrency(Number(p.price), "UZS", locale) : "Bepul"}
+                    {Number(p.price) > 0 && <span className="text-sm font-normal text-muted-foreground">/oy</span>}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
