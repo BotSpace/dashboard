@@ -6,6 +6,7 @@ import { BlogAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
 import { BlogMarkdown } from "@/features/blog/components/blog-markdown";
+import { formatLongDate } from "@/shared/lib/utils";
 
 type PageProps = {
   params: Promise<{ locale: string; slug: string }>;
@@ -29,14 +30,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-function formatDate(value: string | null, locale: string): string {
-  if (!value) return "";
-  try {
-    return new Date(value).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
-  } catch {
-    return "";
-  }
-}
 
 export default async function BlogDetailPage({ params }: PageProps) {
   const { locale, slug } = await params;
@@ -60,7 +53,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
         <div className="flex flex-wrap items-center gap-2 text-sm text-white/40">
           {post.author_name && <span>{post.author_name}</span>}
           {post.author_name && <span>·</span>}
-          {post.published_at && <span>{formatDate(post.published_at, locale)}</span>}
+          {post.published_at && <span>{formatLongDate(post.published_at, locale)}</span>}
           {post.published_at && <span>·</span>}
           <span>{t("readingTime", { min: post.reading_time })}</span>
         </div>

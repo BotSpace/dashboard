@@ -254,7 +254,7 @@
       "plans": {
         "free": {
           "name": "Free",
-          "tagBots": "1 bot",
+          "tagBots": "1 ta bot",
           "features": [
             "Vizual konstruktor",
             "AI agent (limitli)",
@@ -264,7 +264,7 @@
         },
         "pro": {
           "name": "Pro",
-          "tagBots": "10 bot",
+          "tagBots": "10 ta bot",
           "features": [
             "Free'ning barchasi",
             "Kengaytirilgan AI",
@@ -311,7 +311,8 @@
       "docs": "Hujjatlar",
       "terms": "Foydalanish shartlari",
       "privacy": "Maxfiylik",
-      "rights": "Barcha huquqlar himoyalangan"
+      "rights": "Barcha huquqlar himoyalangan",
+      "systemsNormal": "Barcha tizimlar ishlamoqda"
     }
   },
   "auth": {

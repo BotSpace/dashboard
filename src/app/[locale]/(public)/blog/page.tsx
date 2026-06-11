@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BlogAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
+import { formatLongDate } from "@/shared/lib/utils";
 
 // Postlar ro'yxati har so'rovda backenddan yangilanib turishi uchun dinamik.
 export const dynamic = "force-dynamic";
@@ -18,15 +19,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: t("title"),
     description: t("subtitle"),
   };
-}
-
-function formatDate(value: string | null, locale: string): string {
-  if (!value) return "";
-  try {
-    return new Date(value).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
-  } catch {
-    return "";
-  }
 }
 
 export default async function BlogListPage({ params, searchParams }: PageProps) {
@@ -65,7 +57,7 @@ export default async function BlogListPage({ params, searchParams }: PageProps) 
                 <p className="mt-2 line-clamp-3 flex-1 text-sm text-white/60">{post.excerpt}</p>
               )}
               <div className="mt-4 flex items-center gap-2 text-xs text-white/40">
-                {post.published_at && <span>{formatDate(post.published_at, locale)}</span>}
+                {post.published_at && <span>{formatLongDate(post.published_at, locale)}</span>}
                 {post.published_at && <span>·</span>}
                 <span>{t("readingTime", { min: post.reading_time })}</span>
               </div>

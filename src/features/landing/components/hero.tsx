@@ -33,7 +33,7 @@ export function Hero() {
         }}
       />
 
-      <div className="container-page relative z-10 grid min-h-[92svh] items-center gap-8 pb-20 pt-32 md:pt-36 lg:grid-cols-[1.05fr_1fr] lg:gap-12 lg:pt-40">
+      <div className="container-page relative z-10 grid items-center gap-8 pb-16 pt-28 md:pt-32 lg:min-h-[78svh] lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:pt-36">
         {/* Left: copy */}
         <div className="text-center lg:text-left">
           <motion.div
@@ -132,7 +132,7 @@ export function Hero() {
           initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.1, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="relative mx-auto h-[420px] w-full max-w-[560px] md:h-[520px] lg:h-[600px]"
+          className="relative mx-auto h-[300px] w-full max-w-[440px] md:h-[380px] lg:h-[460px]"
         >
           {/* Soft glow halo behind robot */}
           <div

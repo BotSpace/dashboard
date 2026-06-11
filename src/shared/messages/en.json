@@ -262,7 +262,8 @@
       "docs": "Docs",
       "terms": "Terms of Service",
       "privacy": "Privacy",
-      "rights": "All rights reserved"
+      "rights": "All rights reserved",
+      "systemsNormal": "All systems normal"
     }
   },
   "auth": {
