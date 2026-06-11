@@ -34,7 +34,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
     BillingAPI.history().catch(() => []),
   ]);
 
-  const currentPlanName = (subscription as { plan?: { name?: string } })?.plan?.name ?? "free";
+  const currentPlanName = subscription?.plan_details?.name ?? "free";
   const tokensUsed =
     usage?.ai_token_usage?.used ?? (usage ? usage.tokens_used_input + usage.tokens_used_output : 0);
   const tokensLimit =
@@ -64,7 +64,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
               {currentPlanName}
               {currentPlanName !== "free" && (
                 <Badge variant="default" className="text-xs">
-                  {(subscription as { status?: string })?.status === "active" ? "Faol" : (subscription as { status?: string })?.status}
+                  {subscription?.status === "active" ? "Faol" : subscription?.status}
                 </Badge>
               )}
             </CardTitle>

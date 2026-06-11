@@ -51,7 +51,9 @@ export type Plan = {
 
 export type Subscription = {
   id: number | string;
-  plan: Plan;
+  // Backend `plan` ni FK id (raqam) qilib qaytaradi; to'liq obyekt `plan_details`da.
+  plan: number | string;
+  plan_details?: Plan;
   status: "active" | "suspended" | "cancelled";
   started_at?: string;
   expires_at?: string;
