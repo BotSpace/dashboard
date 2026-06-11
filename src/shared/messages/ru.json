@@ -45,7 +45,10 @@
     "withdraw": "Вывод средств",
     "verification": "Верификация",
     "upgradeTitle": "Перейти на Pro",
-    "upgradeDesc": "AI-агент, больше сообщений, приоритетная поддержка"
+    "upgradeDesc": "AI-агент, больше сообщений, приоритетная поддержка",
+    "agentFab": "AI Agent",
+    "agentFabDesc": "быстрое создание бота",
+    "agentFabAria": "Перейти к AI Agent"
   },
   "landing": {
     "navMcp": "MCP",
@@ -304,7 +307,21 @@
     "createBot": "Создать бота",
     "browseTemplates": "Смотреть шаблоны",
     "noBots": "У вас пока нет ботов",
-    "createFirst": "Создать первого бота"
+    "createFirst": "Создать первого бота",
+    "chartEmptyTitle": "Пока нет статистики",
+    "chartEmptyDesc": "Запустите своего первого бота",
+    "chartEmptyCta": "Создать бота",
+    "msgUnit": "сообщений",
+    "title": "Панель управления",
+    "subtitle": "Метрики системы и активность ботов",
+    "active": "Активно",
+    "newBot": "Новый бот",
+    "botPerformance": "Активность ботов",
+    "last30Days": "Последние 30 дней",
+    "topBots": "Топ ботов",
+    "all": "Все",
+    "quickActions": "Быстрые действия",
+    "analytics": "Аналитика"
   },
   "agent": {
     "title": "AI Агент",
@@ -408,6 +425,32 @@
       "stopError": "Ошибка при остановке бота",
       "deployError": "Deploy не удался",
       "deployStarted": "Deploy запущен"
+    },
+    "overview": {
+      "info": "Данные бота",
+      "name": "Название",
+      "username": "Username",
+      "description": "Описание",
+      "state": "Состояние",
+      "status": "Статус",
+      "id": "ID",
+      "connectToken": "Подключите Telegram-токен",
+      "noDescription": "Добавьте описание",
+      "noUsername": "Появится после подключения токена"
+    },
+    "danger": {
+      "title": "Опасная зона",
+      "desc": "Удаление бота безвозвратно удалит бота, его сценарий и все данные. Это нельзя отменить.",
+      "delete": "Удалить бота",
+      "expand": "Открыть опасную зону",
+      "confirmTitle": "Удалить бота",
+      "confirmDesc": "Это действие необратимо. Для подтверждения введите название бота:",
+      "confirmPlaceholder": "Название бота",
+      "cancel": "Отмена",
+      "confirm": "Удалить",
+      "deleting": "Удаление...",
+      "error": "Не удалось удалить бота",
+      "typeToConfirm": "Введите \"{name}\" для подтверждения"
     }
   },
   "templates": {
@@ -453,7 +496,8 @@
     "cancel": "Отмена",
     "requiredEnvsTitle": "Обязательные настройки",
     "envPlaceholder": "Введите значение",
-    "envRequired": "Заполните все обязательные настройки"
+    "envRequired": "Заполните все обязательные настройки",
+    "freePromo": "Бесплатно (акция)"
   },
   "billing": {
     "title": "Оплата и тарифы",

@@ -3,10 +3,12 @@
 import Image from "next/image";
 import { Sparkles } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Link } from "@/shared/i18n/routing";
 
 export function AgentFloatingButton() {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   if (pathname.includes("/app/agent")) {
     return null;
@@ -15,7 +17,7 @@ export function AgentFloatingButton() {
   return (
     <Link
       href="/app/agent"
-      aria-label="AI Agentga o'tish"
+      aria-label={t("agentFabAria")}
       className="group fixed bottom-5 right-4 z-40 flex items-center gap-2 overflow-hidden rounded-full border border-cyan-300/50 bg-background/90 px-2.5 py-2 pr-4 shadow-[0_16px_45px_rgba(8,47,73,0.22)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_22px_60px_rgba(8,47,73,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 sm:bottom-6 sm:right-6 dark:border-cyan-300/20 dark:bg-card/90 dark:shadow-[0_18px_50px_rgba(0,0,0,0.45)]"
     >
       <span className="pointer-events-none absolute inset-0 rounded-full bg-[conic-gradient(from_120deg,rgba(34,211,238,0.0),rgba(34,211,238,0.18),rgba(132,204,22,0.14),rgba(34,211,238,0.0))] opacity-75 motion-safe:animate-[agent-halo_3.8s_linear_infinite]" />
@@ -40,8 +42,8 @@ export function AgentFloatingButton() {
         </span>
       </span>
       <span className="relative hidden min-w-0 flex-col leading-tight sm:flex">
-        <span className="text-xs font-semibold text-foreground">AI Agent</span>
-        <span className="text-[11px] text-muted-foreground">botni tez qurish</span>
+        <span className="text-xs font-semibold text-foreground">{t("agentFab")}</span>
+        <span className="text-[11px] text-muted-foreground">{t("agentFabDesc")}</span>
       </span>
     </Link>
   );

@@ -128,6 +128,7 @@ export default async function TemplatesPage({
           initialHasMore={firstPage.hasMore}
           locale={locale}
           freeLabel={t("free")}
+          freePromoLabel={t("freePromo")}
           basePath="/app/templates"
           ownedLabel={t("owned")}
           loadingLabel={tc("loading")}

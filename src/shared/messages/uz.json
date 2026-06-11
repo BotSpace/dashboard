@@ -45,7 +45,10 @@
     "withdraw": "Pul yechish",
     "verification": "Verifikatsiya",
     "upgradeTitle": "Pro tarifga o'ting",
-    "upgradeDesc": "AI agent, ko'proq xabar, prioritet support"
+    "upgradeDesc": "AI agent, ko'proq xabar, prioritet support",
+    "agentFab": "AI Agent",
+    "agentFabDesc": "botni tez qurish",
+    "agentFabAria": "AI Agentga o'tish"
   },
   "agent": {
     "title": "AI Agent",
@@ -349,7 +352,21 @@
     "createBot": "Bot yaratish",
     "browseTemplates": "Shablonlarni ko'rish",
     "noBots": "Hali bot yaratmagansiz",
-    "createFirst": "Birinchi botingizni yarating"
+    "createFirst": "Birinchi botingizni yarating",
+    "chartEmptyTitle": "Hali statistika yo'q",
+    "chartEmptyDesc": "Birinchi botingizni ishga tushiring",
+    "chartEmptyCta": "Bot yaratish",
+    "msgUnit": "xabar",
+    "title": "Boshqaruv paneli",
+    "subtitle": "Tizim ko'rsatkichlari va bot faoliyati",
+    "active": "Faol",
+    "newBot": "Yangi bot",
+    "botPerformance": "Bot faoliyati",
+    "last30Days": "Oxirgi 30 kun",
+    "topBots": "Top botlar",
+    "all": "Barchasi",
+    "quickActions": "Tezkor harakatlar",
+    "analytics": "Analitika"
   },
   "bots": {
     "title": "Botlar",
@@ -404,6 +421,32 @@
       "stopError": "To'xtatishda xatolik",
       "deployError": "Deploy muvaffaqiyatsiz",
       "deployStarted": "Deploy boshlandi"
+    },
+    "overview": {
+      "info": "Bot ma'lumotlari",
+      "name": "Nom",
+      "username": "Username",
+      "description": "Tavsif",
+      "state": "Holat",
+      "status": "Status",
+      "id": "ID",
+      "connectToken": "Telegram token ulang",
+      "noDescription": "Tavsif qo'shing",
+      "noUsername": "Token ulagandan so'ng paydo bo'ladi"
+    },
+    "danger": {
+      "title": "Xavfli hudud",
+      "desc": "Botni o'chirish — bot, uning oqimi va barcha ma'lumotlari butunlay yo'qoladi. Qaytarib bo'lmaydi.",
+      "delete": "Botni o'chirish",
+      "expand": "Xavfli hududni ochish",
+      "confirmTitle": "Botni o'chirish",
+      "confirmDesc": "Bu amalni qaytarib bo'lmaydi. Tasdiqlash uchun bot nomini kiriting:",
+      "confirmPlaceholder": "Bot nomi",
+      "cancel": "Bekor qilish",
+      "confirm": "O'chirish",
+      "deleting": "O'chirilmoqda...",
+      "error": "Botni o'chirib bo'lmadi",
+      "typeToConfirm": "Tasdiqlash uchun \"{name}\" deb yozing"
     }
   },
   "templates": {
@@ -449,7 +492,8 @@
     "cancel": "Bekor qilish",
     "requiredEnvsTitle": "Kerakli sozlamalar",
     "envPlaceholder": "Qiymat kiriting",
-    "envRequired": "Barcha kerakli sozlamalarni to'ldiring"
+    "envRequired": "Barcha kerakli sozlamalarni to'ldiring",
+    "freePromo": "Bepul (aksiya)"
   },
   "billing": {
     "title": "To'lov va tariflar",

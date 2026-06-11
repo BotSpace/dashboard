@@ -45,7 +45,10 @@
     "withdraw": "Withdraw",
     "verification": "Verification",
     "upgradeTitle": "Upgrade to Pro",
-    "upgradeDesc": "AI agent, more messages, priority support"
+    "upgradeDesc": "AI agent, more messages, priority support",
+    "agentFab": "AI Agent",
+    "agentFabDesc": "build a bot fast",
+    "agentFabAria": "Go to AI Agent"
   },
   "landing": {
     "navMcp": "MCP",
@@ -304,7 +307,21 @@
     "createBot": "Create bot",
     "browseTemplates": "Browse templates",
     "noBots": "You haven't built a bot yet",
-    "createFirst": "Create your first bot"
+    "createFirst": "Create your first bot",
+    "chartEmptyTitle": "No statistics yet",
+    "chartEmptyDesc": "Launch your first bot",
+    "chartEmptyCta": "Create a bot",
+    "msgUnit": "messages",
+    "title": "Dashboard",
+    "subtitle": "System metrics and bot activity",
+    "active": "Active",
+    "newBot": "New bot",
+    "botPerformance": "Bot performance",
+    "last30Days": "Last 30 days",
+    "topBots": "Top bots",
+    "all": "All",
+    "quickActions": "Quick actions",
+    "analytics": "Analytics"
   },
   "agent": {
     "title": "AI Agent",
@@ -408,6 +425,32 @@
       "stopError": "Failed to stop the bot",
       "deployError": "Deploy failed",
       "deployStarted": "Deploy started"
+    },
+    "overview": {
+      "info": "Bot details",
+      "name": "Name",
+      "username": "Username",
+      "description": "Description",
+      "state": "State",
+      "status": "Status",
+      "id": "ID",
+      "connectToken": "Connect a Telegram token",
+      "noDescription": "Add a description",
+      "noUsername": "Appears once a token is connected"
+    },
+    "danger": {
+      "title": "Danger zone",
+      "desc": "Deleting the bot permanently removes the bot, its flow and all data. This cannot be undone.",
+      "delete": "Delete bot",
+      "expand": "Open danger zone",
+      "confirmTitle": "Delete bot",
+      "confirmDesc": "This action cannot be undone. To confirm, type the bot name:",
+      "confirmPlaceholder": "Bot name",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "error": "Could not delete bot",
+      "typeToConfirm": "Type \"{name}\" to confirm"
     }
   },
   "templates": {
@@ -453,7 +496,8 @@
     "cancel": "Cancel",
     "requiredEnvsTitle": "Required settings",
     "envPlaceholder": "Enter value",
-    "envRequired": "Fill in all required settings"
+    "envRequired": "Fill in all required settings",
+    "freePromo": "Free (promo)"
   },
   "billing": {
     "title": "Billing & plans",

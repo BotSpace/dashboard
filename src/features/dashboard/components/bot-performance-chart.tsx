@@ -9,7 +9,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Plus } from "lucide-react";
+import { Link } from "@/shared/i18n/routing";
 
 function formatY(value: number) {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
@@ -17,41 +18,53 @@ function formatY(value: number) {
   return String(value);
 }
 
-/** "2026-05-01" → "1-May" */
-function formatDate(dateStr: string): string {
-  try {
-    const d = new Date(dateStr + "T00:00:00");
-    const day = d.getDate();
-    const month = d.toLocaleString("uz", { month: "short" });
-    return `${day}-${month}`;
-  } catch {
-    return dateStr;
-  }
-}
+// Uzbek month names — toLocaleString("uz") is unreliable across runtimes
+// (produced junk like "M06"), so map explicitly.
+const UZ_MONTHS = [
+  "yanvar", "fevral", "mart", "aprel", "may", "iyun",
+  "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr",
+];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function CustomTooltip({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="rounded-lg border border-blue-500/20 bg-[#0f0f18] px-3 py-2 shadow-xl">
-      <p className="mb-1 text-xs text-slate-400">{label}</p>
-      <p className="text-sm font-semibold text-blue-300">
-        {formatY(payload[0].value)} xabar
-      </p>
-    </div>
-  );
+/** "2026-06-06" → "6-iyun" */
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr + "T00:00:00");
+  if (Number.isNaN(d.getTime())) return dateStr;
+  return `${d.getDate()}-${UZ_MONTHS[d.getMonth()]}`;
 }
 
 interface BotPerformanceChartProps {
-  /** Backend performance points: {date: "YYYY-MM-DD", value: number}[]. Falls back to mock if absent. */
+  /** Backend performance points: {date: "YYYY-MM-DD", value: number}[]. */
   data?: { date: string; value: number }[] | null;
+  labels: {
+    emptyTitle: string;
+    emptyDesc: string;
+    emptyCta: string;
+    msgUnit: string;
+  };
 }
 
-export function BotPerformanceChart({ data }: BotPerformanceChartProps) {
-  const chartData =
+export function BotPerformanceChart({ data, labels }: BotPerformanceChartProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function CustomTooltip({ active, payload, label }: any) {
+    if (!active || !payload?.length) return null;
+    return (
+      <div className="rounded-lg border border-blue-500/20 bg-[#0f0f18] px-3 py-2 shadow-xl">
+        <p className="mb-1 text-xs text-slate-400">{label}</p>
+        <p className="text-sm font-semibold text-blue-300">
+          {formatY(payload[0].value)} {labels.msgUnit}
+        </p>
+      </div>
+    );
+  }
+
+  const points =
     data && data.length > 0
       ? data.map((p) => ({ day: formatDate(p.date), messages: p.value }))
       : [];
+  // Treat an all-zero series the same as no data — a flat line on a 0–1
+  // axis is meaningless and confused users.
+  const hasSignal = points.some((p) => p.messages > 0);
+  const chartData = hasSignal ? points : [];
 
   if (chartData.length === 0) {
     return (
@@ -59,7 +72,17 @@ export function BotPerformanceChart({ data }: BotPerformanceChartProps) {
         <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40">
           <TrendingUp className="h-5 w-5 text-muted-foreground" />
         </div>
-        <p className="text-sm text-muted-foreground">Ma&apos;lumot yo&apos;q</p>
+        <div>
+          <p className="text-sm font-medium text-foreground">{labels.emptyTitle}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{labels.emptyDesc}</p>
+        </div>
+        <Link
+          href="/app/bots/new"
+          className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-3 py-1.5 text-xs font-medium text-blue-400 transition-colors hover:bg-blue-500/20"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          {labels.emptyCta}
+        </Link>
       </div>
     );
   }

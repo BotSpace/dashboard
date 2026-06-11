@@ -15,6 +15,7 @@ interface Props {
   tpl: Template;
   locale: string;
   freeLabel: string;
+  freePromoLabel: string;
   basePath?: string;
   ownedLabel?: string;
 }
@@ -23,12 +24,17 @@ export function TemplateCard({
   tpl,
   locale,
   freeLabel,
+  freePromoLabel,
   basePath = "/templates",
   ownedLabel,
 }: Props) {
   const price = toNumber(tpl.price);
   const original = toNumber(tpl.original_price);
-  const hasDiscount = original > 0 && price < original;
+  // "Free with a struck-through 380,000" confused users. If the template is
+  // free but had a list price, it's a promo → show "Free (promo)" and drop
+  // the old price. A genuine paid discount still shows the struck original.
+  const isFreePromo = price === 0 && original > 0;
+  const hasDiscount = original > 0 && price > 0 && price < original;
   return (
     <Link href={`${basePath}/${tpl.slug}`} className="group">
       <Card className="overflow-hidden transition group-hover:border-primary/40 group-hover:shadow-md h-full flex flex-col">
@@ -70,7 +76,11 @@ export function TemplateCard({
           <div className="mt-auto flex items-end justify-between pt-2">
             <div className="space-y-0.5">
               <div className="text-sm font-semibold">
-                {price === 0 ? freeLabel : formatCurrency(price, "UZS", locale)}
+                {price === 0
+                  ? isFreePromo
+                    ? freePromoLabel
+                    : freeLabel
+                  : formatCurrency(price, "UZS", locale)}
               </div>
               {hasDiscount && (
                 <div className="text-xs text-muted-foreground line-through">

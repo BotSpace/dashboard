@@ -39,7 +39,8 @@ export async function TemplatesPreview({ locale }: { locale: string }) {
           {top.map((tpl) => {
             const price = toNumber(tpl.price);
             const original = toNumber(tpl.original_price);
-            const hasDiscount = original > 0 && price < original;
+            const isFreePromo = price === 0 && original > 0;
+            const hasDiscount = original > 0 && price > 0 && price < original;
             return (
               <Link key={tpl.id} href={`/templates/${tpl.slug}`} className="group">
                 <div
@@ -67,7 +68,11 @@ export async function TemplatesPreview({ locale }: { locale: string }) {
                     <div className="mt-2 flex items-end justify-between">
                       <div>
                         <div className="text-sm font-semibold text-white/70">
-                          {price === 0 ? tt("free") : formatCurrency(price, "UZS", locale)}
+                          {price === 0
+                            ? isFreePromo
+                              ? tt("freePromo")
+                              : tt("free")
+                            : formatCurrency(price, "UZS", locale)}
                         </div>
                         {hasDiscount && (
                           <div className="text-xs text-white/20 line-through">

@@ -14,6 +14,7 @@ interface Props {
   initialHasMore: boolean;
   locale: string;
   freeLabel: string;
+  freePromoLabel: string;
   basePath?: string;
   gridClassName?: string;
   ownedLabel?: string;
@@ -31,6 +32,7 @@ export function TemplatesInfiniteLoader({
   initialHasMore,
   locale,
   freeLabel,
+  freePromoLabel,
   basePath,
   gridClassName = DEFAULT_GRID_CLASS,
   ownedLabel,
@@ -112,6 +114,7 @@ export function TemplatesInfiniteLoader({
             tpl={tpl}
             locale={locale}
             freeLabel={freeLabel}
+            freePromoLabel={freePromoLabel}
             basePath={basePath}
             ownedLabel={ownedLabel}
           />
