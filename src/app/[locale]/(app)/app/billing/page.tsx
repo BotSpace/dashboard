@@ -204,7 +204,15 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                   {history.map((h) => (
                     <tr key={h.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
                       <td className="px-4 py-3 text-muted-foreground">{h.created_at ?? "—"}</td>
-                      <td className="px-4 py-3">{h.type ?? "—"}</td>
+                      <td className="px-4 py-3">
+                        {h.type === "income" ? (
+                          <span className="font-medium text-emerald-500">Kirim</span>
+                        ) : h.type === "expense" ? (
+                          <span className="font-medium text-red-500">Chiqim</span>
+                        ) : (
+                          (h.type ?? "—")
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-right font-medium">
                         {formatCurrency(h.amount, h.currency ?? "UZS", locale)}
                       </td>
