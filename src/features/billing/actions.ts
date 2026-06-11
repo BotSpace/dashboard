@@ -1,5 +1,6 @@
 "use server";
-import { BillingAPI } from "@/shared/api/services";
+import { revalidatePath } from "next/cache";
+import { BillingAPI, SubscriptionAPI } from "@/shared/api/services";
 import { isApiError } from "@/shared/api/client";
 
 type Result = { ok: boolean; link?: string; message?: string };
@@ -28,5 +29,23 @@ export async function createTopUpAction(_prev: Result | undefined, formData: For
   } catch (e) {
     if (isApiError(e)) return { ok: false, message: e.message || "Xatolik yuz berdi" };
     return { ok: false, message: (e as Error).message || "Xatolik yuz berdi" };
+  }
+}
+
+/**
+ * Tarifni yangilash/almashtirish. Backend `total_price`'ni foydalanuvchi
+ * balansidan yechib, tarifni darhol almashtiradi (tashqi to'lov yo'q). Balans
+ * yetmasa backend xato xabarini qaytaradi ("Balansda yetarli mablag' mavjud emas.").
+ */
+export async function upgradePlanAction(
+  planId: number | string,
+): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await SubscriptionAPI.upgrade(planId);
+    revalidatePath("/app/billing");
+    return { ok: true };
+  } catch (e) {
+    if (isApiError(e)) return { ok: false, message: e.message || "Tarifni yangilashda xatolik" };
+    return { ok: false, message: (e as Error).message || "Tarifni yangilashda xatolik" };
   }
 }

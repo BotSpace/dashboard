@@ -2,12 +2,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Bot, CheckCircle2, CreditCard, Sparkles, Zap } from "lucide-react";
 import { SubscriptionAPI, PlansAPI, BillingAPI } from "@/shared/api/services";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/components/ui/card";
-import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
 import { Progress } from "@/shared/components/ui/progress";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { formatCurrency } from "@/shared/lib/utils";
 import { AddFundsDialog } from "@/features/billing/components/add-funds-dialog";
+import { PlanUpgradeButton } from "@/features/billing/components/plan-upgrade-button";
 
 function formatTokens(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -166,18 +166,13 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                       </li>
                     )}
                   </ul>
-                  <Button
-                    variant={isCurrent ? "outline" : "default"}
-                    className={
-                      isCurrent
-                        ? "w-full"
-                        : "w-full"
-                    }
-                    size="sm"
-                    disabled={isCurrent}
-                  >
-                    {isCurrent ? "Joriy tarif" : t("upgrade")}
-                  </Button>
+                  <PlanUpgradeButton
+                    planId={p.id}
+                    planLabel={p.name_display ?? p.name}
+                    price={p.price}
+                    isCurrent={isCurrent}
+                    label={t("upgrade")}
+                  />
                 </CardContent>
               </Card>
             );
