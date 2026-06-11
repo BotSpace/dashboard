@@ -17,6 +17,9 @@ interface Props {
   basePath?: string;
   gridClassName?: string;
   ownedLabel?: string;
+  loadingLabel: string;
+  retryLabel: string;
+  errorLabel: string;
 }
 
 const DEFAULT_GRID_CLASS = "grid gap-5 sm:grid-cols-2 lg:grid-cols-3";
@@ -31,6 +34,9 @@ export function TemplatesInfiniteLoader({
   basePath,
   gridClassName = DEFAULT_GRID_CLASS,
   ownedLabel,
+  loadingLabel,
+  retryLabel,
+  errorLabel,
 }: Props) {
   // Single source of truth: initial server-rendered items + everything
   // appended by the infinite-scroll loader. Rendering both groups in
@@ -72,12 +78,12 @@ export function TemplatesInfiniteLoader({
       setPage(nextPage);
       setHasMore(result.hasMore);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Yuklashda xatolik");
+      setError(e instanceof Error ? e.message : errorLabel);
     } finally {
       setLoading(false);
       inFlight.current = false;
     }
-  }, [baseParams, hasMore, page]);
+  }, [baseParams, hasMore, page, errorLabel]);
 
   useEffect(() => {
     if (!hasMore) return;
@@ -115,7 +121,7 @@ export function TemplatesInfiniteLoader({
       {loading && (
         <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span>Yuklanmoqda…</span>
+          <span>{loadingLabel}</span>
         </div>
       )}
       {error && !loading && (
@@ -129,7 +135,7 @@ export function TemplatesInfiniteLoader({
               loadNext();
             }}
           >
-            qaytadan urinish
+            {retryLabel}
           </button>
         </div>
       )}

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ProjectsAPI } from "@/shared/api/services";
 import { BotTabs } from "@/features/bots/components/bot-tabs";
 import { ConstructorButton } from "@/features/bots/components/constructor-button";
@@ -19,6 +19,7 @@ export default async function BotLayout({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+  const tNav = await getTranslations("nav");
 
   const bot = await ProjectsAPI.get(id).catch(() => null);
   if (!bot) notFound();
@@ -30,7 +31,7 @@ export default async function BotLayout({
         className="inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ChevronLeft className="h-4 w-4" />
-        Botlar
+        {tNav("bots")}
       </Link>
 
       <header className="flex flex-wrap items-center gap-4 rounded-xl border border-border/60 bg-card p-5">

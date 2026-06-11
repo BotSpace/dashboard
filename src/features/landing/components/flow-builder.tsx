@@ -137,7 +137,7 @@ export function FlowBuilder() {
               <span className="ml-3 text-[11px] text-white/40">flow / @myshop_bot</span>
               <span className="ml-auto flex items-center gap-1.5 text-[10px] text-emerald-300/80">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" style={{ boxShadow: "0 0 8px #10b981" }} />
-                Live
+                {t("live")}
               </span>
             </div>
 
@@ -241,7 +241,7 @@ export function FlowBuilder() {
                 />
               </svg>
               <span className="absolute left-5 top-4 whitespace-nowrap rounded-md bg-white px-2 py-0.5 text-[10px] font-semibold text-neutral-900 shadow-md">
-                You
+                {t("you")}
               </span>
             </motion.div>
           </div>

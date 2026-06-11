@@ -127,9 +127,9 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         >
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Pro tarifga o'ting</span>
+            <span className="text-sm font-medium">{t("upgradeTitle")}</span>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">AI agent, ko'proq xabar, prioritet support</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t("upgradeDesc")}</p>
         </Link>
       </div>
     </div>

@@ -25,6 +25,7 @@ export default async function PublicTemplatesPage({
   const sp = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("templates");
+  const tc = await getTranslations("common");
 
   const baseParams = {
     search: sp.search || undefined,
@@ -115,6 +116,9 @@ export default async function PublicTemplatesPage({
           initialHasMore={firstPage.hasMore}
           locale={locale}
           freeLabel={t("free")}
+          loadingLabel={tc("loading")}
+          retryLabel={tc("retry")}
+          errorLabel={tc("error")}
         />
       )}
     </div>

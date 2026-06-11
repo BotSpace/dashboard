@@ -27,6 +27,7 @@ export default async function TemplatesPage({
   const sp = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("templates");
+  const tc = await getTranslations("common");
 
   const baseParams = {
     search: sp.search || undefined,
@@ -129,6 +130,9 @@ export default async function TemplatesPage({
           freeLabel={t("free")}
           basePath="/app/templates"
           ownedLabel={t("owned")}
+          loadingLabel={tc("loading")}
+          retryLabel={tc("retry")}
+          errorLabel={tc("error")}
         />
       )}
     </div>

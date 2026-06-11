@@ -62,7 +62,7 @@ export function Pricing() {
         <div className="mx-auto max-w-2xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-white/55">
             <span className="h-1 w-1 rounded-full bg-violet-300" />
-            Plans
+            {t("eyebrow")}
           </div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}

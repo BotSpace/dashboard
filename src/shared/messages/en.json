@@ -43,7 +43,9 @@
     "earnings": "Earnings",
     "mcp": "MCP",
     "withdraw": "Withdraw",
-    "verification": "Verification"
+    "verification": "Verification",
+    "upgradeTitle": "Upgrade to Pro",
+    "upgradeDesc": "AI agent, more messages, priority support"
   },
   "landing": {
     "navMcp": "MCP",
@@ -95,7 +97,8 @@
           "title": "Analytics",
           "desc": "Real-time monitoring of CPU, RAM, traffic and user behavior"
         }
-      ]
+      ],
+      "eyebrow": "Platform"
     },
     "flow": {
       "eyebrow": "Visual builder",
@@ -131,7 +134,9 @@
           "type": "State",
           "label": "Save"
         }
-      }
+      },
+      "live": "Live",
+      "you": "You"
     },
     "agent": {
       "eyebrow": "AI Agent",
@@ -228,7 +233,8 @@
             "API access"
           ]
         }
-      }
+      },
+      "eyebrow": "Plans"
     },
     "templates": {
       "title": "Ready-made templates",
@@ -238,7 +244,8 @@
     "cta": {
       "title": "Launch your first bot today",
       "subtitle": "No card required. Ready in 5 minutes.",
-      "button": "Sign up free"
+      "button": "Sign up free",
+      "trust": "No card required · 5 min setup"
     },
     "footer": {
       "tagline": "Build Telegram bots visually — with BotSpace",

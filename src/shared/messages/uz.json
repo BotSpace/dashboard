@@ -43,7 +43,9 @@
     "earnings": "Daromad",
     "mcp": "MCP",
     "withdraw": "Pul yechish",
-    "verification": "Verifikatsiya"
+    "verification": "Verifikatsiya",
+    "upgradeTitle": "Pro tarifga o'ting",
+    "upgradeDesc": "AI agent, ko'proq xabar, prioritet support"
   },
   "agent": {
     "title": "AI Agent",
@@ -144,7 +146,8 @@
           "title": "Analitika",
           "desc": "Real-time monitoring, CPU/RAM/trafik, foydalanuvchi xulqi"
         }
-      ]
+      ],
+      "eyebrow": "Platforma"
     },
     "flow": {
       "eyebrow": "Vizual konstruktor",
@@ -180,7 +183,9 @@
           "type": "Holat",
           "label": "Saqlash"
         }
-      }
+      },
+      "live": "Onlayn",
+      "you": "Siz"
     },
     "agent": {
       "eyebrow": "AI Agent",
@@ -277,7 +282,8 @@
             "API access"
           ]
         }
-      }
+      },
+      "eyebrow": "Tariflar"
     },
     "templates": {
       "title": "Tayyor shablonlar",
@@ -287,7 +293,8 @@
     "cta": {
       "title": "Bugun birinchi botingizni ishga tushiring",
       "subtitle": "Karta talab qilinmaydi. 5 daqiqada tayyor bo'ladi.",
-      "button": "Bepul ro'yxatdan o'tish"
+      "button": "Bepul ro'yxatdan o'tish",
+      "trust": "Karta talab qilinmaydi · 5 daqiqada tayyor"
     },
     "footer": {
       "tagline": "Telegram botlarni vizual yarating — BotSpace bilan",

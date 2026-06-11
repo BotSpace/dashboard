@@ -95,7 +95,7 @@ export function CtaBanner() {
             className="mt-6 flex items-center justify-center gap-2 text-[11px] text-white/35"
           >
             <span className="inline-flex h-1 w-1 rounded-full bg-emerald-400" style={{ boxShadow: "0 0 6px #10b981" }} />
-            No card required · 5 min setup
+            {t("trust")}
           </motion.div>
         </motion.div>
       </div>
