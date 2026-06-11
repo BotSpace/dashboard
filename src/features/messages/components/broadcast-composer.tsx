@@ -1,22 +1,12 @@
 "use client";
 import { useState, useTransition, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Send,
-  Loader2,
-  ChevronDown,
-  ChevronUp,
-  Users,
-  ImageIcon,
-  LayoutGrid,
-  AlignLeft,
-} from "lucide-react";
+import { Send, Loader2, Users, ImageIcon, LayoutGrid, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { sendBroadcastFormAction } from "@/features/messages/actions";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
-import { Separator } from "@/shared/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -28,13 +18,7 @@ import {
 import { cn } from "@/shared/lib/utils";
 
 import { MediaUpload, type MediaFile } from "./media-upload";
-import {
-  ButtonBuilder,
-  serializeButtons,
-  type ButtonType,
-  type ButtonRow,
-} from "./button-builder";
-import { MessagePreview } from "./message-preview";
+import { ButtonBuilder, serializeButtons, type ButtonRow } from "./button-builder";
 
 // ── Caption counter ───────────────────────────────────────────────────────────
 
@@ -58,58 +42,73 @@ function CaptionCounter({ count }: { count: number }) {
   );
 }
 
-// ── Collapsible section ───────────────────────────────────────────────────────
+// ── Optional block (constructor-style) ──────────────────────────────────────────
 
-interface SectionProps {
+function OptionalBlock({
+  icon: Icon,
+  title,
+  onRemove,
+  disabled,
+  children,
+}: {
   icon: React.ElementType<{ className?: string }>;
   title: string;
+  onRemove: () => void;
+  disabled?: boolean;
   children: React.ReactNode;
-  defaultOpen?: boolean;
-  badge?: React.ReactNode;
-}
-
-function Section({ icon: Icon, title, children, defaultOpen = true, badge }: SectionProps) {
-  const [open, setOpen] = useState(defaultOpen);
+}) {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className={cn(
-          "flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors",
-          "hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
-        )}
-      >
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+      <div className="flex items-center gap-2.5 border-b border-border px-3 py-2.5">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
           <Icon className="h-3.5 w-3.5" />
         </span>
-        <span className="flex flex-1 items-center gap-2 text-sm font-medium">
-          {title}
-          {badge}
-        </span>
-        {open ? (
-          <ChevronUp className="h-4 w-4 shrink-0 text-muted-foreground" />
-        ) : (
-          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-        )}
-      </button>
-      {open && (
-        <>
-          <Separator />
-          <div className="p-4">{children}</div>
-        </>
-      )}
+        <span className="flex-1 text-sm font-medium">{title}</span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+          onClick={onRemove}
+          disabled={disabled}
+          aria-label={`${title} olib tashlash`}
+        >
+          <X className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+      <div className="p-3">{children}</div>
     </div>
   );
 }
 
-// ── Section badge ─────────────────────────────────────────────────────────────
+// ── Add button (dashed, constructor-style) ──────────────────────────────────────
 
-function SectionBadge({ label }: { label: string }) {
+function AddButton({
+  icon: Icon,
+  label,
+  onClick,
+  disabled,
+}: {
+  icon: React.ElementType<{ className?: string }>;
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
   return (
-    <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        "flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-dashed border-border py-2.5 text-xs font-medium text-muted-foreground transition-colors",
+        "hover:border-primary/40 hover:bg-primary/5 hover:text-primary",
+        "disabled:pointer-events-none disabled:opacity-50",
+      )}
+    >
+      <Plus className="h-3.5 w-3.5" />
+      <Icon className="h-3.5 w-3.5" />
       {label}
-    </span>
+    </button>
   );
 }
 
@@ -160,8 +159,9 @@ export function BroadcastComposer({ projectId }: { projectId: string | number })
 
   const [caption, setCaption] = useState("");
   const [media, setMedia] = useState<MediaFile | null>(null);
-  const [buttonType, setButtonType] = useState<ButtonType>("inline");
+  const [mediaOpen, setMediaOpen] = useState(false);
   const [rows, setRows] = useState<ButtonRow[]>([]);
+  const [buttonsOpen, setButtonsOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -175,7 +175,16 @@ export function BroadcastComposer({ projectId }: { projectId: string | number })
   };
 
   const canSubmit = caption.trim().length > 0 || media !== null;
-  const totalButtonCount = rows.reduce((s, r) => s + r.length, 0);
+
+  const removeMedia = () => {
+    setMedia(null);
+    setMediaOpen(false);
+  };
+
+  const removeButtons = () => {
+    setRows([]);
+    setButtonsOpen(false);
+  };
 
   const handleConfirm = useCallback(() => {
     startTransition(async () => {
@@ -190,8 +199,8 @@ export function BroadcastComposer({ projectId }: { projectId: string | number })
       }
 
       if (rows.length > 0) {
-        fd.set("button_type", buttonType);
-        fd.set("buttons", serializeButtons(rows, buttonType));
+        fd.set("button_type", "inline");
+        fd.set("buttons", serializeButtons(rows));
       }
 
       const result = await sendBroadcastFormAction(projectId, fd);
@@ -203,7 +212,9 @@ export function BroadcastComposer({ projectId }: { projectId: string | number })
         });
         setCaption("");
         setMedia(null);
+        setMediaOpen(false);
         setRows([]);
+        setButtonsOpen(false);
         if (textareaRef.current) {
           textareaRef.current.style.height = "auto";
         }
@@ -212,13 +223,15 @@ export function BroadcastComposer({ projectId }: { projectId: string | number })
         toast.error(result.message ?? "Yuborishda xatolik yuz berdi");
       }
     });
-  }, [caption, media, rows, buttonType, projectId, router]);
+  }, [caption, media, rows, projectId, router]);
 
   const handleSubmitAttempt = (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit || pending) return;
     setConfirmOpen(true);
   };
+
+  const showAddRow = !mediaOpen || !buttonsOpen;
 
   return (
     <>
@@ -230,128 +243,114 @@ export function BroadcastComposer({ projectId }: { projectId: string | number })
       />
 
       <form onSubmit={handleSubmitAttempt} noValidate>
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_340px]">
-          {/* ── Left column: composer ──────────────────────────────────── */}
-          <div className="space-y-4">
-            {/* Header card */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base">Hammaga xabar yuborish</CardTitle>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Matn, media va tugmalar qo&apos;shib broadcast yuboring
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-3 pt-0">
-                {/* Caption section */}
-                <Section icon={AlignLeft} title="Matn" defaultOpen>
-                  <div className="space-y-2">
-                    <textarea
-                      ref={textareaRef}
-                      value={caption}
-                      onChange={handleCaptionChange}
-                      placeholder="Xabar matnini kiriting…"
-                      disabled={pending}
-                      rows={4}
-                      maxLength={CAPTION_LIMIT}
-                      className={cn(
-                        "w-full resize-none rounded-xl border border-input bg-background px-3.5 py-3 text-sm leading-relaxed",
-                        "ring-offset-background placeholder:text-muted-foreground",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                        "disabled:cursor-not-allowed disabled:opacity-50",
-                        "overflow-hidden transition-colors",
-                        caption.length / CAPTION_LIMIT >= 0.85 && "border-amber-400/60",
-                        caption.length >= CAPTION_LIMIT && "border-destructive/60",
-                      )}
-                    />
-                    <div className="flex items-center justify-between">
-                      {caption.length / CAPTION_LIMIT >= 0.85 && caption.length < CAPTION_LIMIT && (
-                        <span className="text-[11px] text-amber-500">Limit yaqinlashmoqda</span>
-                      )}
-                      {caption.length >= CAPTION_LIMIT && (
-                        <span className="text-[11px] text-destructive">Limit to&apos;ldi</span>
-                      )}
-                      {caption.length / CAPTION_LIMIT < 0.85 && <span />}
-                      <CaptionCounter count={caption.length} />
-                    </div>
-                  </div>
-                </Section>
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-base">Hammaga xabar yuborish</CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Xabar matnini yozing, kerak bo&apos;lsa rasm/video va tugma qo&apos;shing
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-3 pt-0">
+            {/* Message text — always visible */}
+            <div className="space-y-2">
+              <textarea
+                ref={textareaRef}
+                value={caption}
+                onChange={handleCaptionChange}
+                placeholder="Xabar matnini kiriting…"
+                disabled={pending}
+                rows={4}
+                maxLength={CAPTION_LIMIT}
+                className={cn(
+                  "w-full resize-none rounded-xl border border-input bg-background px-3.5 py-3 text-sm leading-relaxed",
+                  "ring-offset-background placeholder:text-muted-foreground",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  "disabled:cursor-not-allowed disabled:opacity-50",
+                  "overflow-hidden transition-colors",
+                  caption.length / CAPTION_LIMIT >= 0.85 && "border-amber-400/60",
+                  caption.length >= CAPTION_LIMIT && "border-destructive/60",
+                )}
+              />
+              <div className="flex items-center justify-between">
+                {caption.length / CAPTION_LIMIT >= 0.85 && caption.length < CAPTION_LIMIT && (
+                  <span className="text-[11px] text-amber-500">Limit yaqinlashmoqda</span>
+                )}
+                {caption.length >= CAPTION_LIMIT && (
+                  <span className="text-[11px] text-destructive">Limit to&apos;ldi</span>
+                )}
+                {caption.length / CAPTION_LIMIT < 0.85 && <span />}
+                <CaptionCounter count={caption.length} />
+              </div>
+            </div>
 
-                {/* Media section */}
-                <Section
-                  icon={ImageIcon}
-                  title="Media"
-                  defaultOpen={false}
-                  badge={
-                    media ? (
-                      <SectionBadge label={media.type === "photo" ? "Rasm" : "Video"} />
-                    ) : undefined
-                  }
-                >
-                  <MediaUpload value={media} onChange={setMedia} disabled={pending} />
-                </Section>
+            {/* Media block (optional) */}
+            {mediaOpen && (
+              <OptionalBlock
+                icon={ImageIcon}
+                title="Rasm/Video"
+                onRemove={removeMedia}
+                disabled={pending}
+              >
+                <MediaUpload value={media} onChange={setMedia} disabled={pending} />
+              </OptionalBlock>
+            )}
 
-                {/* Buttons section */}
-                <Section
-                  icon={LayoutGrid}
-                  title="Tugmalar"
-                  defaultOpen={false}
-                  badge={
-                    totalButtonCount > 0 ? (
-                      <SectionBadge label={`${totalButtonCount} ta`} />
-                    ) : undefined
-                  }
-                >
-                  <ButtonBuilder
-                    buttonType={buttonType}
-                    onButtonTypeChange={setButtonType}
-                    rows={rows}
-                    onRowsChange={setRows}
+            {/* Buttons block (optional) */}
+            {buttonsOpen && (
+              <OptionalBlock
+                icon={LayoutGrid}
+                title="Tugmalar"
+                onRemove={removeButtons}
+                disabled={pending}
+              >
+                <ButtonBuilder rows={rows} onRowsChange={setRows} disabled={pending} />
+              </OptionalBlock>
+            )}
+
+            {/* Add row (constructor-style) */}
+            {showAddRow && (
+              <div className="flex gap-2">
+                {!mediaOpen && (
+                  <AddButton
+                    icon={ImageIcon}
+                    label="Rasm/Video"
+                    onClick={() => setMediaOpen(true)}
                     disabled={pending}
                   />
-                </Section>
+                )}
+                {!buttonsOpen && (
+                  <AddButton
+                    icon={LayoutGrid}
+                    label="Tugmalar"
+                    onClick={() => setButtonsOpen(true)}
+                    disabled={pending}
+                  />
+                )}
+              </div>
+            )}
 
-                {/* Footer: audience note + submit */}
-                <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/20 px-4 py-3">
-                  <span className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Users className="h-3.5 w-3.5 shrink-0" />
-                    Botning barcha foydalanuvchilariga yuboriladi
-                  </span>
-                  <Button
-                    type="submit"
-                    disabled={pending || !canSubmit}
-                    size="sm"
-                    className="shrink-0 gap-2"
-                  >
-                    {pending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Send className="h-4 w-4" />
-                    )}
-                    {pending ? "Yuborilmoqda…" : "Yuborish"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* ── Right column: live preview ─────────────────────────────── */}
-          <div className="xl:sticky xl:top-6 xl:self-start">
-            <Card className="overflow-hidden">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Jonli ko&apos;rinish</CardTitle>
-                <p className="text-xs text-muted-foreground">Telegram pufakchasi namunasi</p>
-              </CardHeader>
-              <CardContent className="flex justify-center pb-6">
-                <MessagePreview
-                  caption={caption}
-                  media={media}
-                  buttonType={buttonType}
-                  rows={rows}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+            {/* Footer: audience note + submit */}
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/20 px-4 py-3">
+              <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Users className="h-3.5 w-3.5 shrink-0" />
+                Botning barcha foydalanuvchilariga yuboriladi
+              </span>
+              <Button
+                type="submit"
+                disabled={pending || !canSubmit}
+                size="sm"
+                className="shrink-0 gap-2"
+              >
+                {pending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+                {pending ? "Yuborilmoqda…" : "Yuborish"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </form>
     </>
   );
