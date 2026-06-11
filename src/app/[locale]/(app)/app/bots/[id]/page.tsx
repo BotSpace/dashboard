@@ -4,6 +4,7 @@ import { ProjectsAPI } from "@/shared/api/services";
 import { Section } from "@/shared/components/common/section";
 import { CopyButton } from "@/shared/components/common/copy-button";
 import { DangerZone } from "@/features/bots/components/danger-zone";
+import { formatLongDate } from "@/shared/lib/utils";
 
 export default async function BotOverviewPage({
   params,
@@ -42,6 +43,7 @@ export default async function BotOverviewPage({
       >
         <Row label={t("status")} value={bot?.status ?? "draft"} />
         <Row label={t("id")} value={String(bot?.id ?? id)} copy />
+        <Row label={t("created")} value={bot?.created_at ? formatLongDate(bot.created_at, locale) : undefined} />
       </Section>
 
       <div className="lg:col-span-2">

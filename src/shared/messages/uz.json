@@ -433,7 +433,8 @@
       "id": "ID",
       "connectToken": "Telegram token ulang",
       "noDescription": "Tavsif qo'shing",
-      "noUsername": "Token ulagandan so'ng paydo bo'ladi"
+      "noUsername": "Token ulagandan so'ng paydo bo'ladi",
+      "created": "Yaratilgan"
     },
     "danger": {
       "title": "Xavfli hudud",

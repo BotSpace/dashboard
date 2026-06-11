@@ -437,7 +437,8 @@
       "id": "ID",
       "connectToken": "Connect a Telegram token",
       "noDescription": "Add a description",
-      "noUsername": "Appears once a token is connected"
+      "noUsername": "Appears once a token is connected",
+      "created": "Created"
     },
     "danger": {
       "title": "Danger zone",
