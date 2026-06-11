@@ -55,7 +55,12 @@ export function PlanUpgradeButton({
       const res = await upgradePlanAction(planId);
       if (res.ok) {
         setConfirmOpen(false);
-        toast.success("Tarif yangilandi", { description: `Yangi tarif: ${planLabel}` });
+        toast.success("Tarif yangilandi", {
+          description:
+            Number(price) > 0
+              ? `${planLabel} — ${formatCurrency(Number(price), "UZS")} balansdan yechildi`
+              : `Yangi tarif: ${planLabel}`,
+        });
         router.refresh();
       } else {
         toast.error(res.message ?? "Tarifni yangilashda xatolik");

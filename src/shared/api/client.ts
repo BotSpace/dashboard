@@ -63,14 +63,25 @@ export async function apiFetch<T = unknown>(path: string, opts: ApiOptions = {})
   return data as T;
 }
 
-function extractMessage(data: unknown): string | undefined {
-  if (!data || typeof data !== "object") return undefined;
-  const d = data as Record<string, unknown>;
+function pickMessage(d: Record<string, unknown>): string | undefined {
   for (const key of ["detail", "message", "error", "errors"]) {
     const v = d[key];
     if (typeof v === "string") return v;
     if (Array.isArray(v) && typeof v[0] === "string") return v[0];
   }
+  return undefined;
+}
+
+function extractMessage(data: unknown): string | undefined {
+  if (!data || typeof data !== "object") return undefined;
+  const d = data as Record<string, unknown>;
+  // Backend xatolarni {status:false, data:{detail|message}} konvertida qaytaradi —
+  // shuning uchun avval tashqi obyektni, keyin ichki `data`ni ham tekshiramiz.
+  const top = pickMessage(d);
+  if (top) return top;
+  const inner = d.data;
+  if (typeof inner === "string") return inner;
+  if (inner && typeof inner === "object") return pickMessage(inner as Record<string, unknown>);
   return undefined;
 }
 
