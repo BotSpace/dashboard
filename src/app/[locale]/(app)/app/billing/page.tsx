@@ -125,9 +125,10 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
               <Card
                 key={p.id}
                 className={
-                  isCurrent
-                    ? "border-blue-500/40 ring-2 ring-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent"
-                    : ""
+                  "flex h-full flex-col" +
+                  (isCurrent
+                    ? " border-blue-500/40 ring-2 ring-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent"
+                    : "")
                 }
               >
                 <CardHeader>
@@ -145,7 +146,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                     {Number(p.price) > 0 && <span className="text-sm font-normal text-muted-foreground">/oy</span>}
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="flex flex-1 flex-col gap-4">
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
@@ -166,13 +167,15 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                       </li>
                     )}
                   </ul>
-                  <PlanUpgradeButton
-                    planId={p.id}
-                    planLabel={p.name_display ?? p.name}
-                    price={p.price}
-                    isCurrent={isCurrent}
-                    label={t("upgrade")}
-                  />
+                  <div className="mt-auto pt-2">
+                    <PlanUpgradeButton
+                      planId={p.id}
+                      planLabel={p.name_display ?? p.name}
+                      price={p.price}
+                      isCurrent={isCurrent}
+                      label={t("upgrade")}
+                    />
+                  </div>
                 </CardContent>
               </Card>
             );
