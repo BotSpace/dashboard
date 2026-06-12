@@ -68,23 +68,43 @@ export async function deployReleaseAction(projectId: string | number): Promise<D
     revalidatePath(`/app/bots/${projectId}/releases`);
     return { ok: true };
   } catch (e) {
-    if (isApiError(e) && e.status === 409) {
-      // Backend envelope: {"status": false, "data": {code, limit, running, detail}}
-      const raw = e.details as Record<string, unknown> | null;
-      const d = (raw && typeof raw.data === "object" && raw.data !== null
-        ? (raw.data as Record<string, unknown>)
-        : raw) as Record<string, unknown> | null;
-      if (d && d.code === "running_bot_limit") {
-        return {
-          ok: false,
-          message: String(d.detail ?? "Running bot limit reached"),
-          code: "running_bot_limit",
-          limit: typeof d.limit === "number" ? d.limit : undefined,
-          running: Array.isArray(d.running) ? (d.running as RunningBot[]) : [],
-        };
-      }
+    return toDeployError(e, "Deploy muvaffaqiyatsiz");
+  }
+}
+
+// Maps a deploy/rollback error to a DeployResult, surfacing the running-bot-limit
+// envelope ({"status": false, "data": {code, limit, running, detail}}).
+function toDeployError(e: unknown, fallback: string): DeployResult {
+  if (isApiError(e) && e.status === 409) {
+    const raw = e.details as Record<string, unknown> | null;
+    const d = (raw && typeof raw.data === "object" && raw.data !== null
+      ? (raw.data as Record<string, unknown>)
+      : raw) as Record<string, unknown> | null;
+    if (d && d.code === "running_bot_limit") {
+      return {
+        ok: false,
+        message: String(d.detail ?? "Running bot limit reached"),
+        code: "running_bot_limit",
+        limit: typeof d.limit === "number" ? d.limit : undefined,
+        running: Array.isArray(d.running) ? (d.running as RunningBot[]) : [],
+      };
     }
-    return { ok: false, message: isApiError(e) ? e.message : "Deploy muvaffaqiyatsiz" };
+  }
+  return { ok: false, message: isApiError(e) ? e.message : fallback };
+}
+
+// Re-deploys an older release's saved flow snapshot as a NEW release and
+// restores it as the project's draft. projectId is only used for revalidation.
+export async function rollbackReleaseAction(
+  projectId: string | number,
+  releaseId: string | number,
+): Promise<DeployResult> {
+  try {
+    await ReleasesAPI.rollback(releaseId);
+    revalidatePath(`/app/bots/${projectId}/releases`);
+    return { ok: true };
+  } catch (e) {
+    return toDeployError(e, "Qaytarish muvaffaqiyatsiz");
   }
 }
 

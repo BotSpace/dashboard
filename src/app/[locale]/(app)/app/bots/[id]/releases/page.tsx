@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { DeployButton } from "@/features/bots/components/deploy-button";
 import { ReleasesAutoRefresh } from "@/features/bots/components/releases-auto-refresh";
+import { RollbackButton } from "@/features/bots/components/rollback-button";
 import { EmptyState } from "@/shared/components/common/empty-state";
 
 const statusToVariant = {
@@ -51,6 +52,7 @@ export default async function ReleasesPage({
                   <th className="px-4 py-3 text-left">{t("status")}</th>
                   <th className="px-4 py-3 text-left">{t("deployedAt")}</th>
                   <th className="px-4 py-3 text-left">Service</th>
+                  <th className="px-4 py-3 text-right"></th>
                 </tr>
               </thead>
               <tbody>
@@ -64,6 +66,11 @@ export default async function ReleasesPage({
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{r.created_at ?? "—"}</td>
                     <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{r.service_id ?? "—"}</td>
+                    <td className="px-4 py-3 text-right">
+                      {r.status !== "running" && (
+                        <RollbackButton projectId={id} releaseId={r.id} version={r.version ?? r.id} />
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -120,6 +120,8 @@ export const ReleasesAPI = {
   create: (project: string | number) =>
     api<Release>("/api/relase/", { method: "POST", json: { project } }).then(unwrapItem<Release>),
   stop: (releaseId: string | number) => api<void>(`/api/relase/${releaseId}/stop/`),
+  rollback: (releaseId: string | number) =>
+    api<Release>(`/api/relase/${releaseId}/rollback/`, { method: "POST" }).then(unwrapItem<Release>),
 };
 
 // ENV VARS
