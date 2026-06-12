@@ -257,6 +257,14 @@ export type CmsDocumentListResponse = {
   skip: number;
 };
 
+// Cursor-paginated page (relation picker infinite-scroll). next_cursor is the
+// last _id of a full page, or null when there are no more documents.
+export type CmsDocumentCursorResponse = {
+  results: CmsDocument[];
+  limit: number;
+  next_cursor: string | null;
+};
+
 // ── Dashboard ──────────────────────────────────────────────────────────────
 
 export type DashboardOverview = {

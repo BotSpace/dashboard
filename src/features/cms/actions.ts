@@ -1,7 +1,12 @@
 "use server";
 import { CmsAPI } from "@/shared/api/services";
 import { isApiError } from "@/shared/api/client";
-import type { CmsDocumentListResponse, CmsField } from "@/shared/types/api";
+import type {
+  CmsDocument,
+  CmsDocumentListResponse,
+  CmsDocumentCursorResponse,
+  CmsField,
+} from "@/shared/types/api";
 
 export type CmsResult = { ok: boolean; message?: string; data?: unknown };
 
@@ -34,6 +39,40 @@ export async function listDocumentsAction(args: {
       limit: args.limit,
       skip: args.skip,
     });
+    return { ok: true, data };
+  } catch (e) {
+    const r = fail(e);
+    return { ok: false, message: r.message ?? "Error" };
+  }
+}
+
+export async function listRelationOptionsAction(args: {
+  projectId: string | number;
+  name: string;
+  cursor?: string | null;
+  search?: string;
+  limit?: number;
+}): Promise<{ ok: true; data: CmsDocumentCursorResponse } | { ok: false; message: string }> {
+  try {
+    const data = await CmsAPI.listDocumentsCursor(args.projectId, args.name, {
+      cursor: args.cursor,
+      search: args.search,
+      limit: args.limit,
+    });
+    return { ok: true, data };
+  } catch (e) {
+    const r = fail(e);
+    return { ok: false, message: r.message ?? "Error" };
+  }
+}
+
+export async function getDocumentAction(args: {
+  projectId: string | number;
+  name: string;
+  id: string;
+}): Promise<{ ok: true; data: CmsDocument } | { ok: false; message: string }> {
+  try {
+    const data = await CmsAPI.getDocument(args.projectId, args.name, args.id);
     return { ok: true, data };
   } catch (e) {
     const r = fail(e);
