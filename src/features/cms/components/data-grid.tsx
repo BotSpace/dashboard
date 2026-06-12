@@ -231,7 +231,7 @@ function FilterPanel({
               <select
                 value={row.field}
                 onChange={(e) => updateRow(row.id, { field: e.target.value })}
-                className="h-7 rounded-md border bg-transparent px-2 text-xs"
+                className="h-7 rounded-md border bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground px-2 text-xs"
               >
                 {fields.map((f) => (
                   <option key={f.name} value={f.name}>
@@ -244,7 +244,7 @@ function FilterPanel({
               <select
                 value={row.operator}
                 onChange={(e) => updateRow(row.id, { operator: e.target.value as FilterOperator })}
-                className="h-7 rounded-md border bg-transparent px-2 text-xs"
+                className="h-7 rounded-md border bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground px-2 text-xs"
               >
                 {ops.map((op) => (
                   <option key={op} value={op}>

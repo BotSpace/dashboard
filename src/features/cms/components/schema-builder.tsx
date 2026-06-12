@@ -118,7 +118,7 @@ export function SchemaBuilder({ projectId, collections }: { projectId: string; c
                 <select
                   value={f.kind}
                   onChange={(e) => updateField(i, { kind: e.target.value as CmsFieldKind })}
-                  className="h-8 rounded-md border bg-transparent px-2 text-sm"
+                  className="h-8 rounded-md border bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground px-2 text-sm"
                 >
                   {KINDS.map((k) => (
                     <option key={k} value={k}>{k}</option>
@@ -127,7 +127,7 @@ export function SchemaBuilder({ projectId, collections }: { projectId: string; c
                 <select
                   value={f.index}
                   onChange={(e) => updateField(i, { index: e.target.value as CmsIndexKind })}
-                  className="h-8 rounded-md border bg-transparent px-2 text-sm"
+                  className="h-8 rounded-md border bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground px-2 text-sm"
                 >
                   {INDEX_KINDS.map((k) => (
                     <option key={k} value={k}>idx: {k}</option>
@@ -162,7 +162,7 @@ export function SchemaBuilder({ projectId, collections }: { projectId: string; c
                           relation_collection: e.target.value ? Number(e.target.value) : null,
                         })
                       }
-                      className="h-8 rounded-md border bg-transparent px-2 text-sm"
+                      className="h-8 rounded-md border bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground px-2 text-sm"
                     >
                       <option value="">— tanlang —</option>
                       {collections.map((c) => (
@@ -179,7 +179,7 @@ export function SchemaBuilder({ projectId, collections }: { projectId: string; c
                       onChange={(e) =>
                         updateField(i, { cascade: e.target.value as CmsCascadeMode })
                       }
-                      className="h-8 rounded-md border bg-transparent px-2 text-sm"
+                      className="h-8 rounded-md border bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground px-2 text-sm"
                     >
                       {CASCADE_MODES.map((m) => (
                         <option key={m} value={m}>{m}</option>
@@ -203,7 +203,7 @@ export function SchemaBuilder({ projectId, collections }: { projectId: string; c
         <select
           value={primaryField}
           onChange={(e) => setPrimaryField(e.target.value)}
-          className="h-8 w-full rounded-md border bg-transparent px-2 text-sm"
+          className="h-8 w-full rounded-md border bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground px-2 text-sm"
         >
           <option value="">— tanlanmagan —</option>
           {fields.filter((f) => f.name.trim()).map((f) => (

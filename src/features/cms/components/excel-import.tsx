@@ -255,7 +255,7 @@ export function ExcelImportButton({ projectId, collectionName, fields, onImporte
                         <span className="text-muted-foreground">→</span>
                         <div className="flex-1">
                           <select
-                            className="w-full rounded border bg-background px-2 py-1 text-xs"
+                            className="w-full rounded border bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground px-2 py-1 text-xs"
                             value={mapped ?? ""}
                             onChange={(e) =>
                               setColMap({ ...colMap, [col]: e.target.value || null })
