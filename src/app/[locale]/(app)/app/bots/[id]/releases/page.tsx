@@ -4,6 +4,7 @@ import { ReleasesAPI } from "@/shared/api/services";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { DeployButton } from "@/features/bots/components/deploy-button";
+import { ReleasesAutoRefresh } from "@/features/bots/components/releases-auto-refresh";
 import { EmptyState } from "@/shared/components/common/empty-state";
 
 const statusToVariant = {
@@ -11,6 +12,9 @@ const statusToVariant = {
   stopped: "secondary",
   failed: "destructive",
   pending: "warn",
+  init: "warn",
+  initializing: "warn",
+  stopping: "warn",
 } as const;
 
 export default async function ReleasesPage({
@@ -25,6 +29,7 @@ export default async function ReleasesPage({
 
   return (
     <div className="space-y-4">
+      <ReleasesAutoRefresh statuses={releases.map((r) => r.status ?? "")} />
       <div className="flex justify-end">
         <DeployButton projectId={id} />
       </div>
