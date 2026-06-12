@@ -17,10 +17,11 @@ import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Badge } from "@/shared/components/ui/badge";
 import { deleteDocumentAction, listDocumentsAction } from "../actions";
-import type { CmsDocument, CmsField } from "@/shared/types/api";
+import type { CmsCollection, CmsDocument, CmsField } from "@/shared/types/api";
 import { ExcelExportButton } from "./excel-export";
 import { ExcelImportButton } from "./excel-import";
 import { DocumentViewDrawer } from "./document-view-drawer";
+import { RelationValue } from "./relation-value";
 
 // ─── Filter types ──────────────────────────────────────────────────────────
 
@@ -323,9 +324,10 @@ type Props = {
   projectId: string;
   collectionName: string;
   fields: CmsField[];
+  collections?: CmsCollection[];
 };
 
-export function DataGrid({ projectId, collectionName, fields }: Props) {
+export function DataGrid({ projectId, collectionName, fields, collections = [] }: Props) {
   const router = useRouter();
   const t = useTranslations("cms");
   const [docs, setDocs] = useState<CmsDocument[]>([]);
@@ -717,7 +719,16 @@ export function DataGrid({ projectId, collectionName, fields }: Props) {
                     </td>
                     {cols.map((f) => (
                       <td key={f.name} className="px-2 py-2 max-w-xs truncate">
-                        {renderCell(d[f.name])}
+                        {f.kind === "relation" ? (
+                          <RelationValue
+                            projectId={projectId}
+                            collections={collections}
+                            relationCollectionId={f.relation_collection}
+                            value={d[f.name]}
+                          />
+                        ) : (
+                          renderCell(d[f.name])
+                        )}
                       </td>
                     ))}
                     <td className="px-2 py-2 text-xs text-muted-foreground">
@@ -767,6 +778,7 @@ export function DataGrid({ projectId, collectionName, fields }: Props) {
         collectionName={collectionName}
         doc={viewDoc}
         fields={fields}
+        collections={collections}
         onDeleted={() => reload()}
       />
     </>

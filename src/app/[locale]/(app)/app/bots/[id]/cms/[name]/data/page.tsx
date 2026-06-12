@@ -19,6 +19,8 @@ export default async function BotCmsDataPage({
 
   const collection = await CmsAPI.getCollection(id, name).catch(() => null);
   if (!collection) notFound();
+  // All collections — used to resolve relation fields to their primary_field label.
+  const collections = await CmsAPI.listCollections(id).catch(() => []);
 
   return (
     <div className="space-y-6">
@@ -54,6 +56,7 @@ export default async function BotCmsDataPage({
           projectId={id}
           collectionName={collection.name}
           fields={collection.fields ?? []}
+          collections={collections}
         />
       </Section>
     </div>

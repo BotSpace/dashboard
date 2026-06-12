@@ -15,7 +15,8 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Link } from "@/shared/i18n/routing";
 import { deleteDocumentAction } from "../actions";
-import type { CmsDocument, CmsField } from "@/shared/types/api";
+import { RelationValue } from "./relation-value";
+import type { CmsCollection, CmsDocument, CmsField } from "@/shared/types/api";
 
 type Props = {
   open: boolean;
@@ -24,6 +25,7 @@ type Props = {
   collectionName: string;
   doc: CmsDocument | null;
   fields: CmsField[];
+  collections?: CmsCollection[];
   onDeleted?: () => void;
 };
 
@@ -123,6 +125,7 @@ export function DocumentViewDrawer({
   collectionName,
   doc,
   fields,
+  collections = [],
   onDeleted,
 }: Props) {
   const t = useTranslations("cms");
@@ -173,7 +176,16 @@ export function DocumentViewDrawer({
           {/* Schema fields */}
           {fields.map((f) => (
             <FieldRow key={f.name} label={f.label || f.name} kind={f.kind}>
-              {formatValue(doc[f.name], f.kind)}
+              {f.kind === "relation" ? (
+                <RelationValue
+                  projectId={projectId}
+                  collections={collections}
+                  relationCollectionId={f.relation_collection}
+                  value={doc[f.name]}
+                />
+              ) : (
+                formatValue(doc[f.name], f.kind)
+              )}
             </FieldRow>
           ))}
 
