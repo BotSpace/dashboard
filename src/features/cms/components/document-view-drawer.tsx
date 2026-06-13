@@ -182,6 +182,7 @@ export function DocumentViewDrawer({
                   collections={collections}
                   relationCollectionId={f.relation_collection}
                   value={doc[f.name]}
+                  serverLabel={doc._rel?.[f.name]}
                 />
               ) : (
                 formatValue(doc[f.name], f.kind)

@@ -24,27 +24,43 @@ function pickLabel(doc: CmsDocument, collection: CmsCollection): string {
 
 /**
  * Renders a relation field value as the referenced document's primary_field
- * label (instead of the raw _id), fetching + caching it on demand.
+ * label (instead of the raw _id).
+ *
+ * The label is normally resolved server-side and passed via `serverLabel`
+ * (the document's `_rel[field]` — batched, no flicker). The on-demand fetch
+ * is only a fallback for responses that don't carry `_rel`.
  */
 export function RelationValue({
   projectId,
   collections,
   relationCollectionId,
   value,
+  serverLabel,
 }: {
   projectId: string;
   collections: CmsCollection[];
   relationCollectionId: number | null | undefined;
   value: unknown;
+  serverLabel?: string | string[] | null;
 }) {
   const target = relationCollectionId
     ? collections.find((c) => c.id === relationCollectionId)
     : undefined;
   const id = value === null || value === undefined || value === "" ? "" : String(value);
   const key = target && id ? `${target.name}:${id}` : "";
-  const [label, setLabel] = useState<string>(() => (key ? labelCache.get(key) ?? "" : ""));
+  const resolved =
+    serverLabel == null
+      ? ""
+      : Array.isArray(serverLabel)
+      ? serverLabel.join(", ")
+      : String(serverLabel);
+  const [label, setLabel] = useState<string>(
+    () => resolved || (key ? labelCache.get(key) ?? "" : "")
+  );
 
   useEffect(() => {
+    // Server already resolved the label — no client fetch needed.
+    if (resolved) return;
     if (!target || !id) return;
     const k = `${target.name}:${id}`;
     const cached = labelCache.get(k);
@@ -62,14 +78,15 @@ export function RelationValue({
     return () => {
       cancelled = true;
     };
-  }, [projectId, target?.name, id]);
+  }, [projectId, target?.name, id, resolved]);
 
   if (!id) return <span className="text-muted-foreground">—</span>;
+  const display = resolved || label;
   // Unresolvable relation target — show the raw id rather than nothing.
-  if (!target) return <span className="text-sm break-all">{id}</span>;
+  if (!target && !display) return <span className="text-sm break-all">{id}</span>;
   return (
     <span className="text-sm" title={id}>
-      {label || id.slice(-8)}
+      {display || id.slice(-8)}
     </span>
   );
 }

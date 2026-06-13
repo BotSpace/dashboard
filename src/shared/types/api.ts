@@ -248,6 +248,8 @@ export type CmsDocument = Record<string, unknown> & {
   _updated_at?: string;
   _version?: number;
   _deleted_at?: string | null;
+  // Server-resolved relation labels, keyed by field name (string or list of strings).
+  _rel?: Record<string, string | string[]>;
 };
 
 export type CmsDocumentListResponse = {
