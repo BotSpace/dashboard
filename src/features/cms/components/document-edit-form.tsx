@@ -1,45 +1,19 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Loader2, Save } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { Switch } from "@/shared/components/ui/switch";
 import { updateDocumentAction } from "../actions";
-import type { CmsCollection, CmsDocument, CmsField, CmsFieldKind } from "@/shared/types/api";
-import { RelationSelect } from "./relation-select";
-
-function initValue(kind: CmsFieldKind, raw: unknown): string | boolean {
-  if (kind === "bool") return Boolean(raw);
-  if (raw === null || raw === undefined) return "";
-  if (kind === "json" || kind === "array") {
-    try {
-      return JSON.stringify(raw, null, 2);
-    } catch {
-      return String(raw);
-    }
-  }
-  return String(raw);
-}
-
-function parseValue(k: CmsFieldKind, raw: string | boolean): unknown {
-  if (k === "bool") return raw;
-  const s = String(raw);
-  if (!s) return undefined;
-  if (k === "int") {
-    const n = Number(s);
-    return Number.isInteger(n) ? n : s;
-  }
-  if (k === "float") return Number(s);
-  if (k === "json" || k === "array") {
-    try {
-      return JSON.parse(s);
-    } catch {
-      return s;
-    }
-  }
-  return s;
-}
+import type { CmsCollection, CmsDocument, CmsField } from "@/shared/types/api";
+import {
+  DocumentFields,
+  buildInitialValues,
+  serializeValues,
+  validateFields,
+  type FieldValue,
+  type FormValues,
+} from "./document-fields";
 
 type Props = {
   projectId: string;
@@ -49,23 +23,41 @@ type Props = {
   doc: CmsDocument;
 };
 
+function fmtDate(v: unknown): string | null {
+  if (!v) return null;
+  try {
+    const d = new Date(String(v));
+    return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+  } catch {
+    return String(v);
+  }
+}
+
 export function DocumentEditForm({ projectId, collectionName, fields, collections, doc }: Props) {
   const router = useRouter();
-
-  const initial: Record<string, string | boolean> = {};
-  for (const f of fields) {
-    initial[f.name] = initValue(f.kind, doc[f.name]);
-  }
-
-  const [values, setValues] = useState(initial);
+  const initial = useMemo(() => buildInitialValues(fields, doc), [fields, doc]);
+  const [values, setValues] = useState<FormValues>(initial);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [pending, start] = useTransition();
 
+  const setValue = (name: string, v: FieldValue) => {
+    setValues((prev) => ({ ...prev, [name]: v }));
+    setErrors((prev) => (prev[name] ? { ...prev, [name]: "" } : prev));
+  };
+
+  const dirty = useMemo(
+    () => fields.some((f) => values[f.name] !== initial[f.name]),
+    [fields, values, initial]
+  );
+
   const submit = () => {
-    const patch: Record<string, unknown> = {};
-    for (const f of fields) {
-      const v = parseValue(f.kind, values[f.name]);
-      if (v !== undefined && v !== "") patch[f.name] = v;
+    const errs = validateFields(fields, values);
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      toast.error("Maydonlarni tekshiring");
+      return;
     }
+    const patch = serializeValues(fields, values);
     start(async () => {
       const res = await updateDocumentAction({
         projectId,
@@ -83,47 +75,50 @@ export function DocumentEditForm({ projectId, collectionName, fields, collection
     });
   };
 
+  const created = fmtDate(doc._created_at);
+  const updated = fmtDate(doc._updated_at);
+
   return (
-    <div className="space-y-4">
-      {fields.map((f) => (
-        <div key={f.name} className="space-y-1">
-          <label className="text-xs">
-            <span className="font-medium">{f.label || f.name}</span>
-            <span className="ml-2 text-muted-foreground">{f.kind}</span>
-            {f.required && <span className="ml-1 text-destructive">*</span>}
-          </label>
-          {f.kind === "bool" ? (
-            <Switch
-              checked={Boolean(values[f.name])}
-              onCheckedChange={(checked) => setValues({ ...values, [f.name]: checked })}
-            />
-          ) : f.kind === "longtext" || f.kind === "json" ? (
-            <textarea
-              value={String(values[f.name] ?? "")}
-              onChange={(e) => setValues({ ...values, [f.name]: e.target.value })}
-              rows={4}
-              className="w-full rounded-md border bg-transparent px-3 py-2 text-sm font-mono"
-            />
-          ) : f.kind === "relation" ? (
-            <RelationSelect
-              projectId={projectId}
-              collections={collections}
-              field={f}
-              value={String(values[f.name] ?? "")}
-              onChange={(v) => setValues({ ...values, [f.name]: v })}
-            />
-          ) : (
-            <Input
-              type={f.kind === "int" || f.kind === "float" ? "number" : "text"}
-              value={String(values[f.name] ?? "")}
-              onChange={(e) => setValues({ ...values, [f.name]: e.target.value })}
-            />
+    <div className="space-y-5">
+      {(created || updated) && (
+        <div className="flex flex-wrap gap-x-6 gap-y-1 rounded-md bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+          {created && (
+            <span>
+              Yaratilgan: <span className="text-foreground">{created}</span>
+            </span>
+          )}
+          {updated && (
+            <span>
+              Yangilangan: <span className="text-foreground">{updated}</span>
+            </span>
+          )}
+          {typeof doc._version === "number" && (
+            <span>
+              Versiya: <span className="text-foreground">{doc._version}</span>
+            </span>
           )}
         </div>
-      ))}
-      <div className="flex justify-end gap-2 pt-2">
-        <Button variant="ghost" onClick={() => router.back()}>Bekor</Button>
-        <Button onClick={submit} disabled={pending}>Saqlash</Button>
+      )}
+
+      <DocumentFields
+        fields={fields}
+        values={values}
+        setValue={setValue}
+        projectId={projectId}
+        collections={collections}
+        errors={errors}
+        disabled={pending}
+      />
+
+      <div className="sticky bottom-0 -mx-5 -mb-5 flex items-center justify-end gap-2 rounded-b-xl border-t bg-card/95 px-5 pb-5 pt-3 backdrop-blur">
+        {dirty && <span className="mr-auto text-xs text-muted-foreground">Saqlanmagan o&apos;zgarishlar</span>}
+        <Button variant="ghost" onClick={() => router.back()} disabled={pending}>
+          Bekor
+        </Button>
+        <Button onClick={submit} disabled={pending || !dirty} className="gap-1.5">
+          {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          Saqlash
+        </Button>
       </div>
     </div>
   );

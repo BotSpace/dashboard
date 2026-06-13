@@ -1,37 +1,19 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Loader2, Plus } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { Switch } from "@/shared/components/ui/switch";
 import { insertDocumentAction } from "../actions";
-import type { CmsCollection, CmsField, CmsFieldKind } from "@/shared/types/api";
-import { RelationSelect } from "./relation-select";
-
-function defaultByKind(k: CmsFieldKind): string | boolean {
-  if (k === "bool") return false;
-  return "";
-}
-
-function parseValue(k: CmsFieldKind, raw: string | boolean): unknown {
-  if (k === "bool") return raw;
-  const s = String(raw);
-  if (!s) return undefined;
-  if (k === "int") {
-    const n = Number(s);
-    return Number.isInteger(n) ? n : s;
-  }
-  if (k === "float") return Number(s);
-  if (k === "json" || k === "array") {
-    try {
-      return JSON.parse(s);
-    } catch {
-      return s;
-    }
-  }
-  return s;
-}
+import type { CmsCollection, CmsField } from "@/shared/types/api";
+import {
+  DocumentFields,
+  buildInitialValues,
+  serializeValues,
+  validateFields,
+  type FieldValue,
+  type FormValues,
+} from "./document-fields";
 
 type Props = {
   projectId: string;
@@ -42,17 +24,24 @@ type Props = {
 
 export function DocumentForm({ projectId, collectionName, fields, collections }: Props) {
   const router = useRouter();
-  const initial: Record<string, string | boolean> = {};
-  for (const f of fields) initial[f.name] = defaultByKind(f.kind);
-  const [values, setValues] = useState(initial);
+  const initial = useMemo(() => buildInitialValues(fields), [fields]);
+  const [values, setValues] = useState<FormValues>(initial);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [pending, start] = useTransition();
 
+  const setValue = (name: string, v: FieldValue) => {
+    setValues((prev) => ({ ...prev, [name]: v }));
+    setErrors((prev) => (prev[name] ? { ...prev, [name]: "" } : prev));
+  };
+
   const submit = () => {
-    const document: Record<string, unknown> = {};
-    for (const f of fields) {
-      const v = parseValue(f.kind, values[f.name]);
-      if (v !== undefined && v !== "") document[f.name] = v;
+    const errs = validateFields(fields, values);
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      toast.error("Maydonlarni tekshiring");
+      return;
     }
+    const document = serializeValues(fields, values);
     start(async () => {
       const res = await insertDocumentAction({ projectId, name: collectionName, document });
       if (!res.ok) {
@@ -66,46 +55,25 @@ export function DocumentForm({ projectId, collectionName, fields, collections }:
   };
 
   return (
-    <div className="space-y-4">
-      {fields.map((f) => (
-        <div key={f.name} className="space-y-1">
-          <label className="text-xs">
-            <span className="font-medium">{f.label || f.name}</span>
-            <span className="ml-2 text-muted-foreground">{f.kind}</span>
-            {f.required && <span className="ml-1 text-destructive">*</span>}
-          </label>
-          {f.kind === "bool" ? (
-            <Switch
-              checked={Boolean(values[f.name])}
-              onCheckedChange={(checked) => setValues({ ...values, [f.name]: checked })}
-            />
-          ) : f.kind === "longtext" || f.kind === "json" ? (
-            <textarea
-              value={String(values[f.name] ?? "")}
-              onChange={(e) => setValues({ ...values, [f.name]: e.target.value })}
-              rows={4}
-              className="w-full rounded-md border bg-transparent px-3 py-2 text-sm font-mono"
-            />
-          ) : f.kind === "relation" ? (
-            <RelationSelect
-              projectId={projectId}
-              collections={collections}
-              field={f}
-              value={String(values[f.name] ?? "")}
-              onChange={(v) => setValues({ ...values, [f.name]: v })}
-            />
-          ) : (
-            <Input
-              type={f.kind === "int" || f.kind === "float" ? "number" : "text"}
-              value={String(values[f.name] ?? "")}
-              onChange={(e) => setValues({ ...values, [f.name]: e.target.value })}
-            />
-          )}
-        </div>
-      ))}
-      <div className="flex justify-end gap-2 pt-2">
-        <Button variant="ghost" onClick={() => router.back()}>Bekor</Button>
-        <Button onClick={submit} disabled={pending}>Saqlash</Button>
+    <div className="space-y-5">
+      <DocumentFields
+        fields={fields}
+        values={values}
+        setValue={setValue}
+        projectId={projectId}
+        collections={collections}
+        errors={errors}
+        disabled={pending}
+      />
+
+      <div className="sticky bottom-0 -mx-5 -mb-5 flex items-center justify-end gap-2 rounded-b-xl border-t bg-card/95 px-5 pb-5 pt-3 backdrop-blur">
+        <Button variant="ghost" onClick={() => router.back()} disabled={pending}>
+          Bekor
+        </Button>
+        <Button onClick={submit} disabled={pending} className="gap-1.5">
+          {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+          Saqlash
+        </Button>
       </div>
     </div>
   );
