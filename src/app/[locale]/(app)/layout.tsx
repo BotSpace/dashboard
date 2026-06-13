@@ -1,6 +1,10 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { readSession } from "@/shared/auth/session";
 import { AgentFloatingButton } from "@/features/app-shell/components/agent-floating-button";
+
+// Authenticated app — keep out of search indexes.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 import { PageTransition } from "@/features/app-shell/components/page-transition";
 import { Sidebar } from "@/features/app-shell/components/sidebar";
 import { TopBar } from "@/features/app-shell/components/top-bar";

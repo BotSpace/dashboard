@@ -1,0 +1,50 @@
+import type { MetadataRoute } from "next";
+import { BlogAPI, TemplatesAPI } from "@/shared/api/services";
+import { languageAlternates, localizedUrl } from "@/shared/lib/seo";
+import { routing } from "@/shared/i18n/routing";
+
+// Re-generate hourly so new blog posts / templates appear without a redeploy.
+export const revalidate = 3600;
+
+type EntryOpts = {
+  lastModified?: Date;
+  changeFrequency?: MetadataRoute.Sitemap[number]["changeFrequency"];
+  priority?: number;
+};
+
+function entry(path: string, opts: EntryOpts = {}): MetadataRoute.Sitemap[number] {
+  return {
+    url: localizedUrl(routing.defaultLocale, path),
+    lastModified: opts.lastModified ?? new Date(),
+    changeFrequency: opts.changeFrequency ?? "weekly",
+    priority: opts.priority ?? 0.6,
+    alternates: { languages: languageAlternates(path) },
+  };
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const staticEntries: MetadataRoute.Sitemap = [
+    entry("/", { changeFrequency: "daily", priority: 1 }),
+    entry("/templates", { changeFrequency: "daily", priority: 0.9 }),
+    entry("/blog", { changeFrequency: "daily", priority: 0.7 }),
+    entry("/docs/mcp", { changeFrequency: "monthly", priority: 0.6 }),
+  ];
+
+  const templates = await TemplatesAPI.list().catch(() => []);
+  const templateEntries: MetadataRoute.Sitemap = templates
+    .filter((t) => t.slug)
+    .map((t) => entry(`/templates/${t.slug}`, { changeFrequency: "weekly", priority: 0.7 }));
+
+  const blog = await BlogAPI.list({ page: 1 }).catch(() => null);
+  const blogEntries: MetadataRoute.Sitemap = (blog?.results ?? [])
+    .filter((p) => p.slug)
+    .map((p) =>
+      entry(`/blog/${p.slug}`, {
+        lastModified: p.published_at ? new Date(p.published_at) : undefined,
+        changeFrequency: "monthly",
+        priority: 0.6,
+      })
+    );
+
+  return [...staticEntries, ...templateEntries, ...blogEntries];
+}

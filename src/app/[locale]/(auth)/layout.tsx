@@ -1,6 +1,10 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { Link } from "@/shared/i18n/routing";
 import { LanguageSwitcher } from "@/shared/components/common/language-switcher";
+
+// Login / registration — not for search indexes.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (

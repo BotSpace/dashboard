@@ -626,5 +626,55 @@
     "readingTime": "{min} daqiqa o'qish",
     "publishedOn": "Chop etilgan",
     "metaDescriptionFallback": "BotSpace blogi — Telegram botlarini yaratish bo'yicha qo'llanmalar."
+  },
+  "seo": {
+    "home": {
+      "title": "Telegram bot yaratish — AI konstruktor | BotSpace",
+      "description": "Kod yozmasdan Telegram bot yarating. Vizual flow konstruktor, AI agent, CRM, to'lov va marketplace. BotSpace'da bepul boshlang.",
+      "keywords": [
+        "telegram bot yaratish",
+        "bot konstruktor",
+        "telegram bot",
+        "ai bot",
+        "chatbot yaratish",
+        "bot yasash",
+        "botspace",
+        "telegram bot bepul",
+        "no-code bot"
+      ]
+    },
+    "pricing": {
+      "title": "Tariflar va narxlar",
+      "description": "BotSpace tariflari: Free'dan Pro va Business gacha. Telegram bot, AI token, CRM va to'lovlar — sizga mos rejani tanlang.",
+      "keywords": [
+        "botspace narxlari",
+        "telegram bot narxi",
+        "bot tariflari",
+        "ai token narxi"
+      ]
+    },
+    "templates": {
+      "title": "Tayyor bot shablonlari",
+      "description": "Tayyor Telegram bot shablonlari: do'kon, yetkazib berish, booking, qo'llab-quvvatlash va boshqalar. Bir bosishda o'rnating va sozlang.",
+      "keywords": [
+        "telegram bot shablonlari",
+        "tayyor bot",
+        "bot namunalari",
+        "online do'kon bot"
+      ]
+    },
+    "docs": {
+      "title": "MCP va AI agent hujjatlari",
+      "description": "BotSpace MCP serverini Claude va boshqa AI agentlarga ulang. Tabiiy tilda Telegram bot quring, deploy qiling va boshqaring.",
+      "keywords": [
+        "botspace mcp",
+        "ai agent bot",
+        "claude mcp",
+        "telegram bot api"
+      ]
+    },
+    "org": {
+      "description": "BotSpace — kod yozmasdan Telegram botlar yaratish uchun vizual konstruktor, AI agent va marketplace platformasi."
+    }
   }
 }

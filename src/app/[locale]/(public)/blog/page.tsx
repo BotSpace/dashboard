@@ -3,6 +3,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BlogAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { formatLongDate } from "@/shared/lib/utils";
+import { buildMetadata } from "@/shared/lib/seo";
+import type { Locale } from "@/shared/i18n/routing";
 
 // Postlar ro'yxati har so'rovda backenddan yangilanib turishi uchun dinamik.
 export const dynamic = "force-dynamic";
@@ -15,10 +17,12 @@ type PageProps = {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "blog" });
-  return {
+  return buildMetadata({
+    locale: locale as Locale,
+    path: "/blog",
     title: t("title"),
     description: t("subtitle"),
-  };
+  });
 }
 
 export default async function BlogListPage({ params, searchParams }: PageProps) {

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowLeft, Eye, Heart, ExternalLink, LogIn, LayoutDashboard, Tag, KeyRound } from "lucide-react";
@@ -10,11 +11,36 @@ import { Separator } from "@/shared/components/ui/separator";
 import { Link } from "@/shared/i18n/routing";
 import { formatCurrency, formatNumber } from "@/shared/lib/utils";
 import { OrderButton } from "@/features/templates/components/order-button";
+import { JsonLd } from "@/shared/components/common/json-ld";
+import { buildMetadata, localizedUrl } from "@/shared/lib/seo";
+import type { Locale } from "@/shared/i18n/routing";
 
 function toNumber(v: number | string | undefined | null): number {
   if (v === undefined || v === null) return 0;
   const n = typeof v === "number" ? v : Number(v);
   return Number.isFinite(n) ? n : 0;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const tpl = await TemplatesAPI.get(slug).catch(() => null);
+  if (!tpl) return { title: "Template", robots: { index: false, follow: true } };
+  const description =
+    tpl.short_description ||
+    tpl.description?.slice(0, 160) ||
+    `${tpl.name} — tayyor Telegram bot shabloni.`;
+  return buildMetadata({
+    locale: locale as Locale,
+    path: `/templates/${slug}`,
+    title: tpl.name,
+    description,
+    type: "article",
+    images: tpl.image ? [tpl.image] : undefined,
+  });
 }
 
 export default async function PublicTemplateDetailPage({
@@ -39,8 +65,25 @@ export default async function PublicTemplateDetailPage({
   const isOwned = Boolean(tpl.is_order);
   const isAuthed = Boolean(session);
 
+  const productLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: tpl.name,
+    description: tpl.short_description || tpl.description?.slice(0, 200) || tpl.name,
+    ...(tpl.image ? { image: tpl.image } : {}),
+    url: localizedUrl(locale as Locale, `/templates/${slug}`),
+    category: tpl.categories?.[0]?.name,
+    offers: {
+      "@type": "Offer",
+      price: String(price),
+      priceCurrency: "UZS",
+      availability: "https://schema.org/InStock",
+    },
+  };
+
   return (
     <div className="container-page py-10 space-y-6">
+      <JsonLd data={productLd} />
       <div>
         <Button asChild variant="ghost" size="sm">
           <Link href="/templates" className="gap-1">

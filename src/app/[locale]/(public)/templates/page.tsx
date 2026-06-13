@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Search } from "lucide-react";
 import { TemplatesAPI } from "@/shared/api/services";
@@ -5,6 +6,24 @@ import { Link } from "@/shared/i18n/routing";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import { TemplatesInfiniteLoader } from "@/features/templates/components/templates-infinite-loader";
+import { buildMetadata } from "@/shared/lib/seo";
+import type { Locale } from "@/shared/i18n/routing";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "seo" });
+  return buildMetadata({
+    locale: locale as Locale,
+    path: "/templates",
+    title: t("templates.title"),
+    description: t("templates.description"),
+    keywords: t.raw("templates.keywords") as string[],
+  });
+}
 
 type SearchParams = {
   search?: string;

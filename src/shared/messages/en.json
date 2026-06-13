@@ -630,5 +630,54 @@
     "readingTime": "{min} min read",
     "publishedOn": "Published",
     "metaDescriptionFallback": "BotSpace blog — guides on building Telegram bots."
+  },
+  "seo": {
+    "home": {
+      "title": "Build Telegram Bots with AI — No-Code Builder | BotSpace",
+      "description": "Create Telegram bots without code. Visual flow builder, AI agent, CRM, payments and a marketplace. Start free with BotSpace.",
+      "keywords": [
+        "telegram bot builder",
+        "create telegram bot",
+        "no-code bot",
+        "ai chatbot",
+        "build a bot",
+        "telegram bot maker",
+        "botspace",
+        "chatbot builder"
+      ]
+    },
+    "pricing": {
+      "title": "Pricing & Plans",
+      "description": "BotSpace pricing — from a free plan to Pro and Business. Telegram bots, AI tokens, CRM and payments. Pick the plan that fits you.",
+      "keywords": [
+        "botspace pricing",
+        "telegram bot price",
+        "bot builder plans",
+        "ai token pricing"
+      ]
+    },
+    "templates": {
+      "title": "Ready-made Bot Templates",
+      "description": "Ready-made Telegram bot templates: store, delivery, booking, support and more. Install in one click and customize.",
+      "keywords": [
+        "telegram bot templates",
+        "ready-made bot",
+        "bot examples",
+        "online store bot"
+      ]
+    },
+    "docs": {
+      "title": "MCP & AI Agent Docs",
+      "description": "Connect the BotSpace MCP server to Claude and other AI agents. Build, deploy and manage Telegram bots in natural language.",
+      "keywords": [
+        "botspace mcp",
+        "ai agent bot",
+        "claude mcp",
+        "telegram bot api"
+      ]
+    },
+    "org": {
+      "description": "BotSpace is a no-code visual builder, AI agent and marketplace platform for creating Telegram bots."
+    }
   }
 }

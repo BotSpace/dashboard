@@ -7,6 +7,8 @@ import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
 import { BlogMarkdown } from "@/features/blog/components/blog-markdown";
 import { formatLongDate } from "@/shared/lib/utils";
+import { buildMetadata } from "@/shared/lib/seo";
+import type { Locale } from "@/shared/i18n/routing";
 
 type PageProps = {
   params: Promise<{ locale: string; slug: string }>;
@@ -17,17 +19,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const t = await getTranslations({ locale, namespace: "blog" });
   const post = await BlogAPI.get(slug).catch(() => null);
   if (!post) {
-    return { title: t("title") };
+    return { title: t("title"), robots: { index: false, follow: true } };
   }
-  return {
+  const description = post.excerpt || t("metaDescriptionFallback");
+  const meta = buildMetadata({
+    locale: locale as Locale,
+    path: `/blog/${slug}`,
     title: post.title,
-    description: post.excerpt || t("metaDescriptionFallback"),
-    openGraph: {
-      title: post.title,
-      description: post.excerpt || t("metaDescriptionFallback"),
-      type: "article",
-    },
+    description,
+    type: "article",
+  });
+  meta.openGraph = {
+    ...meta.openGraph,
+    type: "article",
+    publishedTime: post.published_at ?? undefined,
+    authors: post.author_name ? [post.author_name] : undefined,
   };
+  return meta;
 }
 
 

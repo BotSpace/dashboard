@@ -1,6 +1,25 @@
+import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
 import { McpDocsClient } from "@/features/landing/components/mcp-docs-client";
+import { buildMetadata } from "@/shared/lib/seo";
+import type { Locale } from "@/shared/i18n/routing";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "seo" });
+  return buildMetadata({
+    locale: locale as Locale,
+    path: "/docs/mcp",
+    title: t("docs.title"),
+    description: t("docs.description"),
+    keywords: t.raw("docs.keywords") as string[],
+  });
+}
 
 export default async function McpDocsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
