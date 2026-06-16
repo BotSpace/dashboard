@@ -5,6 +5,7 @@ import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
 import { CmsAPI } from "@/shared/api/services";
 import { DataGrid } from "@/features/cms/components/data-grid";
+import { DeleteCollectionButton } from "@/features/cms/components/delete-collection-button";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { Section } from "@/shared/components/common/section";
 
@@ -47,6 +48,15 @@ export default async function BotCmsDataPage({
                 {t("schema")}
               </Link>
             </Button>
+            {!collection.system && (
+              <DeleteCollectionButton
+                projectId={id}
+                name={collection.name}
+                label={collection.label || collection.name}
+                variant="button"
+                redirectTo={`/app/bots/${id}/cms`}
+              />
+            )}
           </>
         }
       />
