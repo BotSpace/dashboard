@@ -7,6 +7,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { EmptyState } from "@/shared/components/common/empty-state";
+import { DeleteCollectionButton } from "@/features/cms/components/delete-collection-button";
 
 export default async function BotCmsListPage({
   params,
@@ -67,6 +68,13 @@ export default async function BotCmsListPage({
                       </div>
                       <code className="text-xs text-muted-foreground">{c.name}</code>
                     </div>
+                    {!c.system && (
+                      <DeleteCollectionButton
+                        projectId={projectId}
+                        name={c.name}
+                        label={c.label || c.name}
+                      />
+                    )}
                   </div>
                   {c.description && (
                     <p className="line-clamp-2 text-sm text-muted-foreground">{c.description}</p>

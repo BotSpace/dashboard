@@ -371,7 +371,13 @@
     "noValue": "—",
     "fieldId": "_id",
     "fieldCreatedAt": "Created at",
-    "fieldUpdatedAt": "Updated at"
+    "fieldUpdatedAt": "Updated at",
+    "deleteCollection": "Delete collection",
+    "deleteCollectionConfirm": "The collection {name} and all its data will be permanently deleted. Continue?",
+    "deleteCollectionSuccess": "Collection deleted",
+    "deleteCollectionError": "Failed to delete",
+    "deleteCancel": "Cancel",
+    "deleteConfirm": "Delete"
   },
   "bots": {
     "title": "Bots",

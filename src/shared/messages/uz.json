@@ -97,7 +97,13 @@
     "noValue": "—",
     "fieldId": "_id",
     "fieldCreatedAt": "Yaratilgan vaqt",
-    "fieldUpdatedAt": "O'zgartirilgan vaqt"
+    "fieldUpdatedAt": "O'zgartirilgan vaqt",
+    "deleteCollection": "Kolleksiyani o'chirish",
+    "deleteCollectionConfirm": "{name} kolleksiyasi va undagi barcha ma'lumotlar butunlay o'chiriladi. Davom etilsinmi?",
+    "deleteCollectionSuccess": "Kolleksiya o'chirildi",
+    "deleteCollectionError": "O'chirishda xatolik",
+    "deleteCancel": "Bekor qilish",
+    "deleteConfirm": "O'chirish"
   },
   "landing": {
     "navMcp": "MCP",

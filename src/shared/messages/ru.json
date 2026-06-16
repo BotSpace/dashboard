@@ -371,7 +371,13 @@
     "noValue": "—",
     "fieldId": "_id",
     "fieldCreatedAt": "Создан",
-    "fieldUpdatedAt": "Обновлён"
+    "fieldUpdatedAt": "Обновлён",
+    "deleteCollection": "Удалить коллекцию",
+    "deleteCollectionConfirm": "Коллекция {name} и все её данные будут удалены безвозвратно. Продолжить?",
+    "deleteCollectionSuccess": "Коллекция удалена",
+    "deleteCollectionError": "Ошибка удаления",
+    "deleteCancel": "Отмена",
+    "deleteConfirm": "Удалить"
   },
   "bots": {
     "title": "Боты",
