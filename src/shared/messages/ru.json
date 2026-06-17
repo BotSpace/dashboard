@@ -48,7 +48,8 @@
     "upgradeDesc": "AI-агент, больше сообщений, приоритетная поддержка",
     "agentFab": "AI Agent",
     "agentFabDesc": "быстрое создание бота",
-    "agentFabAria": "Перейти к AI Agent"
+    "agentFabAria": "Перейти к AI Agent",
+    "credentials": "Credentials"
   },
   "landing": {
     "navMcp": "MCP",

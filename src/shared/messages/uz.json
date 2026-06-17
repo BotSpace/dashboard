@@ -48,7 +48,8 @@
     "upgradeDesc": "AI agent, ko'proq xabar, prioritet support",
     "agentFab": "AI Agent",
     "agentFabDesc": "botni tez qurish",
-    "agentFabAria": "AI Agentga o'tish"
+    "agentFabAria": "AI Agentga o'tish",
+    "credentials": "Credentials"
   },
   "agent": {
     "title": "AI Agent",

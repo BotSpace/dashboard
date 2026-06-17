@@ -28,6 +28,9 @@ import type {
   KycVerification,
   BlogPost,
   BlogPostListItem,
+  Credential,
+  CredentialType,
+  CredentialListResponse,
 } from "@/shared/types/api";
 
 // Backend response shape: { status, data: { results: T[], total_items, ... } }  OR  { results: T[] }  OR plain array
@@ -480,6 +483,30 @@ export const CmsAPI = {
     const d = await api<unknown>(cms(projectId, name, "audit") + "/", { query: params });
     return Array.isArray(d) ? (d as CmsAuditEntry[]) : unwrapList<CmsAuditEntry>(d);
   },
+};
+
+// CREDENTIALS (owner-scoped global)
+export const CredentialsAPI = {
+  listTypes: async (): Promise<CredentialType[]> => {
+    const d = await api<unknown>("/api/v1/credentials/types/");
+    return unwrapList<CredentialType>(d);
+  },
+  list: async (params: { type_key?: string; page?: number; page_size?: number } = {}): Promise<CredentialListResponse> => {
+    const d = await api<unknown>("/api/v1/credentials/", { query: params });
+    return unwrapPaginated<Credential>(d);
+  },
+  get: async (id: string | number): Promise<Credential> =>
+    unwrapItem<Credential>(await api<unknown>(`/api/v1/credentials/${id}/`)),
+  create: (body: { type_key: string; name: string; data: Record<string, string> }): Promise<Credential> =>
+    api<Credential>("/api/v1/credentials/", { method: "POST", json: body }).then(unwrapItem<Credential>),
+  update: (id: string | number, body: { name?: string; data?: Record<string, string> }): Promise<Credential> =>
+    api<Credential>(`/api/v1/credentials/${id}/`, { method: "PATCH", json: body }).then(unwrapItem<Credential>),
+  remove: (id: string | number): Promise<void> =>
+    api<void>(`/api/v1/credentials/${id}/`, { method: "DELETE" }),
+  test: (id: string | number): Promise<{ ok: boolean }> =>
+    api<{ ok: boolean }>(`/api/v1/credentials/${id}/test/`, { method: "POST" }).then(
+      (d) => unwrapItem<{ ok: boolean }>(d)
+    ),
 };
 
 // DASHBOARD

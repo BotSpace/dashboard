@@ -5,6 +5,7 @@ import {
   Bot,
   CreditCard,
   Files,
+  KeyRound,
   LayoutDashboard,
   LifeBuoy,
   PackageOpen,
@@ -32,6 +33,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     { href: "/app/bots", icon: Bot, key: "bots" },
     { href: "/app/templates", icon: PackageOpen, key: "templates" },
     { href: "/app/files", icon: Files, key: "files" },
+    { href: "/app/credentials", icon: KeyRound, key: "credentials" },
   ];
   const secondary: Item[] = [
     { href: "/app/earnings", icon: TrendingUp, key: "earnings" },

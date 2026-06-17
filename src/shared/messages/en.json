@@ -48,7 +48,8 @@
     "upgradeDesc": "AI agent, more messages, priority support",
     "agentFab": "AI Agent",
     "agentFabDesc": "build a bot fast",
-    "agentFabAria": "Go to AI Agent"
+    "agentFabAria": "Go to AI Agent",
+    "credentials": "Credentials"
   },
   "landing": {
     "navMcp": "MCP",

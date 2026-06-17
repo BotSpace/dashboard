@@ -370,6 +370,53 @@ export type KycStatusResponse = {
   verification: KycVerification | null;
 };
 
+// CREDENTIALS (owner-scoped global)
+export type CredentialFieldType = "text" | "password" | "number" | "select" | "textarea";
+
+export type CredentialFieldOption = {
+  value: string;
+  label: string;
+};
+
+export type CredentialField = {
+  name: string;
+  label: string;
+  type: CredentialFieldType;
+  secret?: boolean;
+  required?: boolean;
+  default?: string | number;
+  options?: CredentialFieldOption[];
+};
+
+export type CredentialType = {
+  key: string;
+  label: string;
+  mode: "apikey" | "bearer" | "header" | "basic" | "none";
+  icon?: string;
+  fields: CredentialField[];
+};
+
+export type Credential = {
+  id: number | string;
+  name: string;
+  type_key: string;
+  type: {
+    key: string;
+    label: string;
+    mode: string;
+  };
+  data: Record<string, string>;
+  updated_at: string;
+};
+
+export type CredentialListResponse = {
+  results: Credential[];
+  total_items: number;
+  total_pages: number;
+  current_page: number;
+  page_size: number;
+};
+
 // Blog (publik)
 export type BlogPostListItem = {
   id: number;
