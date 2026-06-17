@@ -22,6 +22,16 @@ export async function listCredentialTypesAction() {
   return CredentialsAPI.listTypes();
 }
 
+export async function getCredentialAction(
+  id: string | number
+): Promise<import("@/shared/types/api").Credential | null> {
+  try {
+    return await CredentialsAPI.get(id);
+  } catch {
+    return null;
+  }
+}
+
 export async function listCredentialsAction(params: {
   type_key?: string;
   page?: number;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, useTransition } from "react";
+import { Link } from "@/shared/i18n/routing";
 import {
   CheckCircle2,
   Edit2,
@@ -195,7 +196,12 @@ export function CredentialsPanel({ initialData, types }: CredentialsPanelProps) 
                             <div className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-blue-500/10 text-blue-400">
                               <KeyRound className="h-3.5 w-3.5" />
                             </div>
-                            <span className="font-medium">{cred.name}</span>
+                            <Link
+                              href={`/app/credentials/${cred.id}`}
+                              className="font-medium hover:underline underline-offset-2"
+                            >
+                              {cred.name}
+                            </Link>
                           </div>
                         </td>
                         <td className="px-4 py-3">
