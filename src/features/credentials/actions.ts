@@ -74,3 +74,21 @@ export async function testCredentialAction(
     return { ok: false, message: isApiError(e) ? e.message : "Test xatolik" };
   }
 }
+
+/**
+ * Server Action: obtain the OAuth2 authorize_url from the backend.
+ * The access token is read server-side so it never reaches the browser.
+ */
+export async function oauthStartAction(
+  provider: string,
+  type_key: string
+): Promise<{ ok: true; authorize_url: string } | { ok: false; message: string }> {
+  try {
+    const res = await CredentialsAPI.oauthStart(provider, type_key);
+    if (!res.authorize_url) return { ok: false, message: "OAuth URL olinmadi" };
+    return { ok: true, authorize_url: res.authorize_url };
+  } catch (e) {
+    const { message } = fail(e);
+    return { ok: false, message: message ?? "OAuth boshlashda xatolik" };
+  }
+}

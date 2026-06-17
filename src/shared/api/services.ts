@@ -507,6 +507,20 @@ export const CredentialsAPI = {
     api<{ ok: boolean }>(`/api/v1/credentials/${id}/test/`, { method: "POST" }).then(
       (d) => unwrapItem<{ ok: boolean }>(d)
     ),
+  /**
+   * Initiates an OAuth2 flow for the given provider + type_key.
+   * Called server-side (Server Action) so the access token never touches the client.
+   * Returns the authorize_url that the client opens in a popup.
+   */
+  oauthStart: async (provider: string, type_key: string): Promise<{ authorize_url: string }> => {
+    const d = await api<unknown>(`/api/v1/credentials/oauth/${provider}/start/`, {
+      method: "POST",
+      json: { type_key },
+    });
+    const payload = unwrapItem<{ authorize_url?: string }>(d);
+    const authorize_url = payload?.authorize_url ?? "";
+    return { authorize_url };
+  },
 };
 
 // DASHBOARD

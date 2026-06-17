@@ -391,8 +391,12 @@ export type CredentialField = {
 export type CredentialType = {
   key: string;
   label: string;
-  mode: "apikey" | "bearer" | "header" | "basic" | "none";
+  mode: "apikey" | "bearer" | "header" | "basic" | "none" | "oauth2";
   icon?: string;
+  /** Present on oauth2 types — e.g. "google" */
+  provider?: string;
+  /** OAuth scopes requested */
+  scopes?: string[];
   fields: CredentialField[];
 };
 
