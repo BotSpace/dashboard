@@ -34,6 +34,7 @@ import { cn } from "@/shared/lib/utils";
 import type { Credential, CredentialField, CredentialType } from "@/shared/types/api";
 import {
   createCredentialAction,
+  listCredentialsAction,
   oauthStartAction,
   updateCredentialAction,
 } from "../actions";
@@ -330,21 +331,34 @@ function OAuthConnect({
   onCancel,
 }: OAuthConnectProps) {
   const [connecting, setConnecting] = useState(false);
-  const listenerRef = useRef<((e: MessageEvent) => void) | null>(null);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
-  // Clean up message listener on unmount
+  // Tear down listeners/timers/popup on unmount
   useEffect(() => {
     return () => {
-      if (listenerRef.current) {
-        window.removeEventListener("message", listenerRef.current);
-        listenerRef.current = null;
-      }
+      cleanupRef.current?.();
+      cleanupRef.current = null;
     };
   }, []);
 
   const handleConnect = async () => {
     if (connecting || !type.provider) return;
     setConnecting(true);
+
+    let settled = false;
+    const finish = (ok: boolean, errMsg?: string | null) => {
+      if (settled) return;
+      settled = true;
+      cleanupRef.current?.();
+      cleanupRef.current = null;
+      setConnecting(false);
+      if (ok) {
+        toast.success("Muvaffaqiyatli ulandi");
+        onSuccess();
+      } else if (errMsg) {
+        toast.error(errMsg);
+      }
+    };
 
     try {
       // Server Action fetches the authorize_url (keeps access token server-side)
@@ -355,54 +369,72 @@ function OAuthConnect({
         return;
       }
 
-      const { authorize_url } = res;
-
-      // Remove any stale listener
-      if (listenerRef.current) {
-        window.removeEventListener("message", listenerRef.current);
+      // Snapshot existing credentials of this type so we can detect the new/updated one.
+      const snapshot = new Set<string>();
+      try {
+        const before = await listCredentialsAction({
+          type_key: type.key,
+          page: 1,
+          page_size: 50,
+        });
+        before.results.forEach((c) => snapshot.add(`${c.id}:${c.updated_at}`));
+      } catch {
+        /* empty snapshot still works */
       }
 
-      // Open OAuth popup
-      const popup = window.open(authorize_url, "oauth", "width=520,height=640");
+      const popup = window.open(res.authorize_url, "oauth", "width=520,height=640");
 
-      // Detect popup closed manually (no postMessage)
-      const pollClosed = setInterval(() => {
-        if (popup?.closed) {
-          clearInterval(pollClosed);
-          if (listenerRef.current) {
-            window.removeEventListener("message", listenerRef.current);
-            listenerRef.current = null;
-          }
-          setConnecting(false);
-        }
-      }, 500);
-
-      // Listen for postMessage from the callback page
+      // Fast path: postMessage from the callback page. Google sets COOP on its consent
+      // pages which severs window.opener, so this often never arrives — the poll below
+      // is the reliable path.
       const handler = (e: MessageEvent) => {
         if (!e.data || e.data.type !== "credential-oauth") return;
-
-        clearInterval(pollClosed);
-        window.removeEventListener("message", handler);
-        listenerRef.current = null;
-        setConnecting(false);
-
-        if (e.data.ok === true) {
-          toast.success("Muvaffaqiyatli ulandi");
-          onSuccess();
-        } else {
-          toast.error(
-            e.data.error
-              ? `OAuth xatoligi: ${e.data.error}`
-              : "OAuth ulashda xatolik"
+        if (e.data.ok === true) finish(true);
+        else
+          finish(
+            false,
+            e.data.error ? `OAuth xatoligi: ${e.data.error}` : "OAuth ulashda xatolik"
           );
+      };
+      window.addEventListener("message", handler);
+
+      // Reliable path: poll the backend until a credential for this type appears/updates.
+      const poll = setInterval(async () => {
+        try {
+          const now = await listCredentialsAction({
+            type_key: type.key,
+            page: 1,
+            page_size: 50,
+          });
+          if (now.results.some((c) => !snapshot.has(`${c.id}:${c.updated_at}`))) {
+            finish(true);
+          }
+        } catch {
+          /* keep polling */
+        }
+      }, 2500);
+
+      // If the user closes the popup, give the poll a few cycles, then silently cancel.
+      let graceTicks = 0;
+      const closeWatch = setInterval(() => {
+        if (popup?.closed && ++graceTicks >= 8) finish(false, null);
+      }, 500);
+
+      const timeout = setTimeout(() => finish(false, null), 180000);
+
+      cleanupRef.current = () => {
+        window.removeEventListener("message", handler);
+        clearInterval(poll);
+        clearInterval(closeWatch);
+        clearTimeout(timeout);
+        try {
+          popup?.close();
+        } catch {
+          /* close may be blocked — harmless */
         }
       };
-
-      listenerRef.current = handler;
-      window.addEventListener("message", handler);
     } catch {
-      toast.error("OAuth boshlanmadi");
-      setConnecting(false);
+      finish(false, "OAuth boshlanmadi");
     }
   };
 
