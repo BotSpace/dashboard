@@ -67,6 +67,17 @@ function unwrapItem<T>(d: unknown): T {
   return d as T;
 }
 
+// Credential responses carry their OWN `data` field (the masked field values), so the
+// generic unwrapItem would mistake it for the {status, data} envelope and return the inner
+// masked dict. Unwrap only when the payload isn't already a credential (has id/type_key).
+function unwrapCredential(d: unknown): Credential {
+  if (!d || typeof d !== "object") return d as Credential;
+  const e = d as { status?: boolean; data?: unknown; id?: unknown; type_key?: unknown };
+  if (e.id !== undefined || e.type_key !== undefined) return e as Credential;
+  if (e.data && typeof e.data === "object") return e.data as Credential;
+  return d as Credential;
+}
+
 export type PaginatedResult<T> = {
   results: T[];
   total_items: number;
@@ -496,11 +507,11 @@ export const CredentialsAPI = {
     return unwrapPaginated<Credential>(d);
   },
   get: async (id: string | number): Promise<Credential> =>
-    unwrapItem<Credential>(await api<unknown>(`/api/v1/credentials/${id}/`)),
+    unwrapCredential(await api<unknown>(`/api/v1/credentials/${id}/`)),
   create: (body: { type_key: string; name: string; data: Record<string, string> }): Promise<Credential> =>
-    api<Credential>("/api/v1/credentials/", { method: "POST", json: body }).then(unwrapItem<Credential>),
+    api<unknown>("/api/v1/credentials/", { method: "POST", json: body }).then(unwrapCredential),
   update: (id: string | number, body: { name?: string; data?: Record<string, string> }): Promise<Credential> =>
-    api<Credential>(`/api/v1/credentials/${id}/`, { method: "PATCH", json: body }).then(unwrapItem<Credential>),
+    api<unknown>(`/api/v1/credentials/${id}/`, { method: "PATCH", json: body }).then(unwrapCredential),
   remove: (id: string | number): Promise<void> =>
     api<void>(`/api/v1/credentials/${id}/`, { method: "DELETE" }),
   test: (id: string | number): Promise<{ ok: boolean }> =>
