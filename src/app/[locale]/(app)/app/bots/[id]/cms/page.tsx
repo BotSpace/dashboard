@@ -61,12 +61,16 @@ export default async function BotCmsListPage({
               <Card className="h-full overflow-hidden transition hover:border-blue-500/40">
                 <CardContent className="flex h-full flex-col space-y-3 p-5">
                   <div className="flex items-start justify-between gap-2">
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-semibold">{c.label || c.name}</h3>
-                        {c.system && <Badge variant="secondary">{t("system")}</Badge>}
+                        <h3 className="truncate text-base font-semibold">{c.label || c.name}</h3>
+                        {c.system && (
+                          <Badge variant="secondary" className="shrink-0">
+                            {t("system")}
+                          </Badge>
+                        )}
                       </div>
-                      <code className="text-xs text-muted-foreground">{c.name}</code>
+                      <code className="block truncate text-xs text-muted-foreground">{c.name}</code>
                     </div>
                     {!c.system && (
                       <DeleteCollectionButton
@@ -76,9 +80,9 @@ export default async function BotCmsListPage({
                       />
                     )}
                   </div>
-                  {c.description && (
-                    <p className="line-clamp-2 text-sm text-muted-foreground">{c.description}</p>
-                  )}
+                  <p className="line-clamp-2 min-h-[2.5rem] text-sm text-muted-foreground">
+                    {c.description}
+                  </p>
                   <div className="mt-auto pt-2">
                     <div className="text-xs text-muted-foreground">
                       {c.fields_count ?? 0} {t("fields")} · v{c.schema_version}
