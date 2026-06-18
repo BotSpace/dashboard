@@ -46,7 +46,7 @@ import {
 // Icon map: registry icon string → lucide component
 // ---------------------------------------------------------------------------
 
-type LucideIconComponent = React.ComponentType<{ className?: string }>;
+type LucideIconComponent = React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
 
 const ICON_MAP: Record<string, LucideIconComponent> = {
   key: Key,
