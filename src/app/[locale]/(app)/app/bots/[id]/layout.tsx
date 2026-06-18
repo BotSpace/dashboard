@@ -40,7 +40,7 @@ export default async function BotLayout({
           <AvatarFallback className="text-sm font-semibold">{initials(bot.name)}</AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <EditableBotName id={id} initialName={bot.name} />
             <Badge variant={bot.status === "active" ? "success" : "secondary"} className="text-[11px]">
               {bot.status ?? "draft"}
