@@ -434,6 +434,18 @@
       "deployError": "Deploy failed",
       "deployStarted": "Deploy started"
     },
+    "botToken": {
+      "title": "Telegram bot token",
+      "description": "Connect your Telegram bot token before deploying.",
+      "label": "Bot token",
+      "placeholder": "110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw",
+      "hint": "Paste the token you received from @BotFather",
+      "required": "Token cannot be empty",
+      "save": "Save & deploy",
+      "cancel": "Cancel",
+      "deployError": "Deploy failed",
+      "deployStarted": "Deploy started"
+    },
     "overview": {
       "info": "Bot details",
       "name": "Name",

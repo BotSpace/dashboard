@@ -434,6 +434,18 @@
       "deployError": "Deploy не удался",
       "deployStarted": "Deploy запущен"
     },
+    "botToken": {
+      "title": "Telegram bot-токен",
+      "description": "Чтобы запустить бота, сначала подключите Telegram bot-токен.",
+      "label": "Bot-токен",
+      "placeholder": "110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw",
+      "hint": "Вставьте токен, полученный от @BotFather",
+      "required": "Токен не может быть пустым",
+      "save": "Сохранить и запустить",
+      "cancel": "Отмена",
+      "deployError": "Deploy не удался",
+      "deployStarted": "Deploy запущен"
+    },
     "overview": {
       "info": "Данные бота",
       "name": "Название",

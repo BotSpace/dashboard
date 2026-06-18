@@ -430,6 +430,18 @@
       "deployError": "Deploy muvaffaqiyatsiz",
       "deployStarted": "Deploy boshlandi"
     },
+    "botToken": {
+      "title": "Telegram bot tokeni",
+      "description": "Botni ishga tushirish uchun avval Telegram bot tokenini ulang.",
+      "label": "Bot token",
+      "placeholder": "110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw",
+      "hint": "@BotFather dan olgan tokenni kiriting",
+      "required": "Token bo'sh bo'lmasin",
+      "save": "Saqlash va ishga tushirish",
+      "cancel": "Bekor qilish",
+      "deployError": "Deploy muvaffaqiyatsiz",
+      "deployStarted": "Deploy boshlandi"
+    },
     "overview": {
       "info": "Bot ma'lumotlari",
       "name": "Nom",

@@ -105,6 +105,16 @@ function unwrapPaginated<T>(d: unknown): PaginatedResult<T> {
 
 // PROJECTS — admin-panel ham `/api/project/`
 export const ProjectsAPI = {
+  setBotToken: async (
+    projectId: string | number,
+    token: string,
+  ): Promise<{ detail: string; username: string }> => {
+    const d = await api<unknown>(`/api/v1/project/${projectId}/set-bot-token/`, {
+      method: "POST",
+      json: { token },
+    });
+    return unwrapItem<{ detail: string; username: string }>(d);
+  },
   list: async (search?: string) => {
     const d = await api<unknown>("/api/project/", { query: { search } });
     return unwrapList<Project>(d);

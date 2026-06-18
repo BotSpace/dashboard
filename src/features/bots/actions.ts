@@ -15,6 +15,10 @@ export type DeployResult =
   | { ok: true }
   | { ok: false; message: string; code?: string; limit?: number; running?: RunningBot[] };
 
+export type SetBotTokenResult =
+  | { ok: true; username: string }
+  | { ok: false; message: string };
+
 export async function createBotAction(_prev: unknown, formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
@@ -73,7 +77,8 @@ export async function deployReleaseAction(projectId: string | number): Promise<D
 }
 
 // Maps a deploy/rollback error to a DeployResult, surfacing the running-bot-limit
-// envelope ({"status": false, "data": {code, limit, running, detail}}).
+// envelope ({"status": false, "data": {code, limit, running, detail}}) and the
+// bot_token_required 400 ({"detail": "...", "code": "bot_token_required"}).
 function toDeployError(e: unknown, fallback: string): DeployResult {
   if (isApiError(e) && e.status === 409) {
     const raw = e.details as Record<string, unknown> | null;
@@ -87,6 +92,17 @@ function toDeployError(e: unknown, fallback: string): DeployResult {
         code: "running_bot_limit",
         limit: typeof d.limit === "number" ? d.limit : undefined,
         running: Array.isArray(d.running) ? (d.running as RunningBot[]) : [],
+      };
+    }
+  }
+  if (isApiError(e) && e.status === 400) {
+    const raw = e.details as Record<string, unknown> | null;
+    const code = raw?.code ?? (raw?.data as Record<string, unknown> | undefined)?.code;
+    if (code === "bot_token_required") {
+      return {
+        ok: false,
+        message: String(raw?.detail ?? "Bot token required"),
+        code: "bot_token_required",
       };
     }
   }
@@ -105,6 +121,19 @@ export async function rollbackReleaseAction(
     return { ok: true };
   } catch (e) {
     return toDeployError(e, "Qaytarish muvaffaqiyatsiz");
+  }
+}
+
+export async function setBotTokenAction(
+  projectId: string | number,
+  token: string,
+): Promise<SetBotTokenResult> {
+  try {
+    const res = await ProjectsAPI.setBotToken(projectId, token);
+    revalidatePath(`/app/bots/${projectId}`);
+    return { ok: true, username: res.username };
+  } catch (e) {
+    return { ok: false, message: isApiError(e) ? e.message : "Token saqlashda xatolik" };
   }
 }
 

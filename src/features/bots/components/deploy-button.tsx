@@ -7,6 +7,7 @@ import { deployReleaseAction } from "@/features/bots/actions";
 import type { RunningBot } from "@/features/bots/actions";
 import { Button } from "@/shared/components/ui/button";
 import { RunningBotLimitDialog } from "./running-bot-limit-dialog";
+import { BotTokenDialog } from "./bot-token-dialog";
 
 export function DeployButton({ projectId }: { projectId: string | number }) {
   const t = useTranslations("bots");
@@ -15,6 +16,7 @@ export function DeployButton({ projectId }: { projectId: string | number }) {
     limit: number;
     running: RunningBot[];
   } | null>(null);
+  const [botTokenOpen, setBotTokenOpen] = useState(false);
 
   const onClick = () => {
     start(async () => {
@@ -26,6 +28,10 @@ export function DeployButton({ projectId }: { projectId: string | number }) {
         }
         if (result.code === "running_bot_limit" && result.running) {
           setLimitState({ limit: result.limit ?? 10, running: result.running });
+          return;
+        }
+        if (result.code === "bot_token_required") {
+          setBotTokenOpen(true);
           return;
         }
         toast.error(result.message ?? t("release.deployFailed"));
@@ -51,6 +57,12 @@ export function DeployButton({ projectId }: { projectId: string | number }) {
           projectId={projectId}
         />
       )}
+
+      <BotTokenDialog
+        open={botTokenOpen}
+        onClose={() => setBotTokenOpen(false)}
+        projectId={projectId}
+      />
     </>
   );
 }
