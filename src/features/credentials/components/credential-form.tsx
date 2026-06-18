@@ -99,10 +99,16 @@ function TypePicker({
   return (
     <div className="space-y-3">
       <Input
+        type="text"
+        name="credential-type-search"
         placeholder="Credential turi qidirish..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         autoFocus
+        autoComplete="off"
+        data-1p-ignore="true"
+        data-lpignore="true"
+        data-bwignore="true"
       />
       <div className="max-h-[320px] overflow-y-auto pr-0.5">
         {filtered.length === 0 ? (
@@ -189,6 +195,10 @@ function FieldRenderer({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={3}
+        autoComplete="off"
+        data-1p-ignore="true"
+        data-lpignore="true"
+        data-bwignore="true"
       />
     );
   }
@@ -204,6 +214,10 @@ function FieldRenderer({
             onChange={(e) => onChange(e.target.value)}
             placeholder={isEdit ? UNCHANGED_PLACEHOLDER : field.label}
             className="pr-10"
+            autoComplete="off"
+            data-1p-ignore="true"
+            data-lpignore="true"
+            data-bwignore="true"
           />
           <button
             type="button"
@@ -229,6 +243,10 @@ function FieldRenderer({
       type={field.type === "number" ? "number" : "text"}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      autoComplete="off"
+      data-1p-ignore="true"
+      data-lpignore="true"
+      data-bwignore="true"
     />
   );
 }
@@ -273,10 +291,15 @@ function DataForm({
         <Label htmlFor="cred-name">Nom</Label>
         <Input
           id="cred-name"
+          name="credential-name"
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
           placeholder={`Masalan: My ${type.label}`}
           autoFocus
+          autoComplete="off"
+          data-1p-ignore="true"
+          data-lpignore="true"
+          data-bwignore="true"
         />
       </div>
 
