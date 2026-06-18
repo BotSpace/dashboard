@@ -15,6 +15,9 @@ import {
   User,
   Globe,
   List,
+  Bot,
+  Sparkles,
+  Boxes,
 } from "lucide-react";
 import { Link } from "@/shared/i18n/routing";
 import { Badge } from "@/shared/components/ui/badge";
@@ -41,6 +44,9 @@ const ICON_MAP: Record<string, LucideIconComponent> = {
   user: User,
   globe: Globe,
   list: List,
+  bot: Bot,
+  sparkles: Sparkles,
+  boxes: Boxes,
 };
 
 function getTypeIcon(iconName: string | undefined): LucideIconComponent {
@@ -109,8 +115,15 @@ export default async function CredentialDetailPage({
 
       {/* Header card */}
       <header className="flex flex-wrap items-center gap-4 rounded-xl border border-border/60 bg-card p-5">
-        <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-blue-400 ring-2 ring-blue-500/20">
-          <TypeIcon className="h-7 w-7" />
+        <div
+          className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-blue-400 ring-2 ring-blue-500/20"
+          style={
+            credType?.color
+              ? { backgroundColor: `${credType.color}1A`, color: credType.color, boxShadow: `0 0 0 2px ${credType.color}33` }
+              : undefined
+          }
+        >
+          <TypeIcon className="h-7 w-7" style={credType?.color ? { color: credType.color } : undefined} />
         </div>
 
         <div className="min-w-0 flex-1">

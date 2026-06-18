@@ -393,6 +393,8 @@ export type CredentialType = {
   label: string;
   mode: "apikey" | "bearer" | "header" | "basic" | "none" | "oauth2";
   icon?: string;
+  /** Brand color (hex) for the icon */
+  color?: string;
   /** Present on oauth2 types — e.g. "google" */
   provider?: string;
   /** OAuth scopes requested */

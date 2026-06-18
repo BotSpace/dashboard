@@ -15,6 +15,9 @@ import {
   User,
   Globe,
   List,
+  Bot,
+  Sparkles,
+  Boxes,
   Loader2,
   RefreshCw,
 } from "lucide-react";
@@ -55,6 +58,9 @@ const ICON_MAP: Record<string, LucideIconComponent> = {
   user: User,
   globe: Globe,
   list: List,
+  bot: Bot,
+  sparkles: Sparkles,
+  boxes: Boxes,
 };
 
 function getTypeIcon(iconName: string | undefined): LucideIconComponent {
@@ -104,24 +110,28 @@ function TypePicker({
             Hech narsa topilmadi
           </p>
         ) : (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {filtered.map((type) => {
               const Icon = getTypeIcon(type.icon);
+              const color = type.color || undefined;
               return (
                 <button
                   key={type.key}
                   type="button"
                   onClick={() => onSelect(type)}
                   className={cn(
-                    "flex flex-col items-center gap-1.5 rounded-lg border p-3",
+                    "flex items-center gap-2.5 rounded-lg border p-3 text-left",
                     "transition-colors hover:border-primary/40 hover:bg-muted/50",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   )}
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
-                    <Icon className="h-4 w-4 text-foreground" />
+                  <div
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted"
+                    style={color ? { backgroundColor: `${color}1A` } : undefined}
+                  >
+                    <Icon className="h-5 w-5" style={color ? { color } : undefined} />
                   </div>
-                  <span className="line-clamp-2 text-center text-[11px] font-medium leading-tight">
+                  <span className="line-clamp-2 text-[12px] font-medium leading-tight">
                     {type.label}
                   </span>
                 </button>
