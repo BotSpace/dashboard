@@ -39,6 +39,7 @@ import {
   createCredentialAction,
   listCredentialsAction,
   oauthStartAction,
+  revealCredentialAction,
   updateCredentialAction,
 } from "../actions";
 
@@ -161,6 +162,10 @@ interface FieldRendererProps {
   onChange: (v: string) => void;
   showSecret: boolean;
   onToggleSecret: () => void;
+  /** True while reveal API call is in-flight for this field */
+  revealLoading?: boolean;
+  /** Whether this field's value has already been revealed */
+  revealed?: boolean;
 }
 
 function FieldRenderer({
@@ -170,6 +175,8 @@ function FieldRenderer({
   onChange,
   showSecret,
   onToggleSecret,
+  revealLoading,
+  revealed,
 }: FieldRendererProps) {
   if (field.type === "select" && field.options?.length) {
     return (
@@ -204,6 +211,11 @@ function FieldRenderer({
   }
 
   if (field.type === "password") {
+    // In edit mode: if the value is empty (masked sentinel), the eye button should
+    // trigger a reveal call first. After reveal the value is populated, so subsequent
+    // eye clicks just toggle visibility.
+    const isEmptyOrMasked = !value || isMasked(value);
+    const needsReveal = isEdit && isEmptyOrMasked && !revealed;
     return (
       <div className="space-y-1">
         <div className="relative">
@@ -212,7 +224,7 @@ function FieldRenderer({
             type={showSecret ? "text" : "password"}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            placeholder={isEdit ? UNCHANGED_PLACEHOLDER : field.label}
+            placeholder={isEdit && isEmptyOrMasked ? UNCHANGED_PLACEHOLDER : undefined}
             className="pr-10"
             autoComplete="off"
             data-1p-ignore="true"
@@ -223,14 +235,27 @@ function FieldRenderer({
             type="button"
             tabIndex={-1}
             onClick={onToggleSecret}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+            disabled={revealLoading}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+            title={needsReveal ? "Qiymatni ko'rish uchun bosing" : showSecret ? "Yashirish" : "Ko'rsatish"}
           >
-            {showSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {revealLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : showSecret ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
           </button>
         </div>
-        {isEdit && (
+        {isEdit && isEmptyOrMasked && !revealed && (
           <p className="text-xs text-muted-foreground">
-            Bo&apos;sh qolsa o&apos;zgarmaydi
+            Bo&apos;sh qolsa o&apos;zgarmaydi. Ko&apos;rish uchun ko&apos;z tugmasini bosing.
+          </p>
+        )}
+        {isEdit && revealed && !showSecret && (
+          <p className="text-xs text-muted-foreground">
+            Qiymat ochildi. Saqlash uchun o&apos;zgartirmasangiz ham bo&apos;ladi.
           </p>
         )}
       </div>
@@ -263,6 +288,10 @@ interface DataFormProps {
   onFieldChange: (name: string, value: string) => void;
   showSecrets: Record<string, boolean>;
   onToggleSecret: (name: string) => void;
+  /** Fields currently being revealed (spinner state) */
+  revealLoadingFields: Record<string, boolean>;
+  /** Fields whose value has already been fetched from reveal endpoint */
+  revealedFields: Record<string, boolean>;
   isEdit: boolean;
   pending: boolean;
   onBack: (() => void) | null;
@@ -278,6 +307,8 @@ function DataForm({
   onFieldChange,
   showSecrets,
   onToggleSecret,
+  revealLoadingFields,
+  revealedFields,
   isEdit,
   pending,
   onBack,
@@ -317,6 +348,8 @@ function DataForm({
             onChange={(v) => onFieldChange(field.name, v)}
             showSecret={showSecrets[field.name] ?? false}
             onToggleSecret={() => onToggleSecret(field.name)}
+            revealLoading={revealLoadingFields[field.name] ?? false}
+            revealed={revealedFields[field.name] ?? false}
           />
         </div>
       ))}
@@ -587,6 +620,10 @@ export function CredentialForm({
   });
 
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
+  /** Which password fields are currently being fetched from /reveal/ */
+  const [revealLoadingFields, setRevealLoadingFields] = useState<Record<string, boolean>>({});
+  /** Which password fields have already been revealed (value populated from API) */
+  const [revealedFields, setRevealedFields] = useState<Record<string, boolean>>({});
   const [pending, setPending] = useState(false);
 
   const handleTypeSelect = (type: CredentialType) => {
@@ -604,7 +641,45 @@ export function CredentialForm({
     setFieldValues((prev) => ({ ...prev, [fieldName]: value }));
   };
 
-  const handleToggleSecret = (fieldName: string) => {
+  const handleToggleSecret = async (fieldName: string) => {
+    // If we're in edit mode and the value is empty/masked and not yet revealed,
+    // fetch the decrypted value first, then flip to visible.
+    if (isEdit && credential) {
+      const currentValue = fieldValues[fieldName] ?? "";
+      const alreadyRevealed = revealedFields[fieldName] ?? false;
+      const isEmptyOrMasked = !currentValue || isMasked(currentValue);
+
+      if (isEmptyOrMasked && !alreadyRevealed) {
+        // Don't allow double-click while loading
+        if (revealLoadingFields[fieldName]) return;
+
+        setRevealLoadingFields((prev) => ({ ...prev, [fieldName]: true }));
+        try {
+          const res = await revealCredentialAction(credential.id);
+          if (res.ok) {
+            const decrypted = res.data[fieldName];
+            if (decrypted !== undefined) {
+              setFieldValues((prev) => ({ ...prev, [fieldName]: decrypted }));
+              setRevealedFields((prev) => ({ ...prev, [fieldName]: true }));
+              // Show the value immediately after reveal
+              setShowSecrets((prev) => ({ ...prev, [fieldName]: true }));
+            } else {
+              // Field not in reveal response — just toggle visibility
+              setShowSecrets((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
+            }
+          } else {
+            toast.error(res.message ?? "Qiymatni ochib bo'lmadi");
+          }
+        } catch {
+          toast.error("Qiymatni ochishda xatolik");
+        } finally {
+          setRevealLoadingFields((prev) => ({ ...prev, [fieldName]: false }));
+        }
+        return;
+      }
+    }
+
+    // Normal toggle (new form, or already revealed value)
     setShowSecrets((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
   };
 
@@ -707,6 +782,8 @@ export function CredentialForm({
       onFieldChange={handleFieldChange}
       showSecrets={showSecrets}
       onToggleSecret={handleToggleSecret}
+      revealLoadingFields={revealLoadingFields}
+      revealedFields={revealedFields}
       isEdit={isEdit}
       pending={pending}
       onBack={isEdit ? null : handleBack}

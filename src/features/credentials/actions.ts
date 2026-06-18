@@ -86,6 +86,22 @@ export async function testCredentialAction(
 }
 
 /**
+ * Server Action: reveal decrypted secret field values for a credential.
+ * Proxied through the server so the JWT stays server-side.
+ */
+export async function revealCredentialAction(
+  id: string | number
+): Promise<{ ok: true; data: Record<string, string> } | { ok: false; message: string }> {
+  try {
+    const data = await CredentialsAPI.reveal(id);
+    return { ok: true, data };
+  } catch (e) {
+    const { message } = fail(e);
+    return { ok: false, message: message ?? "Secret ochib bo'lmadi" };
+  }
+}
+
+/**
  * Server Action: obtain the OAuth2 authorize_url from the backend.
  * The access token is read server-side so it never reaches the browser.
  */

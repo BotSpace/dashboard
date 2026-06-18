@@ -529,6 +529,22 @@ export const CredentialsAPI = {
       (d) => unwrapItem<{ ok: boolean }>(d)
     ),
   /**
+   * Reveal decrypted secret field values for a credential.
+   * Only the owner can call this (backend enforces via JWT).
+   * Response: { "data": { "<field>": "<decrypted_value>", ... } }
+   */
+  reveal: async (id: string | number): Promise<Record<string, string>> => {
+    const d = await api<unknown>(`/api/v1/credentials/${id}/reveal/`);
+    if (d && typeof d === "object") {
+      const envelope = d as { data?: Record<string, string>; status?: boolean };
+      if (envelope.data && typeof envelope.data === "object") return envelope.data;
+      // If backend returns flat { field: value } without envelope
+      const { status: _s, ...rest } = envelope as Record<string, unknown>;
+      return rest as Record<string, string>;
+    }
+    return {};
+  },
+  /**
    * Initiates an OAuth2 flow for the given provider + type_key.
    * Called server-side (Server Action) so the access token never touches the client.
    * Returns the authorize_url that the client opens in a popup.
