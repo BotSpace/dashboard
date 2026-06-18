@@ -57,6 +57,7 @@ export function EditableCredentialName({ id, initialName }: EditableCredentialNa
       <input
         ref={inputRef}
         value={value}
+        size={Math.max((value || initialName).length, 8)}
         onChange={(e) => setValue(e.target.value)}
         onBlur={commit}
         onKeyDown={(e) => {
@@ -68,7 +69,9 @@ export function EditableCredentialName({ id, initialName }: EditableCredentialNa
           }
         }}
         disabled={pending}
-        className="truncate text-2xl font-semibold tracking-tight bg-transparent border-b border-border outline-none w-full min-w-0 disabled:opacity-60"
+        // size-based width (not w-full) so the input matches the text and the type
+        // badge beside it never reflows when entering edit mode.
+        className="max-w-full text-2xl font-semibold tracking-tight bg-transparent border-b border-border outline-none disabled:opacity-60"
       />
     );
   }

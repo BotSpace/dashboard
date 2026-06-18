@@ -114,7 +114,7 @@ export default async function CredentialDetailPage({
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <EditableCredentialName id={credential.id} initialName={credential.name} />
             <Badge variant="secondary" className="text-[11px] shrink-0">
               {credential.type?.label ?? credential.type_key}
