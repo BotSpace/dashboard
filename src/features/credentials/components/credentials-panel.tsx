@@ -3,13 +3,25 @@
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { Link } from "@/shared/i18n/routing";
 import {
+  Boxes,
+  Bot,
   CheckCircle2,
   Edit2,
   FlaskConical,
+  Folder,
+  Globe,
+  Key,
   KeyRound,
+  List,
   Loader2,
+  Mail,
   Plus,
+  Send,
+  Shield,
+  Sparkles,
+  Table,
   Trash2,
+  User,
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -39,6 +51,33 @@ import {
   testCredentialAction,
 } from "../actions";
 import { CredentialForm } from "./credential-form";
+
+// ---------------------------------------------------------------------------
+// Icon map — per-type icons (mirrors detail page)
+// ---------------------------------------------------------------------------
+type LucideIconComponent = React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+
+const ICON_MAP: Record<string, LucideIconComponent> = {
+  key: Key,
+  shield: Shield,
+  mail: Mail,
+  table: Table,
+  folder: Folder,
+  send: Send,
+  user: User,
+  globe: Globe,
+  list: List,
+  bot: Bot,
+  sparkles: Sparkles,
+  boxes: Boxes,
+};
+
+function getTypeIcon(iconName: string | undefined): LucideIconComponent {
+  if (!iconName) return Key;
+  return ICON_MAP[iconName] ?? Key;
+}
+
+// ---------------------------------------------------------------------------
 
 const PAGE_SIZE = 20;
 
@@ -186,6 +225,9 @@ export function CredentialsPanel({ initialData, types }: CredentialsPanelProps) 
                   {credentials.map((cred) => {
                     const testRes = testResult[cred.id];
                     const isTesting = testing[cred.id] ?? false;
+                    const credTypeDef = types.find((t) => t.key === cred.type_key);
+                    const TypeIcon = getTypeIcon(credTypeDef?.icon);
+                    const typeColor = credTypeDef?.color;
                     return (
                       <tr
                         key={cred.id}
@@ -193,8 +235,18 @@ export function CredentialsPanel({ initialData, types }: CredentialsPanelProps) 
                       >
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2.5">
-                            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-blue-500/10 text-blue-400">
-                              <KeyRound className="h-3.5 w-3.5" />
+                            <div
+                              className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-blue-500/10 text-blue-400"
+                              style={
+                                typeColor
+                                  ? { backgroundColor: `${typeColor}1A`, color: typeColor }
+                                  : undefined
+                              }
+                            >
+                              <TypeIcon
+                                className="h-3.5 w-3.5"
+                                style={typeColor ? { color: typeColor } : undefined}
+                              />
                             </div>
                             <Link
                               href={`/app/credentials/${cred.id}`}
