@@ -56,10 +56,10 @@ export default async function BotCmsListPage({
             <Link
               key={c.id}
               href={`/app/bots/${projectId}/cms/${c.name}/data`}
-              className="block"
+              className="block h-full"
             >
-              <Card className="overflow-hidden transition hover:border-blue-500/40">
-                <CardContent className="space-y-3 p-5">
+              <Card className="h-full overflow-hidden transition hover:border-blue-500/40">
+                <CardContent className="flex h-full flex-col space-y-3 p-5">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
@@ -79,7 +79,7 @@ export default async function BotCmsListPage({
                   {c.description && (
                     <p className="line-clamp-2 text-sm text-muted-foreground">{c.description}</p>
                   )}
-                  <div className="pt-2">
+                  <div className="mt-auto pt-2">
                     <div className="text-xs text-muted-foreground">
                       {c.fields_count ?? 0} {t("fields")} · v{c.schema_version}
                     </div>
