@@ -56,7 +56,7 @@ if (!parsed.success) {
 export const env = parsed.success
   ? parsed.data
   : {
-      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? "https://api.botmother.uz",
+      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? "https://api.botspace.uz",
       NEXT_PUBLIC_TELEGRAM_BOT: process.env.NEXT_PUBLIC_TELEGRAM_BOT ?? "botmother_authbot",
       NEXT_PUBLIC_CONSTRUCTOR_URL: process.env.NEXT_PUBLIC_CONSTRUCTOR_URL,
       NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
