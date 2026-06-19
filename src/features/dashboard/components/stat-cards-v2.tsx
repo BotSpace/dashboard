@@ -9,61 +9,14 @@ type LucideIcon = typeof Bot;
 type StatItem = {
   label: string;
   value: string;
-  delta: string | null;
   icon: LucideIcon;
-  gradient: string;
-  iconColor: string;
+  accent: string;
 };
 
 function formatCompact(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
   return String(n);
-}
-
-function buildStats(totals: Totals): StatItem[] {
-  return [
-    {
-      label: "Jami Botlar",
-      value: String(totals.bots),
-      delta: null,
-      icon: Bot,
-      gradient: "from-blue-500/20 to-blue-600/5",
-      iconColor: "text-blue-400",
-    },
-    {
-      label: "Foydalanuvchilar",
-      value: formatCompact(totals.users),
-      delta: null,
-      icon: Users,
-      gradient: "from-indigo-500/20 to-indigo-600/5",
-      iconColor: "text-indigo-400",
-    },
-    {
-      label: "Xabarlar",
-      value: formatCompact(totals.messages),
-      delta: null,
-      icon: MessageSquare,
-      gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
-      iconColor: "text-fuchsia-400",
-    },
-    {
-      label: "Balans",
-      value: `${formatCompact(totals.revenue)} ${totals.currency}`,
-      delta: null,
-      icon: DollarSign,
-      gradient: "from-emerald-500/20 to-emerald-600/5",
-      iconColor: "text-emerald-400",
-    },
-    {
-      label: "Shablonlar",
-      value: String(totals.templates),
-      delta: null,
-      icon: LayoutTemplate,
-      gradient: "from-amber-500/20 to-amber-600/5",
-      iconColor: "text-amber-400",
-    },
-  ];
 }
 
 const ZERO_TOTALS: Totals = {
@@ -76,12 +29,54 @@ const ZERO_TOTALS: Totals = {
   currency: "UZS",
 };
 
-interface StatCardsV2Props {
-  totals?: Totals | null;
+export interface StatCardLabels {
+  totalBots: string;
+  totalUsers: string;
+  totalMessages: string;
+  totalTemplates: string;
+  balance: string;
 }
 
-export function StatCardsV2({ totals }: StatCardsV2Props) {
-  const stats: StatItem[] = buildStats(totals ?? ZERO_TOTALS);
+interface StatCardsV2Props {
+  totals?: Totals | null;
+  labels: StatCardLabels;
+}
+
+export function StatCardsV2({ totals, labels }: StatCardsV2Props) {
+  const t = totals ?? ZERO_TOTALS;
+
+  const stats: StatItem[] = [
+    {
+      label: labels.totalBots,
+      value: String(t.bots),
+      icon: Bot,
+      accent: "border-blue-500/30 bg-blue-500/5",
+    },
+    {
+      label: labels.totalUsers,
+      value: formatCompact(t.users),
+      icon: Users,
+      accent: "border-indigo-500/30 bg-indigo-500/5",
+    },
+    {
+      label: labels.totalMessages,
+      value: formatCompact(t.messages),
+      icon: MessageSquare,
+      accent: "border-fuchsia-500/30 bg-fuchsia-500/5",
+    },
+    {
+      label: labels.balance,
+      value: `${formatCompact(t.revenue)} ${t.currency}`,
+      icon: DollarSign,
+      accent: "border-emerald-500/30 bg-emerald-500/5",
+    },
+    {
+      label: labels.totalTemplates,
+      value: String(t.templates),
+      icon: LayoutTemplate,
+      accent: "border-amber-500/30 bg-amber-500/5",
+    },
+  ];
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">
@@ -89,45 +84,20 @@ export function StatCardsV2({ totals }: StatCardsV2Props) {
         <div
           key={stat.label}
           className={cn(
-            "relative overflow-hidden rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200",
-            "hover:border-border hover:shadow-md",
+            "rounded-xl border bg-card p-4 shadow-sm transition-all duration-200",
+            "hover:shadow-md",
+            stat.accent,
           )}
         >
-          {/* Subtle gradient background */}
-          <div
-            className={cn(
-              "absolute inset-0 bg-gradient-to-br opacity-60",
-              stat.gradient,
-            )}
-          />
+          {/* Icon + Label row */}
+          <div className="mb-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+            <stat.icon className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{stat.label}</span>
+          </div>
 
-          <div className="relative">
-            {/* Icon badge */}
-            <div
-              className={cn(
-                "mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg",
-                "border border-white/10 bg-white/5",
-                stat.iconColor,
-              )}
-            >
-              <stat.icon className="h-4 w-4" />
-            </div>
-
-            {/* Label */}
-            <div className="text-xs text-muted-foreground">{stat.label}</div>
-
-            {/* Value */}
-            <div className="mt-0.5 text-2xl font-bold tracking-tight">
-              {stat.value}
-            </div>
-
-            {stat.delta && (
-              <div className="mt-1.5 flex items-center gap-1">
-                <span className="text-[11px] font-medium text-emerald-400">
-                  {stat.delta}
-                </span>
-              </div>
-            )}
+          {/* Value */}
+          <div className="text-2xl font-bold tracking-tight">
+            {stat.value}
           </div>
         </div>
       ))}

@@ -32,6 +32,14 @@ export default async function DashboardPage({
     msgUnit: t("msgUnit"),
   };
 
+  const statLabels = {
+    totalBots: t("totalBots"),
+    totalUsers: t("totalUsers"),
+    totalMessages: t("totalMessages"),
+    totalTemplates: t("totalTemplates"),
+    balance: t("balance"),
+  };
+
   return (
     <div className="space-y-6 pb-8">
       {/* ── Header ─────────────────────────────────────── */}
@@ -63,7 +71,7 @@ export default async function DashboardPage({
       </header>
 
       {/* ── 1. Stat cards ──────────────────────────────── */}
-      <StatCardsV2 totals={overview?.totals ?? null} />
+      <StatCardsV2 totals={overview?.totals ?? null} labels={statLabels} />
 
       {/* ── 2. Performance chart + Top bots ───────────── */}
       <div className="grid gap-4 lg:grid-cols-3">
