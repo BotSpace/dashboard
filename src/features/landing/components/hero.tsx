@@ -1,9 +1,10 @@
 "use client";
 import dynamic from "next/dynamic";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Bot } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Link } from "@/shared/i18n/routing";
+import { useIsDesktop } from "@/shared/hooks/use-is-desktop";
 
 const SplineScene = dynamic(
   () => import("@/shared/components/ui/splite").then((m) => m.SplineScene),
@@ -12,18 +13,20 @@ const SplineScene = dynamic(
 
 export function Hero() {
   const t = useTranslations("landing.hero");
+  const isDesktop = useIsDesktop();
 
   return (
     <section className="relative isolate overflow-hidden bg-deep grain">
       {/* Background: grid + dual spotlights + dark vignette */}
       <div className="pointer-events-none absolute inset-0 bg-grid bg-grid-fade opacity-[0.55]" />
-      <div className="spot-orb spot-violet -left-32 top-[-180px] h-[640px] w-[640px] opacity-70" />
-      <div className="spot-orb spot-cyan right-[-180px] top-[120px] h-[600px] w-[600px] opacity-60" />
-      <div className="spot-orb spot-blue left-1/2 top-[40%] h-[420px] w-[420px] -translate-x-1/2 opacity-40" />
+      {/* Orbs: reduced size/opacity on mobile to cut repaint cost */}
+      <div className="spot-orb spot-violet -left-32 top-[-180px] h-[320px] w-[320px] opacity-40 lg:h-[640px] lg:w-[640px] lg:opacity-70" />
+      <div className="spot-orb spot-cyan right-[-80px] top-[80px] h-[280px] w-[280px] opacity-35 lg:right-[-180px] lg:top-[120px] lg:h-[600px] lg:w-[600px] lg:opacity-60" />
+      <div className="spot-orb spot-blue left-1/2 top-[40%] h-[200px] w-[200px] -translate-x-1/2 opacity-25 lg:h-[420px] lg:w-[420px] lg:opacity-40" />
 
-      {/* Two vertical beams */}
-      <div className="beam beam-thick left-[18%] opacity-50" />
-      <div className="beam left-[82%] opacity-30" />
+      {/* Beams: hidden on mobile, visible on desktop only */}
+      <div className="beam beam-thick left-[18%] opacity-50 hidden lg:block" />
+      <div className="beam left-[82%] opacity-30 hidden lg:block" />
 
       {/* Bottom vignette into next section */}
       <div
@@ -163,16 +166,28 @@ export function Hero() {
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
           />
 
-          <SplineScene
-            scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-            className="h-full w-full"
-          />
-
-          {/* Cover Spline watermark in bottom-right corner */}
-          <div
-            className="pointer-events-none absolute bottom-2 right-2 h-10 w-32 rounded-md"
-            style={{ background: "var(--bg-deep)" }}
-          />
+          {/* Desktop: heavy WebGL Spline scene. Mobile: NOT mounted at all
+              (no Spline/three JS, no WebGL) — a lightweight static placeholder
+              instead, so phones don't lag/freeze. */}
+          {isDesktop ? (
+            <>
+              <SplineScene
+                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                className="h-full w-full"
+              />
+              {/* Cover Spline watermark in bottom-right corner */}
+              <div
+                className="pointer-events-none absolute bottom-2 right-2 h-10 w-32 rounded-md"
+                style={{ background: "var(--bg-deep)" }}
+              />
+            </>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <div className="relative flex h-36 w-36 items-center justify-center rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-sm">
+                <Bot className="h-20 w-20 text-white/85" strokeWidth={1.5} />
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
 
