@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#0a0a0c;font-family:'Inter',system-ui,sans-serif;color:#e7e7ea;-webkit-font-smoothing:antialiased}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.09);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.16);background-clip:padding-box}
+  ::-webkit-scrollbar-track{background:transparent}
+  input,textarea,button{font-family:inherit}
+  input:focus,textarea:focus{outline:none}
+  input::placeholder,textarea::placeholder{color:#5a5a63}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes glowpulse{0%,100%{box-shadow:0 0 0 1px rgba(59,130,246,.55),0 0 26px rgba(59,130,246,.22)}50%{box-shadow:0 0 0 1px rgba(59,130,246,.85),0 0 40px rgba(59,130,246,.42)}}
+  @keyframes dashmove{to{stroke-dashoffset:-20}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0a0a0c;color:#e7e7ea;font-family:'Inter',sans-serif">
+
+  <!-- ===================== LOGIN ===================== -->
+  <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:760px;height:760px;background:radial-gradient(circle,rgba(59,130,246,.16),transparent 62%);pointer-events:none"></div>
+      <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.035) 1px,transparent 1px);background-size:26px 26px;mask-image:radial-gradient(circle at 50% 40%,black,transparent 70%);pointer-events:none"></div>
+      <div style="position:relative;width:100%;max-width:432px">
+        <div style="display:flex;align-items:center;gap:11px;justify-content:center;margin-bottom:30px">
+          <div style="width:38px;height:38px;border-radius:11px;background:linear-gradient(150deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;box-shadow:0 6px 22px rgba(59,130,246,.4)"><span style="display:flex;transform:rotate(0deg)">{{ I.send }}</span></div>
+          <span style="font-family:'Space Grotesk';font-weight:700;font-size:21px;letter-spacing:-.5px">BotSpace<span style="color:#3b82f6">.uz</span></span>
+        </div>
+        <div style="background:rgba(20,20,24,.6);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:32px 30px;box-shadow:0 24px 60px rgba(0,0,0,.5)">
+          <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:24px;margin:0 0 8px;letter-spacing:-.5px;text-align:center">Telegram orqali kirish</h1>
+          <p style="margin:0 0 24px;text-align:center;color:#8a8a93;font-size:14px;line-height:1.5">Telegram botimizga o'ting va 6 xonali kodni oling</p>
+          <button onClick="{{ openTg }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:9px;padding:13px;border-radius:11px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:14.5px;font-weight:600;box-shadow:0 8px 24px rgba(59,130,246,.32)" style-hover="filter:brightness(1.08)">
+            <span style="font-size:18px;display:flex">{{ I.send }}</span> Telegram botni ochish
+          </button>
+          <sc-if value="{{ tgOpened }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:14px;display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:9px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);color:#86efac;font-size:12.5px">
+              <span style="width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;flex:none"></span> Bot ochildi — kodni pastga kiriting
+            </div>
+          </sc-if>
+          <div style="display:flex;align-items:center;gap:8px;margin:22px 0 14px;color:#5a5a63;font-size:11.5px;font-weight:500">
+            <div style="height:1px;flex:1;background:rgba(255,255,255,.08)"></div> TASDIQLASH KODI <div style="height:1px;flex:1;background:rgba(255,255,255,.08)"></div>
+          </div>
+          <div style="display:flex;gap:9px;justify-content:center" onPaste="{{ onCodePaste }}">
+            <sc-for list="{{ codeDigits }}" as="d" hint-placeholder-count="6">
+              <input data-idx="{{ $index }}" value="{{ d }}" onInput="{{ onCode }}" onKeyDown="{{ onCodeKey }}" inputMode="numeric" maxLength="1" style="width:48px;height:56px;text-align:center;font-family:'Space Grotesk';font-size:22px;font-weight:600;color:#f4f4f5;background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.1);border-radius:11px;transition:all .15s" style-focus="border-color:#3b82f6;background:rgba(59,130,246,.08);box-shadow:0 0 0 3px rgba(59,130,246,.14)" />
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin:22px 0">
+            <div style="height:1px;flex:1;background:rgba(255,255,255,.07)"></div><span style="color:#5a5a63;font-size:12px">yoki</span><div style="height:1px;flex:1;background:rgba(255,255,255,.07)"></div>
+          </div>
+          <button onClick="{{ login }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border-radius:11px;cursor:pointer;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.12);color:#e7e7ea;font-size:14px;font-weight:500" style-hover="background:rgba(255,255,255,.06)">
+            <span style="width:18px;height:18px;border-radius:50%;background:#fff;color:#1a1a1a;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;font-family:'Space Grotesk'">G</span> Google orqali kirish
+          </button>
+        </div>
+        <p style="text-align:center;color:#5a5a63;font-size:12px;margin:20px 0 0;line-height:1.6">Davom etish orqali <span style="color:#8a8a93">Foydalanish shartlari</span> va<br/><span style="color:#8a8a93">Maxfiylik siyosati</span>ga rozilik bildirasiz</p>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===================== CONSTRUCTOR ===================== -->
+  <sc-if value="{{ isConstructor }}" hint-placeholder-val="{{ false }}">
+    <div style="height:100vh;display:flex;flex-direction:column;background:#08080a;overflow:hidden">
+      <!-- top bar -->
+      <div style="height:56px;flex:none;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(12,12,15,.9);backdrop-filter:blur(12px);display:flex;align-items:center;gap:14px;padding:0 18px;z-index:10">
+        <button onClick="{{ backToBotDetail }}" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#a1a1aa;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px" style-hover="background:rgba(255,255,255,.08);color:#fff">{{ I.chevLeft }}</button>
+        <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(150deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#fff;font-family:'Space Grotesk'">TM</div>
+        <div>
+          <div style="font-family:'Space Grotesk';font-weight:600;font-size:14px;line-height:1.2">Telemeditsina boti</div>
+          <div style="font-size:11px;color:#71717a;display:flex;align-items:center;gap:6px"><span style="font-size:13px;display:flex">{{ I.flow }}</span> Konstruktor</div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:12px;color:#a1a1aa"><span style="font-size:13px;display:flex">{{ I.history }}</span> Version 12</div>
+        <button style="display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:9px;border:none;cursor:pointer;background:linear-gradient(150deg,#22c55e,#16a34a);color:#fff;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(34,197,94,.3)" style-hover="filter:brightness(1.1)"><span style="font-size:15px;display:flex">{{ I.play }}</span> Ishga tushirish</button>
+      </div>
+      <!-- canvas -->
+      <div style="flex:1;position:relative;overflow:hidden;background:#0a0a0c;background-image:radial-gradient(rgba(255,255,255,.05) 1.2px,transparent 1.2px);background-size:24px 24px;background-position:center">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(59,130,246,.06),transparent 55%);pointer-events:none"></div>
+
+        <!-- connectors -->
+        <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid meet">
+          <path d="M 350 175 C 430 175, 430 330, 510 330" fill="none" stroke="rgba(59,130,246,.55)" stroke-width="2" stroke-dasharray="6 6" style="animation:dashmove 1s linear infinite"></path>
+          <path d="M 790 330 C 870 330, 870 500, 950 500" fill="none" stroke="rgba(59,130,246,.4)" stroke-width="2" stroke-dasharray="6 6" style="animation:dashmove 1s linear infinite"></path>
+          <circle cx="430" cy="252" r="11" fill="#0a0a0c" stroke="#3b82f6" stroke-width="1.6"></circle>
+          <path d="M 425 252 h 10 M 430 247 v 10" stroke="#3b82f6" stroke-width="1.6" stroke-linecap="round"></path>
+          <circle cx="870" cy="415" r="11" fill="#0a0a0c" stroke="#3b82f6" stroke-width="1.6"></circle>
+          <path d="M 865 415 h 10 M 870 410 v 10" stroke="#3b82f6" stroke-width="1.6" stroke-linecap="round"></path>
+        </svg>
+
+        <!-- TRIGGER node -->
+        <div style="position:absolute;left:14.5%;top:18%;width:236px">
+          <div style="background:rgba(18,18,22,.92);border-radius:14px;border:1px solid rgba(59,130,246,.55);box-shadow:0 0 0 1px rgba(59,130,246,.2),0 0 30px rgba(59,130,246,.18),0 14px 36px rgba(0,0,0,.5);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(59,130,246,.08)">
+              <span style="width:9px;height:9px;border-radius:50%;background:#3b82f6;box-shadow:0 0 8px #3b82f6"></span>
+              <span style="font-size:10px;font-weight:700;letter-spacing:1px;color:#93c5fd">TRIGGER</span>
+            </div>
+            <div style="padding:18px 16px;display:flex;flex-direction:column;align-items:center;gap:11px;text-align:center">
+              <div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(150deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:23px;color:#fff;box-shadow:0 6px 18px rgba(59,130,246,.4)">{{ I.zap }}</div>
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:13.5px;letter-spacing:.5px">XABAR KELGANDA</div>
+              <div style="font-size:11.5px;color:#71717a">Foydalanuvchi /start bosganda</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTION node 1 -->
+        <div style="position:absolute;left:42.5%;top:38%;width:236px">
+          <div style="background:rgba(18,18,22,.92);border-radius:14px;border:1px solid rgba(255,255,255,.1);box-shadow:0 14px 36px rgba(0,0,0,.5);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03)">
+              <span style="width:9px;height:9px;border-radius:50%;background:#8b5cf6;box-shadow:0 0 8px #8b5cf6"></span>
+              <span style="font-size:10px;font-weight:700;letter-spacing:1px;color:#c4b5fd">ACTION</span>
+            </div>
+            <div style="padding:18px 16px;display:flex;flex-direction:column;align-items:center;gap:11px;text-align:center">
+              <div style="width:48px;height:48px;border-radius:13px;background:linear-gradient(150deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:0 6px 18px rgba(139,92,246,.35)">{{ I.msgSquare }}</div>
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:13.5px;letter-spacing:.5px">SALOMLASHISH</div>
+              <div style="font-size:11.5px;color:#71717a">"Assalomu alaykum! 👋"</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTION node 2 (loading) -->
+        <div style="position:absolute;left:79%;top:60%;width:236px">
+          <div style="background:rgba(18,18,22,.92);border-radius:14px;border:1px solid rgba(255,255,255,.1);box-shadow:0 14px 36px rgba(0,0,0,.5);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03)">
+              <span style="width:9px;height:9px;border-radius:50%;background:#71717a"></span>
+              <span style="font-size:10px;font-weight:700;letter-spacing:1px;color:#a1a1aa">ACTION</span>
+            </div>
+            <div style="padding:18px 16px;display:flex;flex-direction:column;align-items:center;gap:11px;text-align:center">
+              <div style="width:48px;height:48px;border-radius:13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center"><span style="width:20px;height:20px;border:2.5px solid rgba(255,255,255,.15);border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite"></span></div>
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:13.5px;letter-spacing:.5px;color:#a1a1aa">YUKLANMOQDA…</div>
+              <div style="font-size:11.5px;color:#5a5a63">Qadam sozlanmoqda</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- zoom controls -->
+        <div style="position:absolute;bottom:20px;right:20px;display:flex;flex-direction:column;gap:6px;background:rgba(18,18,22,.9);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:6px">
+          <button style="width:34px;height:34px;border-radius:8px;background:transparent;border:none;color:#a1a1aa;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px" style-hover="background:rgba(255,255,255,.06);color:#fff">{{ I.zoomin }}</button>
+          <div style="font-size:11px;color:#71717a;text-align:center;font-weight:600">100%</div>
+          <button style="width:34px;height:34px;border-radius:8px;background:transparent;border:none;color:#a1a1aa;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px" style-hover="background:rgba(255,255,255,.06);color:#fff">{{ I.zoomout }}</button>
+          <div style="height:1px;background:rgba(255,255,255,.08);margin:1px 4px"></div>
+          <button style="width:34px;height:34px;border-radius:8px;background:transparent;border:none;color:#a1a1aa;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px" style-hover="background:rgba(255,255,255,.06);color:#fff">{{ I.target }}</button>
+        </div>
+
+        <!-- node palette -->
+        <div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;background:rgba(18,18,22,.9);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:7px">
+          <button style="display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:8px;background:rgba(59,130,246,.12);border:none;color:#93c5fd;cursor:pointer;font-size:12.5px;font-weight:600" style-hover="background:rgba(59,130,246,.2)"><span style="font-size:15px;display:flex">{{ I.zap }}</span> Trigger</button>
+          <button style="display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:8px;background:transparent;border:none;color:#a1a1aa;cursor:pointer;font-size:12.5px;font-weight:600" style-hover="background:rgba(255,255,255,.06);color:#fff"><span style="font-size:15px;display:flex">{{ I.msgSquare }}</span> Xabar</button>
+          <button style="display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:8px;background:transparent;border:none;color:#a1a1aa;cursor:pointer;font-size:12.5px;font-weight:600" style-hover="background:rgba(255,255,255,.06);color:#fff"><span style="font-size:15px;display:flex">{{ I.button }}</span> Tugmalar</button>
+          <button style="display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:8px;background:transparent;border:none;color:#a1a1aa;cursor:pointer;font-size:12.5px;font-weight:600" style-hover="background:rgba(255,255,255,.06);color:#fff"><span style="font-size:15px;display:flex">{{ I.database }}</span> Shart</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!--ROOTSCREENS-->
+
+  <!-- ===================== APP SHELL ===================== -->
+  <sc-if value="{{ showShell }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;min-height:100vh">
+
+      <!-- SIDEBAR -->
+      <aside style="width:248px;flex:none;background:#0c0c0f;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;position:sticky;top:0;height:100vh">
+        <div style="padding:18px 18px 14px;display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(150deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;box-shadow:0 4px 16px rgba(59,130,246,.36)">{{ I.send }}</div>
+          <span style="font-family:'Space Grotesk';font-weight:700;font-size:16.5px;letter-spacing:-.4px">BotSpace<span style="color:#3b82f6">.uz</span></span>
+        </div>
+        <nav style="flex:1;overflow-y:auto;padding:8px 12px;display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="11">
+            <button data-route="{{ item.route }}" onClick="{{ navClick }}" style="{{ item.btnStyle }}" style-hover="background:rgba(255,255,255,.045);color:#e7e7ea">
+              <span style="font-size:18px;display:flex">{{ item.iconEl }}</span>
+              <span style="flex:1;text-align:left">{{ item.label }}</span>
+              <sc-if value="{{ item.badge }}" hint-placeholder-val="{{ false }}"><span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:2px 6px;border-radius:5px;background:rgba(59,130,246,.18);color:#93c5fd">{{ item.badge }}</span></sc-if>
+            </button>
+          </sc-for>
+        </nav>
+        <div style="padding:12px">
+          <div style="border-radius:13px;padding:16px;background:linear-gradient(155deg,rgba(59,130,246,.16),rgba(59,130,246,.04));border:1px solid rgba(59,130,246,.22);position:relative;overflow:hidden">
+            <div style="position:absolute;top:-30px;right:-30px;width:90px;height:90px;background:radial-gradient(circle,rgba(59,130,246,.32),transparent 70%)"></div>
+            <div style="position:relative">
+              <div style="display:flex;align-items:center;gap:7px;font-weight:600;font-size:13.5px;color:#fff;margin-bottom:5px"><span style="font-size:15px;display:flex;color:#93c5fd">{{ I.zap }}</span> Pro tarif</div>
+              <p style="margin:0 0 12px;font-size:11.5px;color:#9ca3c4;line-height:1.5">Cheksiz botlar, AI kreditlar va ustuvor qo'llab-quvvatlash</p>
+              <button onClick="{{ goTolov }}" style="width:100%;padding:8px;border-radius:8px;border:none;cursor:pointer;background:#3b82f6;color:#fff;font-size:12.5px;font-weight:600" style-hover="background:#2563eb">Pro tarifga o'tish</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN COLUMN -->
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+        <!-- HEADER -->
+        <header style="height:60px;flex:none;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(10,10,12,.8);backdrop-filter:blur(12px);display:flex;align-items:center;gap:16px;padding:0 22px;position:sticky;top:0;z-index:30">
+          <div style="position:relative;flex:1;max-width:380px">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;display:flex;color:#5a5a63">{{ I.search }}</span>
+            <input placeholder="Botlarni qidirish…" style="width:100%;padding:9px 12px 9px 36px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#e7e7ea;font-size:13.5px" style-focus="border-color:rgba(59,130,246,.5);background:rgba(255,255,255,.05)" />
+          </div>
+          <div style="flex:1"></div>
+          <button style="width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#a1a1aa;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;position:relative" style-hover="background:rgba(255,255,255,.06);color:#e7e7ea">{{ I.bell }}<span style="position:absolute;top:9px;right:9px;width:7px;height:7px;border-radius:50%;background:#3b82f6;border:1.5px solid #0a0a0c"></span></button>
+          <button onClick="{{ toggleLang }}" style="height:38px;padding:0 12px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#a1a1aa;cursor:pointer;display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500" style-hover="background:rgba(255,255,255,.06);color:#e7e7ea"><span style="font-size:16px;display:flex">{{ I.globe }}</span> {{ lang }} <span style="font-size:14px;display:flex">{{ I.chevDown }}</span></button>
+          <div style="position:relative">
+            <button onClick="{{ toggleProfile }}" style="display:flex;align-items:center;gap:9px;padding:4px 4px 4px 4px;border-radius:9px;background:transparent;border:1px solid transparent;cursor:pointer" style-hover="background:rgba(255,255,255,.04)">
+              <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(150deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:#fff">AK</div>
+              <span style="font-size:14px;display:flex;color:#71717a">{{ I.chevDown }}</span>
+            </button>
+            <sc-if value="{{ profileOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:48px;right:0;width:220px;background:#16161a;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:6px;box-shadow:0 20px 50px rgba(0,0,0,.55);z-index:50;animation:fadeUp .15s ease both">
+                <div style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:4px">
+                  <div style="font-size:13.5px;font-weight:600;color:#f4f4f5">Akmal Karimov</div>
+                  <div style="font-size:11.5px;color:#71717a">@akmal_dev</div>
+                </div>
+                <button data-route="sozlamalar" onClick="{{ menuGo }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;background:transparent;color:#c4c4cc;font-size:13px;cursor:pointer;text-align:left" style-hover="background:rgba(255,255,255,.05);color:#fff"><span style="font-size:16px;display:flex">{{ I.user }}</span> Profil</button>
+                <button data-route="sozlamalar" onClick="{{ menuGo }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;background:transparent;color:#c4c4cc;font-size:13px;cursor:pointer;text-align:left" style-hover="background:rgba(255,255,255,.05);color:#fff"><span style="font-size:16px;display:flex">{{ I.sliders }}</span> Sozlamalar</button>
+                <button data-route="tolov" onClick="{{ menuGo }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;background:transparent;color:#c4c4cc;font-size:13px;cursor:pointer;text-align:left" style-hover="background:rgba(255,255,255,.05);color:#fff"><span style="font-size:16px;display:flex">{{ I.card }}</span> Tarif</button>
+                <div style="height:1px;background:rgba(255,255,255,.06);margin:4px 6px"></div>
+                <button onClick="{{ logout }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;background:transparent;color:#f87171;font-size:13px;cursor:pointer;text-align:left" style-hover="background:rgba(239,68,68,.1)"><span style="font-size:16px;display:flex">{{ I.logout }}</span> Chiqish</button>
+              </div>
+            </sc-if>
+          </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main style="flex:1;overflow-y:auto;position:relative">
+
+          <!-- ===== DASHBOARD ===== -->
+          <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:28px 32px;max-width:1240px">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px">
+                <div>
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+                    <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;margin:0;letter-spacing:-.6px">Boshqaruv paneli</h1>
+                    <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:7px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#86efac;font-size:12px;font-weight:600"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 7px #22c55e"></span> Faol</span>
+                  </div>
+                  <p style="margin:0;color:#8a8a93;font-size:14px">Xush kelibsiz, Akmal. Bugungi platformangiz holati.</p>
+                </div>
+                <button data-route="newbot" onClick="{{ navClick }}" style="display:flex;align-items:center;gap:8px;padding:11px 17px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:14px;font-weight:600;box-shadow:0 6px 20px rgba(59,130,246,.3)" style-hover="filter:brightness(1.08)"><span style="font-size:18px;display:flex">{{ I.plus }}</span> Yangi bot</button>
+              </div>
+
+              <!-- STAT CARDS -->
+              <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px">
+                <sc-for list="{{ stats }}" as="s" hint-placeholder-count="5">
+                  <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:16px;transition:all .18s" style-hover="border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.04)">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                      <span style="font-size:18px;display:flex;color:#3b82f6;width:34px;height:34px;align-items:center;justify-content:center;background:rgba(59,130,246,.1);border-radius:9px">{{ s.iconEl }}</span>
+                      <span style="font-size:11.5px;font-weight:600;color:{{ s.deltaColor }}">{{ s.delta }}</span>
+                    </div>
+                    <div style="font-family:'Space Grotesk';font-weight:600;font-size:23px;letter-spacing:-.5px;color:#f4f4f5">{{ s.value }}</div>
+                    <div style="font-size:12.5px;color:#8a8a93;margin-top:2px">{{ s.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <!-- CHART + TOP BOTS -->
+              <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px">
+                <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+                    <div>
+                      <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin:0">Bot faoliyati</h3>
+                      <p style="margin:3px 0 0;font-size:12.5px;color:#8a8a93">So'nggi 30 kun</p>
+                    </div>
+                    <div style="display:flex;gap:6px">
+                      <span style="padding:5px 11px;border-radius:7px;background:rgba(59,130,246,.14);color:#93c5fd;font-size:12px;font-weight:500">30 kun</span>
+                      <span style="padding:5px 11px;border-radius:7px;background:transparent;color:#71717a;font-size:12px;font-weight:500">7 kun</span>
+                    </div>
+                  </div>
+                  <div style="height:208px;border-radius:11px;border:1px dashed rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 12px,transparent 12px 24px)">
+                    <span style="font-size:30px;display:flex;color:#3a3a42">{{ I.activity }}</span>
+                    <div style="font-weight:600;font-size:14px;color:#a1a1aa">Hali statistika yo'q</div>
+                    <p style="margin:0;font-size:12.5px;color:#6a6a73;text-align:center;max-width:260px">Botlaringiz xabar almasha boshlaganda grafik shu yerda paydo bo'ladi</p>
+                  </div>
+                </div>
+                <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px">
+                  <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin:0 0 16px">Top botlar</h3>
+                  <div style="display:flex;flex-direction:column;gap:4px">
+                    <sc-for list="{{ topBots }}" as="b" hint-placeholder-count="4">
+                      <div style="display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:9px" style-hover="background:rgba(255,255,255,.03)">
+                        <div style="width:34px;height:34px;border-radius:9px;background:{{ b.bg }};display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#fff;flex:none">{{ b.initials }}</div>
+                        <div style="flex:1;min-width:0">
+                          <div style="font-size:13.5px;font-weight:500;color:#e7e7ea;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.name }}</div>
+                          <div style="font-size:11.5px;color:#71717a">{{ b.users }} foydalanuvchi</div>
+                        </div>
+                        <span style="font-size:11.5px;font-weight:600;color:#86efac">{{ b.up }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RECENT + QUICK ACTIONS -->
+              <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px">
+                <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                    <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin:0">So'nggi botlar</h3>
+                    <button data-route="bots" onClick="{{ navClick }}" style="display:flex;align-items:center;gap:4px;background:none;border:none;color:#3b82f6;font-size:12.5px;font-weight:500;cursor:pointer">Barchasi <span style="font-size:14px;display:flex">{{ I.chevRight }}</span></button>
+                  </div>
+                  <div style="display:flex;flex-direction:column">
+                    <sc-for list="{{ recentBots }}" as="b" hint-placeholder-count="4">
+                      <div data-route="botdetail" onClick="{{ navClick }}" style="display:flex;align-items:center;gap:12px;padding:11px 8px;border-radius:9px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer" style-hover="background:rgba(255,255,255,.03)">
+                        <div style="width:36px;height:36px;border-radius:9px;background:{{ b.bg }};display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:#fff;flex:none">{{ b.initials }}</div>
+                        <div style="flex:1;min-width:0">
+                          <div style="font-size:13.5px;font-weight:500;color:#e7e7ea">{{ b.name }}</div>
+                          <div style="font-size:11.5px;color:#71717a">{{ b.time }}</div>
+                        </div>
+                        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600;background:{{ b.statusBg }};color:{{ b.statusColor }}"><span style="width:5px;height:5px;border-radius:50%;background:{{ b.statusColor }}"></span>{{ b.statusLabel }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px">
+                  <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin:0 0 14px">Tezkor harakatlar</h3>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                    <sc-for list="{{ quickActions }}" as="q" hint-placeholder-count="4">
+                      <button data-route="{{ q.route }}" onClick="{{ navClick }}" style="display:flex;flex-direction:column;gap:10px;padding:15px 13px;border-radius:11px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);cursor:pointer;text-align:left" style-hover="border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.06)">
+                        <span style="font-size:19px;display:flex;color:#3b82f6;width:36px;height:36px;align-items:center;justify-content:center;background:rgba(59,130,246,.1);border-radius:9px">{{ q.iconEl }}</span>
+                        <span style="font-size:13px;font-weight:500;color:#e7e7ea;line-height:1.3">{{ q.label }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== AI AGENT ===== -->
+          <sc-if value="{{ isAgent }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;height:calc(100vh - 60px)">
+              <!-- conversations -->
+              <div style="width:264px;flex:none;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;background:#0b0b0e">
+                <div style="padding:16px">
+                  <button style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:10px;border:1px solid rgba(59,130,246,.3);cursor:pointer;background:rgba(59,130,246,.1);color:#93c5fd;font-size:13.5px;font-weight:600" style-hover="background:rgba(59,130,246,.16)"><span style="font-size:17px;display:flex">{{ I.plus }}</span> Yangi suhbat</button>
+                </div>
+                <div style="padding:0 12px 6px;font-size:11px;font-weight:600;letter-spacing:.5px;color:#5a5a63;text-transform:uppercase">Suhbatlar</div>
+                <div style="flex:1;overflow-y:auto;padding:0 12px;display:flex;flex-direction:column;gap:2px">
+                  <sc-for list="{{ conversations }}" as="c" hint-placeholder-count="4">
+                    <button style="{{ c.itemStyle }}" style-hover="background:rgba(255,255,255,.04)">
+                      <span style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.title }}</span>
+                      <span style="font-size:11px;color:#5a5a63">{{ c.time }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+              <!-- chat -->
+              <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+                <div style="height:62px;flex:none;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:12px;padding:0 22px">
+                  <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(150deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff">{{ I.sparkles }}</div>
+                  <div>
+                    <div style="font-family:'Space Grotesk';font-weight:600;font-size:15.5px;display:flex;align-items:center;gap:8px">BotSpace Agent <span style="width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 7px #22c55e"></span></div>
+                    <div style="font-size:12px;color:#71717a">Botingizni boshqarish va flow yaratishda yordam beraman</div>
+                  </div>
+                </div>
+                <div id="agentScroll" style="flex:1;overflow-y:auto;padding:26px 22px">
+                  <div style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px">
+                    <sc-for list="{{ agentMsgs }}" as="m" hint-placeholder-count="1">
+                      <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;justify-content:flex-end">
+                          <div style="max-width:78%;padding:12px 16px;border-radius:14px 14px 4px 14px;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:14px;line-height:1.55;white-space:pre-wrap">{{ m.text }}</div>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ m.isAssistant }}" hint-placeholder-val="{{ true }}">
+                        <div style="display:flex;gap:11px">
+                          <div style="width:30px;height:30px;flex:none;border-radius:9px;background:linear-gradient(150deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff">{{ I.sparkles }}</div>
+                          <div style="max-width:80%;padding:12px 16px;border-radius:4px 14px 14px 14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);color:#dcdce0;font-size:14px;line-height:1.6;white-space:pre-wrap">{{ m.text }}</div>
+                        </div>
+                      </sc-if>
+                    </sc-for>
+                    <sc-if value="{{ agentBusy }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:11px">
+                        <div style="width:30px;height:30px;flex:none;border-radius:9px;background:linear-gradient(150deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff">{{ I.sparkles }}</div>
+                        <div style="padding:15px 16px;border-radius:4px 14px 14px 14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);display:flex;gap:5px">
+                          <span style="width:7px;height:7px;border-radius:50%;background:#5a5a63;animation:blink 1s infinite"></span>
+                          <span style="width:7px;height:7px;border-radius:50%;background:#5a5a63;animation:blink 1s infinite .2s"></span>
+                          <span style="width:7px;height:7px;border-radius:50%;background:#5a5a63;animation:blink 1s infinite .4s"></span>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </div>
+                <!-- composer -->
+                <div style="flex:none;padding:14px 22px 20px">
+                  <div style="max-width:760px;margin:0 auto">
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+                      <sc-for list="{{ promptSuggestions }}" as="p" hint-placeholder-count="4">
+                        <button data-text="{{ p.text }}" onClick="{{ suggest }}" style="display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.09);cursor:pointer;background:rgba(255,255,255,.025);color:#a1a1aa;font-size:12.5px" style-hover="border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.06);color:#c4c4cc"><span style="font-size:15px;display:flex;color:#3b82f6">{{ p.iconEl }}</span> {{ p.text }}</button>
+                      </sc-for>
+                    </div>
+                    <div style="display:flex;align-items:flex-end;gap:10px;padding:10px 10px 10px 16px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1)" style-focus-within="border-color:rgba(59,130,246,.5)">
+                      <textarea value="{{ agentInput }}" onInput="{{ setAgentInput }}" onKeyDown="{{ agentKey }}" rows="1" placeholder="Xabar yozing…" style="flex:1;background:transparent;border:none;color:#e7e7ea;font-size:14px;resize:none;line-height:1.5;max-height:120px;padding:6px 0"></textarea>
+                      <button onClick="{{ sendAgentBtn }}" style="width:40px;height:40px;flex:none;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px" style-hover="filter:brightness(1.1)">{{ I.send }}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== BOTLAR ===== -->
+          <sc-if value="{{ isBots }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 32px;max-width:1240px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px">
+                <div>
+                  <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;margin:0 0 5px;letter-spacing:-.6px">Botlar</h1>
+                  <p style="margin:0;color:#8a8a93;font-size:14px">Jami 12 ta bot • 8 faol, 4 qoralama</p>
+                </div>
+                <button data-route="newbot" onClick="{{ navClick }}" style="display:flex;align-items:center;gap:8px;padding:11px 17px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:14px;font-weight:600;box-shadow:0 6px 20px rgba(59,130,246,.3)" style-hover="filter:brightness(1.08)"><span style="font-size:18px;display:flex">{{ I.plus }}</span> Yangi bot</button>
+              </div>
+              <div style="position:relative;max-width:420px;margin-bottom:22px">
+                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:17px;display:flex;color:#5a5a63">{{ I.search }}</span>
+                <input placeholder="Bot nomi bo'yicha qidirish" style="width:100%;padding:11px 14px 11px 40px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#e7e7ea;font-size:14px" style-focus="border-color:rgba(59,130,246,.5)" />
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+                <sc-for list="{{ botsList }}" as="b" hint-placeholder-count="6">
+                  <div data-route="botdetail" onClick="{{ navClick }}" style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:18px;cursor:pointer;transition:all .18s" style-hover="border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.04);transform:translateY(-2px)">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+                      <div style="width:46px;height:46px;border-radius:12px;background:{{ b.bg }};display:flex;align-items:center;justify-content:center;font-weight:600;font-size:16px;color:#fff;font-family:'Space Grotesk'">{{ b.initials }}</div>
+                      <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;background:{{ b.statusBg }};color:{{ b.statusColor }}"><span style="width:5px;height:5px;border-radius:50%;background:{{ b.statusColor }}"></span>{{ b.statusLabel }}</span>
+                    </div>
+                    <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:15.5px;margin:0 0 5px">{{ b.name }}</h3>
+                    <p style="margin:0 0 14px;font-size:12.5px;color:#8a8a93;line-height:1.5;min-height:36px">{{ b.desc }}</p>
+                    <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5a5a63;border-top:1px solid rgba(255,255,255,.05);padding-top:12px"><span style="font-size:14px;display:flex">{{ I.clock }}</span> {{ b.date }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== YANGI BOT ===== -->
+          <sc-if value="{{ isNewbot }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 32px;max-width:760px">
+              <button data-route="bots" onClick="{{ navClick }}" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;margin-bottom:16px;padding:0" style-hover="color:#a1a1aa"><span style="font-size:16px;display:flex">{{ I.chevLeft }}</span> Botlar</button>
+              <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;margin:0 0 6px;letter-spacing:-.6px">Yangi bot yaratish</h1>
+              <p style="margin:0 0 24px;color:#8a8a93;font-size:14px">Noldan boshlang yoki tayyor shablondan foydalaning</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:26px">
+                <button data-mode="blank" onClick="{{ setNbMode }}" style="text-align:left;padding:20px;border-radius:13px;cursor:pointer;background:{{ nbBlankBg }};border:1.5px solid {{ nbBlankBorder }}">
+                  <span style="font-size:22px;display:flex;color:#3b82f6;width:44px;height:44px;align-items:center;justify-content:center;background:rgba(59,130,246,.1);border-radius:11px;margin-bottom:14px">{{ I.plus }}</span>
+                  <div style="font-family:'Space Grotesk';font-weight:600;font-size:15px;margin-bottom:4px">Bo'sh boshlash</div>
+                  <p style="margin:0;font-size:12.5px;color:#8a8a93;line-height:1.5">Toza loyihadan boshlab, o'zingiz xohlagandek quring</p>
+                </button>
+                <button data-mode="tpl" onClick="{{ setNbMode }}" style="text-align:left;padding:20px;border-radius:13px;cursor:pointer;background:{{ nbTplBg }};border:1.5px solid {{ nbTplBorder }}">
+                  <span style="font-size:22px;display:flex;color:#22c55e;width:44px;height:44px;align-items:center;justify-content:center;background:rgba(34,197,94,.1);border-radius:11px;margin-bottom:14px">{{ I.layers }}</span>
+                  <div style="font-family:'Space Grotesk';font-weight:600;font-size:15px;margin-bottom:4px">Shablondan</div>
+                  <p style="margin:0;font-size:12.5px;color:#8a8a93;line-height:1.5">Tayyor flow va xabarlar bilan tez ishga tushiring</p>
+                </button>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;padding:12px 14px;border-radius:10px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.16)">
+                <span style="font-size:16px;display:flex;color:#93c5fd">{{ I.layers }}</span>
+                <span style="font-size:13px;color:#a1a1aa">Tayyor yechimlar uchun</span>
+                <button data-route="templates" onClick="{{ navClick }}" style="background:none;border:none;color:#3b82f6;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0">Shablonlar marketplace <span style="font-size:14px;display:flex">{{ I.chevRight }}</span></button>
+              </div>
+              <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:18px">
+                <div>
+                  <label style="display:block;font-size:13px;font-weight:500;color:#c4c4cc;margin-bottom:7px">Bot nomi</label>
+                  <input data-field="nbName" value="{{ nbName }}" onInput="{{ setNb }}" placeholder="Mening botim" style="width:100%;padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#e7e7ea;font-size:14px" style-focus="border-color:rgba(59,130,246,.5)" />
+                </div>
+                <div>
+                  <label style="display:block;font-size:13px;font-weight:500;color:#c4c4cc;margin-bottom:7px">Tavsif</label>
+                  <textarea data-field="nbDesc" value="{{ nbDesc }}" onInput="{{ setNb }}" rows="3" placeholder="Bot nima ish qiladi?" style="width:100%;padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#e7e7ea;font-size:14px;resize:none;line-height:1.5" style-focus="border-color:rgba(59,130,246,.5)"></textarea>
+                </div>
+                <div>
+                  <label style="display:block;font-size:13px;font-weight:500;color:#c4c4cc;margin-bottom:7px">Telegram bot token</label>
+                  <input data-field="nbToken" value="{{ nbToken }}" onInput="{{ setNb }}" placeholder="7821049352:AAH..." style="width:100%;padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#e7e7ea;font-size:14px;font-family:monospace" style-focus="border-color:rgba(59,130,246,.5)" />
+                  <p style="margin:7px 0 0;font-size:12px;color:#71717a">BotFather'dan oling: <span style="color:#3b82f6">t.me/BotFather</span></p>
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:18px">
+                  <button data-route="bots" onClick="{{ navClick }}" style="padding:11px 18px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#c4c4cc;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:rgba(255,255,255,.06)">Bekor qilish</button>
+                  <button onClick="{{ createBot }}" disabled="{{ createDisabled }}" style="{{ createBtnStyle }}">
+                    <sc-if value="{{ creating }}" hint-placeholder-val="{{ false }}"><span style="width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></span> Yaratilmoqda…</sc-if>
+                    <sc-if value="{{ notCreating }}" hint-placeholder-val="{{ true }}"><span style="font-size:17px;display:flex">{{ I.check }}</span> Yaratish</sc-if>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== BOT DETAIL ===== -->
+          <sc-if value="{{ isBotDetail }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="padding:24px 32px 0;max-width:1180px">
+                <button data-route="bots" onClick="{{ navClick }}" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:#71717a;font-size:13px;cursor:pointer;margin-bottom:16px;padding:0" style-hover="color:#a1a1aa"><span style="font-size:16px;display:flex">{{ I.chevLeft }}</span> Botlar</button>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+                  <div style="display:flex;align-items:center;gap:15px">
+                    <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(150deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:19px;color:#fff;font-family:'Space Grotesk'">TM</div>
+                    <div>
+                      <div style="display:flex;align-items:center;gap:10px">
+                        <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:23px;margin:0;letter-spacing:-.5px">Telemeditsina boti</h1>
+                        <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:6px;font-size:11.5px;font-weight:600;background:rgba(234,179,8,.12);color:#eab308"><span style="width:5px;height:5px;border-radius:50%;background:#eab308"></span>Qoralama</span>
+                      </div>
+                      <div style="font-size:13px;color:#71717a;margin-top:3px">@telemed_uz_bot</div>
+                    </div>
+                  </div>
+                  <button onClick="{{ goConstructor }}" style="display:flex;align-items:center;gap:8px;padding:11px 18px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:14px;font-weight:600;box-shadow:0 6px 20px rgba(59,130,246,.3)" style-hover="filter:brightness(1.08)"><span style="font-size:18px;display:flex">{{ I.flow }}</span> Konstruktor</button>
+                </div>
+                <div style="display:flex;gap:22px;border-bottom:1px solid rgba(255,255,255,.07);overflow-x:auto">
+                  <sc-for list="{{ botTabs }}" as="t" hint-placeholder-count="7">
+                    <button data-tab="{{ t.id }}" onClick="{{ setBotTab }}" style="{{ t.tabStyle }}">{{ t.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="padding:24px 32px;max-width:1180px">
+                <!-- UMUMIY -->
+                <sc-if value="{{ tabUmumiy }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px">
+                    <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:22px">
+                      <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin:0 0 18px">Bot ma'lumotlari</h3>
+                      <div style="display:flex;flex-direction:column">
+                        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="font-size:13.5px;color:#8a8a93">Nomi</span><span style="font-size:13.5px;color:#e7e7ea;font-weight:500">Telemeditsina boti</span></div>
+                        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="font-size:13.5px;color:#8a8a93">Username</span><span style="font-size:13.5px;color:#e7e7ea;font-weight:500">@telemed_uz_bot</span></div>
+                        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);gap:24px"><span style="font-size:13.5px;color:#8a8a93;flex:none">Tavsif</span><span style="font-size:13.5px;color:#c4c4cc;text-align:right">Onlayn shifokor qabuli, konsultatsiya va retsept</span></div>
+                        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="font-size:13.5px;color:#8a8a93">Holat</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#eab308"><span style="width:5px;height:5px;border-radius:50%;background:#eab308"></span>Qoralama</span></div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="font-size:13.5px;color:#8a8a93">Bot ID</span><span style="display:flex;align-items:center;gap:8px;font-size:13px;color:#c4c4cc;font-family:monospace">bot_7f3a9c21<button onClick="{{ copyId }}" style="background:none;border:none;color:#71717a;cursor:pointer;display:flex;font-size:15px" style-hover="color:#3b82f6">{{ copyIconEl }}</button></span></div>
+                        <div style="display:flex;justify-content:space-between;padding:12px 0"><span style="font-size:13.5px;color:#8a8a93">Yaratilgan sana</span><span style="font-size:13.5px;color:#e7e7ea;font-weight:500">12 Iyun 2026</span></div>
+                      </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:16px">
+                      <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px">
+                        <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:15px;margin:0 0 14px">Tezkor statistika</h3>
+                        <div style="display:flex;flex-direction:column;gap:12px">
+                          <div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:#8a8a93">Foydalanuvchilar</span><span style="font-size:14px;font-weight:600;font-family:'Space Grotesk'">2 140</span></div>
+                          <div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:#8a8a93">Xabarlar</span><span style="font-size:14px;font-weight:600;font-family:'Space Grotesk'">38.4K</span></div>
+                          <div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:#8a8a93">Flow qadamlar</span><span style="font-size:14px;font-weight:600;font-family:'Space Grotesk'">12</span></div>
+                        </div>
+                      </div>
+                      <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.18);border-radius:14px;padding:20px">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:17px;display:flex;color:#f87171">{{ I.alert }}</span><h3 style="font-family:'Space Grotesk';font-weight:600;font-size:14.5px;margin:0;color:#fca5a5">Xavfli hudud</h3></div>
+                        <p style="margin:0 0 14px;font-size:12.5px;color:#a1a1aa;line-height:1.5">Botni o'chirish — barcha flow, ma'lumot va fayllarni qaytarib bo'lmas tarzda yo'qotadi.</p>
+                        <button style="display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:rgba(239,68,68,.18)"><span style="font-size:15px;display:flex">{{ I.trash }}</span> Botni o'chirish</button>
+                      </div>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <!-- XABARLAR (broadcast) -->
+                <sc-if value="{{ tabXabarlar }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px">
+                    <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:22px">
+                      <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin:0 0 4px">Hammaga xabar yuborish</h3>
+                      <p style="margin:0 0 18px;font-size:13px;color:#8a8a93">2 140 ta obunachiga bir vaqtda yetib boradi</p>
+                      <div style="position:relative">
+                        <textarea value="{{ broadcast }}" onInput="{{ setBroadcast }}" rows="6" maxLength="1024" placeholder="Xabar matnini kiriting…" style="width:100%;padding:14px;border-radius:11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#e7e7ea;font-size:14px;resize:none;line-height:1.6" style-focus="border-color:rgba(59,130,246,.5)"></textarea>
+                        <span style="position:absolute;bottom:12px;right:14px;font-size:11.5px;color:#5a5a63">{{ broadcastLen }}/1024</span>
+                      </div>
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;flex-wrap:wrap">
+                        <div style="display:flex;gap:8px">
+                          <button style="display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#a1a1aa;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.06);color:#e7e7ea"><span style="font-size:15px;display:flex">{{ I.image }}</span> Rasm/Video</button>
+                          <button style="display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#a1a1aa;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.06);color:#e7e7ea"><span style="font-size:15px;display:flex">{{ I.button }}</span> Tugmalar</button>
+                        </div>
+                        <button disabled="{{ broadcastDisabled }}" style="{{ broadcastBtnStyle }}"><span style="font-size:16px;display:flex">{{ I.send }}</span> Yuborish</button>
+                      </div>
+                    </div>
+                    <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:22px">
+                      <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:15px;margin:0 0 16px">Yuborilgan xabarlar</h3>
+                      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:36px 12px;text-align:center">
+                        <span style="font-size:28px;display:flex;color:#3a3a42">{{ I.msgSquare }}</span>
+                        <div style="font-size:13.5px;font-weight:600;color:#a1a1aa">Hali xabar yuborilmagan</div>
+                        <p style="margin:0;font-size:12px;color:#6a6a73;max-width:200px">Birinchi e'longiz shu yerda ko'rinadi</p>
+                      </div>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <!-- MA'LUMOTLAR (CMS) -->
+                <sc-if value="{{ tabMalumotlar }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px">
+                    <div>
+                      <h2 style="font-family:'Space Grotesk';font-weight:600;font-size:19px;margin:0 0 4px">Ma'lumotlar (CMS)</h2>
+                      <p style="margin:0;font-size:13px;color:#8a8a93">Bot ma'lumotlarini collection'lar bilan boshqaring</p>
+                    </div>
+                    <button style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:13.5px;font-weight:600" style-hover="filter:brightness(1.08)"><span style="font-size:17px;display:flex">{{ I.plus }}</span> Yangi collection</button>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
+                    <sc-for list="{{ collections }}" as="c" hint-placeholder-count="4">
+                      <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:18px;cursor:pointer;transition:all .15s" style-hover="border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.03)">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                          <div style="display:flex;align-items:center;gap:11px">
+                            <div style="width:40px;height:40px;border-radius:10px;background:{{ c.bg }};display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff">{{ databaseIconEl }}</div>
+                            <div>
+                              <div style="font-family:'Space Grotesk';font-weight:600;font-size:14.5px">{{ c.name }}</div>
+                              <div style="font-size:11.5px;color:#71717a;font-family:monospace">{{ c.key }}</div>
+                            </div>
+                          </div>
+                          <sc-if value="{{ c.system }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:700;letter-spacing:.4px;padding:3px 7px;border-radius:5px;background:rgba(139,92,246,.15);color:#c4b5fd">SYSTEM</span></sc-if>
+                        </div>
+                        <div style="display:flex;gap:18px;border-top:1px solid rgba(255,255,255,.05);padding-top:12px">
+                          <div><div style="font-size:11px;color:#71717a">Maydonlar</div><div style="font-size:14px;font-weight:600;font-family:'Space Grotesk'">{{ c.fields }}</div></div>
+                          <div><div style="font-size:11px;color:#71717a">Versiya</div><div style="font-size:14px;font-weight:600;font-family:'Space Grotesk'">{{ c.version }}</div></div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <!-- FAYLLAR -->
+                <sc-if value="{{ tabFayllar }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:18px;max-width:760px">
+                    <div style="border:2px dashed rgba(255,255,255,.13);border-radius:16px;padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 12px,transparent 12px 24px);transition:all .2s" style-hover="border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.03)">
+                      <div style="width:56px;height:56px;border-radius:14px;background:rgba(59,130,246,.1);display:flex;align-items:center;justify-content:center;font-size:26px;color:#3b82f6">{{ I.upload }}</div>
+                      <div><div style="font-family:'Space Grotesk';font-weight:600;font-size:16px">Faylni shu yerga tashlang yoki tanlang</div><p style="margin:6px 0 0;font-size:13px;color:#71717a">PDF, JPG, PNG, MP4 • Maks. 50 MB</p></div>
+                      <button style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:13.5px;font-weight:600" style-hover="filter:brightness(1.08)">Fayl tanlash</button>
+                    </div>
+                    <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden">
+                      <div style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);font-size:13.5px;font-weight:600;font-family:'Space Grotesk'">Fayllar</div>
+                      <div>
+                        <sc-for list="{{ skeletonRows }}" as="row" hint-placeholder-count="3">
+                          <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.04)">
+                            <div style="width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.04)"></div>
+                            <div style="flex:1"><div style="width:{{ row.w1 }};height:11px;border-radius:5px;background:rgba(255,255,255,.05);margin-bottom:7px"></div><div style="width:{{ row.w2 }};height:9px;border-radius:5px;background:rgba(255,255,255,.03)"></div></div>
+                            <div style="width:60px;height:9px;border-radius:5px;background:rgba(255,255,255,.03)"></div>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <!-- SOZLAMALAR (env) -->
+                <sc-if value="{{ tabSozlamalar }}" hint-placeholder-val="{{ false }}">
+                  <div style="max-width:760px">
+                    <h2 style="font-family:'Space Grotesk';font-weight:600;font-size:19px;margin:0 0 4px">Muhit o'zgaruvchilari</h2>
+                    <p style="margin:0 0 20px;font-size:13px;color:#8a8a93">Maxfiy kalitlar va sozlamalar shifrlangan holda saqlanadi</p>
+                    <div style="display:flex;gap:10px;margin-bottom:20px">
+                      <input value="{{ envK }}" onInput="{{ setEnvK }}" placeholder="KEY" style="flex:0 0 220px;padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#e7e7ea;font-size:13.5px;font-family:monospace" style-focus="border-color:rgba(59,130,246,.5)" />
+                      <input value="{{ envV }}" onInput="{{ setEnvV }}" placeholder="qiymat" style="flex:1;padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#e7e7ea;font-size:13.5px;font-family:monospace" style-focus="border-color:rgba(59,130,246,.5)" />
+                      <button onClick="{{ addEnv }}" style="display:flex;align-items:center;gap:7px;padding:11px 18px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:13.5px;font-weight:600;white-space:nowrap" style-hover="filter:brightness(1.08)"><span style="font-size:16px;display:flex">{{ I.plus }}</span> Qo'shish</button>
+                    </div>
+                    <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden">
+                      <sc-for list="{{ envVars }}" as="v" hint-placeholder-count="3">
+                        <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05)">
+                          <span style="flex:0 0 200px;font-size:13px;color:#93c5fd;font-family:monospace;font-weight:500">{{ v.k }}</span>
+                          <span style="flex:1;font-size:13px;color:#c4c4cc;font-family:monospace;letter-spacing:1px">{{ v.display }}</span>
+                          <button data-i="{{ v.i }}" onClick="{{ toggleEnv }}" style="background:none;border:none;color:#71717a;cursor:pointer;display:flex;font-size:16px" style-hover="color:#e7e7ea">{{ v.eyeEl }}</button>
+                          <button data-i="{{ v.i }}" onClick="{{ delEnv }}" style="background:none;border:none;color:#71717a;cursor:pointer;display:flex;font-size:16px" style-hover="color:#f87171">{{ trashIconEl }}</button>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <!-- VERSIYALAR -->
+                <sc-if value="{{ tabVersiyalar }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+                    <div><h2 style="font-family:'Space Grotesk';font-weight:600;font-size:19px;margin:0 0 4px">Versiyalar</h2><p style="margin:0;font-size:13px;color:#8a8a93">Deploy tarixi va rollback</p></div>
+                    <button style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#22c55e,#16a34a);color:#fff;font-size:13.5px;font-weight:600" style-hover="filter:brightness(1.08)"><span style="font-size:16px;display:flex">{{ I.play }}</span> Ishga tushirish</button>
+                  </div>
+                  <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden">
+                    <div style="display:grid;grid-template-columns:1fr 1.2fr 1.5fr 1fr 1fr;gap:12px;padding:13px 20px;border-bottom:1px solid rgba(255,255,255,.07);font-size:11.5px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.4px">
+                      <span>Versiya</span><span>Holat</span><span>Vaqt</span><span>Service</span><span style="text-align:right">Amallar</span>
+                    </div>
+                    <sc-for list="{{ versions }}" as="v" hint-placeholder-count="4">
+                      <div style="display:grid;grid-template-columns:1fr 1.2fr 1.5fr 1fr 1fr;gap:12px;padding:15px 20px;border-bottom:1px solid rgba(255,255,255,.04);align-items:center">
+                        <span style="font-family:'Space Grotesk';font-weight:600;font-size:14px;display:flex;align-items:center;gap:7px">{{ v.v }}<sc-if value="{{ v.current }}" hint-placeholder-val="{{ false }}"><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;background:rgba(59,130,246,.18);color:#93c5fd">JORIY</span></sc-if></span>
+                        <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:{{ v.sc }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ v.sc }}"></span>{{ v.sl }}</span>
+                        <span style="font-size:13px;color:#a1a1aa">{{ v.time }}</span>
+                        <span style="font-size:12.5px;color:#a1a1aa;font-family:monospace">{{ v.service }}</span>
+                        <span style="text-align:right"><button style="display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#a1a1aa;font-size:12px;cursor:pointer" style-hover="background:rgba(255,255,255,.08);color:#e7e7ea"><span style="font-size:14px;display:flex">{{ rotateIconEl }}</span> Qaytarish</button></span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <!-- MONITORING -->
+                <sc-if value="{{ tabMonitoring }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px">
+                      <sc-for list="{{ monitoring }}" as="m" hint-placeholder-count="4">
+                        <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:18px">
+                          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+                            <span style="font-size:18px;display:flex;color:#3b82f6;width:34px;height:34px;align-items:center;justify-content:center;background:rgba(59,130,246,.1);border-radius:9px">{{ m.iconEl }}</span>
+                            <span style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;background:rgba(255,255,255,.05);color:#71717a">Tez orada</span>
+                          </div>
+                          <div style="font-family:'Space Grotesk';font-weight:600;font-size:22px;color:#3a3a42">—</div>
+                          <div style="font-size:12.5px;color:#8a8a93;margin-top:2px">{{ m.label }}</div>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+                      <div style="width:54px;height:54px;border-radius:14px;background:rgba(59,130,246,.08);display:flex;align-items:center;justify-content:center;font-size:24px;color:#3b82f6">{{ I.activity }}</div>
+                      <div style="font-family:'Space Grotesk';font-weight:600;font-size:17px">Real-time monitoring tez orada</div>
+                      <p style="margin:0;font-size:13px;color:#71717a;max-width:340px;line-height:1.6">CPU, RAM, traffic va disk ko'rsatkichlari bot ishga tushgach jonli grafiklar bilan ko'rinadi</p>
+                    </div>
+                  </div>
+                </sc-if>
+
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== SHABLONLAR MARKETPLACE ===== -->
+          <sc-if value="{{ isTemplates }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 32px;max-width:1240px">
+              <div style="margin-bottom:22px">
+                <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;margin:0 0 5px;letter-spacing:-.6px">Shablonlar marketplace</h1>
+                <p style="margin:0;color:#8a8a93;font-size:14px">Tayyor botlarni bir necha daqiqada ishga tushiring</p>
+              </div>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px">
+                <div style="position:relative;flex:1;min-width:240px;max-width:360px">
+                  <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;display:flex;color:#5a5a63">{{ I.search }}</span>
+                  <input value="{{ tplSearch }}" onInput="{{ setTplSearch }}" placeholder="Shablon qidirish" style="width:100%;padding:10px 14px 10px 38px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#e7e7ea;font-size:13.5px" style-focus="border-color:rgba(59,130,246,.5)" />
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;padding:0 4px">
+                  <span style="font-size:13px;color:#71717a">Narx:</span>
+                  <input placeholder="dan" style="width:74px;padding:9px 11px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#e7e7ea;font-size:13px" style-focus="border-color:rgba(59,130,246,.5)" />
+                  <span style="color:#5a5a63">—</span>
+                  <input placeholder="gacha" style="width:74px;padding:9px 11px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:#e7e7ea;font-size:13px" style-focus="border-color:rgba(59,130,246,.5)" />
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px">
+                <sc-for list="{{ tplCats }}" as="c" hint-placeholder-count="5">
+                  <button data-cat="{{ c.cat }}" onClick="{{ setTplCat }}" style="{{ c.chipStyle }}">{{ c.label }}</button>
+                </sc-for>
+              </div>
+              <sc-if value="{{ tplEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:60px;text-align:center;color:#71717a;font-size:14px">Bu mezon bo'yicha shablon topilmadi</div>
+              </sc-if>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+                <sc-for list="{{ templates }}" as="t" hint-placeholder-count="8">
+                  <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:13px;overflow:hidden;cursor:pointer;transition:all .18s" style-hover="border-color:rgba(59,130,246,.35);transform:translateY(-2px)">
+                    <div style="height:104px;background:{{ t.bg }};position:relative;display:flex;align-items:center;justify-content:center">
+                      <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.14) 1px,transparent 1px);background-size:16px 16px;opacity:.5"></div>
+                      <div style="width:48px;height:48px;border-radius:13px;background:rgba(255,255,255,.18);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;font-family:'Space Grotesk';font-weight:700">{{ t.initials }}</div>
+                      <sc-if value="{{ t.owned }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(0,0,0,.4);color:#86efac"><span style="width:5px;height:5px;border-radius:50%;background:#22c55e"></span>Sizda bor</span></sc-if>
+                    </div>
+                    <div style="padding:14px">
+                      <div style="display:inline-block;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.05);color:#a1a1aa;margin-bottom:9px">{{ t.cat }}</div>
+                      <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:14.5px;margin:0 0 12px;line-height:1.3">{{ t.name }}</h3>
+                      <div style="display:flex;align-items:center;gap:14px;font-size:11.5px;color:#71717a;margin-bottom:13px">
+                        <span style="display:flex;align-items:center;gap:5px"><span style="font-size:14px;display:flex">{{ eyeIconEl }}</span>{{ t.views }}</span>
+                        <span style="display:flex;align-items:center;gap:5px"><span style="font-size:14px;display:flex">{{ downloadIconEl }}</span>{{ t.downloads }}</span>
+                      </div>
+                      <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.05);padding-top:12px">
+                        <span style="font-size:14px;font-weight:700;font-family:'Space Grotesk';color:{{ t.priceColor }}">{{ t.price }}</span>
+                        <button style="padding:6px 13px;border-radius:8px;border:none;cursor:pointer;background:rgba(59,130,246,.14);color:#93c5fd;font-size:12px;font-weight:600" style-hover="background:rgba(59,130,246,.24)">{{ t.cta }}</button>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== FAYLLAR (global) ===== -->
+          <sc-if value="{{ isFiles }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 32px;max-width:860px">
+              <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;margin:0 0 5px;letter-spacing:-.6px">Fayllar</h1>
+              <p style="margin:0 0 24px;color:#8a8a93;font-size:14px">Botlaringiz uchun media va hujjatlar ombori</p>
+              <div style="border:2px dashed rgba(255,255,255,.13);border-radius:16px;padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 12px,transparent 12px 24px)" style-hover="border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.03)">
+                <div style="width:56px;height:56px;border-radius:14px;background:rgba(59,130,246,.1);display:flex;align-items:center;justify-content:center;font-size:26px;color:#3b82f6">{{ I.upload }}</div>
+                <div><div style="font-family:'Space Grotesk';font-weight:600;font-size:16px">Faylni shu yerga tashlang yoki tanlang</div><p style="margin:6px 0 0;font-size:13px;color:#71717a">PDF, JPG, PNG, MP4 • Maks. 50 MB</p></div>
+                <button style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:13.5px;font-weight:600" style-hover="filter:brightness(1.08)">Fayl tanlash</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== CREDENTIALS ===== -->
+          <sc-if value="{{ isCredentials }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 32px;max-width:860px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
+                <div><h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;margin:0 0 5px;letter-spacing:-.6px">Credentials</h1><p style="margin:0;color:#8a8a93;font-size:14px">API kalitlar va integratsiyalar — shifrlangan saqlanadi</p></div>
+                <button style="display:flex;align-items:center;gap:8px;padding:11px 17px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:14px;font-weight:600" style-hover="filter:brightness(1.08)"><span style="font-size:18px;display:flex">{{ I.plus }}</span> Yangi kalit</button>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ creds }}" as="c" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:15px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:16px 18px">
+                    <div style="width:44px;height:44px;border-radius:11px;background:{{ c.bg }};display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;flex:none">{{ c.iconEl }}</div>
+                    <div style="flex:1"><div style="font-family:'Space Grotesk';font-weight:600;font-size:14.5px">{{ c.name }}</div><div style="font-size:12px;color:#71717a">{{ c.type }} • {{ c.date }}</div></div>
+                    <span style="font-family:monospace;font-size:13px;color:#a1a1aa;letter-spacing:1px">{{ c.masked }}</span>
+                    <button style="background:none;border:none;color:#71717a;cursor:pointer;display:flex;font-size:17px;width:32px;height:32px;align-items:center;justify-content:center;border-radius:8px" style-hover="background:rgba(255,255,255,.06);color:#e7e7ea">{{ dotsIconEl }}</button>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== DAROMAD ===== -->
+          <sc-if value="{{ isDaromad }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 32px;max-width:1240px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
+                <div><h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;margin:0 0 5px;letter-spacing:-.6px">Daromad</h1><p style="margin:0;color:#8a8a93;font-size:14px">Shablon sotuvlari va platforma daromadingiz</p></div>
+                <button style="display:flex;align-items:center;gap:8px;padding:11px 17px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#22c55e,#16a34a);color:#fff;font-size:14px;font-weight:600" style-hover="filter:brightness(1.08)"><span style="font-size:17px;display:flex">{{ I.wallet }}</span> Yechib olish</button>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px">
+                <sc-for list="{{ revStats }}" as="s" hint-placeholder-count="4">
+                  <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:16px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><span style="font-size:18px;display:flex;color:#22c55e;width:34px;height:34px;align-items:center;justify-content:center;background:rgba(34,197,94,.1);border-radius:9px">{{ s.iconEl }}</span><span style="font-size:11.5px;font-weight:600;color:{{ s.deltaColor }}">{{ s.delta }}</span></div>
+                    <div style="font-family:'Space Grotesk';font-weight:600;font-size:23px;letter-spacing:-.5px">{{ s.value }}</div>
+                    <div style="font-size:12.5px;color:#8a8a93;margin-top:2px">{{ s.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px">
+                <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px">
+                  <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin:0 0 20px">Oylik daromad</h3>
+                  <div style="display:flex;align-items:flex-end;gap:8px;height:180px">
+                    <sc-for list="{{ revBars }}" as="b" hint-placeholder-count="12">
+                      <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="width:100%;border-radius:5px 5px 0 0;height:{{ b.h }}%;background:{{ b.color }};transition:all .2s"></div></div>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px">
+                  <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin:0 0 14px">So'nggi tranzaksiyalar</h3>
+                  <div style="display:flex;flex-direction:column">
+                    <sc-for list="{{ transactions }}" as="t" hint-placeholder-count="4">
+                      <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+                        <div style="flex:1;min-width:0"><div style="font-size:13px;color:#e7e7ea;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.name }}</div><div style="font-size:11.5px;color:#71717a">{{ t.time }}</div></div>
+                        <span style="font-size:13.5px;font-weight:600;font-family:'Space Grotesk';color:{{ t.amtColor }}">{{ t.amt }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== TO'LOV ===== -->
+          <sc-if value="{{ isTolov }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 32px;max-width:1080px">
+              <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;margin:0 0 5px;letter-spacing:-.6px">To'lov va tarif</h1>
+              <p style="margin:0 0 24px;color:#8a8a93;font-size:14px">Joriy rejangiz va to'lov usullari</p>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px">
+                <sc-for list="{{ plans }}" as="p" hint-placeholder-count="3">
+                  <div style="{{ p.cardStyle }}">
+                    <sc-if value="{{ p.current }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:6px;background:#3b82f6;color:#fff">JORIY</span></sc-if>
+                    <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin-bottom:8px">{{ p.name }}</div>
+                    <div style="display:flex;align-items:baseline;gap:3px;margin-bottom:18px"><span style="font-family:'Space Grotesk';font-weight:700;font-size:30px">{{ p.price }}</span><span style="font-size:13px;color:#71717a">{{ p.period }}</span></div>
+                    <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:20px">
+                      <sc-for list="{{ p.features }}" as="f" hint-placeholder-count="3">
+                        <div style="display:flex;align-items:center;gap:9px;font-size:13px;color:#c4c4cc"><span style="font-size:14px;display:flex;color:#22c55e">{{ checkIconEl }}</span>{{ f }}</div>
+                      </sc-for>
+                    </div>
+                    <button style="{{ p.btnStyle }}">{{ p.cta }}</button>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:20px">
+                <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:15px;margin:0 0 16px">To'lov usuli</h3>
+                <div style="display:flex;align-items:center;gap:14px">
+                  <div style="width:48px;height:32px;border-radius:7px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff">{{ cardIconEl }}</div>
+                  <div style="flex:1"><div style="font-size:13.5px;font-weight:500;font-family:monospace">•••• •••• •••• 4242</div><div style="font-size:12px;color:#71717a">Amal qiladi 08/28 \u2022 Uzcard</div></div>
+                  <button style="padding:8px 14px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#a1a1aa;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.08);color:#e7e7ea">O'zgartirish</button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== MUROJAATLAR ===== -->
+          <sc-if value="{{ isMurojaatlar }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 32px;max-width:1000px">
+              <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;margin:0 0 5px;letter-spacing:-.6px">Murojaatlar</h1>
+              <p style="margin:0 0 24px;color:#8a8a93;font-size:14px">Qo'llab-quvvatlash so'rovlari va tiketlar</p>
+              <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden">
+                <sc-for list="{{ tickets }}" as="t" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer" style-hover="background:rgba(255,255,255,.02)">
+                    <span style="font-family:monospace;font-size:12.5px;color:#71717a;flex:0 0 50px">{{ t.id }}</span>
+                    <div style="flex:1"><div style="font-size:13.5px;font-weight:500;color:#e7e7ea">{{ t.subj }}</div><div style="font-size:12px;color:#71717a">{{ t.user }} • {{ t.time }}</div></div>
+                    <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:11.5px;font-weight:600;background:{{ t.sb }};color:{{ t.sc }}"><span style="width:5px;height:5px;border-radius:50%;background:{{ t.sc }}"></span>{{ t.sl }}</span>
+                    <span style="font-size:15px;display:flex;color:#5a5a63">{{ chevRightIconEl }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== SOZLAMALAR ===== -->
+          <sc-if value="{{ isSozlamalar }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 32px;max-width:760px">
+              <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;margin:0 0 24px;letter-spacing:-.6px">Sozlamalar</h1>
+              <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:22px;margin-bottom:16px">
+                <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:15px;margin:0 0 18px">Profil</h3>
+                <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+                  <div style="width:60px;height:60px;border-radius:15px;background:linear-gradient(150deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:22px;color:#fff;font-family:'Space Grotesk'">AK</div>
+                  <button style="padding:9px 15px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#c4c4cc;font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Rasmni o'zgartirish</button>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                  <div><label style="display:block;font-size:13px;color:#c4c4cc;margin-bottom:7px">Ism</label><input value="Akmal Karimov" style="width:100%;padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#e7e7ea;font-size:14px" style-focus="border-color:rgba(59,130,246,.5)" /></div>
+                  <div><label style="display:block;font-size:13px;color:#c4c4cc;margin-bottom:7px">Username</label><input value="@akmal_dev" style="width:100%;padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:#e7e7ea;font-size:14px;font-family:monospace" style-focus="border-color:rgba(59,130,246,.5)" /></div>
+                </div>
+              </div>
+              <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:22px">
+                <h3 style="font-family:'Space Grotesk';font-weight:600;font-size:15px;margin:0 0 16px">Umumiy</h3>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+                  <div><div style="font-size:13.5px;color:#e7e7ea">Til</div><div style="font-size:12px;color:#71717a">Interfeys tili</div></div>
+                  <div style="display:flex;gap:6px"><span style="padding:6px 13px;border-radius:8px;background:rgba(59,130,246,.14);color:#93c5fd;font-size:12.5px;font-weight:600">O'zbek</span><span style="padding:6px 13px;border-radius:8px;background:transparent;color:#71717a;font-size:12.5px;font-weight:600;cursor:pointer">Русский</span><span style="padding:6px 13px;border-radius:8px;background:transparent;color:#71717a;font-size:12.5px;font-weight:600;cursor:pointer">English</span></div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+                  <div><div style="font-size:13.5px;color:#e7e7ea">Email bildirishnomalar</div><div style="font-size:12px;color:#71717a">Yangiliklar va hisobotlar</div></div>
+                  <div style="width:44px;height:25px;border-radius:13px;background:#3b82f6;position:relative;cursor:pointer"><span style="position:absolute;top:3px;right:3px;width:19px;height:19px;border-radius:50%;background:#fff"></span></div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0">
+                  <div><div style="font-size:13.5px;color:#e7e7ea">Dark mode</div><div style="font-size:12px;color:#71717a">Qorong'i interfeys</div></div>
+                  <div style="width:44px;height:25px;border-radius:13px;background:#3b82f6;position:relative;cursor:pointer"><span style="position:absolute;top:3px;right:3px;width:19px;height:19px;border-radius:50%;background:#fff"></span></div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== MCP ===== -->
+          <sc-if value="{{ isMcp }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:28px 32px;max-width:1000px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
+                <div><h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;margin:0 0 5px;letter-spacing:-.6px">MCP serverlar</h1><p style="margin:0;color:#8a8a93;font-size:14px">Model Context Protocol orqali tashqi tizimlarni ulang</p></div>
+                <button style="display:flex;align-items:center;gap:8px;padding:11px 17px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:14px;font-weight:600" style-hover="filter:brightness(1.08)"><span style="font-size:18px;display:flex">{{ I.plus }}</span> Server ulash</button>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
+                <sc-for list="{{ mcpServers }}" as="m" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:18px">
+                    <div style="width:46px;height:46px;border-radius:12px;background:{{ m.bg }};display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex:none">{{ m.iconEl }}</div>
+                    <div style="flex:1"><div style="font-family:'Space Grotesk';font-weight:600;font-size:14.5px">{{ m.name }}</div><div style="font-size:12px;color:#71717a">{{ m.desc }}</div></div>
+                    <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:11.5px;font-weight:600;background:{{ m.sb }};color:{{ m.sc }}"><span style="width:5px;height:5px;border-radius:50%;background:{{ m.sc }}"></span>{{ m.sl }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!--MAINSCREENS-->
+
+        </main>
+      </div>
+
+      <!-- FLOATING AI CTA -->
+      <sc-if value="{{ showFab }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ goAgent }}" style="position:fixed;bottom:26px;right:26px;z-index:40;display:flex;align-items:center;gap:9px;padding:13px 18px;border-radius:13px;border:none;cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff;font-size:14px;font-weight:600;box-shadow:0 12px 32px rgba(59,130,246,.42)" style-hover="filter:brightness(1.1);transform:translateY(-2px)">
+          <span style="font-size:19px;display:flex">{{ I.sparkles }}</span> AI Agentga o'tish
+        </button>
+      </sc-if>
+
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:860}}">
+class Component extends DCLogic {
+  state = {
+    authed:false, route:'dashboard', botTab:'umumiy', lang:"O'z",
+    codeDigits:['','','','','',''], tgOpened:false,
+    profileOpen:false, langOpen:false,
+    agentConv:1, agentInput:'', agentBusy:false,
+    agentMsgs:[{role:'assistant',text:"Salom! Men BotSpace Agent — botingizni boshqarish, flow'lar yaratish va foydalanuvchilar bilan ishlashda yordam beraman. Nimadan boshlaymiz?"}],
+    broadcast:'', nbName:'', nbDesc:'', nbToken:'', nbMode:'blank', creating:false,
+    envVars:[{k:'BOT_TOKEN',v:'7821049352:AAH...9f3a',show:false},{k:'OPENAI_API_KEY',v:'sk-proj-a4...c2b9',show:false},{k:'WEBHOOK_SECRET',v:'whsec_3f8...e1',show:false}],
+    envK:'', envV:'',
+    tplCat:'all', tplSearch:'', copied:false,
+  };
+
+  get I(){
+    if(this._I) return this._I;
+    const m=(arr)=>React.createElement('svg',{viewBox:'0 0 24 24',width:'1em',height:'1em',fill:'none',stroke:'currentColor',strokeWidth:1.6,strokeLinecap:'round',strokeLinejoin:'round',style:{display:'block',flexShrink:0}},arr.map((x,i)=>React.createElement(x[0],{...x[1],key:i})));
+    const P={
+      dashboard:[['rect',{x:3,y:3,width:7,height:7,rx:1.5}],['rect',{x:14,y:3,width:7,height:7,rx:1.5}],['rect',{x:14,y:14,width:7,height:7,rx:1.5}],['rect',{x:3,y:14,width:7,height:7,rx:1.5}]],
+      sparkles:[['path',{d:'M12 3l1.9 5.6L19.5 10l-5.6 1.4L12 17l-1.9-5.6L4.5 10l5.6-1.4z'}],['path',{d:'M19 15l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z'}]],
+      bot:[['rect',{x:4,y:9,width:16,height:11,rx:2.5}],['path',{d:'M12 9V5.5'}],['circle',{cx:12,cy:4,r:1.4}],['circle',{cx:9,cy:14.5,r:1.1,fill:'currentColor',stroke:'none'}],['circle',{cx:15,cy:14.5,r:1.1,fill:'currentColor',stroke:'none'}],['path',{d:'M2 14v2.5M22 14v2.5'}]],
+      layers:[['path',{d:'M12 2.5 2.5 7 12 11.5 21.5 7z'}],['path',{d:'M2.5 12 12 16.5 21.5 12'}],['path',{d:'M2.5 17 12 21.5 21.5 17'}]],
+      folder:[['path',{d:'M3 7a2 2 0 0 1 2-2h3.5l2 2H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'}]],
+      key:[['circle',{cx:7.5,cy:15.5,r:4}],['path',{d:'M10.4 12.6 20 3M16.5 6.5l2 2M19 4l2 2'}]],
+      wallet:[['path',{d:'M3 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2'}],['rect',{x:3,y:7,width:18,height:12,rx:2.5}],['circle',{cx:16.5,cy:13,r:1.2,fill:'currentColor',stroke:'none'}]],
+      card:[['rect',{x:2.5,y:5,width:19,height:14,rx:2.5}],['path',{d:'M2.5 10h19'}]],
+      message:[['path',{d:'M20.5 11.5a8 8 0 0 1-8.5 8 8.5 8.5 0 0 1-3.6-.8L3.5 20l1.3-4.7A8 8 0 0 1 4 11.5a8 8 0 0 1 8.5-8 8 8 0 0 1 8 8z'}]],
+      sliders:[['path',{d:'M4 7h10M4 12h6M4 17h13'}],['circle',{cx:17,cy:7,r:2.3}],['circle',{cx:13,cy:12,r:2.3}],['circle',{cx:20,cy:17,r:2.3}]],
+      server:[['rect',{x:3,y:4,width:18,height:7,rx:2}],['rect',{x:3,y:13,width:18,height:7,rx:2}],['circle',{cx:7,cy:7.5,r:.9,fill:'currentColor',stroke:'none'}],['circle',{cx:7,cy:16.5,r:.9,fill:'currentColor',stroke:'none'}]],
+      search:[['circle',{cx:11,cy:11,r:7}],['path',{d:'M21 21l-4.3-4.3'}]],
+      bell:[['path',{d:'M18 8.5a6 6 0 0 0-12 0c0 6.5-2.5 8.5-2.5 8.5h17S18 15 18 8.5'}],['path',{d:'M13.7 20.5a2 2 0 0 1-3.4 0'}]],
+      globe:[['circle',{cx:12,cy:12,r:9}],['path',{d:'M3 12h18'}],['path',{d:'M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z'}]],
+      chevDown:[['path',{d:'M6 9l6 6 6-6'}]],
+      chevRight:[['path',{d:'M9 6l6 6-6 6'}]],
+      chevLeft:[['path',{d:'M15 6l-6 6 6 6'}]],
+      plus:[['path',{d:'M12 5v14M5 12h14'}]],
+      play:[['path',{d:'M7 5l12 7-12 7z',fill:'currentColor',stroke:'none'}]],
+      check:[['path',{d:'M4 12.5l5 5L20 6.5'}]],
+      copy:[['rect',{x:9,y:9,width:11,height:11,rx:2.5}],['path',{d:'M5 15H4.5A1.5 1.5 0 0 1 3 13.5V4.5A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5'}]],
+      trash:[['path',{d:'M3.5 6h17M9 6V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V6M18.5 6l-1 13.5A1.5 1.5 0 0 1 16 21H8a1.5 1.5 0 0 1-1.5-1.5L5.5 6'}]],
+      eye:[['path',{d:'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z'}],['circle',{cx:12,cy:12,r:3}]],
+      eyeOff:[['path',{d:'M9.9 4.2A10.9 10.9 0 0 1 12 4c6.5 0 10 8 10 8a13 13 0 0 1-2.2 2.9M6.5 6.6A13 13 0 0 0 2 12s3.5 8 10 8a10.8 10.8 0 0 0 4-.8'}],['path',{d:'M3 3l18 18'}]],
+      upload:[['path',{d:'M21 15v3.5A1.5 1.5 0 0 1 19.5 20H4.5A1.5 1.5 0 0 1 3 18.5V15M7.5 8.5 12 4l4.5 4.5M12 4v12'}]],
+      send:[['path',{d:'M21.5 3 11 13.5M21.5 3l-6.5 18.5-3.8-8.2-8.2-3.8z'}]],
+      users:[['path',{d:'M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20'}],['circle',{cx:10,cy:8,r:3.5}],['path',{d:'M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M15 4.6a3.5 3.5 0 0 1 0 6.8'}]],
+      msgSquare:[['path',{d:'M20 14.5A1.5 1.5 0 0 1 18.5 16H8l-4 4V5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5z'}]],
+      zap:[['path',{d:'M13 2 4.5 13.5H11l-1 8.5L19.5 10H13z',fill:'currentColor',stroke:'none'}]],
+      import:[['path',{d:'M21 15v3.5A1.5 1.5 0 0 1 19.5 20H4.5A1.5 1.5 0 0 1 3 18.5V15M7.5 11 12 15.5 16.5 11M12 15.5V3'}]],
+      x:[['path',{d:'M18 6 6 18M6 6l12 12'}]],
+      database:[['ellipse',{cx:12,cy:5.5,rx:8,ry:3}],['path',{d:'M4 5.5v13c0 1.66 3.58 3 8 3s8-1.34 8-3v-13'}],['path',{d:'M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3'}]],
+      cpu:[['rect',{x:6,y:6,width:12,height:12,rx:2}],['rect',{x:9.5,y:9.5,width:5,height:5,rx:1}],['path',{d:'M9 2v2.5M15 2v2.5M9 19.5V22M15 19.5V22M2 9h2.5M2 15h2.5M19.5 9H22M19.5 15H22'}]],
+      disk:[['rect',{x:3,y:13,width:18,height:6,rx:2}],['path',{d:'M3.5 13 6.5 5.5A1.5 1.5 0 0 1 7.9 4.5h8.2a1.5 1.5 0 0 1 1.4 1L20.5 13'}],['circle',{cx:7,cy:16,r:.9,fill:'currentColor',stroke:'none'}]],
+      activity:[['path',{d:'M22 12h-4l-3 8L9 4l-3 8H2'}]],
+      history:[['path',{d:'M3.5 12a8.5 8.5 0 1 0 2.8-6.3L3 8.5'}],['path',{d:'M3 4v4.5h4.5'}],['path',{d:'M12 8v4.2l3 1.8'}]],
+      rotate:[['path',{d:'M3.5 12a8.5 8.5 0 1 0 2.8-6.3L3 8.5'}],['path',{d:'M3 4v4.5h4.5'}]],
+      external:[['path',{d:'M15 3.5h5.5V9'}],['path',{d:'M20 4 10.5 13.5'}],['path',{d:'M18 13.5v5A1.5 1.5 0 0 1 16.5 20h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H11'}]],
+      dots:[['circle',{cx:5,cy:12,r:1.4,fill:'currentColor',stroke:'none'}],['circle',{cx:12,cy:12,r:1.4,fill:'currentColor',stroke:'none'}],['circle',{cx:19,cy:12,r:1.4,fill:'currentColor',stroke:'none'}]],
+      user:[['circle',{cx:12,cy:8,r:4}],['path',{d:'M4.5 20.5v-1A5.5 5.5 0 0 1 10 14h4a5.5 5.5 0 0 1 5.5 5.5v1'}]],
+      logout:[['path',{d:'M9 20.5H5.5A1.5 1.5 0 0 1 4 19V5a1.5 1.5 0 0 1 1.5-1.5H9M16 16.5l4.5-4.5L16 7.5M20.5 12H9'}]],
+      image:[['rect',{x:3,y:3,width:18,height:18,rx:2.5}],['circle',{cx:8.5,cy:8.5,r:1.8}],['path',{d:'M21 15.5 16 10.5 5 21.5'}]],
+      button:[['rect',{x:2.5,y:8,width:19,height:8,rx:3}],['path',{d:'M7 12h.01M11 12h2'}]],
+      alert:[['path',{d:'M10.3 3.9 1.9 18a1.8 1.8 0 0 0 1.6 2.7h17a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z'}],['path',{d:'M12 9v4M12 17h.01'}]],
+      grid:[['rect',{x:3,y:3,width:7,height:7,rx:1.5}],['rect',{x:14,y:3,width:7,height:7,rx:1.5}],['rect',{x:14,y:14,width:7,height:7,rx:1.5}],['rect',{x:3,y:14,width:7,height:7,rx:1.5}]],
+      edit:[['path',{d:'M12 20h9'}],['path',{d:'M16.5 3.5a2 2 0 0 1 3 3L7 19l-4 1 1-4z'}]],
+      clock:[['circle',{cx:12,cy:12,r:9}],['path',{d:'M12 7v5l3 2'}]],
+      run:[['circle',{cx:12,cy:12,r:9}],['path',{d:'M10 9l5 3-5 3z',fill:'currentColor',stroke:'none'}]],
+      minus:[['path',{d:'M5 12h14'}]],
+      zoomout:[['circle',{cx:11,cy:11,r:7}],['path',{d:'M21 21l-4.3-4.3M8 11h6'}]],
+      zoomin:[['circle',{cx:11,cy:11,r:7}],['path',{d:'M21 21l-4.3-4.3M11 8v6M8 11h6'}]],
+      target:[['circle',{cx:12,cy:12,r:9}],['circle',{cx:12,cy:12,r:5}],['circle',{cx:12,cy:12,r:1,fill:'currentColor',stroke:'none'}]],
+      filter:[['path',{d:'M3 5h18l-7 8v6l-4-2v-4z'}]],
+      download:[['path',{d:'M21 15v3.5A1.5 1.5 0 0 1 19.5 20H4.5A1.5 1.5 0 0 1 3 18.5V15M7.5 11 12 15.5 16.5 11M12 15.5V3'}]],
+      eyeView:[['path',{d:'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z'}],['circle',{cx:12,cy:12,r:3}]],
+      tag:[['path',{d:'M3 7.5V4.5A1.5 1.5 0 0 1 4.5 3h3l11 11a1.5 1.5 0 0 1 0 2.1l-4.4 4.4a1.5 1.5 0 0 1-2.1 0z'}],['circle',{cx:8,cy:8,r:1.3,fill:'currentColor',stroke:'none'}]],
+      flow:[['rect',{x:3,y:4,width:7,height:5,rx:1.5}],['rect',{x:14,y:15,width:7,height:5,rx:1.5}],['path',{d:'M6.5 9v4a2 2 0 0 0 2 2H14'}]],
+    };
+    const out={}; for(const k in P) out[k]=m(P[k]); this._I=out; return out;
+  }
+
+  // ---------- helpers ----------
+  go(route){ this.setState({route, profileOpen:false, langOpen:false}); const m=document.querySelector('main'); if(m) m.scrollTop=0; }
+  navClick = (e)=>{ this.go(e.currentTarget.dataset.route); };
+  menuGo = (e)=>{ this.go(e.currentTarget.dataset.route); };
+  goTolov = ()=> this.go('tolov');
+  goAgent = ()=> this.go('agent');
+  toggleProfile = ()=> this.setState(s=>({profileOpen:!s.profileOpen, langOpen:false}));
+  toggleLang = ()=> this.setState(s=>({lang: s.lang==="O'z"?'Ру':s.lang==='Ру'?'En':"O'z"}));
+
+  // login
+  openTg = ()=> this.setState({tgOpened:true});
+  onCode = (e)=>{
+    const idx=+e.target.dataset.idx;
+    const v=(e.target.value||'').replace(/\D/g,'').slice(-1);
+    const d=[...this.state.codeDigits]; d[idx]=v; this.setState({codeDigits:d});
+    if(v && idx<5){ const n=e.target.parentElement.querySelector('[data-idx="'+(idx+1)+'"]'); if(n) n.focus(); }
+    if(d.every(x=>x)) setTimeout(()=>this.login(),260);
+  };
+  onCodeKey = (e)=>{
+    const idx=+e.target.dataset.idx;
+    if(e.key==='Backspace' && !e.target.value && idx>0){ const p=e.target.parentElement.querySelector('[data-idx="'+(idx-1)+'"]'); if(p) p.focus(); }
+  };
+  onCodePaste = (e)=>{
+    const t=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);
+    if(t.length){ e.preventDefault(); const d=['','','','','','']; for(let i=0;i<t.length;i++) d[i]=t[i]; this.setState({codeDigits:d}); if(t.length===6) setTimeout(()=>this.login(),260); }
+  };
+  login = ()=> this.setState({authed:true, route:'dashboard'});
+  logout = ()=> this.setState({authed:false, route:'dashboard', profileOpen:false, codeDigits:['','','','','',''], tgOpened:false});
+
+  // bot
+  openBot = ()=> this.go('botdetail');
+  setBotTab = (e)=>{ this.setState({botTab:e.currentTarget.dataset.tab}); };
+  copyId = ()=>{ this.setState({copied:true}); setTimeout(()=>this.setState({copied:false}),1400); };
+
+  // agent
+  setAgentInput = (e)=> this.setState({agentInput:e.target.value});
+  agentKey = (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); this.sendAgent(this.state.agentInput); } };
+  suggest = (e)=> this.sendAgent(e.currentTarget.dataset.text);
+  sendAgent = (text)=>{
+    text=(text||'').trim(); if(!text||this.state.agentBusy) return;
+    const msgs=[...this.state.agentMsgs,{role:'user',text}];
+    this.setState({agentMsgs:msgs, agentInput:'', agentBusy:true});
+    setTimeout(()=>{
+      this.setState(s=>({agentMsgs:[...s.agentMsgs,{role:'assistant',text:this.agentReply(text)}], agentBusy:false}));
+      this.scrollAgent();
+    },950);
+    this.scrollAgent();
+  };
+  scrollAgent(){ setTimeout(()=>{ const el=document.getElementById('agentScroll'); if(el) el.scrollTop=el.scrollHeight; },60); }
+  agentReply(t){
+    const l=t.toLowerCase();
+    if(l.includes('/start')||l.includes('salomlash')) return "Ajoyib! /start uchun salomlashish flow tayyorladim:\n\n1. TRIGGER — /start buyrug'i\n2. XABAR — \"Assalomu alaykum! BotSpace'ga xush kelibsiz \uD83D\uDC4B\"\n3. TUGMALAR — [Xizmatlar] [Aloqa] [Yordam]\n4. KUTISH — foydalanuvchi tanlovini kutish\n\nKonstruktorda ochib, tahrirlashni xohlaysizmi?";
+    if(l.includes('vip')||l.includes('aksiya')) return "VIP segment uchun aksiya kampaniyasini sozladim. 142 ta VIP foydalanuvchi aniqlandi. Xabar matni:\n\n\"\uD83C\uDF81 Faqat siz uchun — 30% chegirma! Maxsus taklif 48 soat amal qiladi.\"\n\nHoziroq yuboraymi yoki rejalashtiraymi?";
+    if(l.includes('faq')) return "FAQ bo'limi qo'shildi \u2705 Quyidagi 5 ta savol-javob avtomatik shakllantirildi: ish vaqti, narxlar, yetkazib berish, to'lov usullari va qaytarish siyosati. Tahrirlash uchun \"Ma'lumotlar\" bo'limiga o'ting.";
+    if(l.includes('statistik')) return "So'nggi 7 kun statistikasi:\n\u2022 Yangi foydalanuvchilar: 318 (+12%)\n\u2022 Faol suhbatlar: 1 240\n\u2022 O'rtacha javob vaqti: 1.4s\n\u2022 Konversiya: 6.8%\n\nBatafsil hisobotni \"Monitoring\" bo'limida ko'rishingiz mumkin.";
+    return "Tushunarli. Buni amalga oshirish uchun botingizning flow'iga yangi qadam qo'shaman. Aniqroq qilib aytsangiz — qaysi bot uchun va qanday natija kutyapsiz?";
+  }
+
+  // broadcast / env / newbot
+  setBroadcast = (e)=> this.setState({broadcast:e.target.value});
+  setNb = (e)=>{ const k=e.target.dataset.field; this.setState({[k]:e.target.value}); };
+  setNbMode = (e)=> this.setState({nbMode:e.currentTarget.dataset.mode});
+  createBot = ()=>{ this.setState({creating:true}); setTimeout(()=>this.setState({creating:false, route:'botdetail', botTab:'umumiy'}),1100); };
+  setEnvK = (e)=> this.setState({envK:e.target.value});
+  setEnvV = (e)=> this.setState({envV:e.target.value});
+  addEnv = ()=>{ const k=this.state.envK.trim(); if(!k) return; this.setState(s=>({envVars:[...s.envVars,{k,v:s.envV,show:false}],envK:'',envV:''})); };
+  delEnv = (e)=>{ const i=+e.currentTarget.dataset.i; this.setState(s=>({envVars:s.envVars.filter((_,x)=>x!==i)})); };
+  toggleEnv = (e)=>{ const i=+e.currentTarget.dataset.i; this.setState(s=>({envVars:s.envVars.map((v,x)=>x===i?{...v,show:!v.show}:v)})); };
+
+  // templates
+  setTplCat = (e)=> this.setState({tplCat:e.currentTarget.dataset.cat});
+  setTplSearch = (e)=> this.setState({tplSearch:e.target.value});
+
+  renderVals(){
+    const I=this.I, st=this.state, r=st.route;
+    const navActive = (['bots','newbot','botdetail'].includes(r))?'bots':r;
+    const navDefs=[
+      {route:'dashboard',label:'Boshqaruv',icon:'dashboard'},
+      {route:'agent',label:'AI Agent',icon:'sparkles',badge:'AI'},
+      {route:'bots',label:'Botlar',icon:'bot'},
+      {route:'templates',label:'Shablonlar',icon:'layers'},
+      {route:'files',label:'Fayllar',icon:'folder'},
+      {route:'credentials',label:'Credentials',icon:'key'},
+      {route:'daromad',label:'Daromad',icon:'wallet'},
+      {route:'tolov',label:"To'lov",icon:'card'},
+      {route:'murojaatlar',label:'Murojaatlar',icon:'message'},
+      {route:'sozlamalar',label:'Sozlamalar',icon:'sliders'},
+      {route:'mcp',label:'MCP',icon:'server'},
+    ];
+    const navItems=navDefs.map(n=>{
+      const active=n.route===navActive;
+      return {...n, iconEl:I[n.icon], badge:n.badge||'',
+        btnStyle:'display:flex;align-items:center;gap:12px;width:100%;padding:9px 11px;border-radius:9px;border:none;cursor:pointer;font-size:13.5px;font-weight:500;transition:all .15s;'+(active?'background:rgba(59,130,246,.13);color:#dbeafe;box-shadow:inset 2px 0 0 #3b82f6':'background:transparent;color:#8a8a93')};
+    });
+
+    const sc=(up)=> up?'#86efac':'#f87171';
+    const stats=[
+      {label:'Jami Botlar',value:'12',delta:'+2',icon:'bot',up:true},
+      {label:'Foydalanuvchilar',value:'8 472',delta:'+12.4%',icon:'users',up:true},
+      {label:'Xabarlar',value:'124K',delta:'+5.1%',icon:'msgSquare',up:true},
+      {label:'Balans',value:'$248.50',delta:'-$12',icon:'wallet',up:false},
+      {label:'Shablonlar',value:'34',delta:'+4',icon:'layers',up:true},
+    ].map(s=>({...s,iconEl:I[s.icon],deltaColor:sc(s.up)}));
+
+    const C={blue:'linear-gradient(150deg,#3b82f6,#1d4ed8)',green:'linear-gradient(150deg,#22c55e,#15803d)',violet:'linear-gradient(150deg,#8b5cf6,#6d28d9)',amber:'linear-gradient(150deg,#f59e0b,#b45309)',cyan:'linear-gradient(150deg,#06b6d4,#0e7490)',rose:'linear-gradient(150deg,#f43f5e,#be123c)'};
+    const topBots=[
+      {name:'Telemeditsina boti',initials:'TM',users:'2 140',up:'+8%',bg:C.blue},
+      {name:"Gul do'koni boti",initials:'GD',users:'1 820',up:'+5%',bg:C.rose},
+      {name:'Tarjima agentligi',initials:'TR',users:'1 460',up:'+12%',bg:C.cyan},
+      {name:'Buxgalteriya boti',initials:'BX',users:'940',up:'+3%',bg:C.violet},
+    ];
+    const stMap={running:{statusLabel:'Faol',statusColor:'#22c55e',statusBg:'rgba(34,197,94,.12)'},draft:{statusLabel:'Qoralama',statusColor:'#eab308',statusBg:'rgba(234,179,8,.12)'}};
+    const recentBots=[
+      {name:'Telemeditsina boti',initials:'TM',time:'2 soat oldin',bg:C.blue,...stMap.running},
+      {name:"Gul do'koni boti",initials:'GD',time:'5 soat oldin',bg:C.rose,...stMap.running},
+      {name:'Buxgalteriya boti',initials:'BX',time:'kecha',bg:C.violet,...stMap.draft},
+      {name:'Yuridik xizmatlar',initials:'YU',time:'2 kun oldin',bg:C.amber,...stMap.draft},
+    ];
+    const quickActions=[
+      {label:'Yangi bot yaratish',icon:'plus',route:'newbot'},
+      {label:'Shablon tanlash',icon:'layers',route:'templates'},
+      {label:'AI Assistant',icon:'sparkles',route:'agent'},
+      {label:'Botni import qilish',icon:'import',route:'newbot'},
+    ].map(q=>({...q,iconEl:I[q.icon]}));
+
+    // ---- bots ----
+    const botsList=[
+      {initials:'TM',name:'Telemeditsina boti',desc:'Onlayn shifokor qabuli va konsultatsiya',status:'running',date:'12 Iyun 2026',bg:C.blue},
+      {initials:'GD',name:"Gul do'koni boti",desc:'Buyurtma qabul qilish va yetkazib berish',status:'running',date:'8 Iyun 2026',bg:C.rose},
+      {initials:'BX',name:'Buxgalteriya boti',desc:'Hisob-kitob va avtomatik hisobotlar',status:'draft',date:'3 Iyun 2026',bg:C.violet},
+      {initials:'YU',name:'Yuridik xizmatlar boti',desc:'Konsultatsiya va hujjat tayyorlash',status:'draft',date:'1 Iyun 2026',bg:C.amber},
+      {initials:'TR',name:'Tarjima agentligi boti',desc:'Matn va hujjatlarni tarjima qilish',status:'running',date:'28 May 2026',bg:C.cyan},
+      {initials:'HT',name:'Hotel booking boti',desc:'Xona band qilish va to\u2019lov',status:'draft',date:'24 May 2026',bg:C.green},
+    ].map(b=>({...b,...stMap[b.status]}));
+
+    // ---- agent ----
+    const conversations=[
+      {id:1,title:"/start salomlashish flow",time:'Bugun'},
+      {id:2,title:'VIP aksiya kampaniyasi',time:'Kecha'},
+      {id:3,title:"FAQ bo'limini sozlash",time:'2 kun oldin'},
+      {id:4,title:'Statistika hisoboti',time:'5 kun oldin'},
+    ].map(c=>({...c, itemStyle:'display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;padding:10px 12px;border-radius:9px;border:none;cursor:pointer;transition:all .15s;'+(c.id===st.agentConv?'background:rgba(59,130,246,.12);color:#dbeafe':'background:transparent;color:#a1a1aa')}));
+    const promptSuggestions=[
+      {text:"/start uchun salomlashish flow tuz",icon:'flow'},
+      {text:"VIP foydalanuvchilarga aksiya yubor",icon:'send'},
+      {text:"Botga FAQ bo'lim qo'sh",icon:'msgSquare'},
+      {text:"Foydalanuvchi statistikasini ko'rsat",icon:'activity'},
+    ].map(p=>({...p,iconEl:I[p.icon]}));
+    const agentMsgs=st.agentMsgs.map((m,i)=>({...m,key:i,isUser:m.role==='user',isAssistant:m.role==='assistant'}));
+
+    // ---- bot detail tabs ----
+    const botTabs=[
+      {id:'umumiy',label:'Umumiy'},{id:'xabarlar',label:'Xabarlar'},{id:'malumotlar',label:"Ma'lumotlar"},
+      {id:'fayllar',label:'Fayllar'},{id:'sozlamalar',label:'Sozlamalar'},{id:'versiyalar',label:'Versiyalar'},{id:'monitoring',label:'Monitoring'},
+    ].map(t=>({...t, active:t.id===st.botTab, tabStyle:'padding:11px 4px;background:none;border:none;cursor:pointer;font-size:13.5px;font-weight:500;white-space:nowrap;transition:all .15s;border-bottom:2px solid '+(t.id===st.botTab?'#3b82f6':'transparent')+';color:'+(t.id===st.botTab?'#f4f4f5':'#71717a')}));
+    const collections=[
+      {name:'Chat tarixi',key:'chat_history',system:true,fields:6,version:'v3',bg:C.blue},
+      {name:'consultations',key:'consultations',system:false,fields:9,version:'v2',bg:C.cyan},
+      {name:'doctors',key:'doctors',system:false,fields:12,version:'v5',bg:C.violet},
+      {name:'Foydalanuvchilar',key:'users',system:true,fields:8,version:'v1',bg:C.green},
+    ];
+    const versions=[
+      {v:'v12',status:'running',time:'24 Iyun, 14:32',service:'web',current:true},
+      {v:'v11',status:'stopped',time:'22 Iyun, 09:10',service:'web'},
+      {v:'v10',status:'stopped',time:'18 Iyun, 16:45',service:'web'},
+      {v:'v9',status:'failed',time:'15 Iyun, 11:20',service:'worker'},
+    ].map(v=>{const map={running:{l:'Ishlamoqda',c:'#22c55e',b:'rgba(34,197,94,.12)'},stopped:{l:"To'xtatilgan",c:'#a1a1aa',b:'rgba(255,255,255,.06)'},failed:{l:'Xatolik',c:'#f87171',b:'rgba(239,68,68,.12)'}};return {...v,sl:map[v.status].l,sc:map[v.status].c,sb:map[v.status].b};});
+    const monitoring=[
+      {label:'CPU',icon:'cpu'},{label:'RAM',icon:'server'},{label:'Traffic',icon:'activity'},{label:'Disk',icon:'disk'},
+    ].map(m=>({...m,iconEl:I[m.icon]}));
+    const envVars=st.envVars.map((v,i)=>({...v,i,display:v.show?v.v:'\u2022'.repeat(Math.min(18,Math.max(8,v.v.length))),eyeEl:v.show?I.eyeOff:I.eye}));
+
+    // ---- templates ----
+    const tplAll=[
+      {name:'Telemeditsina boti',cat:"Xizmat ko'rsatish",price:'Bepul (aksiya)',free:true,owned:true,views:'4.2K',downloads:'1 840',bg:C.blue},
+      {name:"To'y agentligi boti",cat:'Shaxsiy brend',price:'$49',free:false,owned:false,views:'2.1K',downloads:'620',bg:C.rose},
+      {name:'Buxgalteriya boti',cat:"Xizmat ko'rsatish",price:'$39',free:false,owned:false,views:'3.4K',downloads:'910',bg:C.violet},
+      {name:'Yuridik xizmatlar boti',cat:"Xizmat ko'rsatish",price:'$59',free:false,owned:false,views:'1.8K',downloads:'430',bg:C.amber},
+      {name:'Tarjima agentligi boti',cat:"Xizmat ko'rsatish",price:'$29',free:false,owned:true,views:'5.1K',downloads:'2 100',bg:C.cyan},
+      {name:"Gul do'koni boti",cat:'Catalog',price:'$35',free:false,owned:false,views:'3.9K',downloads:'1 250',bg:C.rose},
+      {name:'Uskuna ijarasi boti',cat:'Yetkazib berish',price:'$45',free:false,owned:false,views:'1.2K',downloads:'310',bg:C.green},
+      {name:'Hotel boti',cat:'Yetkazib berish',price:'$55',free:false,owned:false,views:'2.7K',downloads:'740',bg:C.blue},
+      {name:'Avtomobil saloni boti',cat:'Catalog',price:'$65',free:false,owned:false,views:'1.9K',downloads:'380',bg:C.violet},
+      {name:'Til kurslari boti',cat:'Shaxsiy brend',price:'$32',free:false,owned:false,views:'4.6K',downloads:'1 560',bg:C.amber},
+    ];
+    const q=st.tplSearch.toLowerCase();
+    const templates=tplAll.filter(t=>(st.tplCat==='all'||t.cat===st.tplCat)&&(!q||t.name.toLowerCase().includes(q))).map(t=>({...t,
+      initials:t.name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(),
+      priceColor:t.free?'#86efac':'#f4f4f5',
+      cta:t.owned?'Ochish':t.free?'Olish':'Sotib olish'}));
+    const tplCats=['all','Catalog','Yetkazib berish','Shaxsiy brend',"Xizmat ko'rsatish"].map(c=>({label:c==='all'?'Barchasi':c,cat:c,active:c===st.tplCat,
+      chipStyle:'padding:7px 14px;border-radius:8px;border:1px solid '+(c===st.tplCat?'rgba(59,130,246,.4)':'rgba(255,255,255,.08)')+';cursor:pointer;font-size:13px;font-weight:500;white-space:nowrap;background:'+(c===st.tplCat?'rgba(59,130,246,.14)':'rgba(255,255,255,.02)')+';color:'+(c===st.tplCat?'#93c5fd':'#a1a1aa')}));
+
+    // ---- credentials ----
+    const creds=[
+      {name:'Telegram Bot API',type:'API token',masked:'\u2022\u2022\u2022\u2022\u2022\u2022 9f3a',date:'12 Iyun 2026',icon:'send',bg:C.blue},
+      {name:'OpenAI',type:'Secret key',masked:'\u2022\u2022\u2022\u2022\u2022\u2022 c2b9',date:'10 Iyun 2026',icon:'sparkles',bg:C.green},
+      {name:'Payme',type:"To'lov kaliti",masked:'\u2022\u2022\u2022\u2022\u2022\u2022 4d12',date:'5 Iyun 2026',icon:'card',bg:C.cyan},
+      {name:'AWS S3',type:'Access key',masked:'\u2022\u2022\u2022\u2022\u2022\u2022 8e21',date:'1 Iyun 2026',icon:'database',bg:C.amber},
+    ].map(c=>({...c,iconEl:I[c.icon]}));
+
+    // ---- daromad ----
+    const revStats=[
+      {label:'Jami daromad',value:'$4 280',delta:'+18%',icon:'wallet',up:true},
+      {label:'Bu oy',value:'$640',delta:'+12%',icon:'activity',up:true},
+      {label:'Sotuvlar',value:'128',delta:'+9',icon:'tag',up:true},
+      {label:"Yechib olinmagan",value:'$248',delta:'',icon:'card',up:true},
+    ].map(s=>({...s,iconEl:I[s.icon],deltaColor:sc(s.up)}));
+    const revBars=[40,55,48,70,62,85,78,95,72,88,60,80].map((h,i)=>({h,key:i,color:i===7?'#22c55e':'rgba(34,197,94,.28)'}));
+    const transactions=[
+      {name:'Telemeditsina boti — shablon sotuvi',amt:'+$39',time:'Bugun, 12:40',pos:true},
+      {name:'Pro tarif obunasi',amt:'-$29',time:'Kecha, 09:00',pos:false},
+      {name:'Tarjima boti — shablon sotuvi',amt:'+$29',time:'22 Iyun',pos:true},
+      {name:'AI kreditlar to\u2019ldirish',amt:'+$50',time:'20 Iyun',pos:true},
+    ].map(t=>({...t,amtColor:t.pos?'#86efac':'#f87171'}));
+
+    // ---- tolov plans ----
+    const plans=[
+      {name:'Bepul',price:'$0',period:'/oy',features:['3 ta bot','1 000 xabar/oy','Asosiy shablonlar'],current:false,cta:'Joriy reja',active:false},
+      {name:'Pro',price:'$29',period:'/oy',features:['Cheksiz botlar','100K xabar/oy','AI kreditlar','Barcha shablonlar','Ustuvor yordam'],current:true,cta:'Joriy tarifingiz',active:true},
+      {name:'Biznes',price:'$99',period:'/oy',features:["Pro'dagi hammasi",'Cheksiz xabarlar','Maxsus domen','SLA kafolati','Shaxsiy menejer'],current:false,cta:"Biznesga o'tish",active:false},
+    ].map(p=>({...p,
+      cardStyle:'position:relative;border-radius:14px;padding:22px;'+(p.current?'background:rgba(59,130,246,.07);border:1.5px solid rgba(59,130,246,.4)':'background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07)'),
+      btnStyle:'width:100%;padding:11px;border-radius:10px;border:none;font-size:13.5px;font-weight:600;cursor:pointer;'+(p.current?'background:rgba(255,255,255,.06);color:#a1a1aa':'background:linear-gradient(150deg,#3b82f6,#2563eb);color:#fff')}));
+
+    // ---- murojaatlar ----
+    const tickets=[
+      {id:'#1284',subj:'Bot token ulanmayapti',user:'Akmal K.',status:'open',time:'10 daqiqa oldin',sc:'#3b82f6',sl:'Ochiq',sb:'rgba(59,130,246,.12)'},
+      {id:'#1283',subj:"To'lov amalga oshmadi",user:'Dilnoza R.',status:'pending',time:'1 soat oldin',sc:'#eab308',sl:'Kutilmoqda',sb:'rgba(234,179,8,.12)'},
+      {id:'#1280',subj:'Shablonni import qilish xatosi',user:'Sardor M.',status:'closed',time:'kecha',sc:'#22c55e',sl:'Yopilgan',sb:'rgba(34,197,94,.12)'},
+      {id:'#1278',subj:'AI javoblari sekin ishlamoqda',user:'Nigora T.',status:'open',time:'2 kun oldin',sc:'#3b82f6',sl:'Ochiq',sb:'rgba(59,130,246,.12)'},
+    ];
+
+    // ---- mcp ----
+    const mcpServers=[
+      {name:'Telegram MCP',desc:'Bot API va webhook integratsiyasi',status:'connected',icon:'send',bg:C.blue},
+      {name:'Database MCP',desc:'CMS va collections ulanishi',status:'connected',icon:'database',bg:C.cyan},
+      {name:'OpenAI MCP',desc:'AI agent va flow generatsiya',status:'connected',icon:'sparkles',bg:C.green},
+      {name:'Payme MCP',desc:"To'lov tizimi integratsiyasi",status:'disconnected',icon:'card',bg:C.amber},
+    ].map(m=>({...m,iconEl:I[m.icon],sc:m.status==='connected'?'#22c55e':'#71717a',sl:m.status==='connected'?'Ulangan':'Uzilgan',sb:m.status==='connected'?'rgba(34,197,94,.12)':'rgba(255,255,255,.06)'}));
+
+    return {
+      I,
+      isLogin:!st.authed,
+      showShell: st.authed && r!=='constructor',
+      isConstructor: st.authed && r==='constructor',
+      isDashboard:r==='dashboard', isAgent:r==='agent', isBots:r==='bots', isNewbot:r==='newbot',
+      isBotDetail:r==='botdetail', isTemplates:r==='templates', isFiles:r==='files',
+      isCredentials:r==='credentials', isDaromad:r==='daromad', isTolov:r==='tolov',
+      isMurojaatlar:r==='murojaatlar', isSozlamalar:r==='sozlamalar', isMcp:r==='mcp',
+      showFab: ['dashboard','bots','botdetail','templates'].includes(r),
+      lang:st.lang, tgOpened:st.tgOpened, profileOpen:st.profileOpen,
+      codeDigits:st.codeDigits,
+      navItems, stats, topBots, recentBots, quickActions,
+      botsList, conversations, promptSuggestions, agentMsgs, agentInput:st.agentInput, agentBusy:st.agentBusy,
+      botTabs, collections, versions, monitoring, envVars, envK:st.envK, envV:st.envV,
+      broadcast:st.broadcast, broadcastLen:st.broadcast.length,
+      broadcastDisabled:st.broadcast.trim().length===0,
+      broadcastBtnStyle:'display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;border:none;font-size:13.5px;font-weight:600;color:#fff;'+(st.broadcast.trim().length>0?'cursor:pointer;background:linear-gradient(150deg,#3b82f6,#2563eb);box-shadow:0 6px 20px rgba(59,130,246,.3)':'cursor:not-allowed;background:rgba(255,255,255,.05);color:#5a5a63'),
+      copyIconEl:st.copied?I.check:I.copy, databaseIconEl:I.database, trashIconEl:I.trash, rotateIconEl:I.rotate,
+      skeletonRows:[{w1:'46%',w2:'28%'},{w1:'62%',w2:'34%'},{w1:'38%',w2:'24%'}],
+      nbName:st.nbName, nbDesc:st.nbDesc, nbToken:st.nbToken, creating:st.creating,
+      nbBlankBg:st.nbMode==='blank'?'rgba(59,130,246,.08)':'rgba(255,255,255,.02)', nbBlankBorder:st.nbMode==='blank'?'rgba(59,130,246,.5)':'rgba(255,255,255,.08)',
+      nbTplBg:st.nbMode==='tpl'?'rgba(34,197,94,.07)':'rgba(255,255,255,.02)', nbTplBorder:st.nbMode==='tpl'?'rgba(34,197,94,.45)':'rgba(255,255,255,.08)',
+      notCreating:!st.creating, createDisabled:st.creating,
+      createBtnStyle:'display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:10px;border:none;font-size:14px;font-weight:600;color:#fff;cursor:'+(st.creating?'default':'pointer')+';background:linear-gradient(150deg,#3b82f6,#2563eb);box-shadow:0 6px 20px rgba(59,130,246,.3);opacity:'+(st.creating?'.8':'1'),
+      templates, tplCats, tplSearch:st.tplSearch, tplEmpty:templates.length===0,
+      eyeIconEl:I.eye, downloadIconEl:I.download,
+      creds, revStats, revBars, transactions, plans, tickets, mcpServers,
+      copied:st.copied,
+      checkIconEl:I.check, cardIconEl:I.card, chevRightIconEl:I.chevRight, dotsIconEl:I.dots,
+      // tab booleans
+      tabUmumiy:st.botTab==='umumiy', tabXabarlar:st.botTab==='xabarlar', tabMalumotlar:st.botTab==='malumotlar',
+      tabFayllar:st.botTab==='fayllar', tabSozlamalar:st.botTab==='sozlamalar', tabVersiyalar:st.botTab==='versiyalar', tabMonitoring:st.botTab==='monitoring',
+      // handlers
+      navClick:this.navClick, menuGo:this.menuGo, goTolov:this.goTolov, goAgent:this.goAgent,
+      toggleProfile:this.toggleProfile, toggleLang:this.toggleLang, logout:this.logout,
+      openTg:this.openTg, onCode:this.onCode, onCodeKey:this.onCodeKey, onCodePaste:this.onCodePaste, login:this.login,
+      openBot:this.openBot, setBotTab:this.setBotTab, copyId:this.copyId,
+      setAgentInput:this.setAgentInput, agentKey:this.agentKey, suggest:this.suggest, sendAgentBtn:()=>this.sendAgent(st.agentInput),
+      setBroadcast:this.setBroadcast, setNb:this.setNb, setNbMode:this.setNbMode, createBot:this.createBot,
+      setEnvK:this.setEnvK, setEnvV:this.setEnvV, addEnv:this.addEnv, delEnv:this.delEnv, toggleEnv:this.toggleEnv,
+      setTplCat:this.setTplCat, setTplSearch:this.setTplSearch,
+      goConstructor:()=>this.go('constructor'), backToBots:()=>this.go('bots'), backToBotDetail:()=>this.go('botdetail'),
+    };
+  }
+}
+</script>
+</body>
+</html>
