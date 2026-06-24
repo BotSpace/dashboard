@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { EmptyState } from "@/shared/components/common/empty-state";
 import { FileUploader } from "@/features/files/components/file-uploader";
+import { FileDeleteButton } from "@/features/files/components/file-delete-button";
 
 function expiryLabel(expiresAt?: string | null): { text: string; variant: "secondary" | "destructive" | "outline" } {
   if (!expiresAt) return { text: "Doimiy", variant: "secondary" };
@@ -85,6 +86,7 @@ export default async function BotFilesPage({
                       );
                     })()}
                   </div>
+                  <FileDeleteButton id={f.id} project={id} name={f.name} />
                 </li>
               ))}
             </ul>

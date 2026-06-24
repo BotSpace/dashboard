@@ -1,6 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { FileIcon, Files } from "lucide-react";
 import { FilesAPI } from "@/shared/api/services";
+import { FileDeleteButton } from "@/features/files/components/file-delete-button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { PageHeader } from "@/shared/components/common/page-header";
@@ -66,6 +67,7 @@ export default async function FilesPage({ params }: { params: Promise<{ locale: 
                   <th className="px-4 py-3 text-right">Hajm</th>
                   <th className="px-4 py-3 text-left">Sana</th>
                   <th className="px-4 py-3 text-left">Muddat</th>
+                  <th className="px-4 py-3 text-right">Amal</th>
                 </tr>
               </thead>
               <tbody>
@@ -92,6 +94,9 @@ export default async function FilesPage({ params }: { params: Promise<{ locale: 
                           </Badge>
                         );
                       })()}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <FileDeleteButton id={f.id} name={f.name} />
                     </td>
                   </tr>
                 ))}
