@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-/* BotSpace redesign typography (mockup): Inter (body) + Space Grotesk (display). */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+/* BotSpace redesign typography (mockup): Inter + Space Grotesk are loaded via a
+   <link> in the root layout (CSS @import breaks Turbopack's Lightning CSS pipeline). */
 
 @custom-variant dark (&:is(.dark *));
 
