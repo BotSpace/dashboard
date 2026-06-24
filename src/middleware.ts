@@ -152,10 +152,12 @@ export default async function middleware(request: NextRequest) {
   // cookie mutations: login sets it, logout clears it. If middleware ALSO runs its
   // proactive token refresh here, its fresh Set-Cookie races the action's clear —
   // so once the access token is old enough to trigger a refresh, logout silently
-  // re-establishes bm_session and the user can't sign out. Skip session handling
-  // entirely for server actions and let the action be the single writer.
+  // re-establishes bm_session and the user can't sign out. So skip the SESSION
+  // handling for server actions — but STILL run the intl middleware, otherwise an
+  // action POSTed to a non-locale-prefixed path (e.g. /app/bots/<id>/files) is never
+  // rewritten to its internal route and 404s.
   if (request.headers.has("next-action")) {
-    return NextResponse.next();
+    return intlMiddleware(request) ?? NextResponse.next();
   }
 
   const { locale, rest } = stripLocale(pathname);
