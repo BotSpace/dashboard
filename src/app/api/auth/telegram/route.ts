@@ -1,28 +1,35 @@
 // Telegram "Kirish 🔐" avto-login — ROUTE HANDLER (server action emas).
-// Sabab: server action'da cookies().set() brauzerga ishonchli qo'llanmasdi
-// (imperativ chaqiruvda Set-Cookie tushmasdi). Route handler esa setSessionCookie
-// + NextResponse.redirect bilan Set-Cookie'ni doim chiqaradi (sinab tasdiqlandi).
+// Server action cookies().set() ni brauzerga ishonchli qo'llamasdi; route handler
+// esa Set-Cookie'ni redirect javobida doim chiqaradi.
 //
-// Telegram bot link: https://botspace.uz/<locale>/auth?code=... → /auth sahifa
-// shu route'ga to'liq navigatsiya qiladi: /api/auth/telegram?code=&callbackUrl=&locale=
+// MUHIM (prod): nginx/gateway orqasida req.nextUrl.origin "http://localhost:3010"
+// bo'lib qoladi → redirect noto'g'ri origin'ga ketadi. Shuning uchun base URL
+// x-forwarded-host/proto header'laridan olinadi. Cookie esa redirect javob
+// obyektiga to'g'ridan-to'g'ri (res.cookies.set) yoziladi — kafolatli.
 import { NextRequest, NextResponse } from "next/server";
 import { apiFetch, isApiError } from "@/shared/api/client";
-import { setSessionCookie, type SessionUser } from "@/shared/auth/session";
+import { encodeSession, type SessionUser } from "@/shared/auth/session";
+import { env } from "@/shared/lib/env";
+import { REFRESH_TOKEN_TTL_SEC } from "@/shared/lib/constants";
 
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
   const code = (sp.get("code") ?? "").trim();
   const callbackUrl = (sp.get("callbackUrl") ?? "").trim();
   const locale = (sp.get("locale") ?? "uz").trim() || "uz";
-  const origin = req.nextUrl.origin;
 
+  // RELATIV Location: brauzer uni joriy URL (https://botspace.uz/api/auth/telegram)
+  // ga nisbatan hal qiladi — origin taxmin qilish shart emas. NextResponse.redirect
+  // absolyut URL talab qiladi, shuning uchun javobni qo'lda quramiz. Bu nginx/gateway
+  // orqasida req.nextUrl.origin "localhost:3010" bo'lib qolishi muammosini butunlay yo'q qiladi.
+  const redirectTo = (path: string) =>
+    new NextResponse(null, { status: 307, headers: { Location: path } });
   const toLogin = (msg?: string) =>
-    NextResponse.redirect(
-      new URL(`/${locale}/login${msg ? `?error=${encodeURIComponent(msg)}` : ""}`, origin),
-    );
+    redirectTo(`/${locale}/login${msg ? `?error=${encodeURIComponent(msg)}` : ""}`);
 
   if (!/^\d{6}$/.test(code)) return toLogin("Kod yaroqsiz");
 
+  let value: string;
   try {
     const res = await apiFetch<Record<string, unknown>>("/authbot/login/", {
       method: "POST",
@@ -35,7 +42,7 @@ export async function GET(req: NextRequest) {
     const refresh = (token?.refresh as string) ?? (root.refresh as string);
     if (!access || !refresh) return toLogin("Tokenlar kelmadi");
     const user = ((root.user as SessionUser) ?? ({ id: 0 } as SessionUser)) as SessionUser;
-    await setSessionCookie({ access, refresh, user });
+    value = await encodeSession({ access, refresh, user });
   } catch (e) {
     const msg = isApiError(e)
       ? e.message || "Kod noto'g'ri yoki muddati o'tgan"
@@ -47,5 +54,15 @@ export async function GET(req: NextRequest) {
     callbackUrl && callbackUrl.startsWith("/") && callbackUrl !== "/"
       ? `/${locale}${callbackUrl}`
       : `/${locale}/app`;
-  return NextResponse.redirect(new URL(target, origin));
+
+  const res = redirectTo(target);
+  res.cookies.set(env.SESSION_COOKIE_NAME, value, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: REFRESH_TOKEN_TTL_SEC,
+    ...(env.SESSION_COOKIE_DOMAIN ? { domain: env.SESSION_COOKIE_DOMAIN } : {}),
+  });
+  return res;
 }

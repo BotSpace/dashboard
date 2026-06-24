@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,7 +8,6 @@ import { ArrowRight, ArrowLeft, ExternalLink, Sparkles, Check } from "lucide-rea
 import { toast } from "sonner";
 import { CanvasRevealEffect } from "@/shared/components/ui/sign-in-flow-1";
 import { GoogleButton } from "./google-button";
-import { telegramLoginAction, type ActionState } from "@/features/auth/actions";
 import { env } from "@/shared/lib/env";
 import { OTP_LENGTH } from "@/shared/lib/constants";
 import { cn } from "@/shared/lib/utils";
@@ -30,25 +29,28 @@ export function LoginForm({ from }: { from?: string }) {
   const botUsername = env.NEXT_PUBLIC_TELEGRAM_BOT;
   const botUrl = `https://t.me/${botUsername}`;
 
-  const [state, action, pending] = useActionState<ActionState | undefined, FormData>(
-    telegramLoginAction,
-    undefined,
-  );
+  // Cookie'ni ishonchli o'rnatish uchun login ROUTE HANDLER orqali ketadi
+  // (server action cookies().set() ni brauzerga qo'llamasdi). Route handler
+  // setSessionCookie + redirect qiladi; xato bo'lsa /login?error= ga qaytaradi.
+  const [submitting, setSubmitting] = useState(false);
 
+  const submitCode = () => {
+    if (!codeComplete || submitting) return;
+    setSubmitting(true);
+    const cb = from && from.startsWith("/") ? from : "/";
+    const url =
+      `/api/auth/telegram?code=${encodeURIComponent(codeString)}` +
+      `&callbackUrl=${encodeURIComponent(cb)}` +
+      `&locale=${encodeURIComponent(locale)}`;
+    window.location.href = url;
+  };
+
+  // Route handler /login?error=MSG ga qaytarsa — xabarni ko'rsatamiz.
   useEffect(() => {
-    if (state?.ok) {
-      setReverseCanvasVisible(true);
-      setTimeout(() => setInitialCanvasVisible(false), 50);
-      setTimeout(() => setStep("success"), 1400);
-      const target = from && from.startsWith("/") ? from : `/${locale}/app`;
-      setTimeout(() => {
-        router.push(target);
-        router.refresh();
-      }, 2400);
-    } else if (state?.message) {
-      toast.error(state.message);
-    }
-  }, [state, from, locale, router]);
+    if (typeof window === "undefined") return;
+    const err = new URLSearchParams(window.location.search).get("error");
+    if (err) toast.error(err);
+  }, []);
 
   useEffect(() => {
     if (step === "code") {
@@ -263,8 +265,13 @@ export function LoginForm({ from }: { from?: string }) {
                     <p className="text-[14px] text-white/55">{t("telegram.enterCode")}</p>
                   </div>
 
-                  <form action={action} className="space-y-6">
-                    <input type="hidden" name="code" value={codeString} />
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      submitCode();
+                    }}
+                    className="space-y-6"
+                  >
 
                     {/* OTP cells */}
                     <div className="flex items-center justify-between gap-2">
@@ -317,15 +324,15 @@ export function LoginForm({ from }: { from?: string }) {
                       </motion.button>
                       <button
                         type="submit"
-                        disabled={!codeComplete || pending}
+                        disabled={!codeComplete || submitting}
                         className={cn(
                           "h-12 flex-1 rounded-xl text-[14px] font-semibold transition-all",
-                          codeComplete && !pending
+                          codeComplete && !submitting
                             ? "btn-primary"
                             : "cursor-not-allowed border border-white/[0.06] bg-white/[0.025] text-white/30",
                         )}
                       >
-                        {pending ? (
+                        {submitting ? (
                           <span className="inline-flex items-center gap-2">
                             <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white/80" />
                             ...
