@@ -25,6 +25,10 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
+# `next start` re-reads next.config at runtime (non-standalone). Without it the
+# config falls back to defaults — notably serverActions.bodySizeLimit drops to 1 MB,
+# breaking larger file uploads with a 500. Ship the config into the runtime image.
+COPY --from=builder /app/next.config.ts ./next.config.ts
 
 USER nextjs
 EXPOSE 3010
