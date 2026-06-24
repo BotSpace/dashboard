@@ -16,6 +16,24 @@ export type ProjectMonitoring = {
   prometheus_available: boolean;
 };
 
+/** One time-series point: [unix_ts_seconds, value]. */
+export type MetricPoint = [number, number];
+
+export type MonitoringRange = "1h" | "6h" | "24h" | "7d";
+
+export type ProjectMonitoringHistory = {
+  range: MonitoringRange;
+  step: string;
+  prometheus_available: boolean;
+  series: {
+    cpu_cores: MetricPoint[];
+    memory_bytes: MetricPoint[];
+    net_rx_bps: MetricPoint[];
+    net_tx_bps: MetricPoint[];
+    disk_bytes: MetricPoint[];
+  };
+};
+
 export type Project = {
   id: number | string;
   uuid?: string;

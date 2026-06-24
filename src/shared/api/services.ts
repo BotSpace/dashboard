@@ -3,6 +3,8 @@ import { api } from "./server";
 import type {
   Project,
   ProjectMonitoring,
+  ProjectMonitoringHistory,
+  MonitoringRange,
   Release,
   EnvVar,
   Plan,
@@ -138,6 +140,13 @@ export const ProjectsAPI = {
   monitoring: async (id: string | number): Promise<ProjectMonitoring> => {
     const d = await api<unknown>(`/api/project/${id}/monitoring/`);
     return unwrapItem<ProjectMonitoring>(d);
+  },
+  monitoringHistory: async (
+    id: string | number,
+    range: MonitoringRange = "24h",
+  ): Promise<ProjectMonitoringHistory> => {
+    const d = await api<unknown>(`/api/project/${id}/monitoring/history/`, { query: { range } });
+    return unwrapItem<ProjectMonitoringHistory>(d);
   },
 };
 

@@ -2,7 +2,13 @@ import { setRequestLocale } from "next-intl/server";
 import { Cpu, MemoryStick, Network, HardDrive } from "lucide-react";
 import { Section } from "@/shared/components/common/section";
 import { ProjectsAPI } from "@/shared/api/services";
-import type { ProjectMonitoring } from "@/shared/types/api";
+import type {
+  ProjectMonitoring,
+  ProjectMonitoringHistory,
+  MonitoringRange,
+} from "@/shared/types/api";
+import { MonitoringCharts } from "@/features/monitoring/monitoring-charts";
+import { RangeSelector } from "@/features/monitoring/range-selector";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -60,15 +66,28 @@ function MetricCard({ title, icon, value, subValue, unavailable }: MetricCardPro
 
 export default async function MonitoringPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<{ range?: string }>;
 }) {
   const { locale, id } = await params;
+  const { range: rangeParam } = await searchParams;
   setRequestLocale(locale);
 
+  const range: MonitoringRange = (["1h", "6h", "24h", "7d"] as const).includes(
+    rangeParam as MonitoringRange,
+  )
+    ? (rangeParam as MonitoringRange)
+    : "24h";
+
   let data: ProjectMonitoring | null = null;
+  let history: ProjectMonitoringHistory | null = null;
   try {
-    data = await ProjectsAPI.monitoring(id);
+    [data, history] = await Promise.all([
+      ProjectsAPI.monitoring(id),
+      ProjectsAPI.monitoringHistory(id, range).catch(() => null),
+    ]);
   } catch {
     // endpoint tayyor bo'lmasa yoki xato bo'lsa — null saqlab qolamiz
   }
@@ -76,6 +95,7 @@ export default async function MonitoringPage({
   const prometheusOk = data?.prometheus_available === true;
 
   return (
+    <div className="space-y-6">
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {/* CPU */}
       <MetricCard
@@ -129,6 +149,22 @@ export default async function MonitoringPage({
           </div>
         )}
       </Section>
+    </div>
+
+      {/* Tarix chartlari */}
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-foreground">Tarix</h2>
+          <RangeSelector current={range} />
+        </div>
+        {history ? (
+          <MonitoringCharts history={history} />
+        ) : (
+          <div className="rounded-xl border border-border/60 bg-card p-8 text-center text-sm text-muted-foreground">
+            Tarix ma&apos;lumotlari hozircha mavjud emas.
+          </div>
+        )}
+      </div>
     </div>
   );
 }
