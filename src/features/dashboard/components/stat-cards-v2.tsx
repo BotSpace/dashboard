@@ -11,7 +11,7 @@ type StatItem = {
   value: string;
   delta: string | null;
   icon: LucideIcon;
-  gradient: string;
+  iconBg: string;
   iconColor: string;
 };
 
@@ -28,7 +28,7 @@ function buildStats(totals: Totals): StatItem[] {
       value: String(totals.bots),
       delta: null,
       icon: Bot,
-      gradient: "from-blue-500/20 to-blue-600/5",
+      iconBg: "bg-blue-500/10",
       iconColor: "text-blue-400",
     },
     {
@@ -36,7 +36,7 @@ function buildStats(totals: Totals): StatItem[] {
       value: formatCompact(totals.users),
       delta: null,
       icon: Users,
-      gradient: "from-indigo-500/20 to-indigo-600/5",
+      iconBg: "bg-indigo-500/10",
       iconColor: "text-indigo-400",
     },
     {
@@ -44,7 +44,7 @@ function buildStats(totals: Totals): StatItem[] {
       value: formatCompact(totals.messages),
       delta: null,
       icon: MessageSquare,
-      gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
+      iconBg: "bg-fuchsia-500/10",
       iconColor: "text-fuchsia-400",
     },
     {
@@ -52,7 +52,7 @@ function buildStats(totals: Totals): StatItem[] {
       value: `${formatCompact(totals.revenue)} ${totals.currency}`,
       delta: null,
       icon: DollarSign,
-      gradient: "from-emerald-500/20 to-emerald-600/5",
+      iconBg: "bg-emerald-500/10",
       iconColor: "text-emerald-400",
     },
     {
@@ -60,7 +60,7 @@ function buildStats(totals: Totals): StatItem[] {
       value: String(totals.templates),
       delta: null,
       icon: LayoutTemplate,
-      gradient: "from-amber-500/20 to-amber-600/5",
+      iconBg: "bg-amber-500/10",
       iconColor: "text-amber-400",
     },
   ];
@@ -84,50 +84,45 @@ export function StatCardsV2({ totals }: StatCardsV2Props) {
   const stats: StatItem[] = buildStats(totals ?? ZERO_TOTALS);
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">
+    <div className="grid grid-cols-2 gap-[14px] sm:grid-cols-3 lg:grid-cols-5">
       {stats.map((stat) => (
         <div
           key={stat.label}
           className={cn(
-            "relative overflow-hidden rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200",
-            "hover:border-border hover:shadow-md",
+            "group rounded-[13px] border border-border/70 bg-card/70 p-4",
+            "transition-all duration-[180ms]",
+            "hover:border-blue-500/30 hover:bg-blue-500/4",
           )}
         >
-          {/* Subtle gradient background */}
-          <div
-            className={cn(
-              "absolute inset-0 bg-gradient-to-br opacity-60",
-              stat.gradient,
-            )}
-          />
-
-          <div className="relative">
-            {/* Icon badge */}
-            <div
+          {/* Top row: icon + delta */}
+          <div className="mb-[14px] flex items-center justify-between">
+            <span
               className={cn(
-                "mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg",
-                "border border-white/10 bg-white/5",
+                "flex h-[34px] w-[34px] items-center justify-center rounded-[9px] text-[18px]",
+                stat.iconBg,
                 stat.iconColor,
               )}
             >
-              <stat.icon className="h-4 w-4" />
-            </div>
-
-            {/* Label */}
-            <div className="text-xs text-muted-foreground">{stat.label}</div>
-
-            {/* Value */}
-            <div className="mt-0.5 text-2xl font-bold tracking-tight">
-              {stat.value}
-            </div>
-
+              <stat.icon className="h-[18px] w-[18px]" />
+            </span>
             {stat.delta && (
-              <div className="mt-1.5 flex items-center gap-1">
-                <span className="text-[11px] font-medium text-emerald-400">
-                  {stat.delta}
-                </span>
-              </div>
+              <span className="text-[11.5px] font-semibold text-emerald-400">
+                {stat.delta}
+              </span>
             )}
+          </div>
+
+          {/* Value */}
+          <div
+            className="text-[23px] font-semibold tracking-[-0.5px] text-foreground leading-none"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            {stat.value}
+          </div>
+
+          {/* Label */}
+          <div className="mt-0.5 text-[12.5px] text-muted-foreground">
+            {stat.label}
           </div>
         </div>
       ))}

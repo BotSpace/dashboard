@@ -1,7 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
-import { KeyRound } from "lucide-react";
 import { CredentialsAPI } from "@/shared/api/services";
-import { PageHeader } from "@/shared/components/common/page-header";
 import { CredentialsPanel } from "@/features/credentials/components/credentials-panel";
 
 export default async function CredentialsPage({
@@ -23,15 +21,5 @@ export default async function CredentialsPage({
     })),
   ]);
 
-  return (
-    <div className="space-y-6">
-      <PageHeader
-        icon={<KeyRound className="h-5 w-5" />}
-        title="Credentials"
-        subtitle="API kalitlar, tokenlar va autentifikatsiya ma'lumotlarini boshqaring"
-      />
-
-      <CredentialsPanel initialData={initialData} types={types} />
-    </div>
-  );
+  return <CredentialsPanel initialData={initialData} types={types} />;
 }

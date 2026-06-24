@@ -12,10 +12,13 @@ export function DangerZone({
   id,
   locale,
   name,
+  compact,
 }: {
   id: string | number;
   locale: string;
   name?: string;
+  /** compact=true: no outer card wrapper, used inside a pre-styled danger card */
+  compact?: boolean;
 }) {
   const t = useTranslations("bots.danger");
   const [expanded, setExpanded] = useState(false);
@@ -44,6 +47,60 @@ export function DangerZone({
       }
     });
   };
+
+  if (compact) {
+    return (
+      <div>
+        <p className="mb-[14px] text-[12.5px] leading-[1.5] text-muted-foreground">
+          {t("desc")}
+        </p>
+        {!expanded ? (
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="inline-flex items-center gap-[7px] rounded-[9px] border border-red-500/30 bg-red-500/10 px-[14px] py-[9px] text-[13px] font-semibold text-red-400 transition-colors hover:bg-red-500/[0.18]"
+          >
+            <Trash2 className="h-[15px] w-[15px]" />
+            {t("delete")}
+          </button>
+        ) : (
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <label className="text-xs text-muted-foreground">
+                {name ? t("typeToConfirm", { name }) : t("confirmDesc")}
+              </label>
+              <Input
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                placeholder={t("confirmPlaceholder")}
+                disabled={pending}
+                autoComplete="off"
+                className="bg-white/[0.03] border-white/10 focus:border-red-500/40 text-[13.5px]"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={!matches || pending}
+                onClick={onDelete}
+              >
+                <Trash2 className="h-4 w-4" />
+                {pending ? t("deleting") : t("delete")}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => { setExpanded(false); setConfirm(""); }}
+              >
+                {t("cancel") ?? "Bekor"}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-xl border border-destructive/30 bg-card transition-colors">

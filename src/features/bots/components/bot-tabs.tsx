@@ -20,7 +20,7 @@ export function BotTabs({ id }: { id: string | number }) {
   ];
 
   return (
-    <nav className="-mb-px flex gap-1 overflow-x-auto border-b">
+    <nav className="flex gap-[22px] overflow-x-auto border-b border-border/[0.07]">
       {tabs.map((tab) => {
         const full = `/${locale}${tab.href}`;
         const active = tab.end ? pathname === full : pathname.startsWith(full);
@@ -29,10 +29,10 @@ export function BotTabs({ id }: { id: string | number }) {
             key={tab.href}
             href={tab.href}
             className={cn(
-              "whitespace-nowrap border-b-2 px-3 py-2.5 text-sm transition-colors",
+              "relative whitespace-nowrap pb-2.5 pt-0.5 text-[13.5px] font-medium transition-colors",
               active
-                ? "border-blue-500 text-foreground font-medium"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border/60"
+                ? "text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:rounded-full after:bg-blue-500"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             {tab.label}

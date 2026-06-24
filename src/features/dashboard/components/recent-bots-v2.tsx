@@ -1,8 +1,7 @@
-import { ArrowRight, Bot } from "lucide-react";
+import { Bot } from "lucide-react";
 import { Link } from "@/shared/i18n/routing";
-import { Badge } from "@/shared/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
-import { initials } from "@/shared/lib/utils";
+import { cn, initials } from "@/shared/lib/utils";
 import type { Project } from "@/shared/types/api";
 
 type BotItem = {
@@ -30,6 +29,27 @@ function toBotItems(bots: Project[]): BotItem[] {
   }));
 }
 
+const STATUS_CONFIG = {
+  active: {
+    bg: "bg-emerald-500/10",
+    color: "text-emerald-400",
+    dot: "bg-emerald-400",
+    label: "Faol",
+  },
+  inactive: {
+    bg: "bg-zinc-500/10",
+    color: "text-zinc-400",
+    dot: "bg-zinc-400",
+    label: "Nofaol",
+  },
+  draft: {
+    bg: "bg-amber-500/10",
+    color: "text-amber-400",
+    dot: "bg-amber-400",
+    label: "Draft",
+  },
+};
+
 export function RecentBotsV2({ bots }: { bots: Project[] }) {
   const items: BotItem[] = toBotItems(bots).slice(0, 5);
 
@@ -51,42 +71,57 @@ export function RecentBotsV2({ bots }: { bots: Project[] }) {
   }
 
   return (
-    <ul className="space-y-2.5">
-      {items.map((bot) => (
-        <li key={bot.id}>
+    <div className="flex flex-col">
+      {items.map((bot, idx) => {
+        const statusKey = bot.status ?? "draft";
+        const cfg = STATUS_CONFIG[statusKey] ?? STATUS_CONFIG.draft;
+        const isLast = idx === items.length - 1;
+
+        return (
           <Link
+            key={bot.id}
             href={`/app/bots/${bot.uuid ?? bot.id}`}
-            className="group flex items-center gap-3 rounded-xl border border-border/40 bg-card/50 p-3 transition-all duration-150 hover:border-border hover:bg-card"
+            className={cn(
+              "flex items-center gap-3 rounded-[9px] px-2 py-[11px]",
+              "transition-colors hover:bg-white/3",
+              !isLast && "border-b border-white/4",
+            )}
           >
             {/* Avatar */}
-            <Avatar className="h-9 w-9 shrink-0">
+            <Avatar className="h-9 w-9 shrink-0 rounded-[9px]">
               {bot.avatar && <AvatarImage src={bot.avatar} alt={bot.name} />}
-              <AvatarFallback className="bg-blue-500/15 text-xs font-bold text-blue-300">
+              <AvatarFallback className="rounded-[9px] bg-blue-500/15 text-xs font-bold text-blue-300">
                 {bot.initial ?? initials(bot.name)}
               </AvatarFallback>
             </Avatar>
 
-            {/* Name + handle */}
+            {/* Name + time */}
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium">{bot.name}</div>
-              <div className="truncate text-[11px] text-muted-foreground">
-                {bot.username ? `@${bot.username.replace(/^@/, "")}` : (bot.updatedAt ?? "—")}
+              <div className="truncate text-[13.5px] font-medium text-foreground">
+                {bot.name}
+              </div>
+              <div className="truncate text-[11.5px] text-muted-foreground">
+                {bot.username
+                  ? `@${bot.username.replace(/^@/, "")}`
+                  : (bot.updatedAt ?? "—")}
               </div>
             </div>
 
-            {/* Status + arrow */}
-            <div className="flex shrink-0 items-center gap-2">
-              <Badge
-                variant={bot.status === "active" ? "success" : "secondary"}
-                className="text-[10px]"
-              >
-                {bot.status === "active" ? "Faol" : bot.status === "inactive" ? "Nofaol" : "Draft"}
-              </Badge>
-              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-            </div>
+            {/* Status badge with dot */}
+            <span
+              className={cn(
+                "inline-flex shrink-0 items-center gap-[5px] rounded-[6px] px-[9px] py-[3px]",
+                "text-[11px] font-semibold",
+                cfg.bg,
+                cfg.color,
+              )}
+            >
+              <span className={cn("h-[5px] w-[5px] rounded-full", cfg.dot)} />
+              {cfg.label}
+            </span>
           </Link>
-        </li>
-      ))}
-    </ul>
+        );
+      })}
+    </div>
   );
 }

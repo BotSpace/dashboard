@@ -4,7 +4,6 @@ import { TemplatesAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
-import { PageHeader } from "@/shared/components/common/page-header";
 import { EmptyState } from "@/shared/components/common/empty-state";
 import { TemplatesInfiniteLoader } from "@/features/templates/components/templates-infinite-loader";
 
@@ -54,72 +53,160 @@ export default async function TemplatesPage({
   );
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title={t("title")}
-        subtitle={t("subtitle")}
-        icon={<PackageOpen className="h-5 w-5" />}
-      />
-
-      <form className="grid gap-3 md:grid-cols-[1fr_180px_140px_140px_auto]">
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            name="search"
-            defaultValue={sp.search ?? ""}
-            placeholder={t("search")}
-            className="pl-9 bg-muted/40 focus-visible:bg-background"
-          />
-        </div>
-        <select
-          name="categories"
-          defaultValue={activeCategory}
-          className="h-9 rounded-md border border-input bg-transparent px-3 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    <div style={{ padding: "28px 32px", maxWidth: 1240 }}>
+      {/* Header */}
+      <div style={{ marginBottom: 22 }}>
+        <h1
+          className="tracking-tight"
+          style={{
+            fontFamily: "Space Grotesk",
+            fontWeight: 600,
+            fontSize: 27,
+            margin: "0 0 5px",
+            letterSpacing: "-0.6px",
+          }}
         >
-          <option value="">{t("allCategories")}</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-        <Input
-          name="price_min"
-          type="number"
-          min={0}
-          defaultValue={sp.price_min ?? ""}
-          placeholder={t("priceFrom")}
-        />
-        <Input
-          name="price_max"
-          type="number"
-          min={0}
-          defaultValue={sp.price_max ?? ""}
-          placeholder={t("priceTo")}
-        />
-        <div className="flex gap-2">
-          <Button type="submit">{t("filter")}</Button>
-          {hasFilters && (
-            <Button asChild type="button" variant="ghost">
-              <Link href="/app/templates">{t("reset")}</Link>
-            </Button>
-          )}
-        </div>
-      </form>
+          {t("title")}
+        </h1>
+        <p className="text-muted-foreground" style={{ margin: 0, fontSize: 14 }}>
+          {t("subtitle")}
+        </p>
+      </div>
 
-      {items.length === 0 ? (
-        <EmptyState
-          icon={<PackageOpen className="h-7 w-7" />}
-          title={t("notFound")}
-          description={hasFilters ? "Filtrlarni o'chirib ko'ring" : undefined}
-          action={
-            hasFilters ? (
-              <Button asChild variant="outline">
+      {/* Search + price filter */}
+      <form>
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            flexWrap: "wrap",
+            alignItems: "center",
+            marginBottom: 18,
+          }}
+        >
+          {/* Search */}
+          <div style={{ position: "relative", flex: 1, minWidth: 240, maxWidth: 360 }}>
+            <Search
+              className="text-muted-foreground"
+              style={{
+                position: "absolute",
+                left: 13,
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: 16,
+                height: 16,
+                pointerEvents: "none",
+              }}
+            />
+            <Input
+              name="search"
+              defaultValue={sp.search ?? ""}
+              placeholder={t("search")}
+              style={{ paddingLeft: 38 }}
+              className="bg-muted/30 focus-visible:bg-background"
+            />
+          </div>
+
+          {/* Price range */}
+          <div
+            className="text-muted-foreground"
+            style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 4px" }}
+          >
+            <span style={{ fontSize: 13 }}>Narx:</span>
+            <Input
+              name="price_min"
+              type="number"
+              min={0}
+              defaultValue={sp.price_min ?? ""}
+              placeholder={t("priceFrom")}
+              className="bg-muted/30 focus-visible:bg-background"
+              style={{ width: 84, fontSize: 13 }}
+            />
+            <span className="text-muted-foreground/60">—</span>
+            <Input
+              name="price_max"
+              type="number"
+              min={0}
+              defaultValue={sp.price_max ?? ""}
+              placeholder={t("priceTo")}
+              className="bg-muted/30 focus-visible:bg-background"
+              style={{ width: 84, fontSize: 13 }}
+            />
+          </div>
+
+          {/* Submit / reset */}
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button type="submit" size="sm">
+              {t("filter")}
+            </Button>
+            {hasFilters && (
+              <Button asChild type="button" variant="ghost" size="sm">
                 <Link href="/app/templates">{t("reset")}</Link>
               </Button>
-            ) : undefined
-          }
-        />
+            )}
+          </div>
+        </div>
+
+        {/* Category chips */}
+        {categories.length > 0 && (
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 22 }}>
+            <Link
+              href="/app/templates"
+              className={[
+                "inline-flex items-center rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors",
+                activeCategory === ""
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted/40 text-muted-foreground hover:bg-muted/70",
+              ].join(" ")}
+            >
+              {t("allCategories")}
+            </Link>
+            {categories.map((c) => {
+              const isActive = activeCategory === String(c.id);
+              const params = new URLSearchParams();
+              params.set("categories", String(c.id));
+              if (sp.search) params.set("search", sp.search);
+              if (sp.price_min) params.set("price_min", sp.price_min);
+              if (sp.price_max) params.set("price_max", sp.price_max);
+              return (
+                <Link
+                  key={c.id}
+                  href={`/app/templates?${params.toString()}`}
+                  className={[
+                    "inline-flex items-center rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors",
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted/40 text-muted-foreground hover:bg-muted/70",
+                  ].join(" ")}
+                >
+                  {c.name}
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </form>
+
+      {/* Grid / empty */}
+      {items.length === 0 ? (
+        <div
+          className="text-muted-foreground"
+          style={{ padding: 60, textAlign: "center", fontSize: 14 }}
+        >
+          {hasFilters ? (
+            <>
+              {t("notFound")}{" "}
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/app/templates">{t("reset")}</Link>
+              </Button>
+            </>
+          ) : (
+            <EmptyState
+              icon={<PackageOpen className="h-7 w-7" />}
+              title={t("notFound")}
+            />
+          )}
+        </div>
       ) : (
         <TemplatesInfiniteLoader
           initialItems={items}

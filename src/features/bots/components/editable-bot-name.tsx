@@ -70,7 +70,8 @@ export function EditableBotName({ id, initialName }: EditableBotNameProps) {
         }}
         disabled={pending}
         // size-based width (not w-full) so the status badge beside it doesn't reflow on edit
-        className="max-w-full text-2xl font-semibold tracking-tight bg-transparent border-b border-border outline-none disabled:opacity-60"
+        className="max-w-full bg-transparent border-b border-border outline-none disabled:opacity-60"
+        style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: "23px", fontWeight: 600, letterSpacing: "-0.5px" }}
       />
     );
   }
@@ -81,7 +82,12 @@ export function EditableBotName({ id, initialName }: EditableBotNameProps) {
       onClick={startEditing}
       className="group inline-flex items-center gap-1.5 min-w-0 text-left"
     >
-      <span className="truncate text-2xl font-semibold tracking-tight">{initialName}</span>
+      <span
+        className="truncate"
+        style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: "23px", fontWeight: 600, letterSpacing: "-0.5px" }}
+      >
+        {initialName}
+      </span>
       <Pencil className="h-4 w-4 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
     </button>
   );

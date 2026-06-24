@@ -68,14 +68,20 @@ export function BotPerformanceChart({ data, labels }: BotPerformanceChartProps) 
 
   if (chartData.length === 0) {
     return (
-      <div className="flex h-[220px] flex-col items-center justify-center gap-3 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40">
-          <TrendingUp className="h-5 w-5 text-muted-foreground" />
+      <div
+        className="flex h-[208px] flex-col items-center justify-center gap-[10px] rounded-[11px] border border-dashed border-border/40 text-center"
+        style={{
+          background:
+            "repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0 12px, transparent 12px 24px)",
+        }}
+      >
+        <TrendingUp className="h-[30px] w-[30px] text-border/40" />
+        <div className="font-semibold text-sm text-muted-foreground/70">
+          {labels.emptyTitle}
         </div>
-        <div>
-          <p className="text-sm font-medium text-foreground">{labels.emptyTitle}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">{labels.emptyDesc}</p>
-        </div>
+        <p className="max-w-[260px] text-[12.5px] text-muted-foreground/50">
+          {labels.emptyDesc}
+        </p>
         <Link
           href="/app/bots/new"
           className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-3 py-1.5 text-xs font-medium text-blue-400 transition-colors hover:bg-blue-500/20"

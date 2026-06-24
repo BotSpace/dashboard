@@ -46,46 +46,48 @@ export function TypingIndicator({ phase, currentTool, currentSubAgent }: Props) 
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex items-start gap-3"
+      className="flex items-start gap-[11px]"
     >
+      {/* Bot avatar — matches mockup: 30x30, rounded-[9px], gradient */}
       <div
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-2 ring-transparent",
+          "flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px]",
           activeSubAgent
-            ? "animate-pulse bg-blue-500/15 text-blue-600 ring-blue-400/30 dark:text-blue-300"
-            : phase === "tool"
-              ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-              : "bg-gradient-to-br from-primary/20 to-primary/5 text-primary"
+            ? "animate-pulse bg-blue-500/20 text-blue-500"
+            : "bg-gradient-to-br from-primary to-primary/70 text-white"
         )}
       >
         {activeSubAgent ? (
-          <Bot className="h-4 w-4" />
+          <Bot className="h-[15px] w-[15px]" />
         ) : phase === "tool" ? (
-          <Wrench className="h-4 w-4" />
+          <Wrench className="h-[15px] w-[15px]" />
         ) : (
-          <Bot className="h-4 w-4" />
+          <Bot className="h-[15px] w-[15px]" />
         )}
       </div>
+      {/* Bubble */}
       <div
         className={cn(
-          "flex items-center gap-2.5 rounded-2xl px-4 py-2.5",
-          activeSubAgent ? "bg-blue-500/10" : "bg-muted/40"
+          "flex items-center gap-2.5 rounded-[4px_14px_14px_14px] border border-border px-4 py-[15px]",
+          activeSubAgent ? "bg-blue-500/5" : "bg-muted/5"
         )}
       >
         <Dots />
-        <span
-          className={cn(
-            "text-xs font-medium",
-            activeSubAgent ? "text-blue-700 dark:text-blue-200" : "text-muted-foreground"
-          )}
-        >
-          {label(phase, currentTool, currentSubAgent)}
-        </span>
+        {label(phase, currentTool, currentSubAgent) && (
+          <span
+            className={cn(
+              "text-xs font-medium",
+              activeSubAgent ? "text-blue-600 dark:text-blue-300" : "text-muted-foreground"
+            )}
+          >
+            {label(phase, currentTool, currentSubAgent)}
+          </span>
+        )}
         {phase !== "waiting" && (
           <Loader2
             className={cn(
               "h-3 w-3 animate-spin",
-              activeSubAgent ? "text-blue-500" : "text-muted-foreground/60"
+              activeSubAgent ? "text-blue-500" : "text-muted-foreground/50"
             )}
           />
         )}
@@ -96,10 +98,10 @@ export function TypingIndicator({ phase, currentTool, currentSubAgent }: Props) 
 
 function Dots() {
   return (
-    <span className="inline-flex items-center gap-1">
-      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50 [animation-delay:-0.3s]" />
-      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50 [animation-delay:-0.15s]" />
-      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50" />
+    <span className="inline-flex items-center gap-[5px]">
+      <span className="h-[7px] w-[7px] animate-bounce rounded-full bg-muted-foreground/40 [animation-delay:-0.3s]" />
+      <span className="h-[7px] w-[7px] animate-bounce rounded-full bg-muted-foreground/40 [animation-delay:-0.15s]" />
+      <span className="h-[7px] w-[7px] animate-bounce rounded-full bg-muted-foreground/40" />
     </span>
   );
 }

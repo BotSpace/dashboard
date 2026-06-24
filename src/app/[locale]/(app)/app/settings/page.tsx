@@ -1,13 +1,10 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Settings, User, Shield, KeyRound, Mail, Phone } from "lucide-react";
+import { Shield, KeyRound, User } from "lucide-react";
 import { readSession } from "@/shared/auth/session";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { ProfileForm } from "@/features/settings/components/profile-form";
 import { PasswordForm } from "@/features/settings/components/password-form";
 import { APITokensPanel } from "@/features/settings/components/api-tokens";
-import { PageHeader } from "@/shared/components/common/page-header";
 import { initials } from "@/shared/lib/utils";
 
 export default async function SettingsPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -19,97 +16,169 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
 
   const fullName = [user?.first_name, user?.last_name].filter(Boolean).join(" ") || "—";
   const avatar = (user as { avatar?: string } | undefined)?.avatar;
+  const avatarInitials = initials(fullName);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <PageHeader title={t("title")} icon={<Settings className="h-5 w-5" />} />
+    <div style={{ padding: "28px 32px", maxWidth: 760 }}>
+      {/* Page title */}
+      <h1
+        style={{
+          fontFamily: "Space Grotesk",
+          fontWeight: 600,
+          fontSize: 27,
+          margin: "0 0 24px",
+          letterSpacing: "-0.6px",
+          color: "var(--foreground)",
+        }}
+      >
+        {t("title")}
+      </h1>
 
-      {/* Identity header */}
-      <Card className="relative overflow-hidden border-border/60">
-        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-transparent" />
-        <CardContent className="relative flex flex-col items-center gap-4 pt-6 text-center sm:flex-row sm:items-center sm:text-left">
-          <Avatar className="h-16 w-16 shrink-0 ring-2 ring-border/50">
-            {avatar && <AvatarImage src={avatar} alt={fullName} />}
-            <AvatarFallback className="text-lg font-semibold">{initials(fullName)}</AvatarFallback>
-          </Avatar>
-          <div className="min-w-0">
-            <h2 className="truncate text-lg font-semibold">{fullName}</h2>
-            <div className="mt-1 flex flex-col items-center gap-1 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-4">
-              {user?.phone && (
-                <span className="inline-flex items-center gap-1.5">
-                  <Phone className="h-3.5 w-3.5" /> {user.phone}
-                </span>
-              )}
-              {user?.email && (
-                <span className="inline-flex items-center gap-1.5">
-                  <Mail className="h-3.5 w-3.5" /> {user.email}
-                </span>
-              )}
+      {/* Profil card */}
+      <div
+        style={{
+          background: "rgba(255,255,255,0.025)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          borderRadius: 14,
+          padding: 22,
+          marginBottom: 16,
+        }}
+      >
+        <h3
+          style={{
+            fontFamily: "Space Grotesk",
+            fontWeight: 600,
+            fontSize: 15,
+            margin: "0 0 18px",
+            color: "var(--foreground)",
+          }}
+        >
+          {t("tabs.general")}
+        </h3>
+
+        {/* Avatar row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
+          {avatar ? (
+            <img
+              src={avatar}
+              alt={fullName}
+              style={{ width: 60, height: 60, borderRadius: 15, objectFit: "cover", flexShrink: 0 }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 60,
+                height: 60,
+                borderRadius: 15,
+                background: "linear-gradient(150deg,#3b82f6,#1d4ed8)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 600,
+                fontSize: 22,
+                color: "#fff",
+                fontFamily: "Space Grotesk",
+                flexShrink: 0,
+              }}
+            >
+              {avatarInitials}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          )}
+        </div>
 
-      <Tabs defaultValue="general">
-        <TabsList>
-          <TabsTrigger value="general" className="gap-1.5">
-            <User className="h-4 w-4" /> {t("tabs.general")}
+        {/* Profile form */}
+        <ProfileForm
+          defaultFirstName={user?.first_name}
+          defaultLastName={user?.last_name}
+          defaultEmail={user?.email}
+          defaultPhone={user?.phone}
+        />
+      </div>
+
+      {/* Tabs: Xavfsizlik + API tokenlar */}
+      <Tabs defaultValue="security">
+        <TabsList
+          style={{
+            background: "rgba(255,255,255,0.025)",
+            border: "1px solid rgba(255,255,255,0.07)",
+            borderRadius: 10,
+            padding: "4px",
+            marginBottom: 12,
+          }}
+        >
+          <TabsTrigger
+            value="security"
+            style={{ fontFamily: "Space Grotesk", fontSize: 13, fontWeight: 600 }}
+          >
+            <Shield className="h-3.5 w-3.5 mr-1.5" />
+            {t("tabs.security")}
           </TabsTrigger>
-          <TabsTrigger value="security" className="gap-1.5">
-            <Shield className="h-4 w-4" /> {t("tabs.security")}
-          </TabsTrigger>
-          <TabsTrigger value="tokens" className="gap-1.5">
-            <KeyRound className="h-4 w-4" /> {t("tabs.tokens")}
+          <TabsTrigger
+            value="tokens"
+            style={{ fontFamily: "Space Grotesk", fontSize: 13, fontWeight: 600 }}
+          >
+            <KeyRound className="h-3.5 w-3.5 mr-1.5" />
+            {t("tabs.tokens")}
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="general">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-4 w-4 text-blue-400" /> {t("tabs.general")}
-              </CardTitle>
-              <CardDescription>Ism, familiya va aloqa ma&apos;lumotlaringizni boshqaring.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ProfileForm
-                defaultFirstName={user?.first_name}
-                defaultLastName={user?.last_name}
-                defaultEmail={user?.email}
-                defaultPhone={user?.phone}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
+        {/* Xavfsizlik tab */}
         <TabsContent value="security">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-emerald-400" /> {t("changePassword")}
-              </CardTitle>
-              <CardDescription>Hisobingiz xavfsizligi uchun kuchli, takrorlanmas parol tanlang.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PasswordForm />
-            </CardContent>
-          </Card>
+          <div
+            style={{
+              background: "rgba(255,255,255,0.025)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              borderRadius: 14,
+              padding: 22,
+            }}
+          >
+            <h3
+              style={{
+                fontFamily: "Space Grotesk",
+                fontWeight: 600,
+                fontSize: 15,
+                margin: "0 0 16px",
+                color: "var(--foreground)",
+              }}
+            >
+              {t("changePassword")}
+            </h3>
+            <PasswordForm />
+          </div>
         </TabsContent>
 
+        {/* API tokenlar tab */}
         <TabsContent value="tokens">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <KeyRound className="h-4 w-4 text-amber-400" /> {t("tabs.tokens")}
-              </CardTitle>
-              <CardDescription>
-                Tashqi xizmatlar (MCP, CI/CD, monitoring) BotSpace&apos;ga ulanish uchun API tokenlar.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <APITokensPanel />
-            </CardContent>
-          </Card>
+          <div
+            style={{
+              background: "rgba(255,255,255,0.025)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              borderRadius: 14,
+              padding: 22,
+            }}
+          >
+            <h3
+              style={{
+                fontFamily: "Space Grotesk",
+                fontWeight: 600,
+                fontSize: 15,
+                margin: "0 0 4px",
+                color: "var(--foreground)",
+              }}
+            >
+              {t("tabs.tokens")}
+            </h3>
+            <p
+              style={{
+                fontSize: 12,
+                color: "var(--muted-foreground)",
+                margin: "0 0 16px",
+              }}
+            >
+              Tashqi xizmatlar (MCP, CI/CD, monitoring) BotSpace&apos;ga ulanish uchun API tokenlar.
+            </p>
+            <APITokensPanel />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

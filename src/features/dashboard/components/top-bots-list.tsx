@@ -4,7 +4,7 @@ import type { DashboardOverview } from "@/shared/types/api";
 
 type TopBot = DashboardOverview["top_bots"][number];
 
-const AVATAR_COLORS = [
+const AVATAR_BG = [
   "bg-blue-500/20 text-blue-300",
   "bg-indigo-500/20 text-indigo-300",
   "bg-fuchsia-500/20 text-fuchsia-300",
@@ -43,27 +43,40 @@ export function TopBotsList({ bots }: TopBotsListProps) {
   }
 
   return (
-    <ul className="space-y-3">
+    <div className="flex flex-col gap-1">
       {bots.map((bot, idx) => (
-        <li key={bot.id} className="flex items-center gap-3">
-          <span className="w-4 text-center text-xs text-muted-foreground">{idx + 1}</span>
+        <div
+          key={bot.id}
+          className="flex items-center gap-[11px] rounded-[9px] px-2 py-[9px] transition-colors hover:bg-white/3"
+        >
+          {/* Avatar */}
           <div
             className={cn(
-              "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold",
-              AVATAR_COLORS[idx % AVATAR_COLORS.length],
+              "flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] text-xs font-semibold",
+              AVATAR_BG[idx % AVATAR_BG.length],
             )}
           >
             {initials(bot.name)}
           </div>
-          <div className="min-w-0 flex-1 truncate text-sm font-medium">{bot.name}</div>
-          <div className="flex flex-col items-end">
-            <span className="text-sm font-semibold tabular-nums">{formatVal(bot.messages)}</span>
-            {bot.delta !== null && (
-              <span className="text-[11px] font-medium text-emerald-400">+{bot.delta}%</span>
-            )}
+
+          {/* Name + users */}
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[13.5px] font-medium text-foreground">
+              {bot.name}
+            </div>
+            <div className="text-[11.5px] text-muted-foreground">
+              {formatVal(bot.messages)} xabar
+            </div>
           </div>
-        </li>
+
+          {/* Delta */}
+          {bot.delta !== null && (
+            <span className="shrink-0 text-[11.5px] font-semibold text-emerald-400">
+              +{bot.delta}%
+            </span>
+          )}
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }

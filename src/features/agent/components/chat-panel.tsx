@@ -211,9 +211,9 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
   };
 
   return (
-    <div className="relative flex h-full overflow-hidden rounded-xl border bg-background">
+    <div className="relative flex h-full overflow-hidden rounded-xl border border-border bg-background">
       {/* Desktop sidebar */}
-      <div className="hidden w-64 shrink-0 border-r md:block">
+      <div className="hidden w-64 shrink-0 border-r border-border md:block">
         <ThreadsSidebar
           threads={threads}
           activeId={threadId}
@@ -449,8 +449,8 @@ function ChatThread({
 
   return (
     <>
-      {/* Header */}
-      <header className="flex items-center gap-2 border-b px-3 py-2 sm:px-4">
+      {/* Header — mockup: 62px, gradient avatar, name + green dot, subtitle */}
+      <header className="flex h-[62px] shrink-0 items-center gap-3 border-b border-border px-4 sm:px-5">
         <Button
           variant="ghost"
           size="icon"
@@ -461,11 +461,26 @@ function ChatThread({
           <PanelLeftOpen className="h-4 w-4" />
         </Button>
 
-        <div className="hidden items-center gap-2 md:flex">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
-            <Sparkles className="h-3.5 w-3.5 text-primary" />
+        {/* Bot identity */}
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-primary to-primary/70">
+            <Sparkles className="h-[18px] w-[18px] text-white" />
           </div>
-          <span className="text-sm font-semibold">BotSpace Agent</span>
+          <div>
+            <div
+              className="flex items-center gap-2 text-[15.5px] font-semibold"
+              style={{ fontFamily: "Space Grotesk, sans-serif" }}
+            >
+              BotSpace Agent
+              <span className="relative flex h-[7px] w-[7px]">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-emerald-500 shadow-[0_0_7px_theme(colors.emerald.500)]" />
+              </span>
+            </div>
+            <div className="text-[12px] text-muted-foreground">
+              Botingizni boshqarish va flow yaratishda yordam beraman
+            </div>
+          </div>
         </div>
 
         <RunStatusChip
@@ -494,8 +509,8 @@ function ChatThread({
         {isEmpty ? (
           <EmptyState onSend={send} />
         ) : (
-          <div className="mx-auto max-w-3xl px-3 py-4 sm:px-6">
-            <div className="space-y-5">
+          <div className="mx-auto max-w-[760px] px-5 py-6 sm:px-6">
+            <div className="flex flex-col gap-[18px]">
               {items.map((item) => {
                 if (item.kind === "user") {
                   return <UserMessage key={item.id} text={item.text} />;
@@ -510,10 +525,10 @@ function ChatThread({
               })}
 
               {stream.thinking && stream.phase === "thinking" && (
-                <div className="flex gap-3">
+                <div className="flex gap-[11px]">
                   <BotAvatar />
-                  <div className="min-w-0 flex-1 rounded-2xl bg-muted/40 px-4 py-3">
-                    <div className="whitespace-pre-wrap text-sm text-muted-foreground">
+                  <div className="max-w-[80%] rounded-[4px_14px_14px_14px] border border-border bg-muted/5 px-4 py-3">
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
                       {stream.thinking}
                     </div>
                   </div>
@@ -551,7 +566,7 @@ function ChatThread({
               )}
 
               {stream.plan.length > 0 && (
-                <div className="ml-11 max-w-md">
+                <div className="ml-[41px] max-w-md">
                   <PlanPanel plan={stream.plan} />
                 </div>
               )}
@@ -581,12 +596,30 @@ function ChatThread({
         </AnimatePresence>
       </div>
 
-      {/* Input area */}
-      <div className="border-t bg-background px-3 pb-3 pt-2 sm:px-6 sm:pb-4 sm:pt-3">
-        <div className="mx-auto max-w-3xl">
+      {/* Input area — mockup: prompt chips + textarea + send button */}
+      <div className="shrink-0 border-t border-border bg-background px-5 pb-5 pt-3.5 sm:px-6">
+        <div className="mx-auto max-w-[760px]">
+          {/* Prompt suggestion chips — shown only when idle/empty */}
+          {!isRunning && items.length === 0 && (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {SUGGESTIONS.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => send(s)}
+                  className="flex items-center gap-1.5 rounded-[9px] border border-border bg-muted/5 px-3 py-2 text-[12.5px] text-muted-foreground transition-all hover:border-primary/35 hover:bg-primary/5 hover:text-foreground"
+                >
+                  <Sparkles className="h-[15px] w-[15px] shrink-0 text-primary" />
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Composer box */}
           <div
             className={cn(
-              "flex items-end gap-2 rounded-2xl border bg-card px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-2 focus-within:ring-ring/20",
+              "flex items-end gap-2.5 rounded-[14px] border border-border bg-muted/5 px-4 py-2.5 transition-all focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10",
               isRunning && "opacity-70"
             )}
           >
@@ -611,36 +644,36 @@ function ChatThread({
                   ? "Agent ishlamoqda…"
                   : "Xabar yozing…"
               }
-              className="max-h-40 min-h-[24px] flex-1 resize-none bg-transparent text-sm leading-6 placeholder:text-muted-foreground/60 focus:outline-none"
+              className="max-h-[120px] min-h-[24px] flex-1 resize-none bg-transparent py-1.5 text-[14px] leading-[1.5] text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
               disabled={isRunning}
             />
             {isRunning && requestId ? (
-              <Button
+              <button
+                type="button"
                 onClick={stopRun}
                 disabled={pending}
-                size="icon"
-                variant="destructive"
-                className="h-8 w-8 shrink-0 rounded-xl"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-destructive text-white transition-all hover:brightness-110 disabled:opacity-50"
                 aria-label="To'xtatish"
               >
                 <Square className="h-3.5 w-3.5 fill-current" />
-              </Button>
+              </button>
             ) : (
-              <Button
+              <button
+                type="button"
                 onClick={() => send()}
                 disabled={!input.trim() || pending}
-                size="icon"
-                className="h-8 w-8 shrink-0 rounded-xl"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-primary to-primary/80 text-white transition-all hover:brightness-110 disabled:opacity-40"
                 aria-label="Yuborish"
               >
                 {pending ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <Loader2 className="h-[15px] w-[15px] animate-spin" />
                 ) : (
-                  <Send className="h-3.5 w-3.5" />
+                  <Send className="h-[15px] w-[15px]" />
                 )}
-              </Button>
+              </button>
             )}
           </div>
+
           {isRunning && stream.phase !== "waiting" && (
             <div className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
               <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
@@ -656,8 +689,8 @@ function ChatThread({
 
 function BotAvatar() {
   return (
-    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5">
-      <Bot className="h-4 w-4 text-primary" />
+    <div className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px] bg-gradient-to-br from-primary to-primary/70">
+      <Sparkles className="h-[15px] w-[15px] text-white" />
     </div>
   );
 }
@@ -668,13 +701,10 @@ function UserMessage({ text }: { text: string }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="flex gap-3"
+      className="flex justify-end"
     >
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
-        <User className="h-4 w-4 text-muted-foreground" />
-      </div>
-      <div className="min-w-0 flex-1 pt-1">
-        <div className="whitespace-pre-wrap text-sm leading-relaxed">{text}</div>
+      <div className="max-w-[78%] rounded-[14px_14px_4px_14px] bg-gradient-to-br from-primary to-primary/80 px-4 py-3 text-[14px] leading-[1.55] text-white">
+        <div className="whitespace-pre-wrap">{text}</div>
       </div>
     </motion.div>
   );
@@ -686,10 +716,12 @@ function AssistantMessage({ text }: { text: string }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="flex gap-3"
+      className="flex gap-[11px]"
     >
       <BotAvatar />
-      <MessageMarkdown className="min-w-0 flex-1 pt-1">{text}</MessageMarkdown>
+      <div className="max-w-[80%] rounded-[4px_14px_14px_14px] border border-border bg-muted/5 px-4 py-3 text-[14px] leading-[1.6] text-foreground">
+        <MessageMarkdown className="min-w-0">{text}</MessageMarkdown>
+      </div>
     </motion.div>
   );
 }
@@ -703,10 +735,15 @@ function EmptyState({ onSend }: { onSend: (text: string) => void }) {
         transition={{ duration: 0.3 }}
         className="flex flex-col items-center"
       >
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent sm:h-20 sm:w-20">
-          <Sparkles className="h-8 w-8 text-primary sm:h-10 sm:w-10" />
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[18px] bg-gradient-to-br from-primary to-primary/70 sm:h-20 sm:w-20 sm:rounded-[22px]">
+          <Sparkles className="h-8 w-8 text-white sm:h-10 sm:w-10" />
         </div>
-        <h2 className="mb-1 text-lg font-semibold sm:text-xl">BotSpace Agent</h2>
+        <h2
+          className="mb-1 text-lg font-semibold sm:text-xl"
+          style={{ fontFamily: "Space Grotesk, sans-serif" }}
+        >
+          BotSpace Agent
+        </h2>
         <p className="mb-6 max-w-sm text-center text-sm text-muted-foreground">
           Botingizni boshqarish, flow&apos;lar yaratish va foydalanuvchilar bilan ishlashda yordam beraman
         </p>
@@ -716,8 +753,9 @@ function EmptyState({ onSend }: { onSend: (text: string) => void }) {
               key={s}
               type="button"
               onClick={() => onSend(s)}
-              className="rounded-xl border bg-card px-4 py-3 text-left text-sm text-muted-foreground transition-all hover:border-primary/30 hover:bg-primary/5 hover:text-foreground active:scale-[0.98]"
+              className="flex items-center gap-2 rounded-[9px] border border-border bg-muted/5 px-4 py-3 text-left text-[12.5px] text-muted-foreground transition-all hover:border-primary/35 hover:bg-primary/5 hover:text-foreground active:scale-[0.98]"
             >
+              <Sparkles className="h-[15px] w-[15px] shrink-0 text-primary" />
               {s}
             </button>
           ))}

@@ -45,6 +45,10 @@ export function TopBar({ user }: { user: UserMenuUser }) {
         <div className="ml-auto flex items-center gap-1">
           <Button variant="ghost" size="icon" aria-label="Bildirishnomalar" className="relative">
             <Bell className="h-4 w-4" />
+            <span
+              aria-hidden="true"
+              className="absolute right-2 top-2 h-[7px] w-[7px] rounded-full bg-primary ring-2 ring-background"
+            />
           </Button>
           <LanguageSwitcher />
           <div className="ml-0.5">

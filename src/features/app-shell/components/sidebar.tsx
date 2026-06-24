@@ -10,14 +10,13 @@ import {
   LifeBuoy,
   PackageOpen,
   Settings,
-  Sparkles,
+  Send,
   TrendingUp,
   Wand2,
   Plug,
+  Zap,
 } from "lucide-react";
 import { Link } from "@/shared/i18n/routing";
-import { Logo } from "@/shared/components/common/logo";
-import { Separator } from "@/shared/components/ui/separator";
 import { cn } from "@/shared/lib/utils";
 
 type Item = { href: string; icon: typeof LayoutDashboard; key: string };
@@ -50,13 +49,25 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className="flex items-center px-4 py-4">
-        <Link href="/app" aria-label="BotSpace" onClick={onNavigate} className="block max-w-[160px]">
-          <Logo className="w-full" />
+      <div className="flex items-center px-[18px] pb-3.5 pt-[18px]">
+        <Link
+          href="/app"
+          aria-label="BotSpace"
+          onClick={onNavigate}
+          className="flex items-center gap-2.5"
+        >
+          <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-gradient-to-br from-primary to-blue-700 text-white shadow-[0_4px_16px_rgba(59,130,246,0.36)]">
+            <Send className="h-4 w-4" />
+          </span>
+          <span
+            className="text-[16.5px] font-bold leading-none tracking-[-0.4px] text-foreground"
+            style={{ fontFamily: "Space Grotesk, var(--font-display)" }}
+          >
+            BotSpace<span className="text-primary">.uz</span>
+          </span>
         </Link>
       </div>
-      <Separator />
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-2">
         {main.map((i) => (
           <NavLink
             key={i.key}
@@ -121,17 +132,29 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           </Link>
         </div>
       </nav>
-      <div className="px-3 pb-4">
+      <div className="p-3">
         <Link
           href="/app/billing"
           onClick={onNavigate}
-          className="block rounded-xl border border-primary/30 bg-gradient-to-br from-primary/10 to-fuchsia-500/10 p-4 transition hover:from-primary/15"
+          className="relative block overflow-hidden rounded-[13px] border border-primary/25 bg-gradient-to-br from-primary/15 to-primary/[0.04] p-4 transition hover:border-primary/40"
         >
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">{t("upgradeTitle")}</span>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-8 -top-8 h-[90px] w-[90px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(59,130,246,0.32), transparent 70%)" }}
+          />
+          <div className="relative">
+            <div className="mb-1.5 flex items-center gap-2 text-[13.5px] font-semibold text-foreground">
+              <Zap className="h-[15px] w-[15px] text-blue-300" />
+              {t("upgradeTitle")}
+            </div>
+            <p className="mb-3 text-[11.5px] leading-relaxed text-muted-foreground">
+              {t("upgradeDesc")}
+            </p>
+            <span className="block w-full rounded-lg bg-primary py-2 text-center text-[12.5px] font-semibold text-primary-foreground">
+              {t("upgradeTitle")}
+            </span>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">{t("upgradeDesc")}</p>
         </Link>
       </div>
     </div>
@@ -164,19 +187,19 @@ function NavLink({
       href={href}
       onClick={onClick}
       className={cn(
-        "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+        "relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors",
         active
-          ? "bg-blue-500/10 text-blue-400 font-medium"
-          : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground"
+          ? "bg-primary/10 font-medium text-primary"
+          : "text-muted-foreground hover:bg-white/[0.045] hover:text-foreground"
       )}
     >
       {active && (
         <span
-          className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-blue-500"
+          className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary"
           aria-hidden="true"
         />
       )}
-      <Icon className={cn("h-4 w-4 shrink-0", active && "text-blue-400")} />
+      <Icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-primary")} />
       {label}
     </Link>
   );
