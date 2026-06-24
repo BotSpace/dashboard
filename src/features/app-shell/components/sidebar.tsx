@@ -10,13 +10,13 @@ import {
   LifeBuoy,
   PackageOpen,
   Settings,
-  Send,
   TrendingUp,
   Wand2,
   Plug,
   Zap,
 } from "lucide-react";
 import { Link } from "@/shared/i18n/routing";
+import { Logo } from "@/shared/components/common/logo";
 import { cn } from "@/shared/lib/utils";
 
 type Item = { href: string; icon: typeof LayoutDashboard; key: string };
@@ -54,17 +54,9 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           href="/app"
           aria-label="BotSpace"
           onClick={onNavigate}
-          className="flex items-center gap-2.5"
+          className="block max-w-[160px]"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-gradient-to-br from-primary to-blue-700 text-white shadow-[0_4px_16px_rgba(59,130,246,0.36)]">
-            <Send className="h-4 w-4" />
-          </span>
-          <span
-            className="text-[16.5px] font-bold leading-none tracking-[-0.4px] text-foreground"
-            style={{ fontFamily: "Space Grotesk, var(--font-display)" }}
-          >
-            BotSpace<span className="text-primary">.uz</span>
-          </span>
+          <Logo className="w-full" />
         </Link>
       </div>
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-2">
