@@ -2,7 +2,7 @@ fullnameOverride: "dashboard"
 
 image:
   repository: registry.iprogrammer.uz/botspace/dashboard
-  tag: "cad71e2"
+  tag: "1e1de79"
   pullPolicy: Always
 
 imagePullSecrets:
