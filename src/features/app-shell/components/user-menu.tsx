@@ -1,7 +1,6 @@
 "use client";
 import { useLocale, useTranslations } from "next-intl";
 import { LogOut, Settings, CreditCard, UserCircle } from "lucide-react";
-import { logoutAction } from "@/features/auth/actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -33,13 +32,10 @@ export function UserMenu({ user }: { user: UserMenuUser }) {
   const locale = useLocale();
   const display = fullName(user) || user.email || user.phone || "—";
 
-  const handleLogout = async () => {
-    try {
-      await logoutAction();
-    } finally {
-      // Qattiq navigatsiya: middleware qayta ishlaydi, klient holati tozalanadi.
-      window.location.href = `/${locale}/login`;
-    }
+  const handleLogout = () => {
+    // ROUTE HANDLER orqali: cookie'ni ishonchli o'chiradi (server action
+    // cookies().delete() ni brauzerga qo'llamasdi → logout ishlamasdi).
+    window.location.href = `/api/auth/logout?locale=${locale}`;
   };
 
   return (

@@ -1,6 +1,6 @@
 "use server";
 import { apiFetch, isApiError } from "@/shared/api/client";
-import { setSessionCookie, clearSessionCookie, type SessionUser } from "@/shared/auth/session";
+import { setSessionCookie, type SessionUser } from "@/shared/auth/session";
 
 export type ActionState = {
   ok: boolean;
@@ -70,22 +70,7 @@ export async function telegramLoginAction(
   }
 }
 
-export async function googleLoginAction(idToken: string): Promise<ActionState> {
-  try {
-    const res = await apiFetch<unknown>("/api/v1/auth/google", {
-      method: "POST",
-      json: { id_token: idToken },
-      skipAuth: true,
-    });
-    await persistSession(res);
-    return { ok: true };
-  } catch (e) {
-    return { ok: false, message: isApiError(e) ? e.message : "Google bilan kirishda xatolik" };
-  }
-}
-
-// Sessiya cookie'sini tozalaydi. Navigatsiyani klient qiladi (window.location)
-// — server redirect Radix onSelect ichida ishonchli ishlamaydi.
-export async function logoutAction(): Promise<void> {
-  await clearSessionCookie();
-}
+// Eslatma: login (telegram + google) va logout endi ROUTE HANDLER'lar orqali:
+//   /api/auth/telegram, /api/auth/google, /api/auth/logout
+// Sabab: server action'da o'rnatilgan/o'chirilgan cookie brauzerga ishonchli
+// qo'llanmasdi. Route handler'lar Set-Cookie'ni doim chiqaradi.

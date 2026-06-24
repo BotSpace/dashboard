@@ -1,9 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { toast } from "sonner";
-import { googleLoginAction } from "@/features/auth/actions";
 import { Button } from "@/shared/components/ui/button";
 import { env } from "@/shared/lib/env";
 
@@ -27,7 +25,6 @@ declare global {
 export function GoogleButton({ label }: { label: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
-  const router = useRouter();
   const locale = useLocale();
   const clientId = env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -50,11 +47,20 @@ export function GoogleButton({ label }: { label: string }) {
     window.google?.accounts.id.initialize({
       client_id: clientId,
       callback: async ({ credential }) => {
-        const res = await googleLoginAction(credential);
-        if (res.ok) {
-          router.push(`/${locale}/app`);
-          router.refresh();
-        } else {
+        // Route handler cookie'ni JSON javobga yozadi (server action emas) →
+        // qattiq navigatsiya bilan ilovaga kiramiz, cookie qo'llanadi.
+        try {
+          const r = await fetch("/api/auth/google", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ id_token: credential }),
+          });
+          if (r.ok) {
+            window.location.href = `/${locale}/app`;
+          } else {
+            toast.error("Google login failed");
+          }
+        } catch {
           toast.error("Google login failed");
         }
       },
@@ -65,7 +71,7 @@ export function GoogleButton({ label }: { label: string }) {
       width: ref.current.clientWidth,
       text: "continue_with",
     });
-  }, [loaded, clientId, locale, router]);
+  }, [loaded, clientId, locale]);
 
   if (!clientId) {
     return (
