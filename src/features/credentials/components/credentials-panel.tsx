@@ -179,7 +179,7 @@ export function CredentialsPanel({ initialData, types }: CredentialsPanelProps) 
   const totalPages = data.total_pages;
 
   return (
-    <div className="px-8 py-7 max-w-[860px]">
+    <div className="px-8 py-7 max-w-[1240px]">
       {/* ------------------------------------------------------------------ */}
       {/* Header                                                               */}
       {/* ------------------------------------------------------------------ */}
