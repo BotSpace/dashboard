@@ -147,6 +147,17 @@ function clearSessionCookie(response: NextResponse) {
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Server Actions (POST with the `Next-Action` header) own their own session
+  // cookie mutations: login sets it, logout clears it. If middleware ALSO runs its
+  // proactive token refresh here, its fresh Set-Cookie races the action's clear —
+  // so once the access token is old enough to trigger a refresh, logout silently
+  // re-establishes bm_session and the user can't sign out. Skip session handling
+  // entirely for server actions and let the action be the single writer.
+  if (request.headers.has("next-action")) {
+    return NextResponse.next();
+  }
+
   const { locale, rest } = stripLocale(pathname);
 
   const isProtected = PROTECTED_PREFIXES.some(
