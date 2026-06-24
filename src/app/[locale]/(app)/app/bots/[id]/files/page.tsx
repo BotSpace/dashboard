@@ -86,7 +86,7 @@ export default async function BotFilesPage({
                       );
                     })()}
                   </div>
-                  <FileDeleteButton id={f.id} project={id} name={f.name} />
+                  <FileDeleteButton uuid={f.uuid} project={id} name={f.name} />
                 </li>
               ))}
             </ul>

@@ -89,6 +89,7 @@ export type SubscriptionUsage = {
 
 export type FileItem = {
   id: number | string;
+  uuid?: string;
   name: string;
   url?: string;
   size?: number;

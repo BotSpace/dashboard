@@ -96,7 +96,7 @@ export default async function FilesPage({ params }: { params: Promise<{ locale: 
                       })()}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <FileDeleteButton id={f.id} name={f.name} />
+                      <FileDeleteButton uuid={f.uuid} name={f.name} />
                     </td>
                   </tr>
                 ))}
