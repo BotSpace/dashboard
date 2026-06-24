@@ -5,6 +5,17 @@ export type Paginated<T> = {
   results: T[];
 };
 
+export type ProjectMonitoring = {
+  cpu_cores: number | null;
+  memory_bytes: number | null;
+  net_rx_bps: number | null;
+  net_tx_bps: number | null;
+  disk_bytes: number | null;
+  disk_files_bytes: number | null;
+  disk_cms_bytes: number | null;
+  prometheus_available: boolean;
+};
+
 export type Project = {
   id: number | string;
   uuid?: string;

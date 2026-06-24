@@ -2,6 +2,7 @@ import "server-only";
 import { api } from "./server";
 import type {
   Project,
+  ProjectMonitoring,
   Release,
   EnvVar,
   Plan,
@@ -134,6 +135,10 @@ export const ProjectsAPI = {
     api<Project>(`/api/project/${id}/`, { method: "PATCH", json: body }).then(unwrapItem<Project>),
   remove: (id: string | number) => api<void>(`/api/project/${id}/`, { method: "DELETE" }),
   stopDebug: (id: string | number) => api<void>(`/api/project/${id}/stop/`),
+  monitoring: async (id: string | number): Promise<ProjectMonitoring> => {
+    const d = await api<unknown>(`/api/project/${id}/monitoring/`);
+    return unwrapItem<ProjectMonitoring>(d);
+  },
 };
 
 // RELEASES
