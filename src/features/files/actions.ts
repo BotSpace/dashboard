@@ -28,9 +28,11 @@ export async function uploadFileAction(formData: FormData): Promise<FilesResult>
   if (file.size === 0) return { ok: false, message: "Bo'sh fayl" };
 
   const project = formData.get("project");
+  const ttl = formData.get("ttl");
   const out = new FormData();
   out.append("file", file, file.name);
   if (project && String(project)) out.append("project", String(project));
+  if (ttl && Number(ttl) > 0) out.append("ttl", String(ttl));
 
   try {
     const data = await FilesAPI.upload(out);

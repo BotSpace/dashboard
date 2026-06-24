@@ -95,6 +95,7 @@ export type FileItem = {
   mime?: string;
   project?: number | string | null;
   created_at?: string;
+  expires_at?: string | null;
 };
 
 export type TemplateCategory = {
