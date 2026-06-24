@@ -2,56 +2,62 @@
 
 // Telegram bot "Kirish 🔐" tugmasi shu sahifaga olib keladi:
 //   /<locale>/auth?callbackUrl=%2F&code=<6 xonali kod>
-// Bu yerda kod avtomatik tekshiriladi (telegramLoginAction → /authbot/login/),
-// sessiya cookie o'rnatiladi va foydalanuvchi ilovага yo'naltiriladi.
+// Kod yashirin <form action={telegramAutoLoginAction}> orqali avtomatik yuboriladi.
+// MUHIM: server action'da o'rnatilgan sessiya cookie'si brauzerga FAQAT form-action
+// dispatch'i + server-side redirect orqali qo'llanadi. Eski imperativ `await action()`
+// Set-Cookie'ni qo'llamasdi — login bo'lib token kelsa ham bm_session o'rnatilmay,
+// foydalanuvchi /login'ga qaytib qolardi. Endi action muvaffaqiyatda server-side
+// redirect qiladi (cookie redirect javobi bilan qo'llanadi).
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useActionState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale } from "next-intl";
 import { Loader2, AlertCircle } from "lucide-react";
 
-import { telegramLoginAction } from "@/features/auth/actions";
+import { telegramAutoLoginAction, type ActionState } from "@/features/auth/actions";
 import { Link } from "@/shared/i18n/routing";
 
 function AutoLogin() {
   const router = useRouter();
   const locale = useLocale();
   const params = useSearchParams();
-  const ranRef = useRef(false);
-  const [error, setError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const submittedRef = useRef(false);
 
+  const [state, action] = useActionState<ActionState | undefined, FormData>(
+    telegramAutoLoginAction,
+    undefined,
+  );
+
+  const code = (params.get("code") ?? "").trim();
+  const callbackUrl = params.get("callbackUrl") ?? "";
+  const validCode = /^\d{6}$/.test(code);
+
+  // Yaroqsiz kod → to'g'ridan-to'g'ri login sahifasiga.
   useEffect(() => {
-    // Strict Mode'da effekt ikki marta ishlamasligi uchun guard.
-    if (ranRef.current) return;
-    ranRef.current = true;
+    if (!validCode) router.replace(`/${locale}/login`);
+  }, [validCode, locale, router]);
 
-    const code = (params.get("code") ?? "").trim();
-    const callbackUrl = params.get("callbackUrl");
-
-    if (!/^\d{6}$/.test(code)) {
-      router.replace(`/${locale}/login`);
-      return;
+  // Mount'da formani BIR marta yuboramiz. Muvaffaqiyatda action server-side
+  // redirect qiladi (shu sahifa o'zi ilovaga o'tib ketadi).
+  useEffect(() => {
+    if (validCode && !submittedRef.current && formRef.current) {
+      submittedRef.current = true;
+      formRef.current.requestSubmit();
     }
+  }, [validCode]);
 
-    void (async () => {
-      const fd = new FormData();
-      fd.set("code", code);
-      const res = await telegramLoginAction(undefined, fd);
-      if (res.ok) {
-        const target =
-          callbackUrl && callbackUrl.startsWith("/") && callbackUrl !== "/"
-            ? `/${locale}${callbackUrl}`
-            : `/${locale}/app`;
-        router.replace(target);
-        router.refresh();
-      } else {
-        setError(res.message ?? "Kirishda xatolik yuz berdi");
-      }
-    })();
-  }, [params, router, locale]);
+  const error = state && !state.ok ? (state.message ?? "Kirishda xatolik yuz berdi") : null;
 
   return (
     <div className="flex min-h-svh items-center justify-center px-4">
+      {/* Yashirin auto-submit form — cookie form-action orqali qo'llanishi uchun. */}
+      <form ref={formRef} action={action} className="hidden">
+        <input type="hidden" name="code" value={code} readOnly />
+        <input type="hidden" name="callbackUrl" value={callbackUrl} readOnly />
+        <input type="hidden" name="locale" value={locale} readOnly />
+      </form>
+
       {error ? (
         <div className="flex max-w-sm flex-col items-center gap-4 text-center">
           <div className="grid h-12 w-12 place-items-center rounded-full bg-red-500/10 text-red-400">

@@ -1,4 +1,5 @@
 "use server";
+import { redirect } from "next/navigation";
 import { apiFetch, isApiError } from "@/shared/api/client";
 import { setSessionCookie, clearSessionCookie, type SessionUser } from "@/shared/auth/session";
 
@@ -68,6 +69,43 @@ export async function telegramLoginAction(
     }
     return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
   }
+}
+
+// Telegram "Kirish 🔐" avto-login. Form-action sifatida chaqiriladi va MUVAFFAQIYATda
+// server-side redirect qiladi — shunda Set-Cookie redirect javobi bilan brauzerga
+// qo'llanadi va foydalanuvchi cookie bilan ilovaga o'tadi (imperativ `await` da
+// cookie qo'llanmasdi). Xato bo'lsa ActionState qaytaradi (forma xatoni ko'rsatadi).
+export async function telegramAutoLoginAction(
+  _prev: ActionState | undefined,
+  formData: FormData
+): Promise<ActionState> {
+  const code = String(formData.get("code") ?? "").trim();
+  const callbackUrl = String(formData.get("callbackUrl") ?? "").trim();
+  const locale = String(formData.get("locale") ?? "uz").trim() || "uz";
+  if (!/^\d{6}$/.test(code)) return { ok: false, message: "Kod 6 xonali raqam bo'lishi kerak" };
+
+  try {
+    const res = await apiFetch<unknown>("/authbot/login/", {
+      method: "POST",
+      json: { code: Number(code) },
+      skipAuth: true,
+    });
+    await persistSession(res);
+  } catch (e) {
+    if (isApiError(e)) {
+      const details = e.details as { code?: string[]; detail?: string } | undefined;
+      const msg = details?.code?.[0] ?? details?.detail ?? e.message;
+      return { ok: false, message: msg || "Kod noto'g'ri yoki muddati o'tgan" };
+    }
+    return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
+  }
+
+  // MUHIM: redirect() try/catch tashqarisida — u maxsus xato tashlaydi, catch uni yutib yubormasin.
+  const target =
+    callbackUrl && callbackUrl.startsWith("/") && callbackUrl !== "/"
+      ? `/${locale}${callbackUrl}`
+      : `/${locale}/app`;
+  redirect(target);
 }
 
 export async function googleLoginAction(idToken: string): Promise<ActionState> {
