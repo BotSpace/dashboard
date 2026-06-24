@@ -10,6 +10,7 @@ import { formatCurrency, formatNumber } from "@/shared/lib/utils";
 import { sanitizeRichText } from "@/shared/lib/sanitize";
 import { TemplateActions } from "@/features/templates/components/template-actions";
 import { PageHeader } from "@/shared/components/common/page-header";
+import { LazyImage } from "@/shared/components/common/lazy-image";
 import { Section } from "@/shared/components/common/section";
 
 function toNumber(v: number | string | undefined | null): number {
@@ -62,10 +63,9 @@ export default async function TemplateDetailPage({
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
-          <div className="overflow-hidden rounded-xl border bg-gradient-to-br from-blue-500/10 to-fuchsia-500/10 aspect-[16/9]">
+          <div className="relative overflow-hidden rounded-xl border bg-gradient-to-br from-blue-500/10 to-fuchsia-500/10 aspect-[16/9]">
             {tpl.image ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={tpl.image} alt={tpl.name} className="h-full w-full object-cover" />
+              <LazyImage src={tpl.image} alt={tpl.name} eager />
             ) : (
               <div className="grid h-full place-items-center text-muted-foreground/40">
                 <Tag className="h-16 w-16" />

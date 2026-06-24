@@ -2,6 +2,7 @@ import { Eye, Heart, Tag } from "lucide-react";
 import { Link } from "@/shared/i18n/routing";
 import { Card } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
+import { LazyImage } from "@/shared/components/common/lazy-image";
 import { formatCurrency, formatNumber } from "@/shared/lib/utils";
 import type { Template } from "@/shared/types/api";
 
@@ -40,12 +41,7 @@ export function TemplateCard({
       <Card className="overflow-hidden transition group-hover:border-primary/40 group-hover:shadow-md h-full flex flex-col">
         <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/10 to-fuchsia-500/10">
           {tpl.image ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={tpl.image}
-              alt={tpl.name}
-              className="h-full w-full object-cover"
-            />
+            <LazyImage src={tpl.image} alt={tpl.name} />
           ) : (
             <div className="grid h-full place-items-center text-muted-foreground/40">
               <Tag className="h-10 w-10" />
