@@ -9,19 +9,7 @@ import { FileDeleteButton } from "@/features/files/components/file-delete-button
 import { CopyButton } from "@/shared/components/common/copy-button";
 import { Pagination } from "@/shared/components/common/pagination";
 
-function expiryLabel(expiresAt?: string | null): { text: string; variant: "secondary" | "destructive" | "outline" } {
-  if (!expiresAt) return { text: "Doimiy", variant: "secondary" };
-  const diff = new Date(expiresAt).getTime() - Date.now();
-  const days = Math.ceil(diff / 86400000);
-  if (days < 0) return { text: "Muddati o'tgan", variant: "destructive" };
-  if (days === 0) return { text: "Bugun tugaydi", variant: "destructive" };
-  if (days <= 3) return { text: `${days} kun qoldi`, variant: "destructive" };
-  const d = new Date(expiresAt);
-  return {
-    text: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} gacha`,
-    variant: "outline",
-  };
-}
+import { fileExpiryLabel } from "@/shared/lib/file-expiry";
 
 function humanSize(bytes?: number) {
   if (!bytes && bytes !== 0) return "—";
@@ -101,7 +89,7 @@ export default async function BotFilesPage({
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     <span className="text-xs text-muted-foreground">{f.created_at ?? ""}</span>
                     {(() => {
-                      const { text, variant } = expiryLabel(f.expires_at);
+                      const { text, variant } = fileExpiryLabel(f.expires_at);
                       return (
                         <Badge variant={variant} className="text-xs font-normal">
                           {text}
