@@ -3,6 +3,7 @@ import { FileIcon, Files } from "lucide-react";
 import { FilesAPI } from "@/shared/api/services";
 import { FileDeleteButton } from "@/features/files/components/file-delete-button";
 import { CopyButton } from "@/shared/components/common/copy-button";
+import { Pagination } from "@/shared/components/common/pagination";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { PageHeader } from "@/shared/components/common/page-header";
@@ -36,10 +37,27 @@ function humanSize(bytes?: number) {
   return `${v.toFixed(v < 10 ? 1 : 0)} ${units[i]}`;
 }
 
-export default async function FilesPage({ params }: { params: Promise<{ locale: string }> }) {
+const PAGE_SIZE = 20;
+
+export default async function FilesPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { locale } = await params;
+  const { page: pageParam } = await searchParams;
   setRequestLocale(locale);
-  const files = await FilesAPI.list().catch(() => []);
+  const page = Math.max(1, Number(pageParam) || 1);
+  const paged = await FilesAPI.listPaged({ page, page_size: PAGE_SIZE }).catch(() => ({
+    results: [],
+    total_items: 0,
+    total_pages: 1,
+    current_page: 1,
+    page_size: PAGE_SIZE,
+  }));
+  const files = paged.results;
 
   return (
     <div className="space-y-6">
@@ -114,6 +132,7 @@ export default async function FilesPage({ params }: { params: Promise<{ locale: 
           </CardContent>
         </Card>
       )}
+      <Pagination currentPage={page} totalPages={paged.total_pages} />
     </div>
   );
 }

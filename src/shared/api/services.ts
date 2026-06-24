@@ -195,6 +195,12 @@ export const FilesAPI = {
     const d = await api<unknown>("/api/file/", { query: { project } });
     return unwrapList<FileItem>(d);
   },
+  listPaged: async (
+    params: { project?: string | number; page?: number; page_size?: number } = {},
+  ): Promise<PaginatedResult<FileItem>> => {
+    const d = await api<unknown>("/api/file/", { query: params });
+    return unwrapPaginated<FileItem>(d);
+  },
   upload: async (body: FormData) => {
     const d = await api<unknown>("/api/file/", { method: "POST", body });
     return unwrapItem<FileItem>(d);

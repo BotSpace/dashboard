@@ -7,6 +7,7 @@ import { EmptyState } from "@/shared/components/common/empty-state";
 import { FileUploader } from "@/features/files/components/file-uploader";
 import { FileDeleteButton } from "@/features/files/components/file-delete-button";
 import { CopyButton } from "@/shared/components/common/copy-button";
+import { Pagination } from "@/shared/components/common/pagination";
 
 function expiryLabel(expiresAt?: string | null): { text: string; variant: "secondary" | "destructive" | "outline" } {
   if (!expiresAt) return { text: "Doimiy", variant: "secondary" };
@@ -34,14 +35,27 @@ function humanSize(bytes?: number) {
   return `${v.toFixed(v < 10 ? 1 : 0)} ${units[i]}`;
 }
 
+const PAGE_SIZE = 20;
+
 export default async function BotFilesPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { locale, id } = await params;
+  const { page: pageParam } = await searchParams;
   setRequestLocale(locale);
-  const files = await FilesAPI.list(id).catch(() => []);
+  const page = Math.max(1, Number(pageParam) || 1);
+  const paged = await FilesAPI.listPaged({ project: id, page, page_size: PAGE_SIZE }).catch(() => ({
+    results: [],
+    total_items: 0,
+    total_pages: 1,
+    current_page: 1,
+    page_size: PAGE_SIZE,
+  }));
+  const files = paged.results;
 
   return (
     <div className="space-y-6">
@@ -102,6 +116,7 @@ export default async function BotFilesPage({
           </CardContent>
         </Card>
       )}
+      <Pagination currentPage={page} totalPages={paged.total_pages} />
     </div>
   );
 }
