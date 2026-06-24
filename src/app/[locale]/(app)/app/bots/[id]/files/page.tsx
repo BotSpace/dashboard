@@ -6,6 +6,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { EmptyState } from "@/shared/components/common/empty-state";
 import { FileUploader } from "@/features/files/components/file-uploader";
 import { FileDeleteButton } from "@/features/files/components/file-delete-button";
+import { CopyButton } from "@/shared/components/common/copy-button";
 
 function expiryLabel(expiresAt?: string | null): { text: string; variant: "secondary" | "destructive" | "outline" } {
   if (!expiresAt) return { text: "Doimiy", variant: "secondary" };
@@ -71,9 +72,17 @@ export default async function BotFilesPage({
                     ) : (
                       <span className="block truncate font-medium">{f.name}</span>
                     )}
-                    <span className="text-xs text-muted-foreground">
+                    <span className="block text-xs text-muted-foreground">
                       {f.mime ?? "—"} · {humanSize(f.size)}
                     </span>
+                    {f.uuid && (
+                      <div className="mt-0.5 flex items-center gap-1">
+                        <span className="truncate font-mono text-[11px] text-muted-foreground" title={f.uuid}>
+                          {f.uuid}
+                        </span>
+                        <CopyButton value={f.uuid} label="UUID" className="p-1" />
+                      </div>
+                    )}
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     <span className="text-xs text-muted-foreground">{f.created_at ?? ""}</span>

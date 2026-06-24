@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { FileIcon, Files } from "lucide-react";
 import { FilesAPI } from "@/shared/api/services";
 import { FileDeleteButton } from "@/features/files/components/file-delete-button";
+import { CopyButton } from "@/shared/components/common/copy-button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { PageHeader } from "@/shared/components/common/page-header";
@@ -80,6 +81,14 @@ export default async function FilesPage({ params }: { params: Promise<{ locale: 
                         </a>
                       ) : (
                         f.name
+                      )}
+                      {f.uuid && (
+                        <div className="mt-0.5 flex items-center gap-1">
+                          <span className="truncate font-mono text-[11px] font-normal text-muted-foreground" title={f.uuid}>
+                            {f.uuid}
+                          </span>
+                          <CopyButton value={f.uuid} label="UUID" className="p-1" />
+                        </div>
                       )}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{f.mime ?? "—"}</td>
