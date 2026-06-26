@@ -406,6 +406,22 @@ export function useAgentStream({
               next.phase = "error";
             } else {
               next.phase = "done";
+              if (ev.type === "run_completed") {
+                // Per-prompt token usage (includes sub-agent tokens) — attach
+                // to the last assistant turn so the UI can show it.
+                const p = ev.payload as { input_tokens?: number; output_tokens?: number };
+                if (p.input_tokens != null || p.output_tokens != null) {
+                  const turns = [...next.turns];
+                  for (let i = turns.length - 1; i >= 0; i--) {
+                    const t = turns[i];
+                    if (t.kind === "assistant") {
+                      turns[i] = { ...t, inputTokens: p.input_tokens, outputTokens: p.output_tokens };
+                      break;
+                    }
+                  }
+                  next.turns = turns;
+                }
+              }
             }
             esRef.current?.close();
             esRef.current = null;

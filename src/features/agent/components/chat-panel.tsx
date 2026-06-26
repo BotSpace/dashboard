@@ -85,7 +85,7 @@ type Props = {
 
 type RenderItem =
   | { kind: "user"; id: string; text: string }
-  | { kind: "assistant"; id: string; text: string }
+  | { kind: "assistant"; id: string; text: string; inputTokens?: number; outputTokens?: number }
   | { kind: "tool-group"; id: string; calls: ToolCallView[]; pending: boolean }
   | { kind: "sub_agent"; id: string; turn: Extract<ChatTurn, { kind: "sub_agent" }> };
 
@@ -501,7 +501,14 @@ function ChatThread({
                   return <UserMessage key={item.id} text={item.text} />;
                 }
                 if (item.kind === "assistant") {
-                  return <AssistantMessage key={item.id} text={item.text} />;
+                  return (
+                    <AssistantMessage
+                      key={item.id}
+                      text={item.text}
+                      inputTokens={item.inputTokens}
+                      outputTokens={item.outputTokens}
+                    />
+                  );
                 }
                 if (item.kind === "sub_agent") {
                   return <SubAgentAccordion key={item.id} turn={item.turn} />;
@@ -680,7 +687,16 @@ function UserMessage({ text }: { text: string }) {
   );
 }
 
-function AssistantMessage({ text }: { text: string }) {
+function AssistantMessage({
+  text,
+  inputTokens,
+  outputTokens,
+}: {
+  text: string;
+  inputTokens?: number;
+  outputTokens?: number;
+}) {
+  const total = (inputTokens ?? 0) + (outputTokens ?? 0);
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -689,7 +705,17 @@ function AssistantMessage({ text }: { text: string }) {
       className="flex gap-3"
     >
       <BotAvatar />
-      <MessageMarkdown className="min-w-0 flex-1 pt-1">{text}</MessageMarkdown>
+      <div className="min-w-0 flex-1">
+        <MessageMarkdown className="pt-1">{text}</MessageMarkdown>
+        {total > 0 && (
+          <div className="mt-1 text-[11px] text-muted-foreground" title="Bu javob uchun sarflangan tokenlar (sub-agentlar bilan)">
+            🔢 {total.toLocaleString()} token
+            {inputTokens != null && outputTokens != null
+              ? ` · ${inputTokens.toLocaleString()} in / ${outputTokens.toLocaleString()} out`
+              : ""}
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 }
