@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
+import { analytics } from "@/shared/analytics/umami";
 import { Button } from "@/shared/components/ui/button";
 import {
   cancelRunAction,
@@ -412,6 +413,7 @@ function ChatThread({
     if (inputRef.current) {
       inputRef.current.style.height = "auto";
     }
+    analytics.agentPrompt({ projectId, length: msg.length });
     start(async () => {
       const res = await startRunAction({ projectId, prompt: msg, threadId });
       if (!res.ok || !res.request_id) {

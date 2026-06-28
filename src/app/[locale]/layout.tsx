@@ -2,7 +2,6 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import Script from "next/script";
 import { notFound } from "next/navigation";
-import { UmamiTracker } from "@/shared/analytics/umami";
 import { routing } from "@/shared/i18n/routing";
 import { ThemeProvider } from "@/shared/providers/theme-provider";
 import { Toaster } from "@/shared/providers/toaster";
@@ -28,12 +27,10 @@ export default async function LocaleLayout({
         {/* Umami analytics (self-hosted) — landing + app tashriflarini kuzatadi.
             website-id ommaviy (script tegida ko'rinadi), sir emas. */}
         <Script
-          defer
           src="https://umami.botspace.uz/script.js"
           data-website-id="2699cd62-0385-4c4a-9d52-2c47e5512e53"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
         />
-        <UmamiTracker />
         <ThemeProvider>
           <NextIntlClientProvider>
             {children}

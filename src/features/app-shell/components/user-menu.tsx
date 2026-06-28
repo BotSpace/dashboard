@@ -13,6 +13,7 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { Link } from "@/shared/i18n/routing";
 import { initials } from "@/shared/lib/utils";
+import { analytics } from "@/shared/analytics/umami";
 
 export type UserMenuUser = {
   id: string | number;
@@ -33,6 +34,7 @@ export function UserMenu({ user }: { user: UserMenuUser }) {
   const display = fullName(user) || user.email || user.phone || "—";
 
   const handleLogout = () => {
+    analytics.logout();
     // ROUTE HANDLER orqali: cookie'ni ishonchli o'chiradi (server action
     // cookies().delete() ni brauzerga qo'llamasdi → logout ishlamasdi).
     window.location.href = `/api/auth/logout?locale=${locale}`;

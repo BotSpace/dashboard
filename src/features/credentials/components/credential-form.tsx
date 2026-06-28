@@ -34,6 +34,7 @@ import {
 } from "@/shared/components/ui/select";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { cn } from "@/shared/lib/utils";
+import { analytics } from "@/shared/analytics/umami";
 import type { Credential, CredentialField, CredentialType } from "@/shared/types/api";
 import {
   createCredentialAction,
@@ -727,6 +728,7 @@ export function CredentialForm({
 
       if (result.ok && result.data) {
         toast.success(isEdit ? "Credential yangilandi" : "Credential yaratildi");
+        if (!isEdit) analytics.credentialCreated({ type: selectedType.key });
         onSuccess(result.data as Credential);
       } else {
         toast.error(result.message ?? "Xatolik");

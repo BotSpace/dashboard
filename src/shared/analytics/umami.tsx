@@ -1,9 +1,8 @@
 "use client";
 
-// Umami analytics — global avtomatik tracker + foydalanuvchi identifikatsiyasi.
-// Asosiy <Script> pageview'larni (sahifa, referrer, brauzer/OS, davlat, vaqt)
-// avtomatik yig'adi. Bu yerda qo'shimcha: HAR bosish (tugma/link), forma yuborish,
-// tashqi link va login'da userId bog'lash — har komponentga tegmasdan, global.
+// Umami analytics — aniq NOMLI eventlar (generic "click" emas).
+// Asosiy <Script> pageview + web-vitals'ni avtomatik yig'adi. Bu yerda esa
+// muhim harakatlar uchun nomli event helper'lari va foydalanuvchi identify.
 
 import { useEffect } from "react";
 
@@ -18,72 +17,35 @@ declare global {
   }
 }
 
-function track(event: string, data?: Record<string, unknown>) {
-  window.umami?.track(event, data);
+/** Past darajadagi helper — ixtiyoriy joyda nomli event yuborish uchun. */
+export function track(event: string, data?: Record<string, unknown>) {
+  if (typeof window !== "undefined") window.umami?.track(event, data);
 }
 
-function clean(s: string): string {
-  return s.replace(/\s+/g, " ").trim().slice(0, 80);
-}
-
-/** Global click/submit/outbound tracker — root layout'ga bir marta o'rnatiladi. */
-export function UmamiTracker() {
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      const el = (e.target as Element)?.closest?.(
-        'a,button,[role="button"],input[type="submit"],input[type="button"]'
-      ) as HTMLElement | null;
-      if (!el) return;
-
-      const label = clean(
-        el.getAttribute("aria-label") ||
-          (el as HTMLInputElement).value ||
-          el.textContent ||
-          ""
-      );
-      const href = el.getAttribute("href") || undefined;
-      const data: Record<string, unknown> = {
-        label: label || el.tagName.toLowerCase(),
-        tag: el.tagName.toLowerCase(),
-        path: location.pathname,
-      };
-      if (href) {
-        data.href = href;
-        try {
-          const u = new URL(href, location.href);
-          if (u.host && u.host !== location.host) {
-            track("outbound", { href: u.href, path: location.pathname });
-          }
-        } catch {
-          /* relative/hash href — e'tiborsiz */
-        }
-      }
-      track("click", data);
-    };
-
-    const onSubmit = (e: SubmitEvent) => {
-      const form = e.target as HTMLElement | null;
-      if (!form || form.tagName !== "FORM") return;
-      track("form-submit", {
-        form:
-          form.getAttribute("id") ||
-          form.getAttribute("name") ||
-          form.getAttribute("aria-label") ||
-          "form",
-        path: location.pathname,
-      });
-    };
-
-    document.addEventListener("click", onClick, true);
-    document.addEventListener("submit", onSubmit, true);
-    return () => {
-      document.removeEventListener("click", onClick, true);
-      document.removeEventListener("submit", onSubmit, true);
-    };
-  }, []);
-
-  return null;
-}
+/** Aniq nomli eventlar — call-site'lar toza va nomi bir xil bo'lishi uchun. */
+export const analytics = {
+  // Auth
+  login: (method?: string) => track("login", { method }),
+  logout: () => track("logout"),
+  register: (method?: string) => track("register", { method }),
+  // Loyiha / bot
+  projectCreated: (d?: Record<string, unknown>) => track("project-created", d),
+  projectDeleted: (d?: Record<string, unknown>) => track("project-deleted", d),
+  botDebugRun: (d?: Record<string, unknown>) => track("bot-debug-run", d),
+  botReleased: (d?: Record<string, unknown>) => track("bot-released", d),
+  // Credentials
+  credentialCreated: (d?: Record<string, unknown>) => track("credential-created", d),
+  credentialDeleted: (d?: Record<string, unknown>) => track("credential-deleted", d),
+  // AI agent
+  agentPrompt: (d?: Record<string, unknown>) => track("ai-agent-prompt", d),
+  // Monetizatsiya
+  planUpgrade: (d?: Record<string, unknown>) => track("plan-upgrade", d),
+  paymentStarted: (d?: Record<string, unknown>) => track("payment-started", d),
+  // CMS / collections
+  collectionCreated: (d?: Record<string, unknown>) => track("collection-created", d),
+  // Broadcast / messaging
+  broadcastSent: (d?: Record<string, unknown>) => track("broadcast-sent", d),
+};
 
 /** Login bo'lganda session'ni Umami'ga bog'laydi (qaysi user nima qildi). */
 export function UmamiIdentify({

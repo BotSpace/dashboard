@@ -23,6 +23,7 @@ import {
 } from "@/shared/components/ui/dialog";
 import { deleteCredentialAction, testCredentialAction, oauthStartAction, listCredentialsAction } from "@/features/credentials/actions";
 import { CredentialForm } from "@/features/credentials/components/credential-form";
+import { analytics } from "@/shared/analytics/umami";
 import type { Credential, CredentialType } from "@/shared/types/api";
 
 interface CredentialDetailActionsProps {
@@ -73,6 +74,7 @@ export function CredentialDetailActions({
     startDelete(async () => {
       const res = await deleteCredentialAction(credential.id);
       if (res.ok) {
+        analytics.credentialDeleted({ type: credential.type_key });
         toast.success("O'chirildi");
         setDeleteOpen(false);
         router.push(`/${locale}/app/credentials`);

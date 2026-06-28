@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { deployReleaseAction } from "@/features/bots/actions";
 import type { RunningBot } from "@/features/bots/actions";
 import { Button } from "@/shared/components/ui/button";
+import { analytics } from "@/shared/analytics/umami";
 import { RunningBotLimitDialog } from "./running-bot-limit-dialog";
 import { BotTokenDialog } from "./bot-token-dialog";
 
@@ -23,6 +24,7 @@ export function DeployButton({ projectId }: { projectId: string | number }) {
       try {
         const result = await deployReleaseAction(projectId);
         if (result.ok) {
+          analytics.botReleased({ projectId });
           toast.success(t("release.deployStarted"));
           return;
         }
