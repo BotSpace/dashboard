@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { readSession } from "@/shared/auth/session";
+import { UmamiIdentify } from "@/shared/analytics/umami";
 import { AgentFloatingButton } from "@/features/app-shell/components/agent-floating-button";
 
 // Authenticated app — keep out of search indexes.
@@ -22,6 +23,11 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-svh">
+      <UmamiIdentify
+        userId={session.user.id}
+        role={session.user.role}
+        username={session.user.username}
+      />
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar user={session.user} />
