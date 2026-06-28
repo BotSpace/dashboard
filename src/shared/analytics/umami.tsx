@@ -31,20 +31,35 @@ export const analytics = {
   // Loyiha / bot
   projectCreated: (d?: Record<string, unknown>) => track("project-created", d),
   projectDeleted: (d?: Record<string, unknown>) => track("project-deleted", d),
+  botRenamed: (d?: Record<string, unknown>) => track("bot-renamed", d),
+  botTokenSet: (d?: Record<string, unknown>) => track("bot-token-set", d),
   botDebugRun: (d?: Record<string, unknown>) => track("bot-debug-run", d),
+  botDebugStopped: (d?: Record<string, unknown>) => track("bot-debug-stopped", d),
   botReleased: (d?: Record<string, unknown>) => track("bot-released", d),
+  botStopped: (d?: Record<string, unknown>) => track("bot-stopped", d),
+  botRollback: (d?: Record<string, unknown>) => track("bot-rollback", d),
   // Credentials
   credentialCreated: (d?: Record<string, unknown>) => track("credential-created", d),
+  credentialUpdated: (d?: Record<string, unknown>) => track("credential-updated", d),
   credentialDeleted: (d?: Record<string, unknown>) => track("credential-deleted", d),
+  credentialTested: (d?: Record<string, unknown>) => track("credential-tested", d),
+  credentialOauthStart: (d?: Record<string, unknown>) => track("credential-oauth-start", d),
   // AI agent
   agentPrompt: (d?: Record<string, unknown>) => track("ai-agent-prompt", d),
   // Monetizatsiya
   planUpgrade: (d?: Record<string, unknown>) => track("plan-upgrade", d),
   paymentStarted: (d?: Record<string, unknown>) => track("payment-started", d),
+  templateOrdered: (d?: Record<string, unknown>) => track("template-ordered", d),
   // CMS / collections
   collectionCreated: (d?: Record<string, unknown>) => track("collection-created", d),
+  collectionDeleted: (d?: Record<string, unknown>) => track("collection-deleted", d),
+  documentInserted: (d?: Record<string, unknown>) => track("document-inserted", d),
+  // Fayllar
+  fileUploaded: (d?: Record<string, unknown>) => track("file-uploaded", d),
   // Broadcast / messaging
   broadcastSent: (d?: Record<string, unknown>) => track("broadcast-sent", d),
+  // API tokenlar
+  apiTokenCreated: (d?: Record<string, unknown>) => track("api-token-created", d),
 };
 
 /** Login bo'lganda session'ni Umami'ga bog'laydi (qaysi user nima qildi). */
