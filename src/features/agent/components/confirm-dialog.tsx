@@ -39,7 +39,7 @@ export function ConfirmDialog({
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
+          {description && <DialogDescription className="break-words">{description}</DialogDescription>}
         </DialogHeader>
         <DialogFooter className="gap-2 sm:gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
