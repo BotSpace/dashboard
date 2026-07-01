@@ -176,6 +176,7 @@ export type TemplateRequirementModule = {
 export type TemplateRequirementEnv = {
   key: string;
   required: boolean;
+  label?: string;
   description?: string;
 };
 
@@ -477,6 +478,22 @@ export type CredentialListResponse = {
   total_pages: number;
   current_page: number;
   page_size: number;
+};
+
+// Managed Bot
+export type ManagedBot = {
+  id: number;
+  tg_bot_id: string;
+  username: string;
+  name: string;
+  used: boolean;
+  created_at: string;
+};
+
+export type ManagedBotConfig = {
+  enabled: boolean;
+  manager_username?: string;
+  deep_link_template?: string;
 };
 
 // Blog (publik)

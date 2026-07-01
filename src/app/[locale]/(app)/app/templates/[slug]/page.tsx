@@ -63,7 +63,7 @@ export default async function TemplateDetailPage({
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
-          <div className="relative overflow-hidden rounded-xl border bg-gradient-to-br from-blue-500/10 to-fuchsia-500/10 aspect-[16/9]">
+          <div className="relative overflow-hidden rounded-xl border bg-gradient-to-br from-primary/10 via-primary/5 to-sky-500/10 aspect-[16/9]">
             {tpl.image ? (
               <LazyImage src={tpl.image} alt={tpl.name} eager />
             ) : (
@@ -145,10 +145,9 @@ export default async function TemplateDetailPage({
 
               <TemplateActions
                 templateId={tpl.id}
-                templateName={tpl.name}
+                templateSlug={tpl.slug ?? String(tpl.id)}
                 isFree={isFree}
                 isOwned={isOwned}
-                requiredEnvs={tpl.required_envs}
                 orderLabels={{
                   buy: t("buy"),
                   use: t("use"),
@@ -156,32 +155,7 @@ export default async function TemplateDetailPage({
                   success: t("orderSuccess"),
                   error: t("orderError"),
                 }}
-                createLabels={{
-                  cta: t("createProject"),
-                  title: t("createProjectTitle"),
-                  description: t("createProjectDescription"),
-                  nameLabel: t("projectNameLabel"),
-                  namePlaceholder: t("projectNamePlaceholder"),
-                  tokenLabel: t("botTokenLabel"),
-                  tokenPlaceholder: t("botTokenPlaceholder"),
-                  tokenHelp: t("botTokenHelp"),
-                  botFatherLink: "@BotFather",
-                  submit: t("createSubmit"),
-                  success: t("createSuccess"),
-                  cancel: t("cancel"),
-                  requiredEnvsTitle: t("requiredEnvsTitle"),
-                  envPlaceholder: t("envPlaceholder"),
-                  envRequired: t("envRequired"),
-                  requiredCredentialsTitle: t("requiredCredentialsTitle"),
-                  credentialSelectPlaceholder: t("credentialSelectPlaceholder"),
-                  credentialCreateNew: t("credentialCreateNew"),
-                  credentialRequired: t("credentialRequired"),
-                  modulesTitle: t("modulesTitle"),
-                  modulesNote: t("modulesNote"),
-                  loadingRequirements: t("loadingRequirements"),
-                  credentialCreateTitle: t("credentialCreateTitle"),
-                  credentialCreateDesc: t("credentialCreateDesc"),
-                }}
+                createLabel={t("createProject")}
               />
 
               {tpl.demo_url && (
