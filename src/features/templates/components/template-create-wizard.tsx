@@ -658,7 +658,7 @@ function StepConnections({
           key={cred.key}
           logicalKey={cred.key}
           typeKey={cred.type}
-          label={cred.label}
+          label={cred.label?.trim() || humanizeEnvKey(cred.key)}
           description={cred.description}
           selectedId={credValues[cred.key] ?? null}
           onSelect={(id) => onCredSelect(cred.key, id)}
