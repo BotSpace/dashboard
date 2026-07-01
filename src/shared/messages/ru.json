@@ -60,6 +60,7 @@
     "navBlog": "Блог",
     "navContact": "Контакты",
     "navLogin": "Войти",
+    "navDashboard": "Кабинет",
     "navStart": "Начать",
     "hero": {
       "badge": "Новое: AI-ассистент и визуальный конструктор",
@@ -560,6 +561,9 @@
     "managedUsernameHint": "Строчные буквы, цифры и _, должен заканчиваться на bot",
     "managedOptionalNameLabel": "Название бота (необязательно)",
     "managedOpenTelegramBtn": "Создать в Telegram",
+    "managedCopyLink": "Копировать ссылку",
+    "managedCopyLinkDone": "Ссылка скопирована",
+    "managedCopyLinkFail": "Не удалось скопировать ссылку",
     "managedWaiting": "Ожидание подключения бота...",
     "managedConnected": "Бот подключён",
     "managedSelectRequired": "Выберите бота или создайте нового"

@@ -115,6 +115,7 @@
     "navBlog": "Blog",
     "navContact": "Aloqa",
     "navLogin": "Kirish",
+    "navDashboard": "Kabinet",
     "navStart": "Boshlash",
     "hero": {
       "badge": "Yangi: AI yordamchi va vizual flow konstruktor",
@@ -556,6 +557,9 @@
     "managedUsernameHint": "Kichik harf, raqam va _ bo'lishi mumkin, oxiri bot bilan tugashi shart",
     "managedOptionalNameLabel": "Bot nomi (ixtiyoriy)",
     "managedOpenTelegramBtn": "Telegram'da yaratish",
+    "managedCopyLink": "Havolani nusxalash",
+    "managedCopyLinkDone": "Havola nusxalandi",
+    "managedCopyLinkFail": "Havolani nusxalab bo'lmadi",
     "managedWaiting": "Bot ulanishini kutmoqda...",
     "managedConnected": "Bot ulandi",
     "managedSelectRequired": "Bot tanlang yoki yangi yarating"

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import { Menu, X, ArrowUpRight, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "@/shared/i18n/routing";
@@ -9,7 +9,7 @@ import { LanguageSwitcher } from "@/shared/components/common/language-switcher";
 
 type NavLink = { href: string; label: string; internal?: boolean; highlight?: boolean };
 
-export function PublicHeader() {
+export function PublicHeader({ authenticated = false }: { authenticated?: boolean }) {
   const t = useTranslations("landing");
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -85,13 +85,23 @@ export function PublicHeader() {
           <div className="flex items-center gap-2 md:gap-3">
             <div className="hidden items-center gap-3 md:flex">
               <LanguageSwitcher />
-              <Link
-                href="/login"
-                className="btn-primary group inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-semibold"
-              >
-                {t("navLogin")}
-                <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-[1px] group-hover:-translate-y-[1px]" />
-              </Link>
+              {authenticated ? (
+                <Link
+                  href="/app"
+                  className="btn-primary group inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-semibold"
+                >
+                  <User className="h-3.5 w-3.5" />
+                  {t("navDashboard")}
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="btn-primary group inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-semibold"
+                >
+                  {t("navLogin")}
+                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-[1px] group-hover:-translate-y-[1px]" />
+                </Link>
+              )}
             </div>
             <button
               onClick={() => setOpen((v) => !v)}
@@ -148,14 +158,25 @@ export function PublicHeader() {
                 <div className="my-2 h-px bg-white/[0.06]" />
                 <div className="flex items-center justify-between gap-3 px-1">
                   <LanguageSwitcher />
-                  <Link
-                    href="/login"
-                    className="btn-primary inline-flex flex-1 items-center justify-center gap-1.5 rounded-full py-2.5 text-sm font-semibold"
-                    onClick={() => setOpen(false)}
-                  >
-                    {t("navLogin")}
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                  </Link>
+                  {authenticated ? (
+                    <Link
+                      href="/app"
+                      className="btn-primary inline-flex flex-1 items-center justify-center gap-1.5 rounded-full py-2.5 text-sm font-semibold"
+                      onClick={() => setOpen(false)}
+                    >
+                      <User className="h-3.5 w-3.5" />
+                      {t("navDashboard")}
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/login"
+                      className="btn-primary inline-flex flex-1 items-center justify-center gap-1.5 rounded-full py-2.5 text-sm font-semibold"
+                      onClick={() => setOpen(false)}
+                    >
+                      {t("navLogin")}
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </Link>
+                  )}
                 </div>
               </div>
             </motion.div>

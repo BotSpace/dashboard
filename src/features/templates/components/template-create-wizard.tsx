@@ -8,6 +8,7 @@ import {
   Boxes,
   Check,
   CheckCircle2,
+  Copy,
   ExternalLink,
   Loader2,
   Rocket,
@@ -80,6 +81,9 @@ interface WizardLabels {
   managedUsernameHint: string;
   managedOptionalNameLabel: string;
   managedOpenTelegramBtn: string;
+  managedCopyLink: string;
+  managedCopyLinkDone: string;
+  managedCopyLinkFail: string;
   managedWaiting: string;
   managedConnected: string;
   managedSelectRequired: string;
@@ -275,18 +279,34 @@ function StepBot({
     if (!name.trim()) onNameChange(bot.name || bot.username);
   }
 
-  function handleOpenTelegram() {
-    if (!managedConfig?.deep_link_template) return;
+  function buildDeepLink() {
+    if (!managedConfig?.deep_link_template) return null;
     const uname = newUsername.trim();
     const bname = newBotName.trim() || uname;
-    const link = managedConfig.deep_link_template
+    return managedConfig.deep_link_template
       .replace("{username}", uname)
       .replace("{name}", bname);
+  }
+
+  async function handleCopyLink() {
+    const link = buildDeepLink();
+    if (!link) return;
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success(labels.managedCopyLinkDone);
+    } catch {
+      toast.error(labels.managedCopyLinkFail);
+    }
+  }
+
+  function handleOpenTelegram() {
+    const link = buildDeepLink();
+    if (!link) return;
     // Oynani AVVAL ochamiz (user-gesture popup-blocker'ga tushmasin), keyin claim.
     window.open(link, "_blank");
     // Botni SHU (login qilgan) foydalanuvchiga bog'lash uchun claim (fire-and-forget) —
     // webhook Telegram-yaratuvchi emas, claim bo'yicha egani aniqlaydi.
-    void claimManagedBotAction(uname);
+    void claimManagedBotAction(newUsername.trim());
     setDeepLinkOpened(true);
     // Snapshot mavjud bot id'lari — shundan keyin paydo bo'lgani "yangi" hisoblanadi
     knownIds.current = new Set(managedBots.map((b) => b.id));
@@ -445,25 +465,38 @@ function StepBot({
                 />
               </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!canOpenTelegram || polling}
-                onClick={handleOpenTelegram}
-                className="w-full gap-2"
-              >
-                {polling ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    {labels.managedWaiting}
-                  </>
-                ) : (
-                  <>
-                    <ExternalLink className="h-4 w-4" />
-                    {labels.managedOpenTelegramBtn}
-                  </>
-                )}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={!canOpenTelegram || polling}
+                  onClick={handleOpenTelegram}
+                  className="flex-1 gap-2"
+                >
+                  {polling ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      {labels.managedWaiting}
+                    </>
+                  ) : (
+                    <>
+                      <ExternalLink className="h-4 w-4" />
+                      {labels.managedOpenTelegramBtn}
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  disabled={!canOpenTelegram}
+                  onClick={handleCopyLink}
+                  title={labels.managedCopyLink}
+                  aria-label={labels.managedCopyLink}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </TabsContent>
 

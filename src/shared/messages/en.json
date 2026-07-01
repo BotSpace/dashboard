@@ -60,6 +60,7 @@
     "navBlog": "Blog",
     "navContact": "Contact",
     "navLogin": "Log in",
+    "navDashboard": "Dashboard",
     "navStart": "Get started",
     "hero": {
       "badge": "New: AI assistant & visual flow builder",
@@ -560,6 +561,9 @@
     "managedUsernameHint": "Lowercase letters, digits and _, must end with bot",
     "managedOptionalNameLabel": "Bot name (optional)",
     "managedOpenTelegramBtn": "Create in Telegram",
+    "managedCopyLink": "Copy link",
+    "managedCopyLinkDone": "Link copied",
+    "managedCopyLinkFail": "Could not copy link",
     "managedWaiting": "Waiting for bot to connect...",
     "managedConnected": "Bot connected",
     "managedSelectRequired": "Select a bot or create a new one"
