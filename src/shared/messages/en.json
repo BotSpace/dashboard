@@ -518,7 +518,16 @@
     "requiredEnvsTitle": "Required settings",
     "envPlaceholder": "Enter value",
     "envRequired": "Fill in all required settings",
-    "freePromo": "Free (promo)"
+    "freePromo": "Free (promo)",
+    "requiredCredentialsTitle": "Required connections (Credentials)",
+    "credentialSelectPlaceholder": "Select credential",
+    "credentialCreateNew": "Create new",
+    "credentialRequired": "Select all required credentials",
+    "modulesTitle": "Used modules",
+    "modulesNote": "The following modules will be installed automatically",
+    "loadingRequirements": "Loading requirements…",
+    "credentialCreateTitle": "Create new credential",
+    "credentialCreateDesc": "Enter the required information"
   },
   "billing": {
     "title": "Billing & plans",

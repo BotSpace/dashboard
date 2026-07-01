@@ -172,6 +172,15 @@ export default async function TemplateDetailPage({
                   requiredEnvsTitle: t("requiredEnvsTitle"),
                   envPlaceholder: t("envPlaceholder"),
                   envRequired: t("envRequired"),
+                  requiredCredentialsTitle: t("requiredCredentialsTitle"),
+                  credentialSelectPlaceholder: t("credentialSelectPlaceholder"),
+                  credentialCreateNew: t("credentialCreateNew"),
+                  credentialRequired: t("credentialRequired"),
+                  modulesTitle: t("modulesTitle"),
+                  modulesNote: t("modulesNote"),
+                  loadingRequirements: t("loadingRequirements"),
+                  credentialCreateTitle: t("credentialCreateTitle"),
+                  credentialCreateDesc: t("credentialCreateDesc"),
                 }}
               />
 

@@ -514,7 +514,16 @@
     "requiredEnvsTitle": "Kerakli sozlamalar",
     "envPlaceholder": "Qiymat kiriting",
     "envRequired": "Barcha kerakli sozlamalarni to'ldiring",
-    "freePromo": "Bepul (aksiya)"
+    "freePromo": "Bepul (aksiya)",
+    "requiredCredentialsTitle": "Kerakli ulanishlar (Credentials)",
+    "credentialSelectPlaceholder": "Credential tanlang",
+    "credentialCreateNew": "Yangi yaratish",
+    "credentialRequired": "Barcha kerakli credential'larni tanlang",
+    "modulesTitle": "Ishlatilayotgan modullar",
+    "modulesNote": "Quyidagi modullar avtomatik o'rnatiladi",
+    "loadingRequirements": "Talablar yuklanmoqda…",
+    "credentialCreateTitle": "Yangi credential yaratish",
+    "credentialCreateDesc": "Kerakli ma'lumotlarni kiriting"
   },
   "billing": {
     "title": "To'lov va tariflar",

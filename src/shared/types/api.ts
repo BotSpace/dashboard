@@ -160,6 +160,31 @@ export type Template = {
   required_envs?: { key: string; description?: string }[];
 };
 
+export type TemplateRequirementCredential = {
+  key: string;
+  type: string;
+  label: string;
+  required: boolean;
+  description?: string;
+};
+
+export type TemplateRequirementModule = {
+  slug: string;
+  required: boolean;
+};
+
+export type TemplateRequirementEnv = {
+  key: string;
+  required: boolean;
+  description?: string;
+};
+
+export type TemplateRequirements = {
+  credentials: TemplateRequirementCredential[];
+  modules: TemplateRequirementModule[];
+  envs: TemplateRequirementEnv[];
+};
+
 export type TicketMessage = {
   id: number | string;
   sender: "user" | "admin";

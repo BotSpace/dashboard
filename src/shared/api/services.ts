@@ -20,6 +20,7 @@ import type {
   Template,
   TemplateCategory,
   TemplateFeature,
+  TemplateRequirements,
   Ticket,
   Transaction,
   BroadcastMessage,
@@ -129,10 +130,26 @@ export const ProjectsAPI = {
   get: async (id: string | number) => unwrapItem<Project>(await api<unknown>(`/api/project/${id}/`)),
   create: (body: Partial<Project>) =>
     api<Project>("/api/project/", { method: "POST", json: body }).then(unwrapItem<Project>),
-  createFromTemplate: (body: { template: number | string; name: string; token: string; envs?: Record<string, string> }) =>
+  createFromTemplate: (body: {
+    template: number | string;
+    name: string;
+    token: string;
+    envs?: Record<string, string>;
+    credentials?: Record<string, number | string>;
+  }) =>
     api<Project>("/api/project/create-from-template/", { method: "POST", json: body }).then(
       unwrapItem<Project>,
     ),
+  templateRequirements: async (templateId: string | number): Promise<TemplateRequirements> => {
+    const d = await api<unknown>("/api/v1/project/template-requirements/", {
+      query: { template: templateId },
+    });
+    if (d && typeof d === "object") {
+      const envelope = d as { status?: boolean; data?: TemplateRequirements };
+      if (envelope.data && typeof envelope.data === "object") return envelope.data;
+    }
+    return d as TemplateRequirements;
+  },
   update: (id: string | number, body: Partial<Project>) =>
     api<Project>(`/api/project/${id}/`, { method: "PATCH", json: body }).then(unwrapItem<Project>),
   remove: (id: string | number) => api<void>(`/api/project/${id}/`, { method: "DELETE" }),

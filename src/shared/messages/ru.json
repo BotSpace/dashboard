@@ -518,7 +518,16 @@
     "requiredEnvsTitle": "Обязательные настройки",
     "envPlaceholder": "Введите значение",
     "envRequired": "Заполните все обязательные настройки",
-    "freePromo": "Бесплатно (акция)"
+    "freePromo": "Бесплатно (акция)",
+    "requiredCredentialsTitle": "Необходимые подключения (Credentials)",
+    "credentialSelectPlaceholder": "Выберите credential",
+    "credentialCreateNew": "Создать новый",
+    "credentialRequired": "Выберите все необходимые credentials",
+    "modulesTitle": "Используемые модули",
+    "modulesNote": "Следующие модули будут установлены автоматически",
+    "loadingRequirements": "Загрузка требований…",
+    "credentialCreateTitle": "Создать новый credential",
+    "credentialCreateDesc": "Введите необходимые данные"
   },
   "billing": {
     "title": "Оплата и тарифы",

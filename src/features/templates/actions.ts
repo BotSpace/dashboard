@@ -1,6 +1,7 @@
 "use server";
 import { isApiError } from "@/shared/api/client";
 import { TemplatesAPI, ProjectsAPI, type TemplateListParams, type PaginatedTemplates } from "@/shared/api/services";
+import type { TemplateRequirements } from "@/shared/types/api";
 
 export type OrderResult = { ok: boolean; message?: string };
 
@@ -47,8 +48,28 @@ export async function orderTemplateAction(templateId: number | string): Promise<
   return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
 }
 
+export async function getTemplateRequirementsAction(
+  templateId: number | string
+): Promise<{ ok: true; data: TemplateRequirements } | { ok: false; message: string }> {
+  try {
+    const data = await ProjectsAPI.templateRequirements(templateId);
+    return { ok: true, data };
+  } catch (e) {
+    if (isApiError(e)) {
+      return { ok: false, message: e.message };
+    }
+    return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
+  }
+}
+
 export async function createProjectFromTemplateAction(
-  body: { template: number | string; name: string; token: string; envs?: Record<string, string> }
+  body: {
+    template: number | string;
+    name: string;
+    token: string;
+    envs?: Record<string, string>;
+    credentials?: Record<string, number | string>;
+  }
 ): Promise<CreateFromTemplateResult> {
   try {
     const project = await ProjectsAPI.createFromTemplate(body);
@@ -63,6 +84,7 @@ export async function createProjectFromTemplateAction(
             token?: string[];
             message?: string;
             envs?: string[] | Record<string, string[]> | string;
+            credentials?: string[] | Record<string, string[]> | string;
           }
         | undefined;
       let msg: string | undefined;
@@ -78,6 +100,13 @@ export async function createProjectFromTemplateAction(
           .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`)
           .join("; ");
         msg = envErrors || undefined;
+      } else if (typeof details?.credentials === "string") msg = details.credentials;
+      else if (Array.isArray(details?.credentials)) msg = (details.credentials as string[]).join("; ");
+      else if (details?.credentials && typeof details.credentials === "object") {
+        const credErrors = Object.entries(details.credentials as Record<string, string[]>)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v[0] : v}`)
+          .join("; ");
+        msg = credErrors || undefined;
       } else if (typeof details?.message === "string") msg = details.message;
       return { ok: false, message: msg ?? e.message };
     }
