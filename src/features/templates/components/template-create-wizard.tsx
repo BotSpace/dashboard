@@ -220,6 +220,7 @@ interface StepBotProps {
   managedBots: ManagedBot[];
   selectedManagedId: number | null;
   onSelectManaged: (id: number | null) => void;
+  onPollManaged: () => Promise<ManagedBot[]>;
   botMode: "telegram" | "manual";
   onBotModeChange: (m: "telegram" | "manual") => void;
   labels: WizardLabels;
@@ -236,6 +237,7 @@ function StepBot({
   managedBots,
   selectedManagedId,
   onSelectManaged,
+  onPollManaged,
   botMode,
   onBotModeChange,
   labels,
@@ -259,24 +261,17 @@ function StepBot({
     };
   }, []);
 
-  // When managedBots list updates (from parent polling), check for new bot
-  useEffect(() => {
-    if (!polling) return;
-    const newBot = managedBots.find((b) => !knownIds.current.has(b.id));
-    if (newBot) {
-      stopPolling();
-      onSelectManaged(newBot.id);
-      // Fill name if empty
-      if (!name.trim()) onNameChange(newBot.name || newBot.username);
-      toast.success(labels.managedConnected);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [managedBots]);
-
   function stopPolling() {
     if (pollRef.current) clearInterval(pollRef.current);
     pollRef.current = null;
     setPolling(false);
+  }
+
+  // Ro'yxatdan bot tanlash (yoki poll topganda) — spinner'ni ham to'xtatadi
+  function pickBot(bot: ManagedBot) {
+    stopPolling();
+    onSelectManaged(bot.id);
+    if (!name.trim()) onNameChange(bot.name || bot.username);
   }
 
   function handleOpenTelegram() {
@@ -288,15 +283,26 @@ function StepBot({
       .replace("{name}", bname);
     window.open(link, "_blank");
     setDeepLinkOpened(true);
-    // Snapshot current ids before polling
+    // Snapshot mavjud bot id'lari — shundan keyin paydo bo'lgani "yangi" hisoblanadi
     knownIds.current = new Set(managedBots.map((b) => b.id));
     pollCount.current = 0;
     setPolling(true);
-    // Parent polling is triggered externally; here we just show spinner
-    // and let the useEffect above catch the new bot.
-    // Fallback: stop after 2 min (40 × 3s)
-    pollRef.current = setInterval(() => {
+    // Har 3s'da REAL fetch qilib yangi botni qidiradi (max 2 daqiqa)
+    pollRef.current = setInterval(async () => {
       pollCount.current += 1;
+      try {
+        const bots = await onPollManaged();
+        const newBot = bots.find((b) => !knownIds.current.has(b.id));
+        if (newBot) {
+          stopPolling();
+          onSelectManaged(newBot.id);
+          if (!name.trim()) onNameChange(newBot.name || newBot.username);
+          toast.success(labels.managedConnected);
+          return;
+        }
+      } catch {
+        // e'tiborsiz — keyingi tick qayta urinadi
+      }
       if (pollCount.current >= 40) stopPolling();
     }, 3000);
   }
@@ -371,7 +377,7 @@ function StepBot({
                         name="managed-bot"
                         value={String(bot.id)}
                         checked={selectedManagedId === bot.id}
-                        onChange={() => onSelectManaged(bot.id)}
+                        onChange={() => pickBot(bot)}
                         className="accent-primary h-4 w-4 shrink-0"
                       />
                       <Bot className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -799,10 +805,7 @@ export function TemplateCreateWizard({
   const [selectedManagedId, setSelectedManagedId] = useState<number | null>(null);
   const [botMode, setBotMode] = useState<"telegram" | "manual">("telegram");
 
-  // Polling ref for managed bots
-  const managedPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Fetch managed bot config on mount
+  // Fetch managed bot config + list on mount
   useEffect(() => {
     getManagedBotConfigAction().then((res) => {
       if (res.ok) setManagedConfig(res.data);
@@ -812,20 +815,15 @@ export function TemplateCreateWizard({
     });
   }, []);
 
-  // Poll managed bots every 3s (started when StepBot opens deep link)
-  // We expose a startPoll / stopPoll via effect cleanup
-  useEffect(() => {
-    // Start polling when on bot step and telegram tab
-    if (managedConfig?.enabled && botMode === "telegram") {
-      managedPollRef.current = setInterval(async () => {
-        const res = await listManagedBotsAction();
-        if (res.ok) setManagedBots(res.data);
-      }, 3000);
+  // StepBot poll'i chaqiradi: managed botlarni olib state'ni yangilaydi va ro'yxatni qaytaradi
+  const pollManagedBots = async (): Promise<ManagedBot[]> => {
+    const res = await listManagedBotsAction();
+    if (res.ok) {
+      setManagedBots(res.data);
+      return res.data;
     }
-    return () => {
-      if (managedPollRef.current) clearInterval(managedPollRef.current);
-    };
-  }, [managedConfig?.enabled, botMode]);
+    return managedBots;
+  };
 
   // Stepper state
   const steps = buildSteps(requirements);
@@ -948,6 +946,7 @@ export function TemplateCreateWizard({
             managedBots={managedBots}
             selectedManagedId={selectedManagedId}
             onSelectManaged={setSelectedManagedId}
+            onPollManaged={pollManagedBots}
             botMode={botMode}
             onBotModeChange={setBotMode}
             labels={labels}
