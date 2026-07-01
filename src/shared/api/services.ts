@@ -151,6 +151,12 @@ export const ProjectsAPI = {
     const d = await api<unknown>("/api/managed-bot/");
     return unwrapList<ManagedBot>(d);
   },
+  claimManagedBot: async (username: string): Promise<void> => {
+    await api<unknown>("/api/managed-bot/claim/", {
+      method: "POST",
+      json: { username },
+    });
+  },
   templateRequirements: async (templateId: string | number): Promise<TemplateRequirements> => {
     const d = await api<unknown>("/api/v1/project/template-requirements/", {
       query: { template: templateId },

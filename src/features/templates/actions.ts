@@ -86,6 +86,14 @@ export async function listManagedBotsAction(): Promise<
   }
 }
 
+export async function claimManagedBotAction(username: string): Promise<void> {
+  try {
+    await ProjectsAPI.claimManagedBot(username);
+  } catch {
+    // claim best-effort — muvaffaqiyatsiz bo'lsa Telegram matching zaxira ishlaydi
+  }
+}
+
 export async function createProjectFromTemplateAction(
   body: {
     template: number | string;

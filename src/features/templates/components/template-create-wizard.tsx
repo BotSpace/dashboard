@@ -29,6 +29,7 @@ import {
   createProjectFromTemplateAction,
   getManagedBotConfigAction,
   listManagedBotsAction,
+  claimManagedBotAction,
 } from "@/features/templates/actions";
 import type { TemplateRequirements, ManagedBot, ManagedBotConfig } from "@/shared/types/api";
 
@@ -281,7 +282,11 @@ function StepBot({
     const link = managedConfig.deep_link_template
       .replace("{username}", uname)
       .replace("{name}", bname);
+    // Oynani AVVAL ochamiz (user-gesture popup-blocker'ga tushmasin), keyin claim.
     window.open(link, "_blank");
+    // Botni SHU (login qilgan) foydalanuvchiga bog'lash uchun claim (fire-and-forget) —
+    // webhook Telegram-yaratuvchi emas, claim bo'yicha egani aniqlaydi.
+    void claimManagedBotAction(uname);
     setDeepLinkOpened(true);
     // Snapshot mavjud bot id'lari — shundan keyin paydo bo'lgani "yangi" hisoblanadi
     knownIds.current = new Set(managedBots.map((b) => b.id));
