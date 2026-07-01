@@ -46,6 +46,11 @@ export type Project = {
   updated_at?: string;
   status?: "active" | "inactive" | "draft";
   flow?: unknown;
+  // Additive fields returned by create-from-template (and project detail):
+  // which mode the bot is running in, and how to reach it on Telegram.
+  bot_mode?: "release" | "debug";
+  bot_username?: string | null;
+  bot_link?: string | null;
 };
 
 export type Release = {

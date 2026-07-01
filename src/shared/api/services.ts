@@ -137,6 +137,7 @@ export const ProjectsAPI = {
     name: string;
     token?: string;
     managed_bot_id?: number;
+    mode?: "release" | "debug";
     envs?: Record<string, string>;
     credentials?: Record<string, number | string>;
   }) =>

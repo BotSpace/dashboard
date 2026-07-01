@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect, useRef } from "react";
-import { useRouter } from "@/shared/i18n/routing";
+import { useRouter, Link } from "@/shared/i18n/routing";
 import {
   ArrowLeft,
   ArrowRight,
@@ -17,6 +17,8 @@ import {
   Key,
   RefreshCw,
   Plus,
+  Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
@@ -31,8 +33,9 @@ import {
   getManagedBotConfigAction,
   listManagedBotsAction,
   claimManagedBotAction,
+  getBotLaunchStatusAction,
 } from "@/features/templates/actions";
-import type { TemplateRequirements, ManagedBot, ManagedBotConfig } from "@/shared/types/api";
+import type { TemplateRequirements, ManagedBot, ManagedBotConfig, Project } from "@/shared/types/api";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -43,6 +46,7 @@ interface WizardLabels {
   stepSettings: string;
   stepConnections: string;
   stepConfirm: string;
+  stepLaunch: string;
   next: string;
   back: string;
   create: string;
@@ -87,6 +91,23 @@ interface WizardLabels {
   managedWaiting: string;
   managedConnected: string;
   managedSelectRequired: string;
+  // Debug (tokensiz sinov) tab
+  debugTabLabel: string;
+  debugInfoText: string;
+  debugConfirmBadge: string;
+  debugConfirmNote: string;
+  // Launch step
+  launchStartingTitle: string;
+  launchStartingText: string;
+  launchRunningTitle: string;
+  launchOpenBotBtn: string;
+  launchOpenProjectBtn: string;
+  launchDebugBadge: string;
+  launchDebugHint: string;
+  launchFailedTitle: string;
+  launchFailedText: string;
+  launchTimeoutTitle: string;
+  launchTimeoutText: string;
 }
 
 interface Props {
@@ -101,7 +122,11 @@ interface Props {
 // Step definitions
 // ---------------------------------------------------------------------------
 
-type StepId = "bot" | "settings" | "connections" | "confirm";
+type StepId = "bot" | "settings" | "connections" | "confirm" | "launch";
+
+// Bot ni qanday ulash: Telegram orqali (managed), qo'lda token, yoki
+// tokensiz sinov (debug) — BotSpace'ning umumiy test botida ishga tushadi.
+type BotMode = "telegram" | "manual" | "debug";
 
 function buildSteps(requirements: TemplateRequirements): StepId[] {
   const steps: StepId[] = ["bot"];
@@ -109,6 +134,8 @@ function buildSteps(requirements: TemplateRequirements): StepId[] {
   if ((requirements.credentials ?? []).filter((c) => c.required).length > 0)
     steps.push("connections");
   steps.push("confirm");
+  // Har doim yakuniy "ishga tushirish" qadami — natija shu yerda ko'rsatiladi.
+  steps.push("launch");
   return steps;
 }
 
@@ -121,6 +148,7 @@ const STEP_LABEL_KEYS: Record<StepId, keyof WizardLabels> = {
   settings: "stepSettings",
   connections: "stepConnections",
   confirm: "stepConfirm",
+  launch: "stepLaunch",
 };
 
 interface StepperProps {
@@ -226,8 +254,8 @@ interface StepBotProps {
   selectedManagedId: number | null;
   onSelectManaged: (id: number | null) => void;
   onPollManaged: () => Promise<ManagedBot[]>;
-  botMode: "telegram" | "manual";
-  onBotModeChange: (m: "telegram" | "manual") => void;
+  botMode: BotMode;
+  onBotModeChange: (m: BotMode) => void;
   labels: WizardLabels;
 }
 
@@ -364,20 +392,26 @@ function StepBot({
         </div>
       </div>
 
-      {managedEnabled ? (
-        <Tabs value={botMode} onValueChange={(v) => onBotModeChange(v as "telegram" | "manual")}>
-          <TabsList className="w-full">
+      <Tabs value={botMode} onValueChange={(v) => onBotModeChange(v as BotMode)}>
+        <TabsList className="w-full">
+          {managedEnabled && (
             <TabsTrigger value="telegram" className="flex-1 gap-1.5">
               <Bot className="h-4 w-4" />
               {labels.managedTabTelegram}
             </TabsTrigger>
-            <TabsTrigger value="manual" className="flex-1 gap-1.5">
-              <Key className="h-4 w-4" />
-              {labels.managedTabManual}
-            </TabsTrigger>
-          </TabsList>
+          )}
+          <TabsTrigger value="manual" className="flex-1 gap-1.5">
+            <Key className="h-4 w-4" />
+            {labels.managedTabManual}
+          </TabsTrigger>
+          <TabsTrigger value="debug" className="flex-1 gap-1.5">
+            <Sparkles className="h-4 w-4" />
+            {labels.debugTabLabel}
+          </TabsTrigger>
+        </TabsList>
 
-          {/* TELEGRAM tab */}
+        {managedEnabled && (
+          /* TELEGRAM tab */
           <TabsContent value="telegram" className="mt-4 space-y-4">
             {/* Existing bots list */}
             {managedBots.length > 0 && (
@@ -499,30 +533,28 @@ function StepBot({
               </div>
             </div>
           </TabsContent>
+        )}
 
-          {/* MANUAL tab */}
-          <TabsContent value="manual" className="mt-4">
-            <ManualTokenInput
-              token={token}
-              onTokenChange={onTokenChange}
-              tokenTouched={tokenTouched}
-              onTokenBlur={onTokenBlur}
-              tokenInvalid={tokenInvalid}
-              labels={labels}
-            />
-          </TabsContent>
-        </Tabs>
-      ) : (
-        /* Managed disabled → only manual */
-        <ManualTokenInput
-          token={token}
-          onTokenChange={onTokenChange}
-          tokenTouched={tokenTouched}
-          onTokenBlur={onTokenBlur}
-          tokenInvalid={tokenInvalid}
-          labels={labels}
-        />
-      )}
+        {/* MANUAL tab */}
+        <TabsContent value="manual" className="mt-4">
+          <ManualTokenInput
+            token={token}
+            onTokenChange={onTokenChange}
+            tokenTouched={tokenTouched}
+            onTokenBlur={onTokenBlur}
+            tokenInvalid={tokenInvalid}
+            labels={labels}
+          />
+        </TabsContent>
+
+        {/* DEBUG (tokensiz sinov) tab */}
+        <TabsContent value="debug" className="mt-4">
+          <div className="rounded-lg border border-dashed bg-muted/20 p-4 flex gap-3">
+            <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+            <p className="text-sm text-muted-foreground">{labels.debugInfoText}</p>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
@@ -682,6 +714,7 @@ function StepConnections({
 interface StepConfirmProps {
   name: string;
   token: string;
+  botMode: BotMode;
   managedBot: ManagedBot | null;
   envValues: Record<string, string>;
   credValues: Record<string, number | string>;
@@ -692,6 +725,7 @@ interface StepConfirmProps {
 function StepConfirm({
   name,
   token,
+  botMode,
   managedBot,
   envValues,
   credValues,
@@ -720,8 +754,18 @@ function StepConfirm({
           <span className="text-sm font-medium text-right">{name}</span>
         </div>
 
-        {/* Token or managed bot */}
-        {managedBot ? (
+        {/* Token, managed bot, or debug (tokensiz sinov) */}
+        {botMode === "debug" ? (
+          <div className="flex items-start justify-between gap-4 px-4 py-3">
+            <span className="text-sm text-muted-foreground shrink-0">
+              {labels.summaryToken}
+            </span>
+            <Badge variant="secondary" className="text-xs gap-1">
+              <Sparkles className="h-3 w-3" />
+              {labels.debugConfirmBadge}
+            </Badge>
+          </div>
+        ) : managedBot ? (
           <div className="flex items-start justify-between gap-4 px-4 py-3">
             <span className="text-sm text-muted-foreground shrink-0">
               {labels.summaryToken}
@@ -739,6 +783,12 @@ function StepConfirm({
             <code className="text-xs font-mono bg-muted px-2 py-0.5 rounded text-right">
               {maskedToken}
             </code>
+          </div>
+        )}
+
+        {botMode === "debug" && (
+          <div className="px-4 py-3">
+            <p className="text-xs text-muted-foreground">{labels.debugConfirmNote}</p>
           </div>
         )}
 
@@ -814,6 +864,100 @@ function StepConfirm({
 }
 
 // ---------------------------------------------------------------------------
+// Step 5: Launch — post-create, polls until the bot is running
+// ---------------------------------------------------------------------------
+
+type LaunchStatus = "starting" | "running" | "failed" | "timeout";
+type LaunchProject = Pick<Project, "id" | "uuid" | "name" | "bot_mode" | "bot_username" | "bot_link">;
+
+interface StepLaunchProps {
+  state: LaunchStatus;
+  project: LaunchProject | null;
+  labels: WizardLabels;
+}
+
+function StepLaunch({ state, project, labels }: StepLaunchProps) {
+  const projectId = project?.uuid ?? project?.id;
+  const projectHref = projectId != null ? `/app/bots/${projectId}` : "/app/bots";
+  const isDebug = project?.bot_mode === "debug";
+
+  if (state === "starting") {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-14 text-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="text-sm font-medium">{labels.launchStartingTitle}</p>
+        <p className="text-xs text-muted-foreground">{labels.launchStartingText}</p>
+      </div>
+    );
+  }
+
+  if (state === "failed" || state === "timeout") {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
+        <AlertTriangle className="h-8 w-8 text-amber-500" />
+        <p className="text-sm font-medium">
+          {state === "failed" ? labels.launchFailedTitle : labels.launchTimeoutTitle}
+        </p>
+        <p className="text-xs text-muted-foreground max-w-xs">
+          {state === "failed" ? labels.launchFailedText : labels.launchTimeoutText}
+        </p>
+        <Button asChild className="mt-2 gap-1.5">
+          <Link href={projectHref}>
+            {labels.launchOpenProjectBtn}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
+  // running
+  return (
+    <div className="flex flex-col items-center gap-4 py-6 text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10">
+        <CheckCircle2 className="h-7 w-7 text-emerald-500" />
+      </div>
+      <div className="space-y-1">
+        <p className="text-base font-semibold">{labels.launchRunningTitle}</p>
+        <p className="text-sm text-muted-foreground">{project?.name}</p>
+        {project?.bot_username && (
+          <p className="text-sm text-muted-foreground">@{project.bot_username}</p>
+        )}
+      </div>
+
+      {isDebug && (
+        <div className="w-full space-y-1.5 rounded-lg border border-dashed bg-muted/20 p-3">
+          <Badge variant="warn" className="gap-1">
+            <Sparkles className="h-3 w-3" />
+            {labels.launchDebugBadge}
+          </Badge>
+          <p className="text-xs text-muted-foreground">{labels.launchDebugHint}</p>
+        </div>
+      )}
+
+      <div className="flex w-full flex-col gap-2 sm:flex-row">
+        {project?.bot_link && (
+          <Button asChild size="lg" className="flex-1 gap-1.5">
+            <a href={project.bot_link} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="h-4 w-4" />
+              {labels.launchOpenBotBtn}
+            </a>
+          </Button>
+        )}
+        <Button
+          asChild
+          variant={project?.bot_link ? "outline" : "default"}
+          size="lg"
+          className="flex-1 gap-1.5"
+        >
+          <Link href={projectHref}>{labels.launchOpenProjectBtn}</Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main wizard
 // ---------------------------------------------------------------------------
 
@@ -841,7 +985,7 @@ export function TemplateCreateWizard({
   const [managedConfig, setManagedConfig] = useState<ManagedBotConfig | null>(null);
   const [managedBots, setManagedBots] = useState<ManagedBot[]>([]);
   const [selectedManagedId, setSelectedManagedId] = useState<number | null>(null);
-  const [botMode, setBotMode] = useState<"telegram" | "manual">("telegram");
+  const [botMode, setBotMode] = useState<BotMode>("telegram");
 
   // Fetch managed bot config + list on mount
   useEffect(() => {
@@ -852,6 +996,61 @@ export function TemplateCreateWizard({
       if (res.ok) setManagedBots(res.data);
     });
   }, []);
+
+  // Agar "Telegram orqali" o'chirilgan bo'lsa va foydalanuvchi hali tanlov
+  // qilmagan bo'lsa (default "telegram"), mavjud bo'lmagan tabga tushib
+  // qolmaslik uchun "manual"ga o'tkazamiz.
+  useEffect(() => {
+    if (managedConfig && !managedConfig.enabled && botMode === "telegram") {
+      setBotMode("manual");
+    }
+  }, [managedConfig, botMode]);
+
+  // Launch step (post-create) state
+  const [launchState, setLaunchState] = useState<LaunchStatus>("starting");
+  const [launchProject, setLaunchProject] = useState<LaunchProject | null>(null);
+  const [pollTargetId, setPollTargetId] = useState<string | number | null>(null);
+
+  // Bot ishga tushishini poll qilish — releases/page.tsx bilan bir xil
+  // endpoint (ReleasesAPI.list) dan foydalanadigan getBotLaunchStatusAction
+  // orqali. ~3s oraliq, ~2 daqiqagacha (40 urinish), running/failed'da to'xtaydi.
+  useEffect(() => {
+    if (pollTargetId == null) return;
+    let stopped = false;
+    let attempts = 0;
+    const timer = setInterval(async () => {
+      if (stopped) return;
+      attempts += 1;
+      const res = await getBotLaunchStatusAction(pollTargetId);
+      if (stopped) return;
+      if (res.ok) {
+        if (res.project) {
+          setLaunchProject((prev) => (prev ? { ...prev, ...res.project } : (res.project ?? prev)));
+        }
+        if (res.status === "running") {
+          setLaunchState("running");
+          stopped = true;
+          clearInterval(timer);
+          return;
+        }
+        if (res.status === "failed") {
+          setLaunchState("failed");
+          stopped = true;
+          clearInterval(timer);
+          return;
+        }
+      }
+      if (attempts >= 40) {
+        setLaunchState("timeout");
+        stopped = true;
+        clearInterval(timer);
+      }
+    }, 3000);
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+    };
+  }, [pollTargetId]);
 
   // StepBot poll'i chaqiradi: managed botlarni olib state'ni yangilaydi va ro'yxatni qaytaradi
   const pollManagedBots = async (): Promise<ManagedBot[]> => {
@@ -875,10 +1074,13 @@ export function TemplateCreateWizard({
   // ---------------------------------------------------------------------------
 
   const isManagedMode = managedConfig?.enabled && botMode === "telegram";
+  const isDebugMode = botMode === "debug";
 
-  const botStepValid = isManagedMode
-    ? name.trim().length > 0 && selectedManagedId != null
-    : name.trim().length > 0 && TOKEN_RE.test(token.trim());
+  const botStepValid = isDebugMode
+    ? name.trim().length > 0
+    : isManagedMode
+      ? name.trim().length > 0 && selectedManagedId != null
+      : name.trim().length > 0 && TOKEN_RE.test(token.trim());
 
   const stepValid: Record<StepId, boolean> = {
     bot: botStepValid,
@@ -889,6 +1091,7 @@ export function TemplateCreateWizard({
       .filter((c) => c.required)
       .every((c) => credValues[c.key] != null),
     confirm: true,
+    launch: true,
   };
 
   const canNext = stepValid[currentStep];
@@ -929,36 +1132,52 @@ export function TemplateCreateWizard({
       Object.keys(credValues).length > 0 ? credValues : undefined;
 
     startTransition(async () => {
-      const body = isManagedMode
+      const body = isDebugMode
         ? {
             template: templateId,
             name: name.trim(),
-            managed_bot_id: selectedManagedId!,
+            mode: "debug" as const,
             ...(envs ? { envs } : {}),
             ...(credentials ? { credentials } : {}),
           }
-        : {
-            template: templateId,
-            name: name.trim(),
-            token: token.trim(),
-            ...(envs ? { envs } : {}),
-            ...(credentials ? { credentials } : {}),
-          };
+        : isManagedMode
+          ? {
+              template: templateId,
+              name: name.trim(),
+              managed_bot_id: selectedManagedId!,
+              ...(envs ? { envs } : {}),
+              ...(credentials ? { credentials } : {}),
+            }
+          : {
+              template: templateId,
+              name: name.trim(),
+              token: token.trim(),
+              ...(envs ? { envs } : {}),
+              ...(credentials ? { credentials } : {}),
+            };
 
       const res = await createProjectFromTemplateAction(body);
 
-      if (res.ok && (res.project_id || res.project_uuid)) {
+      if (res.ok && res.project) {
         toast.success(labels.success);
-        const botId = res.project_uuid ?? res.project_id;
-        router.push(`/app/bots/${botId}`);
-        router.refresh();
+        const project = res.project;
+        const targetId = project.uuid ?? project.id;
+        setLaunchProject({
+          id: project.id,
+          uuid: project.uuid,
+          name: project.name,
+          bot_mode: project.bot_mode,
+          bot_username: project.bot_username,
+          bot_link: project.bot_link,
+        });
+        setLaunchState("starting");
+        setStepIndex(steps.length - 1); // "launch" — always the final step
+        setPollTargetId(targetId);
       } else {
         toast.error(res.message ?? labels.error);
       }
     });
   }
-
-  const isLastStep = stepIndex === steps.length - 1;
 
   const selectedManagedBot = managedBots.find((b) => b.id === selectedManagedId) ?? null;
 
@@ -1019,6 +1238,7 @@ export function TemplateCreateWizard({
           <StepConfirm
             name={name}
             token={token}
+            botMode={botMode}
             managedBot={selectedManagedBot}
             envValues={envValues}
             credValues={credValues}
@@ -1026,49 +1246,59 @@ export function TemplateCreateWizard({
             labels={labels}
           />
         )}
-      </div>
 
-      <Separator className="my-6" />
-
-      {/* Navigation */}
-      <div className="flex items-center justify-between gap-3">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={goBack}
-          disabled={pending}
-          className="gap-1.5"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {labels.back}
-        </Button>
-
-        {isLastStep ? (
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={pending}
-            className="gap-1.5"
-          >
-            {pending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Rocket className="h-4 w-4" />
-            )}
-            {labels.create}
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            onClick={goNext}
-            disabled={!canNext || pending}
-            className="gap-1.5"
-          >
-            {labels.next}
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+        {currentStep === "launch" && (
+          <StepLaunch state={launchState} project={launchProject} labels={labels} />
         )}
       </div>
+
+      {/* "launch" (yakuniy) qadamda alohida navigatsiya yo'q — StepLaunch
+          o'zining "Botni ochish" / "Loyihani ochish" tugmalarini ko'rsatadi. */}
+      {currentStep !== "launch" && (
+        <>
+          <Separator className="my-6" />
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={goBack}
+              disabled={pending}
+              className="gap-1.5"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {labels.back}
+            </Button>
+
+            {currentStep === "confirm" ? (
+              <Button
+                type="button"
+                onClick={handleSubmit}
+                disabled={pending}
+                className="gap-1.5"
+              >
+                {pending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Rocket className="h-4 w-4" />
+                )}
+                {labels.create}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={goNext}
+                disabled={!canNext || pending}
+                className="gap-1.5"
+              >
+                {labels.next}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

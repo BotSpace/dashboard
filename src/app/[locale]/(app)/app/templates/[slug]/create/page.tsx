@@ -104,6 +104,22 @@ export default async function TemplateCreatePage({
             managedWaiting: t("managedWaiting"),
             managedConnected: t("managedConnected"),
             managedSelectRequired: t("managedSelectRequired"),
+            stepLaunch: t("wizardStepLaunch"),
+            debugTabLabel: t("debugTabLabel"),
+            debugInfoText: t("debugInfoText"),
+            debugConfirmBadge: t("debugConfirmBadge"),
+            debugConfirmNote: t("debugConfirmNote"),
+            launchStartingTitle: t("launchStartingTitle"),
+            launchStartingText: t("launchStartingText"),
+            launchRunningTitle: t("launchRunningTitle"),
+            launchOpenBotBtn: t("launchOpenBotBtn"),
+            launchOpenProjectBtn: t("launchOpenProjectBtn"),
+            launchDebugBadge: t("launchDebugBadge"),
+            launchDebugHint: t("launchDebugHint"),
+            launchFailedTitle: t("launchFailedTitle"),
+            launchFailedText: t("launchFailedText"),
+            launchTimeoutTitle: t("launchTimeoutTitle"),
+            launchTimeoutText: t("launchTimeoutText"),
           }}
         />
       </Section>
