@@ -1,7 +1,7 @@
 "use server";
 import { isApiError } from "@/shared/api/client";
 import { TemplatesAPI, ProjectsAPI, type TemplateListParams, type PaginatedTemplates } from "@/shared/api/services";
-import type { TemplateRequirements } from "@/shared/types/api";
+import type { TemplateRequirements, ManagedBot, ManagedBotConfig } from "@/shared/types/api";
 
 export type OrderResult = { ok: boolean; message?: string };
 
@@ -62,11 +62,36 @@ export async function getTemplateRequirementsAction(
   }
 }
 
+export async function getManagedBotConfigAction(): Promise<
+  { ok: true; data: ManagedBotConfig } | { ok: false; message: string }
+> {
+  try {
+    const data = await ProjectsAPI.managedBotConfig();
+    return { ok: true, data };
+  } catch (e) {
+    if (isApiError(e)) return { ok: false, message: e.message };
+    return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
+  }
+}
+
+export async function listManagedBotsAction(): Promise<
+  { ok: true; data: ManagedBot[] } | { ok: false; message: string }
+> {
+  try {
+    const data = await ProjectsAPI.listManagedBots();
+    return { ok: true, data };
+  } catch (e) {
+    if (isApiError(e)) return { ok: false, message: e.message };
+    return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
+  }
+}
+
 export async function createProjectFromTemplateAction(
   body: {
     template: number | string;
     name: string;
-    token: string;
+    token?: string;
+    managed_bot_id?: number;
     envs?: Record<string, string>;
     credentials?: Record<string, number | string>;
   }

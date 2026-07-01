@@ -35,6 +35,8 @@ import type {
   Credential,
   CredentialType,
   CredentialListResponse,
+  ManagedBot,
+  ManagedBotConfig,
 } from "@/shared/types/api";
 
 // Backend response shape: { status, data: { results: T[], total_items, ... } }  OR  { results: T[] }  OR plain array
@@ -133,13 +135,22 @@ export const ProjectsAPI = {
   createFromTemplate: (body: {
     template: number | string;
     name: string;
-    token: string;
+    token?: string;
+    managed_bot_id?: number;
     envs?: Record<string, string>;
     credentials?: Record<string, number | string>;
   }) =>
     api<Project>("/api/project/create-from-template/", { method: "POST", json: body }).then(
       unwrapItem<Project>,
     ),
+  managedBotConfig: async (): Promise<ManagedBotConfig> => {
+    const d = await api<unknown>("/api/managed-bot/config/");
+    return unwrapItem<ManagedBotConfig>(d);
+  },
+  listManagedBots: async (): Promise<ManagedBot[]> => {
+    const d = await api<unknown>("/api/managed-bot/");
+    return unwrapList<ManagedBot>(d);
+  },
   templateRequirements: async (templateId: string | number): Promise<TemplateRequirements> => {
     const d = await api<unknown>("/api/v1/project/template-requirements/", {
       query: { template: templateId },
