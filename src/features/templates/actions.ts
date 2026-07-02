@@ -5,15 +5,46 @@ import type { TemplateRequirements, Project } from "@/shared/types/api";
 
 // Managed-bot (Telegram orqali) + launch-status polling actions are generic
 // (project/release concepts, nothing template-specific) and now live in
-// features/bots/actions.ts, shared with the blank-bot wizard. Re-exported
-// here so the template-create wizard's existing imports keep working as-is.
-export {
-  getManagedBotConfigAction,
-  listManagedBotsAction,
-  claimManagedBotAction,
-  getBotLaunchStatusAction,
+// features/bots/actions.ts, shared with the blank-bot wizard. "use server"
+// faylida re-export TAQIQLANGAN (SWC: only async functions) — shu sabab
+// yupqa async wrapper'lar orqali qayta eksport qilamiz.
+import {
+  getManagedBotConfigAction as _getManagedBotConfigAction,
+  listManagedBotsAction as _listManagedBotsAction,
+  claimManagedBotAction as _claimManagedBotAction,
+  getBotLaunchStatusAction as _getBotLaunchStatusAction,
 } from "@/features/bots/actions";
-export type { BotLaunchStatus, BotLaunchStatusResult } from "@/features/bots/actions";
+import type {
+  BotLaunchStatus as _BotLaunchStatus,
+  BotLaunchStatusResult as _BotLaunchStatusResult,
+} from "@/features/bots/actions";
+
+export type BotLaunchStatus = _BotLaunchStatus;
+export type BotLaunchStatusResult = _BotLaunchStatusResult;
+
+export async function getManagedBotConfigAction(
+  ...args: Parameters<typeof _getManagedBotConfigAction>
+) {
+  return _getManagedBotConfigAction(...args);
+}
+
+export async function listManagedBotsAction(
+  ...args: Parameters<typeof _listManagedBotsAction>
+) {
+  return _listManagedBotsAction(...args);
+}
+
+export async function claimManagedBotAction(
+  ...args: Parameters<typeof _claimManagedBotAction>
+) {
+  return _claimManagedBotAction(...args);
+}
+
+export async function getBotLaunchStatusAction(
+  ...args: Parameters<typeof _getBotLaunchStatusAction>
+) {
+  return _getBotLaunchStatusAction(...args);
+}
 
 export type OrderResult = { ok: boolean; message?: string };
 
