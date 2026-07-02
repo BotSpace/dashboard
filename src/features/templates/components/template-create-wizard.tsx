@@ -1,24 +1,17 @@
 "use client";
 
-import { useState, useTransition, useEffect, useRef } from "react";
-import { useRouter, Link } from "@/shared/i18n/routing";
+import { useState, useTransition, useEffect } from "react";
+import { useRouter } from "@/shared/i18n/routing";
 import {
   ArrowLeft,
   ArrowRight,
   Boxes,
-  Check,
   CheckCircle2,
-  Copy,
-  ExternalLink,
   Loader2,
   Rocket,
   User,
   Bot,
-  Key,
-  RefreshCw,
-  Plus,
   Sparkles,
-  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
@@ -26,16 +19,17 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Badge } from "@/shared/components/ui/badge";
 import { Separator } from "@/shared/components/ui/separator";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
+import { WizardStepper } from "@/shared/components/common/wizard-stepper";
+import { BotConnectTabs, TOKEN_RE } from "@/features/bots/components/bot-connect-tabs";
+import { BotLaunchStep } from "@/features/bots/components/bot-launch-step";
+import { useLaunchPolling } from "@/features/bots/hooks/use-launch-polling";
 import { CredentialSlot } from "./credential-slot";
 import {
   createProjectFromTemplateAction,
   getManagedBotConfigAction,
   listManagedBotsAction,
-  claimManagedBotAction,
-  getBotLaunchStatusAction,
 } from "@/features/templates/actions";
-import type { TemplateRequirements, ManagedBot, ManagedBotConfig, Project } from "@/shared/types/api";
+import type { TemplateRequirements, ManagedBot, ManagedBotConfig } from "@/shared/types/api";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -140,7 +134,8 @@ function buildSteps(requirements: TemplateRequirements): StepId[] {
 }
 
 // ---------------------------------------------------------------------------
-// Stepper indicator
+// Stepper indicator — generic WizardStepper (shared/components/common),
+// just resolve each StepId to its translated label here.
 // ---------------------------------------------------------------------------
 
 const STEP_LABEL_KEYS: Record<StepId, keyof WizardLabels> = {
@@ -151,95 +146,10 @@ const STEP_LABEL_KEYS: Record<StepId, keyof WizardLabels> = {
   launch: "stepLaunch",
 };
 
-interface StepperProps {
-  steps: StepId[];
-  currentIndex: number;
-  labels: WizardLabels;
-}
-
-function Stepper({ steps, currentIndex, labels }: StepperProps) {
-  return (
-    <nav aria-label="Progress" className="mb-8">
-      {/* Desktop: horizontal */}
-      <ol className="hidden sm:flex items-center gap-0">
-        {steps.map((step, idx) => {
-          const done = idx < currentIndex;
-          const active = idx === currentIndex;
-          const isLast = idx === steps.length - 1;
-
-          return (
-            <li key={step} className="flex items-center flex-1 last:flex-none">
-              <div className="flex flex-col items-center gap-1.5 min-w-[64px]">
-                <div
-                  className={[
-                    "flex h-9 w-9 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors",
-                    done
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : active
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-muted-foreground/30 bg-background text-muted-foreground",
-                  ].join(" ")}
-                >
-                  {done ? <Check className="h-4 w-4" /> : <span>{idx + 1}</span>}
-                </div>
-                <span
-                  className={[
-                    "text-xs font-medium whitespace-nowrap",
-                    active
-                      ? "text-foreground"
-                      : done
-                        ? "text-foreground/70"
-                        : "text-muted-foreground",
-                  ].join(" ")}
-                >
-                  {labels[STEP_LABEL_KEYS[step]]}
-                </span>
-              </div>
-              {!isLast && (
-                <div
-                  className={[
-                    "h-0.5 flex-1 mx-2 mb-5 transition-colors",
-                    done ? "bg-primary" : "bg-muted-foreground/20",
-                  ].join(" ")}
-                />
-              )}
-            </li>
-          );
-        })}
-      </ol>
-
-      {/* Mobile: compact dots + step name */}
-      <div className="flex sm:hidden items-center gap-3">
-        <div className="flex gap-1.5">
-          {steps.map((step, idx) => (
-            <div
-              key={step}
-              className={[
-                "h-1.5 rounded-full transition-all",
-                idx < currentIndex
-                  ? "w-4 bg-primary"
-                  : idx === currentIndex
-                    ? "w-6 bg-primary"
-                    : "w-4 bg-muted-foreground/30",
-              ].join(" ")}
-            />
-          ))}
-        </div>
-        <span className="text-sm text-muted-foreground">
-          {labels[STEP_LABEL_KEYS[steps[currentIndex]]]}
-        </span>
-      </div>
-    </nav>
-  );
-}
-
 // ---------------------------------------------------------------------------
-// Step 1: Bot name + token (with optional managed-bot flow)
+// Step 1: Bot name + connection (Telegram orqali / Token qo'lda / Tokensiz
+// sinov) — the tabs themselves are the shared BotConnectTabs component.
 // ---------------------------------------------------------------------------
-
-const TOKEN_RE = /^\d+:.+/;
-// Telegram username rules: lowercase letters/numbers/underscore, ends with "bot"
-const USERNAME_RE = /^[a-z][a-z0-9_]{3,}bot$/i;
 
 interface StepBotProps {
   name: string;
@@ -275,100 +185,6 @@ function StepBot({
   onBotModeChange,
   labels,
 }: StepBotProps) {
-  const tokenInvalid =
-    tokenTouched && token.trim() !== "" && !TOKEN_RE.test(token.trim());
-
-  // New-bot creation form (inside telegram tab)
-  const [newUsername, setNewUsername] = useState("");
-  const [newBotName, setNewBotName] = useState("");
-  const [polling, setPolling] = useState(false);
-  const [deepLinkOpened, setDeepLinkOpened] = useState(false);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const pollCount = useRef(0);
-  const knownIds = useRef<Set<number>>(new Set(managedBots.map((b) => b.id)));
-
-  // Stop polling on unmount
-  useEffect(() => {
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, []);
-
-  function stopPolling() {
-    if (pollRef.current) clearInterval(pollRef.current);
-    pollRef.current = null;
-    setPolling(false);
-  }
-
-  // Ro'yxatdan bot tanlash (yoki poll topganda) — spinner'ni ham to'xtatadi
-  function pickBot(bot: ManagedBot) {
-    stopPolling();
-    onSelectManaged(bot.id);
-    if (!name.trim()) onNameChange(bot.name || bot.username);
-  }
-
-  function buildDeepLink() {
-    if (!managedConfig?.deep_link_template) return null;
-    const uname = newUsername.trim();
-    const bname = newBotName.trim() || uname;
-    return managedConfig.deep_link_template
-      .replace("{username}", uname)
-      .replace("{name}", bname);
-  }
-
-  async function handleCopyLink() {
-    const link = buildDeepLink();
-    if (!link) return;
-    try {
-      await navigator.clipboard.writeText(link);
-      toast.success(labels.managedCopyLinkDone);
-    } catch {
-      toast.error(labels.managedCopyLinkFail);
-    }
-  }
-
-  function handleOpenTelegram() {
-    const link = buildDeepLink();
-    if (!link) return;
-    // Oynani AVVAL ochamiz (user-gesture popup-blocker'ga tushmasin), keyin claim.
-    window.open(link, "_blank");
-    // Botni SHU (login qilgan) foydalanuvchiga bog'lash uchun claim (fire-and-forget) —
-    // webhook Telegram-yaratuvchi emas, claim bo'yicha egani aniqlaydi.
-    void claimManagedBotAction(newUsername.trim());
-    setDeepLinkOpened(true);
-    // Snapshot mavjud bot id'lari — shundan keyin paydo bo'lgani "yangi" hisoblanadi
-    knownIds.current = new Set(managedBots.map((b) => b.id));
-    pollCount.current = 0;
-    setPolling(true);
-    // Har 3s'da REAL fetch qilib yangi botni qidiradi (max 2 daqiqa)
-    pollRef.current = setInterval(async () => {
-      pollCount.current += 1;
-      try {
-        const bots = await onPollManaged();
-        const newBot = bots.find((b) => !knownIds.current.has(b.id));
-        if (newBot) {
-          stopPolling();
-          onSelectManaged(newBot.id);
-          if (!name.trim()) onNameChange(newBot.name || newBot.username);
-          toast.success(labels.managedConnected);
-          return;
-        }
-      } catch {
-        // e'tiborsiz — keyingi tick qayta urinadi
-      }
-      if (pollCount.current >= 40) stopPolling();
-    }, 3000);
-  }
-
-  const usernameInvalid = newUsername.trim().length > 0 && !USERNAME_RE.test(newUsername.trim());
-  const canOpenTelegram =
-    !!managedConfig?.deep_link_template &&
-    newUsername.trim().length > 0 &&
-    USERNAME_RE.test(newUsername.trim());
-
-  // Managed bot mode (enabled:true) → show tabs
-  const managedEnabled = managedConfig?.enabled === true;
-
   return (
     <div className="space-y-5">
       {/* Bot project name — always shown */}
@@ -392,222 +208,22 @@ function StepBot({
         </div>
       </div>
 
-      <Tabs value={botMode} onValueChange={(v) => onBotModeChange(v as BotMode)}>
-        <TabsList className="w-full">
-          {managedEnabled && (
-            <TabsTrigger value="telegram" className="flex-1 gap-1.5">
-              <Bot className="h-4 w-4" />
-              {labels.managedTabTelegram}
-            </TabsTrigger>
-          )}
-          <TabsTrigger value="manual" className="flex-1 gap-1.5">
-            <Key className="h-4 w-4" />
-            {labels.managedTabManual}
-          </TabsTrigger>
-          <TabsTrigger value="debug" className="flex-1 gap-1.5">
-            <Sparkles className="h-4 w-4" />
-            {labels.debugTabLabel}
-          </TabsTrigger>
-        </TabsList>
-
-        {managedEnabled && (
-          /* TELEGRAM tab */
-          <TabsContent value="telegram" className="mt-4 space-y-4">
-            {/* Existing bots list */}
-            {managedBots.length > 0 && (
-              <div className="space-y-2">
-                <Label>{labels.managedBotSelectLabel}</Label>
-                <div className="space-y-2">
-                  {managedBots.map((bot) => (
-                    <label
-                      key={bot.id}
-                      htmlFor={`mbot-${bot.id}`}
-                      className={[
-                        "flex items-center gap-3 rounded-lg border p-3 cursor-pointer transition-colors",
-                        selectedManagedId === bot.id
-                          ? "border-primary bg-primary/5"
-                          : "hover:bg-muted/50",
-                        bot.used ? "opacity-60" : "",
-                      ].join(" ")}
-                    >
-                      <input
-                        type="radio"
-                        id={`mbot-${bot.id}`}
-                        name="managed-bot"
-                        value={String(bot.id)}
-                        checked={selectedManagedId === bot.id}
-                        onChange={() => pickBot(bot)}
-                        className="accent-primary h-4 w-4 shrink-0"
-                      />
-                      <Bot className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">@{bot.username}</p>
-                        {bot.name && (
-                          <p className="text-xs text-muted-foreground truncate">{bot.name}</p>
-                        )}
-                      </div>
-                      {bot.used && (
-                        <Badge variant="secondary" className="text-xs shrink-0">
-                          {labels.managedBotUsed}
-                        </Badge>
-                      )}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {managedBots.length === 0 && !deepLinkOpened && (
-              <p className="text-sm text-muted-foreground">{labels.managedBotNoList}</p>
-            )}
-
-            {/* Create new bot section */}
-            <div className="rounded-lg border border-dashed p-4 space-y-3">
-              <p className="text-sm font-medium flex items-center gap-1.5">
-                <Plus className="h-4 w-4" />
-                {labels.managedNewBotTitle}
-              </p>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="managed-username">
-                  {labels.managedUsernameLabel}
-                  <span className="ml-1 text-destructive">*</span>
-                </Label>
-                <Input
-                  id="managed-username"
-                  value={newUsername}
-                  onChange={(e) => setNewUsername(e.target.value.toLowerCase())}
-                  placeholder={labels.managedUsernamePlaceholder}
-                  spellCheck={false}
-                  autoComplete="off"
-                  className={usernameInvalid ? "border-destructive focus-visible:ring-destructive" : ""}
-                />
-                <p className="text-xs text-muted-foreground">{labels.managedUsernameHint}</p>
-                {usernameInvalid && (
-                  <p className="text-xs text-destructive">{labels.managedUsernameHint}</p>
-                )}
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="managed-botname">{labels.managedOptionalNameLabel}</Label>
-                <Input
-                  id="managed-botname"
-                  value={newBotName}
-                  onChange={(e) => setNewBotName(e.target.value)}
-                  placeholder={newUsername ? `${newUsername} Bot` : "My Bot"}
-                  maxLength={64}
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={!canOpenTelegram || polling}
-                  onClick={handleOpenTelegram}
-                  className="flex-1 gap-2"
-                >
-                  {polling ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      {labels.managedWaiting}
-                    </>
-                  ) : (
-                    <>
-                      <ExternalLink className="h-4 w-4" />
-                      {labels.managedOpenTelegramBtn}
-                    </>
-                  )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  disabled={!canOpenTelegram}
-                  onClick={handleCopyLink}
-                  title={labels.managedCopyLink}
-                  aria-label={labels.managedCopyLink}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
-        )}
-
-        {/* MANUAL tab */}
-        <TabsContent value="manual" className="mt-4">
-          <ManualTokenInput
-            token={token}
-            onTokenChange={onTokenChange}
-            tokenTouched={tokenTouched}
-            onTokenBlur={onTokenBlur}
-            tokenInvalid={tokenInvalid}
-            labels={labels}
-          />
-        </TabsContent>
-
-        {/* DEBUG (tokensiz sinov) tab */}
-        <TabsContent value="debug" className="mt-4">
-          <div className="rounded-lg border border-dashed bg-muted/20 p-4 flex gap-3">
-            <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-            <p className="text-sm text-muted-foreground">{labels.debugInfoText}</p>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
-
-function ManualTokenInput({
-  token,
-  onTokenChange,
-  tokenTouched,
-  onTokenBlur,
-  tokenInvalid,
-  labels,
-}: {
-  token: string;
-  onTokenChange: (v: string) => void;
-  tokenTouched: boolean;
-  onTokenBlur: () => void;
-  tokenInvalid: boolean;
-  labels: WizardLabels;
-}) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor="wizard-token">
-        {labels.tokenLabel}
-        <span className="ml-1 text-destructive">*</span>
-      </Label>
-      <Input
-        id="wizard-token"
-        value={token}
-        onChange={(e) => onTokenChange(e.target.value)}
-        onBlur={onTokenBlur}
-        placeholder={labels.tokenPlaceholder}
-        spellCheck={false}
-        autoComplete="off"
-        className={
-          tokenInvalid
-            ? "border-destructive focus-visible:ring-destructive"
-            : ""
-        }
+      <BotConnectTabs
+        name={name}
+        onNameChange={onNameChange}
+        token={token}
+        onTokenChange={onTokenChange}
+        tokenTouched={tokenTouched}
+        onTokenBlur={onTokenBlur}
+        managedConfig={managedConfig}
+        managedBots={managedBots}
+        selectedManagedId={selectedManagedId}
+        onSelectManaged={onSelectManaged}
+        onPollManaged={onPollManaged}
+        botMode={botMode}
+        onBotModeChange={onBotModeChange}
+        labels={labels}
       />
-      {tokenInvalid && (
-        <p className="text-xs text-destructive">{labels.tokenInvalid}</p>
-      )}
-      <p className="text-xs text-muted-foreground">
-        {labels.tokenHelp}{" "}
-        <a
-          href="https://t.me/BotFather"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-0.5 underline hover:text-foreground"
-        >
-          @BotFather <ExternalLink className="h-3 w-3" />
-        </a>
-      </p>
     </div>
   );
 }
@@ -864,98 +480,9 @@ function StepConfirm({
 }
 
 // ---------------------------------------------------------------------------
-// Step 5: Launch — post-create, polls until the bot is running
+// Step 5: Launch — post-create, polls until the bot is running.
+// Shared BotLaunchStep component + useLaunchPolling hook (features/bots).
 // ---------------------------------------------------------------------------
-
-type LaunchStatus = "starting" | "running" | "failed" | "timeout";
-type LaunchProject = Pick<Project, "id" | "uuid" | "name" | "bot_mode" | "bot_username" | "bot_link">;
-
-interface StepLaunchProps {
-  state: LaunchStatus;
-  project: LaunchProject | null;
-  labels: WizardLabels;
-}
-
-function StepLaunch({ state, project, labels }: StepLaunchProps) {
-  const projectId = project?.uuid ?? project?.id;
-  const projectHref = projectId != null ? `/app/bots/${projectId}` : "/app/bots";
-  const isDebug = project?.bot_mode === "debug";
-
-  if (state === "starting") {
-    return (
-      <div className="flex flex-col items-center justify-center gap-3 py-14 text-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm font-medium">{labels.launchStartingTitle}</p>
-        <p className="text-xs text-muted-foreground">{labels.launchStartingText}</p>
-      </div>
-    );
-  }
-
-  if (state === "failed" || state === "timeout") {
-    return (
-      <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-        <AlertTriangle className="h-8 w-8 text-amber-500" />
-        <p className="text-sm font-medium">
-          {state === "failed" ? labels.launchFailedTitle : labels.launchTimeoutTitle}
-        </p>
-        <p className="text-xs text-muted-foreground max-w-xs">
-          {state === "failed" ? labels.launchFailedText : labels.launchTimeoutText}
-        </p>
-        <Button asChild className="mt-2 gap-1.5">
-          <Link href={projectHref}>
-            {labels.launchOpenProjectBtn}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
-    );
-  }
-
-  // running
-  return (
-    <div className="flex flex-col items-center gap-4 py-6 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10">
-        <CheckCircle2 className="h-7 w-7 text-emerald-500" />
-      </div>
-      <div className="space-y-1">
-        <p className="text-base font-semibold">{labels.launchRunningTitle}</p>
-        <p className="text-sm text-muted-foreground">{project?.name}</p>
-        {project?.bot_username && (
-          <p className="text-sm text-muted-foreground">@{project.bot_username}</p>
-        )}
-      </div>
-
-      {isDebug && (
-        <div className="w-full space-y-1.5 rounded-lg border border-dashed bg-muted/20 p-3">
-          <Badge variant="warn" className="gap-1">
-            <Sparkles className="h-3 w-3" />
-            {labels.launchDebugBadge}
-          </Badge>
-          <p className="text-xs text-muted-foreground">{labels.launchDebugHint}</p>
-        </div>
-      )}
-
-      <div className="flex w-full flex-col gap-2 sm:flex-row">
-        {project?.bot_link && (
-          <Button asChild size="lg" className="flex-1 gap-1.5">
-            <a href={project.bot_link} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="h-4 w-4" />
-              {labels.launchOpenBotBtn}
-            </a>
-          </Button>
-        )}
-        <Button
-          asChild
-          variant={project?.bot_link ? "outline" : "default"}
-          size="lg"
-          className="flex-1 gap-1.5"
-        >
-          <Link href={projectHref}>{labels.launchOpenProjectBtn}</Link>
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Main wizard
@@ -1006,51 +533,10 @@ export function TemplateCreateWizard({
     }
   }, [managedConfig, botMode]);
 
-  // Launch step (post-create) state
-  const [launchState, setLaunchState] = useState<LaunchStatus>("starting");
-  const [launchProject, setLaunchProject] = useState<LaunchProject | null>(null);
+  // Launch step (post-create) state — shared poller, see features/bots/hooks.
   const [pollTargetId, setPollTargetId] = useState<string | number | null>(null);
-
-  // Bot ishga tushishini poll qilish — releases/page.tsx bilan bir xil
-  // endpoint (ReleasesAPI.list) dan foydalanadigan getBotLaunchStatusAction
-  // orqali. ~3s oraliq, ~2 daqiqagacha (40 urinish), running/failed'da to'xtaydi.
-  useEffect(() => {
-    if (pollTargetId == null) return;
-    let stopped = false;
-    let attempts = 0;
-    const timer = setInterval(async () => {
-      if (stopped) return;
-      attempts += 1;
-      const res = await getBotLaunchStatusAction(pollTargetId);
-      if (stopped) return;
-      if (res.ok) {
-        if (res.project) {
-          setLaunchProject((prev) => (prev ? { ...prev, ...res.project } : (res.project ?? prev)));
-        }
-        if (res.status === "running") {
-          setLaunchState("running");
-          stopped = true;
-          clearInterval(timer);
-          return;
-        }
-        if (res.status === "failed") {
-          setLaunchState("failed");
-          stopped = true;
-          clearInterval(timer);
-          return;
-        }
-      }
-      if (attempts >= 40) {
-        setLaunchState("timeout");
-        stopped = true;
-        clearInterval(timer);
-      }
-    }, 3000);
-    return () => {
-      stopped = true;
-      clearInterval(timer);
-    };
-  }, [pollTargetId]);
+  const { launchState, setLaunchState, launchProject, setLaunchProject } =
+    useLaunchPolling(pollTargetId);
 
   // StepBot poll'i chaqiradi: managed botlarni olib state'ni yangilaydi va ro'yxatni qaytaradi
   const pollManagedBots = async (): Promise<ManagedBot[]> => {
@@ -1187,7 +673,10 @@ export function TemplateCreateWizard({
 
   return (
     <div className="mx-auto max-w-lg w-full">
-      <Stepper steps={steps} currentIndex={stepIndex} labels={labels} />
+      <WizardStepper
+        steps={steps.map((s) => labels[STEP_LABEL_KEYS[s]])}
+        currentIndex={stepIndex}
+      />
 
       {/* Step content */}
       <div className="min-h-[240px]">
@@ -1248,7 +737,7 @@ export function TemplateCreateWizard({
         )}
 
         {currentStep === "launch" && (
-          <StepLaunch state={launchState} project={launchProject} labels={labels} />
+          <BotLaunchStep state={launchState} project={launchProject} labels={labels} />
         )}
       </div>
 

@@ -1,7 +1,19 @@
 "use server";
 import { isApiError } from "@/shared/api/client";
-import { TemplatesAPI, ProjectsAPI, ReleasesAPI, type TemplateListParams, type PaginatedTemplates } from "@/shared/api/services";
-import type { TemplateRequirements, ManagedBot, ManagedBotConfig, Project } from "@/shared/types/api";
+import { TemplatesAPI, ProjectsAPI, type TemplateListParams, type PaginatedTemplates } from "@/shared/api/services";
+import type { TemplateRequirements, Project } from "@/shared/types/api";
+
+// Managed-bot (Telegram orqali) + launch-status polling actions are generic
+// (project/release concepts, nothing template-specific) and now live in
+// features/bots/actions.ts, shared with the blank-bot wizard. Re-exported
+// here so the template-create wizard's existing imports keep working as-is.
+export {
+  getManagedBotConfigAction,
+  listManagedBotsAction,
+  claimManagedBotAction,
+  getBotLaunchStatusAction,
+} from "@/features/bots/actions";
+export type { BotLaunchStatus, BotLaunchStatusResult } from "@/features/bots/actions";
 
 export type OrderResult = { ok: boolean; message?: string };
 
@@ -12,13 +24,6 @@ export type CreateFromTemplateResult = {
   project_uuid?: string;
   message?: string;
 };
-
-// Bot ni ishga tushirish holati — StepLaunch pollingi shu qiymatlarni kutadi.
-export type BotLaunchStatus = "running" | "pending" | "failed" | "none";
-
-export type BotLaunchStatusResult =
-  | { ok: true; status: BotLaunchStatus; project?: Project }
-  | { ok: false; status: "none"; message: string };
 
 export async function loadMoreTemplatesAction(
   params: TemplateListParams
@@ -67,38 +72,6 @@ export async function getTemplateRequirementsAction(
       return { ok: false, message: e.message };
     }
     return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
-  }
-}
-
-export async function getManagedBotConfigAction(): Promise<
-  { ok: true; data: ManagedBotConfig } | { ok: false; message: string }
-> {
-  try {
-    const data = await ProjectsAPI.managedBotConfig();
-    return { ok: true, data };
-  } catch (e) {
-    if (isApiError(e)) return { ok: false, message: e.message };
-    return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
-  }
-}
-
-export async function listManagedBotsAction(): Promise<
-  { ok: true; data: ManagedBot[] } | { ok: false; message: string }
-> {
-  try {
-    const data = await ProjectsAPI.listManagedBots();
-    return { ok: true, data };
-  } catch (e) {
-    if (isApiError(e)) return { ok: false, message: e.message };
-    return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
-  }
-}
-
-export async function claimManagedBotAction(username: string): Promise<void> {
-  try {
-    await ProjectsAPI.claimManagedBot(username);
-  } catch {
-    // claim best-effort — muvaffaqiyatsiz bo'lsa Telegram matching zaxira ishlaydi
   }
 }
 
@@ -153,37 +126,5 @@ export async function createProjectFromTemplateAction(
       return { ok: false, message: msg ?? e.message };
     }
     return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
-  }
-}
-
-
-// Post-create polling for the wizard's "Ishga tushirish" step. Reuses the same
-// endpoints the bots list/detail pages already use to read release/debug
-// status (ReleasesAPI.list — see releases/page.tsx) plus a fresh project
-// fetch, since bot_username/bot_link may only be resolved once the
-// debug/release container actually comes up.
-export async function getBotLaunchStatusAction(
-  projectId: number | string
-): Promise<BotLaunchStatusResult> {
-  try {
-    const [project, releases] = await Promise.all([
-      ProjectsAPI.get(projectId).catch(() => undefined),
-      ReleasesAPI.list(projectId).catch(() => []),
-    ]);
-
-    let status: BotLaunchStatus = "none";
-    if (releases.length > 0) {
-      if (releases.some((r) => r.status === "running")) status = "running";
-      else if (releases.some((r) => r.status === "failed")) status = "failed";
-      else status = "pending";
-    }
-
-    return { ok: true, status, project };
-  } catch (e) {
-    return {
-      ok: false,
-      status: "none",
-      message: isApiError(e) ? e.message : "Server bilan bog'lanib bo'lmadi",
-    };
   }
 }

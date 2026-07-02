@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { FilePlus2, LayoutTemplate, Plus } from "lucide-react";
-import { CreateBotForm } from "@/features/bots/components/create-form";
+import { CreateBotWizard } from "@/features/bots/components/create-bot-wizard";
 import { CardDescription } from "@/shared/components/ui/card";
 import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
@@ -11,6 +11,7 @@ export default async function NewBotPage({ params }: { params: Promise<{ locale:
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("bots.create");
+  const w = await getTranslations("bots.wizard");
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -39,8 +40,64 @@ export default async function NewBotPage({ params }: { params: Promise<{ locale:
         </div>
       </div>
 
-      <Section title="Bot ma'lumotlari" icon={<Plus className="h-4 w-4" />}>
-        <CreateBotForm />
+      <Section>
+        <CreateBotWizard
+          labels={{
+            stepBot: w("stepBot"),
+            stepConfirm: w("stepConfirm"),
+            stepLaunch: w("stepLaunch"),
+            next: w("next"),
+            back: w("back"),
+            create: w("create"),
+            nameLabel: w("nameLabel"),
+            namePlaceholder: w("namePlaceholder"),
+            descriptionLabel: w("descriptionLabel"),
+            descriptionPlaceholder: w("descriptionPlaceholder"),
+            tokenLabel: w("tokenLabel"),
+            tokenPlaceholder: w("tokenPlaceholder"),
+            tokenHelp: w("tokenHelp"),
+            tokenInvalid: w("tokenInvalid"),
+            confirmTitle: w("confirmTitle"),
+            summaryName: w("summaryName"),
+            summaryDescription: w("summaryDescription"),
+            summaryConnection: w("summaryConnection"),
+            success: w("success"),
+            error: w("error"),
+            managedTabTelegram: w("managedTabTelegram"),
+            managedTabManual: w("managedTabManual"),
+            managedBotSelectLabel: w("managedBotSelectLabel"),
+            managedBotUsed: w("managedBotUsed"),
+            managedBotNoList: w("managedBotNoList"),
+            managedNewBotTitle: w("managedNewBotTitle"),
+            managedUsernameLabel: w("managedUsernameLabel"),
+            managedUsernamePlaceholder: w("managedUsernamePlaceholder"),
+            managedUsernameHint: w("managedUsernameHint"),
+            managedOptionalNameLabel: w("managedOptionalNameLabel"),
+            managedOpenTelegramBtn: w("managedOpenTelegramBtn"),
+            managedCopyLink: w("managedCopyLink"),
+            managedCopyLinkDone: w("managedCopyLinkDone"),
+            managedCopyLinkFail: w("managedCopyLinkFail"),
+            managedWaiting: w("managedWaiting"),
+            managedConnected: w("managedConnected"),
+            debugTabLabel: w("debugTabLabel"),
+            debugInfoText: w("debugInfoText"),
+            debugConfirmBadge: w("debugConfirmBadge"),
+            debugConfirmNote: w("debugConfirmNote"),
+            launchStartingTitle: w("launchStartingTitle"),
+            launchStartingText: w("launchStartingText"),
+            launchRunningTitle: w("launchRunningTitle"),
+            launchOpenBotBtn: w("launchOpenBotBtn"),
+            launchOpenProjectBtn: w("launchOpenProjectBtn"),
+            launchDebugBadge: w("launchDebugBadge"),
+            launchDebugHint: w("launchDebugHint"),
+            launchFailedTitle: w("launchFailedTitle"),
+            launchFailedText: w("launchFailedText"),
+            launchTimeoutTitle: w("launchTimeoutTitle"),
+            launchTimeoutText: w("launchTimeoutText"),
+            launchNoConnectTitle: w("launchNoConnectTitle"),
+            launchNoConnectText: w("launchNoConnectText"),
+          }}
+        />
       </Section>
     </div>
   );

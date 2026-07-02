@@ -51,6 +51,11 @@ export type Project = {
   bot_mode?: "release" | "debug";
   bot_username?: string | null;
   bot_link?: string | null;
+  // Present on project detail (RetrieveProjectSerializer → RetrieveDebugSerializer)
+  // when the project has a debug (tokenless) container. status: "initializing" |
+  // "pending" | "running" | "failed" | "stopped" (container lifecycle, not a
+  // release — debug mode never creates a Release row).
+  debug?: { status?: string } | null;
 };
 
 export type Release = {

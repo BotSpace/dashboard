@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ProjectsAPI, ReleasesAPI, EnvAPI } from "@/shared/api/services";
 import { isApiError } from "@/shared/api/client";
+import type { ManagedBot, ManagedBotConfig, Project } from "@/shared/types/api";
 
 export type RunningBot = {
   project_id: number;
@@ -11,6 +12,174 @@ export type RunningBot = {
   release_id?: number;
 };
 
+// ---------------------------------------------------------------------------
+// Managed bot ("Telegram orqali") + launch-status polling — generic
+// project/release actions shared by the blank-bot wizard (this feature) and
+// the template-create wizard (features/templates). Historically these lived
+// only in features/templates/actions.ts; moved here since they don't touch
+// anything template-specific, and templates/actions.ts re-exports them so
+// existing imports keep working unchanged.
+// ---------------------------------------------------------------------------
+
+export async function getManagedBotConfigAction(): Promise<
+  { ok: true; data: ManagedBotConfig } | { ok: false; message: string }
+> {
+  try {
+    const data = await ProjectsAPI.managedBotConfig();
+    return { ok: true, data };
+  } catch (e) {
+    if (isApiError(e)) return { ok: false, message: e.message };
+    return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
+  }
+}
+
+export async function listManagedBotsAction(): Promise<
+  { ok: true; data: ManagedBot[] } | { ok: false; message: string }
+> {
+  try {
+    const data = await ProjectsAPI.listManagedBots();
+    return { ok: true, data };
+  } catch (e) {
+    if (isApiError(e)) return { ok: false, message: e.message };
+    return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
+  }
+}
+
+export async function claimManagedBotAction(username: string): Promise<void> {
+  try {
+    await ProjectsAPI.claimManagedBot(username);
+  } catch {
+    // claim best-effort — muvaffaqiyatsiz bo'lsa Telegram matching zaxira ishlaydi
+  }
+}
+
+// Bot ni ishga tushirish holati — StepLaunch pollingi shu qiymatlarni kutadi.
+export type BotLaunchStatus = "running" | "pending" | "failed" | "none";
+
+export type BotLaunchStatusResult =
+  | { ok: true; status: BotLaunchStatus; project?: Project }
+  | { ok: false; status: "none"; message: string };
+
+// Post-create polling for the wizards' "Ishga tushirish" step. Reuses the same
+// endpoints the bots list/detail pages already use to read release/debug
+// status (ReleasesAPI.list — see releases/page.tsx) plus a fresh project
+// fetch, since bot_username/bot_link may only be resolved once the
+// debug/release container actually comes up.
+export async function getBotLaunchStatusAction(
+  projectId: number | string
+): Promise<BotLaunchStatusResult> {
+  try {
+    const [project, releases] = await Promise.all([
+      ProjectsAPI.get(projectId).catch(() => undefined),
+      ReleasesAPI.list(projectId).catch(() => []),
+    ]);
+
+    // Debug (tokenless) mode never creates a Release row — the container's
+    // own lifecycle lives on project.debug.status instead (see RetrieveProjectSerializer
+    // → RetrieveDebugSerializer). Combine both sources so debug-mode bots
+    // (managed-bot AND "Tokensiz sinov") are detected as running too, not just
+    // release-mode ones.
+    const debugStatus = project?.debug?.status;
+    const releaseRunning = releases.some((r) => r.status === "running");
+    const releaseFailed = releases.some((r) => r.status === "failed");
+
+    let status: BotLaunchStatus = "none";
+    if (releaseRunning || debugStatus === "running") {
+      status = "running";
+    } else if (releaseFailed || debugStatus === "failed") {
+      status = "failed";
+    } else if (releases.length > 0 || debugStatus === "initializing" || debugStatus === "pending") {
+      status = "pending";
+    }
+
+    return { ok: true, status, project };
+  } catch (e) {
+    return {
+      ok: false,
+      status: "none",
+      message: isApiError(e) ? e.message : "Server bilan bog'lanib bo'lmadi",
+    };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Blank-bot wizard submit (src/app/[locale]/(app)/app/bots/new)
+// ---------------------------------------------------------------------------
+
+export type CreateBlankBotBody = {
+  name: string;
+  description?: string;
+  token?: string;
+  managed_bot_id?: number;
+  mode?: "debug";
+};
+
+export type CreateBlankBotResult =
+  | { ok: true; project: Project; noConnect: boolean }
+  | { ok: false; message: string };
+
+// Creates a plain (non-template) project and — unlike the flat legacy
+// createBotAction — also attempts to bring the bot online right away so the
+// wizard's "Ishga tushirish" step has something to poll, mirroring the
+// template-create wizard's UX.
+//
+// KNOWN BACKEND GAP: `/api/project/` (ProjectsAPI.create) is not documented to
+// accept `managed_bot_id` / `mode` — those are currently only wired into
+// `/api/project/create-from-template/`. We pass them through opportunistically
+// (best-effort, ignored if unsupported) and then try to deploy a release; if
+// that fails with `bot_token_required` the project simply has no token yet
+// (managed-bot linking didn't take, or "Tokensiz sinov" was chosen and the
+// backend has no template-less debug mode). In that case we return
+// `noConnect: true` so the UI can show a "connect a token on the project page"
+// note instead of polling forever.
+export async function createBlankBotAction(
+  body: CreateBlankBotBody
+): Promise<CreateBlankBotResult> {
+  let project: Project;
+  try {
+    project = await ProjectsAPI.create({
+      name: body.name,
+      description: body.description,
+      ...(body.token ? { token: body.token } : {}),
+      // Not part of the typed Project shape (see gap note above) — passed
+      // opportunistically in case the base endpoint's serializer accepts it.
+      ...(body.managed_bot_id ? { managed_bot_id: body.managed_bot_id } : {}),
+      ...(body.mode ? { mode: body.mode } : {}),
+    } as Partial<Project>);
+  } catch (e) {
+    if (isApiError(e)) {
+      const details = e.details as { detail?: string; name?: string[]; token?: string[] } | undefined;
+      const msg =
+        details?.detail ??
+        (Array.isArray(details?.name) ? details.name[0] : undefined) ??
+        (Array.isArray(details?.token) ? details.token[0] : undefined) ??
+        e.message;
+      return { ok: false, message: msg };
+    }
+    return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
+  }
+
+  // Project created — now try to bring it online (mirrors DeployButton).
+  let noConnect = false;
+  try {
+    await ReleasesAPI.create(project.id);
+  } catch (e) {
+    if (isApiError(e) && e.status === 400) {
+      const raw = e.details as Record<string, unknown> | null;
+      const code = raw?.code ?? (raw?.data as Record<string, unknown> | undefined)?.code;
+      if (code === "bot_token_required") {
+        noConnect = true;
+      }
+    }
+    // Other deploy errors (e.g. running_bot_limit) are swallowed here — the
+    // project still exists, the launch step will time out and the user can
+    // manage it from the project page like any other bot.
+  }
+
+  revalidatePath("/app/bots");
+  return { ok: true, project, noConnect };
+}
+
 export type DeployResult =
   | { ok: true }
   | { ok: false; message: string; code?: string; limit?: number; running?: RunningBot[] };
@@ -18,22 +187,6 @@ export type DeployResult =
 export type SetBotTokenResult =
   | { ok: true; username: string }
   | { ok: false; message: string };
-
-export async function createBotAction(_prev: unknown, formData: FormData) {
-  const name = String(formData.get("name") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
-  const token = String(formData.get("token") ?? "").trim();
-  const locale = String(formData.get("locale") ?? "uz");
-  if (!name) return { ok: false, message: "Bot nomini kiriting" };
-  try {
-    const project = await ProjectsAPI.create({ name, description, token: token || undefined });
-    revalidatePath("/app/bots");
-    redirect(`/${locale}/app/bots/${project.uuid ?? project.id}`);
-  } catch (e) {
-    if (isApiError(e)) return { ok: false, message: e.message };
-    throw e;
-  }
-}
 
 export async function updateBotAction(id: string | number, _prev: unknown, formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
