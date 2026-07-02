@@ -179,7 +179,7 @@ export function BotTokenDialog({ open, onClose, projectId }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <div className="flex items-center gap-2">
             <KeyRound className="h-5 w-5 text-blue-500" />
@@ -194,7 +194,7 @@ export function BotTokenDialog({ open, onClose, projectId }: Props) {
             {t("loading")}
           </div>
         ) : (
-          <div className="py-1">
+          <div className="py-1 flex-1 overflow-y-auto -mx-1 px-1">
             <BotConnectTabs
               name={name}
               onNameChange={setName}

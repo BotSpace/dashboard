@@ -41,6 +41,18 @@ export function BotInfoCard({ projectId, username, releaseBot, debugBot }: Props
         title={t("title")}
         icon={<Bot className="h-4 w-4 text-blue-400" />}
         contentClassName="space-y-3 text-sm"
+        actions={
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpen(true)}
+            title={t("changeBot")}
+            aria-label={t("changeBot")}
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+        }
       >
         <div className="flex items-center justify-between gap-3 border-b border-border/50 pb-2">
           <span className="text-muted-foreground">{t("usernameLabel")}</span>
@@ -67,11 +79,6 @@ export function BotInfoCard({ projectId, username, releaseBot, debugBot }: Props
             <span className="text-xs italic text-muted-foreground/70">{t("noUsername")}</span>
           )}
         </div>
-
-        <Button variant="outline" size="sm" onClick={() => setOpen(true)} className="w-full gap-1.5">
-          <Pencil className="h-3.5 w-3.5" />
-          {t("changeBot")}
-        </Button>
       </Section>
 
       <BotTokenDialog open={open} onClose={() => setOpen(false)} projectId={projectId} />

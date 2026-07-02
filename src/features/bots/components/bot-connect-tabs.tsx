@@ -219,7 +219,8 @@ export function BotConnectTabs({
           {managedBots.length > 0 && (
             <div className="space-y-2">
               <Label>{labels.managedBotSelectLabel}</Label>
-              <div className="space-y-2">
+              {/* Ko'p bot bo'lsa oyna to'lib ketmasin — ro'yxat scroll bo'ladi */}
+              <div className="space-y-2 max-h-[240px] overflow-y-auto pr-1">
                 {managedBots.map((bot) => (
                   <label
                     key={bot.id}
