@@ -20,8 +20,14 @@ import type { ManagedBot, ManagedBotConfig } from "@/shared/types/api";
 // ---------------------------------------------------------------------------
 
 export const TOKEN_RE = /^\d+:.+/;
-// Telegram username rules: lowercase letters/numbers/underscore, ends with "bot"
-export const USERNAME_RE = /^[a-z][a-z0-9_]{3,}bot$/i;
+// Telegram username rules: lowercase letters/numbers/underscore. "bot" suffiksni
+// foydalanuvchidan talab qilmaymiz — withBotSuffix avtomatik qo'shadi.
+export const USERNAME_RE = /^[a-z][a-z0-9_]+$/;
+
+export function withBotSuffix(v: string) {
+  const u = v.trim().toLowerCase();
+  return u.endsWith("bot") ? u : `${u}bot`;
+}
 
 export type BotMode = "telegram" | "manual" | "debug";
 
@@ -118,7 +124,7 @@ export function BotConnectTabs({
 
   function buildDeepLink() {
     if (!managedConfig?.deep_link_template) return null;
-    const uname = newUsername.trim();
+    const uname = withBotSuffix(newUsername);
     const bname = newBotName.trim() || uname;
     return managedConfig.deep_link_template
       .replace("{username}", uname)
@@ -143,7 +149,7 @@ export function BotConnectTabs({
     window.open(link, "_blank");
     // Botni SHU (login qilgan) foydalanuvchiga bog'lash uchun claim (fire-and-forget) —
     // webhook Telegram-yaratuvchi emas, claim bo'yicha egani aniqlaydi.
-    void claimManagedBotAction(newUsername.trim());
+    void claimManagedBotAction(withBotSuffix(newUsername));
     setDeepLinkOpened(true);
     // Snapshot mavjud bot id'lari — shundan keyin paydo bo'lgani "yangi" hisoblanadi
     knownIds.current = new Set(managedBots.map((b) => b.id));
@@ -169,11 +175,12 @@ export function BotConnectTabs({
     }, 3000);
   }
 
-  const usernameInvalid = newUsername.trim().length > 0 && !USERNAME_RE.test(newUsername.trim());
-  const canOpenTelegram =
-    !!managedConfig?.deep_link_template &&
-    newUsername.trim().length > 0 &&
-    USERNAME_RE.test(newUsername.trim());
+  const usernameBase = newUsername.trim().toLowerCase();
+  const effectiveUsername = usernameBase ? withBotSuffix(usernameBase) : "";
+  const usernameValid =
+    USERNAME_RE.test(usernameBase) && effectiveUsername.length >= 5;
+  const usernameInvalid = usernameBase.length > 0 && !usernameValid;
+  const canOpenTelegram = !!managedConfig?.deep_link_template && usernameValid;
 
   // Managed bot mode (enabled:true) → show tabs
   const managedEnabled = managedConfig?.enabled === true;
@@ -273,6 +280,9 @@ export function BotConnectTabs({
               {usernameInvalid && (
                 <p className="text-xs text-destructive">{labels.managedUsernameHint}</p>
               )}
+              {usernameValid && (
+                <p className="text-xs text-primary">@{effectiveUsername}</p>
+              )}
             </div>
 
             <div className="space-y-1.5">
@@ -281,7 +291,7 @@ export function BotConnectTabs({
                 id="managed-botname"
                 value={newBotName}
                 onChange={(e) => setNewBotName(e.target.value)}
-                placeholder={newUsername ? `${newUsername} Bot` : "My Bot"}
+                placeholder={effectiveUsername ? `${effectiveUsername} Bot` : "My Bot"}
                 maxLength={64}
               />
             </div>

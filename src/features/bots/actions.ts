@@ -70,7 +70,16 @@ export async function getBotLaunchStatusAction(
 ): Promise<BotLaunchStatusResult> {
   try {
     const [project, releases] = await Promise.all([
-      ProjectsAPI.get(projectId).catch(() => undefined),
+      ProjectsAPI.get(projectId).catch((e) => {
+        // Yutilgan xato diagnostikasiz qolmasin — poll nega "none"
+        // qaytarayotganini server logidan ko'rish uchun.
+        console.error(
+          "[launch-poll] project fetch failed",
+          projectId,
+          isApiError(e) ? `${e.status} ${e.message}` : e
+        );
+        return undefined;
+      }),
       ReleasesAPI.list(projectId).catch(() => []),
     ]);
 
@@ -91,6 +100,19 @@ export async function getBotLaunchStatusAction(
     } else if (releases.length > 0 || debugStatus === "initializing" || debugStatus === "pending") {
       status = "pending";
     }
+
+    // Har bir poll natijasi server logida ko'rinsin (spinner qotib qolsa sabab
+    // shu yerdan o'qiladi).
+    console.log(
+      "[launch-poll]",
+      projectId,
+      "debug=",
+      debugStatus ?? null,
+      "releases=",
+      releases.length,
+      "->",
+      status
+    );
 
     return { ok: true, status, project };
   } catch (e) {
