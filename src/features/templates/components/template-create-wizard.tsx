@@ -647,7 +647,8 @@ export function TemplateCreateWizard({
       if (res.ok && res.project) {
         toast.success(labels.success);
         const project = res.project;
-        const targetId = project.uuid ?? project.id;
+        // Raqamli id afzal — barcha status endpointlari pk bilan bir xil ishlaydi.
+        const targetId = project.id ?? project.uuid;
         setLaunchProject({
           id: project.id,
           uuid: project.uuid,

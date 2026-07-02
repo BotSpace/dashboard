@@ -330,7 +330,8 @@ export function CreateBotWizard({ labels }: Props) {
       if (res.ok) {
         toast.success(labels.success);
         const project = res.project;
-        const targetId = project.uuid ?? project.id;
+        // Raqamli id afzal — barcha status endpointlari pk bilan bir xil ishlaydi.
+        const targetId = project.id ?? project.uuid;
         setLaunchProject({
           id: project.id,
           uuid: project.uuid,

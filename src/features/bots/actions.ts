@@ -94,6 +94,8 @@ export async function getBotLaunchStatusAction(
 
     return { ok: true, status, project };
   } catch (e) {
+    // Server log — poll jimgina yutilmasin (diagnostika uchun).
+    console.error("[launch-poll]", projectId, isApiError(e) ? `${e.status} ${e.message}` : e);
     return {
       ok: false,
       status: "none",
