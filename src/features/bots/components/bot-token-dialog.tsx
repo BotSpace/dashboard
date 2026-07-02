@@ -1,8 +1,9 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { KeyRound, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/shared/i18n/routing";
 import {
   Dialog,
   DialogContent,
@@ -12,9 +13,19 @@ import {
   DialogFooter,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import { setBotTokenAction, deployReleaseAction } from "@/features/bots/actions";
+import {
+  BotConnectTabs,
+  TOKEN_RE,
+  type BotConnectLabels,
+  type BotMode,
+} from "@/features/bots/components/bot-connect-tabs";
+import {
+  setBotTokenAction,
+  deployReleaseAction,
+  getManagedBotConfigAction,
+  listManagedBotsAction,
+} from "@/features/bots/actions";
+import type { ManagedBot, ManagedBotConfig } from "@/shared/types/api";
 
 interface Props {
   open: boolean;
@@ -22,51 +33,153 @@ interface Props {
   projectId: string | number;
 }
 
+// ---------------------------------------------------------------------------
+// "Telegram bot tokeni" dialogi — bot allaqachon yaratilgan (debug/tokensiz
+// yoki qayta ulash) holatida chaqiriladi: DeployButton token yo'qligi bilan
+// deploy fail bo'lganda, va BotInfoCard "Botni o'zgartirish" tugmasi orqali.
+// Ichida create-bot-wizard bilan bir xil shared BotConnectTabs — faqat
+// Telegram orqali (managed bot) / Token qo'lda tablari (showDebugTab=false:
+// allaqachon ishlayotgan botni qayta "tokensiz sinov"ga o'tkazish ma'nosiz).
+// ---------------------------------------------------------------------------
+
 export function BotTokenDialog({ open, onClose, projectId }: Props) {
   const t = useTranslations("bots.botToken");
+  const w = useTranslations("bots.wizard");
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(true);
+  const [managedConfig, setManagedConfig] = useState<ManagedBotConfig | null>(null);
+  const [managedBots, setManagedBots] = useState<ManagedBot[]>([]);
+  const [selectedManagedId, setSelectedManagedId] = useState<number | null>(null);
+  const [botMode, setBotMode] = useState<BotMode>("manual");
+
+  const [name, setName] = useState("");
   const [token, setToken] = useState("");
+  const [tokenTouched, setTokenTouched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
-  function handleSave() {
-    const trimmed = token.trim();
-    if (!trimmed) {
-      setError(t("required"));
-      return;
+  // Dialog ochilganda holatni tozalab, managed-bot config/ro'yxatni yuklaymiz.
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setToken("");
+    setTokenTouched(false);
+    setSelectedManagedId(null);
+    setName("");
+
+    Promise.all([getManagedBotConfigAction(), listManagedBotsAction()]).then(
+      ([cfgRes, botsRes]) => {
+        if (cancelled) return;
+        if (cfgRes.ok) {
+          setManagedConfig(cfgRes.data);
+          setBotMode(cfgRes.data.enabled ? "telegram" : "manual");
+        } else {
+          setManagedConfig(null);
+          setBotMode("manual");
+        }
+        if (botsRes.ok) setManagedBots(botsRes.data);
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
+
+  async function pollManagedBots(): Promise<ManagedBot[]> {
+    const res = await listManagedBotsAction();
+    if (res.ok) {
+      setManagedBots(res.data);
+      return res.data;
     }
+    return managedBots;
+  }
+
+  function handleSave() {
     setError(null);
 
+    if (botMode === "telegram") {
+      if (selectedManagedId == null) {
+        setError(t("selectBotRequired"));
+        return;
+      }
+    } else {
+      const trimmed = token.trim();
+      if (!trimmed) {
+        setError(t("required"));
+        return;
+      }
+      if (!TOKEN_RE.test(trimmed)) {
+        setError(w("tokenInvalid"));
+        return;
+      }
+    }
+
     start(async () => {
-      const setResult = await setBotTokenAction(projectId, trimmed);
+      const body =
+        botMode === "telegram"
+          ? { managed_bot_id: selectedManagedId! }
+          : { token: token.trim() };
+
+      const setResult = await setBotTokenAction(projectId, body);
       if (!setResult.ok) {
         setError(setResult.message);
         return;
       }
 
-      // Token saved — retry the deploy automatically
+      // Token/managed bot saqlandi — deployni avtomatik qayta urinamiz.
       const deployResult = await deployReleaseAction(projectId);
       if (!deployResult.ok) {
         toast.error(deployResult.message ?? t("deployError"));
+        router.refresh();
         onClose();
         return;
       }
 
       toast.success(t("deployStarted"));
+      router.refresh();
       onClose();
     });
   }
 
   function handleOpenChange(v: boolean) {
-    if (!v) {
-      setToken("");
-      setError(null);
+    if (!v && !pending) {
       onClose();
     }
   }
 
+  const labels: BotConnectLabels = {
+    managedTabTelegram: w("managedTabTelegram"),
+    managedTabManual: w("managedTabManual"),
+    managedBotSelectLabel: w("managedBotSelectLabel"),
+    managedBotUsed: w("managedBotUsed"),
+    managedBotNoList: w("managedBotNoList"),
+    managedNewBotTitle: w("managedNewBotTitle"),
+    managedUsernameLabel: w("managedUsernameLabel"),
+    managedUsernamePlaceholder: w("managedUsernamePlaceholder"),
+    managedUsernameHint: w("managedUsernameHint"),
+    managedOptionalNameLabel: w("managedOptionalNameLabel"),
+    managedOpenTelegramBtn: w("managedOpenTelegramBtn"),
+    managedCopyLink: w("managedCopyLink"),
+    managedCopyLinkDone: w("managedCopyLinkDone"),
+    managedCopyLinkFail: w("managedCopyLinkFail"),
+    managedWaiting: w("managedWaiting"),
+    managedConnected: w("managedConnected"),
+    debugTabLabel: w("debugTabLabel"),
+    debugInfoText: w("debugInfoText"),
+    tokenLabel: w("tokenLabel"),
+    tokenPlaceholder: w("tokenPlaceholder"),
+    tokenHelp: w("tokenHelp"),
+    tokenInvalid: w("tokenInvalid"),
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <div className="flex items-center gap-2">
             <KeyRound className="h-5 w-5 text-blue-500" />
@@ -75,36 +188,48 @@ export function BotTokenDialog({ open, onClose, projectId }: Props) {
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3 py-1">
-          <div className="space-y-1.5">
-            <Label htmlFor="bot-token-input">{t("label")}</Label>
-            <Input
-              id="bot-token-input"
-              type="password"
-              placeholder={t("placeholder")}
-              value={token}
-              onChange={(e) => {
-                setToken(e.target.value);
+        {loading ? (
+          <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {t("loading")}
+          </div>
+        ) : (
+          <div className="py-1">
+            <BotConnectTabs
+              name={name}
+              onNameChange={setName}
+              token={token}
+              onTokenChange={(v) => {
+                setToken(v);
                 if (error) setError(null);
               }}
-              disabled={pending}
-              autoComplete="off"
-              data-1p-ignore
-              data-lpignore="true"
-              data-bwignore
+              tokenTouched={tokenTouched}
+              onTokenBlur={() => setTokenTouched(true)}
+              managedConfig={managedConfig}
+              managedBots={managedBots}
+              selectedManagedId={selectedManagedId}
+              onSelectManaged={(id) => {
+                setSelectedManagedId(id);
+                if (error) setError(null);
+              }}
+              onPollManaged={pollManagedBots}
+              botMode={botMode}
+              onBotModeChange={(m) => {
+                setBotMode(m);
+                setError(null);
+              }}
+              labels={labels}
+              showDebugTab={false}
             />
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
+            {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
           </div>
-          <p className="text-xs text-muted-foreground">{t("hint")}</p>
-        </div>
+        )}
 
         <DialogFooter className="gap-2 sm:gap-2">
           <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={pending}>
             {t("cancel")}
           </Button>
-          <Button onClick={handleSave} disabled={pending || !token.trim()} className="gap-2">
+          <Button onClick={handleSave} disabled={pending || loading} className="gap-2">
             {pending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (

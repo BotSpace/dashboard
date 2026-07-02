@@ -113,11 +113,11 @@ function unwrapPaginated<T>(d: unknown): PaginatedResult<T> {
 export const ProjectsAPI = {
   setBotToken: async (
     projectId: string | number,
-    token: string,
+    body: { token?: string; managed_bot_id?: number },
   ): Promise<{ detail: string; username: string }> => {
     const d = await api<unknown>(`/api/v1/project/${projectId}/set-bot-token/`, {
       method: "POST",
-      json: { token },
+      json: body,
     });
     return unwrapItem<{ detail: string; username: string }>(d);
   },

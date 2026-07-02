@@ -445,7 +445,18 @@
       "save": "Сохранить и запустить",
       "cancel": "Отмена",
       "deployError": "Deploy не удался",
-      "deployStarted": "Deploy запущен"
+      "deployStarted": "Deploy запущен",
+      "loading": "Загрузка...",
+      "selectBotRequired": "Выберите бота или создайте нового",
+      "botInfo": {
+        "title": "Бот",
+        "usernameLabel": "Telegram бот",
+        "noUsername": "Ещё не подключён",
+        "modeLabel": "Режим",
+        "modeRelease": "Release",
+        "modeDebug": "Тестовый режим (test bot)",
+        "changeBot": "Изменить бота"
+      }
     },
     "overview": {
       "info": "Данные бота",

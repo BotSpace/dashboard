@@ -72,6 +72,11 @@ export interface BotConnectTabsProps {
   botMode: BotMode;
   onBotModeChange: (m: BotMode) => void;
   labels: BotConnectLabels;
+  /** "Tokensiz sinov" (debug) tabini ko'rsatish. Default true. Bot allaqachon
+   * ishlab turgan joyda (masalan bot detail sahifasidagi "Botni o'zgartirish"
+   * dialogi) debug rejimga qaytarish ma'nosiz — false berilsa tab butunlay
+   * yashiriladi va botMode "debug" bo'la olmaydi. */
+  showDebugTab?: boolean;
 }
 
 export function BotConnectTabs({
@@ -89,6 +94,7 @@ export function BotConnectTabs({
   botMode,
   onBotModeChange,
   labels,
+  showDebugTab = true,
 }: BotConnectTabsProps) {
   const tokenInvalid =
     tokenTouched && token.trim() !== "" && !TOKEN_RE.test(token.trim());
@@ -198,10 +204,12 @@ export function BotConnectTabs({
           <Key className="h-4 w-4" />
           {labels.managedTabManual}
         </TabsTrigger>
-        <TabsTrigger value="debug" className="flex-1 gap-1.5">
-          <Sparkles className="h-4 w-4" />
-          {labels.debugTabLabel}
-        </TabsTrigger>
+        {showDebugTab && (
+          <TabsTrigger value="debug" className="flex-1 gap-1.5">
+            <Sparkles className="h-4 w-4" />
+            {labels.debugTabLabel}
+          </TabsTrigger>
+        )}
       </TabsList>
 
       {managedEnabled && (
@@ -345,12 +353,14 @@ export function BotConnectTabs({
       </TabsContent>
 
       {/* DEBUG (tokensiz sinov) tab */}
-      <TabsContent value="debug" className="mt-4">
-        <div className="rounded-lg border border-dashed bg-muted/20 p-4 flex gap-3">
-          <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          <p className="text-sm text-muted-foreground">{labels.debugInfoText}</p>
-        </div>
-      </TabsContent>
+      {showDebugTab && (
+        <TabsContent value="debug" className="mt-4">
+          <div className="rounded-lg border border-dashed bg-muted/20 p-4 flex gap-3">
+            <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+            <p className="text-sm text-muted-foreground">{labels.debugInfoText}</p>
+          </div>
+        </TabsContent>
+      )}
     </Tabs>
   );
 }

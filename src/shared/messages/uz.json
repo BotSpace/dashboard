@@ -441,7 +441,18 @@
       "save": "Saqlash va ishga tushirish",
       "cancel": "Bekor qilish",
       "deployError": "Deploy muvaffaqiyatsiz",
-      "deployStarted": "Deploy boshlandi"
+      "deployStarted": "Deploy boshlandi",
+      "loading": "Yuklanmoqda...",
+      "selectBotRequired": "Botni tanlang yoki yangi bot yarating",
+      "botInfo": {
+        "title": "Bot",
+        "usernameLabel": "Telegram bot",
+        "noUsername": "Hali ulanmagan",
+        "modeLabel": "Rejim",
+        "modeRelease": "Release",
+        "modeDebug": "Sinov rejimi (test bot)",
+        "changeBot": "Botni o'zgartirish"
+      }
     },
     "overview": {
       "info": "Bot ma'lumotlari",

@@ -303,10 +303,10 @@ export async function rollbackReleaseAction(
 
 export async function setBotTokenAction(
   projectId: string | number,
-  token: string,
+  body: { token?: string; managed_bot_id?: number },
 ): Promise<SetBotTokenResult> {
   try {
-    const res = await ProjectsAPI.setBotToken(projectId, token);
+    const res = await ProjectsAPI.setBotToken(projectId, body);
     revalidatePath(`/app/bots/${projectId}`);
     return { ok: true, username: res.username };
   } catch (e) {

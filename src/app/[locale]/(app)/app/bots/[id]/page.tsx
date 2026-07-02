@@ -4,6 +4,7 @@ import { ProjectsAPI } from "@/shared/api/services";
 import { Section } from "@/shared/components/common/section";
 import { CopyButton } from "@/shared/components/common/copy-button";
 import { DangerZone } from "@/features/bots/components/danger-zone";
+import { BotInfoCard } from "@/features/bots/components/bot-info-card";
 import { formatLongDate } from "@/shared/lib/utils";
 
 export default async function BotOverviewPage({
@@ -18,6 +19,15 @@ export default async function BotOverviewPage({
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
+      <div className="lg:col-span-2">
+        <BotInfoCard
+          projectId={id}
+          username={bot?.username ?? bot?.bot_username}
+          releaseBot={bot?.release_bot}
+          debugBot={bot?.debug_bot}
+        />
+      </div>
+
       <Section
         title={t("info")}
         icon={<Info className="h-4 w-4 text-blue-400" />}

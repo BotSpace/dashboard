@@ -56,6 +56,10 @@ export type Project = {
   // "pending" | "running" | "failed" | "stopped" (container lifecycle, not a
   // release — debug mode never creates a Release row).
   debug?: { status?: string } | null;
+  // Additive booleans on RetrieveProjectSerializer — which connection mode the
+  // bot is currently running under (own/managed token vs. tokenless debug bot).
+  release_bot?: boolean;
+  debug_bot?: boolean;
 };
 
 export type Release = {

@@ -445,7 +445,18 @@
       "save": "Save & deploy",
       "cancel": "Cancel",
       "deployError": "Deploy failed",
-      "deployStarted": "Deploy started"
+      "deployStarted": "Deploy started",
+      "loading": "Loading...",
+      "selectBotRequired": "Select a bot or create a new one",
+      "botInfo": {
+        "title": "Bot",
+        "usernameLabel": "Telegram bot",
+        "noUsername": "Not connected yet",
+        "modeLabel": "Mode",
+        "modeRelease": "Release",
+        "modeDebug": "Test mode (test bot)",
+        "changeBot": "Change bot"
+      }
     },
     "overview": {
       "info": "Bot details",
