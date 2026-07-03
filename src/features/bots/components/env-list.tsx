@@ -73,7 +73,7 @@ export function EnvList({ projectId, items }: { projectId: string | number; item
                   onClick={() =>
                     start(async () => {
                       try {
-                        await removeEnvAction(e.id, projectId);
+                        await removeEnvAction(e.key, projectId);
                         toast.success("O'chirildi");
                       } catch {
                         toast.error("O'chirishda xatolik");

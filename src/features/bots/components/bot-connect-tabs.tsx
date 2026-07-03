@@ -139,7 +139,10 @@ export function BotConnectTabs({
 
   async function handleCopyLink() {
     const link = buildDeepLink();
-    if (!link) return;
+    if (!link) {
+      toast.error(labels.managedCopyLinkFail);
+      return;
+    }
     try {
       await navigator.clipboard.writeText(link);
       toast.success(labels.managedCopyLinkDone);
@@ -150,7 +153,15 @@ export function BotConnectTabs({
 
   function handleOpenTelegram() {
     const link = buildDeepLink();
-    if (!link) return;
+    if (!link) {
+      // managedConfig.deep_link_template is only absent when this backend
+      // instance has no MANAGER_BOT_USERNAME/MANAGER_BOT_TOKEN configured
+      // (internal/modules/webhook/usecase.go ManagedBotConfig) — a
+      // deployment gap, not a user input problem. Surface it instead of
+      // silently no-op'ing on click.
+      toast.error(labels.managedCopyLinkFail);
+      return;
+    }
     // Oynani AVVAL ochamiz (user-gesture popup-blocker'ga tushmasin), keyin claim.
     window.open(link, "_blank");
     // Botni SHU (login qilgan) foydalanuvchiga bog'lash uchun claim (fire-and-forget) —
@@ -186,7 +197,15 @@ export function BotConnectTabs({
   const usernameValid =
     USERNAME_RE.test(usernameBase) && effectiveUsername.length >= 5;
   const usernameInvalid = usernameBase.length > 0 && !usernameValid;
-  const canOpenTelegram = !!managedConfig?.deep_link_template && usernameValid;
+  // Gate the button on the username being valid, NOT on
+  // managedConfig.deep_link_template also being present: that field only
+  // exists when this backend instance has MANAGER_BOT_USERNAME/
+  // MANAGER_BOT_TOKEN configured (internal/modules/webhook/usecase.go), so a
+  // deployment with those unset would otherwise permanently disable this
+  // button with no explanation even for a perfectly valid username. If the
+  // link truly can't be built, handleOpenTelegram/handleCopyLink now toast
+  // a clear error instead of silently no-op'ing.
+  const canOpenTelegram = usernameValid;
 
   return (
     <Tabs value={botMode} onValueChange={(v) => onBotModeChange(v as BotMode)}>

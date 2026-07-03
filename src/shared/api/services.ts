@@ -118,7 +118,14 @@ export const ProjectsAPI = {
   ): Promise<{ detail: string; username: string }> => {
     throw new Error("Bot token ulash hali Go backend'da yo'q (project modulida deploy/engine ulanmagan)");
   },
-  createFromTemplate: (_body: {
+  // internal/modules/project: POST /projects/create-from-template — resolves
+  // + purchase-checks the template (buyer must already hold a paid order,
+  // see TemplatesAPI.order/OrderButton) server-side and seeds a brand-new
+  // project with its flow. managed_bot_id/credentials are accepted by the
+  // backend's request shape but not wired yet (managed_bot_id gets an
+  // explicit 400 instead of being silently ignored — see
+  // project/handler.go's CreateFromTemplate).
+  createFromTemplate: (body: {
     template: number | string;
     name: string;
     token?: string;
@@ -126,9 +133,7 @@ export const ProjectsAPI = {
     mode?: "release" | "debug";
     envs?: Record<string, string>;
     credentials?: Record<string, number | string>;
-  }): Promise<Project> => {
-    throw new Error("Shablondan bot yaratish hali Go backend'da yo'q");
-  },
+  }): Promise<Project> => api<Project>("/api/v1/projects/create-from-template", { method: "POST", json: body }),
   managedBotConfig: async (): Promise<ManagedBotConfig> => {
     const d = await api<unknown>("/api/v1/managed-bot/config");
     return d as ManagedBotConfig;
@@ -143,6 +148,7 @@ export const ProjectsAPI = {
   templateRequirements: async (_templateId: string | number): Promise<TemplateRequirements> => {
     return { credentials: [], modules: [], envs: [] };
   },
+  startDebug: (id: string | number) => api<void>(`/api/v1/projects/${id}/debug`),
   stopDebug: (id: string | number) => api<void>(`/api/v1/projects/${id}/debug/stop`),
   // Monitoring (Prometheus-backed) has no route in the Go backend yet —
   // engine orchestrator is a no-op stub (internal/server/server.go: engine.NewStub()).
@@ -170,7 +176,7 @@ export const ProjectsAPI = {
 // RELEASES — internal/modules/release ("/relase", mirrors legacy Django path)
 export const ReleasesAPI = {
   list: async (project: string | number) => {
-    const d = await api<unknown>("/api/v1/relase", { query: { project_id: project } });
+    const d = await api<unknown>("/api/v1/relase", { query: { project } });
     return unwrapList<Release>(d);
   },
   create: (project: string | number) =>
@@ -184,10 +190,12 @@ export const ReleasesAPI = {
 };
 
 // ENV VARS — internal/modules/release ("/enviroment"); DELETE keys off the
-// project-scoped `key`, not a numeric row id (Go: DELETE /enviroment/:key).
+// project-scoped `key`, not a numeric row id (Go: DELETE /enviroment/:key,
+// gated by the mandatory ?project= query param — handler.go's
+// queryProjectID returns 400 "project.required" without it).
 export const EnvAPI = {
   list: async (project: string | number) => {
-    const d = await api<unknown>("/api/v1/enviroment", { query: { project_id: project } });
+    const d = await api<unknown>("/api/v1/enviroment", { query: { project } });
     return unwrapList<EnvVar>(d);
   },
   create: (body: { project: string | number; key: string; value: string; secret?: boolean }) =>
@@ -195,7 +203,8 @@ export const EnvAPI = {
       method: "POST",
       json: { project_id: body.project, key: body.key, value: body.value, secret: body.secret ?? false },
     }),
-  remove: (key: string) => api<void>(`/api/v1/enviroment/${encodeURIComponent(key)}`, { method: "DELETE" }),
+  remove: (key: string, project: string | number) =>
+    api<void>(`/api/v1/enviroment/${encodeURIComponent(key)}`, { method: "DELETE", query: { project } }),
 };
 
 // PLANS — public, no auth needed
@@ -370,8 +379,15 @@ export const BillingAPI = {
     return { balance: d.balance, template_balance: d.template_balance, currency: "UZS" };
   },
   // Balansni to'ldirish — Click/Payme pay link qaytaradi.
-  createTopUp: async (body: { method: "click" | "payme"; amount: number }): Promise<{ link: string }> => {
-    const d = await api<{ link: string }>("/api/v1/payment/link", { method: "POST", json: body });
+  // internal/modules/payment/dto.go CreatePaymentLinkRequest: `method` (click|payme)
+  // + `amount` as a STRING (validate:"required" on a string field — a bare
+  // number in the JSON body fails Go's json.Unmarshal into string, hence the
+  // old "invalid request body" error).
+  createTopUp: async (body: { method: "click" | "payme"; amount: number | string }): Promise<{ link: string }> => {
+    const d = await api<{ link: string }>("/api/v1/payment/link", {
+      method: "POST",
+      json: { method: body.method, amount: String(body.amount) },
+    });
     return { link: d?.link ?? "" };
   },
 };
@@ -445,6 +461,21 @@ export const MessagesAPI = {
 };
 
 // CMSv2 — collection schema in Postgres, documents in Mongo (internal/modules/cms)
+
+// Lowercase snake_case, ASCII-only — matches CreateCollectionRequest.Slug's
+// validate:"required,min=1,max=80" and the Mongo-collection-name constraint
+// (see dto.go comment). Falls back to "collection" if nothing survives
+// (e.g. an all-emoji/non-latin name), since an empty slug always 400s.
+function slugify(raw: string): string {
+  const s = raw
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 80);
+  return s || "collection";
+}
+
 function cms(projectId: string | number, ...parts: (string | number)[]): string {
   const tail = parts.map((p) => encodeURIComponent(p)).join("/");
   return `/api/v1/cms/projects/${projectId}/collections${tail ? "/" + tail : ""}`;
@@ -457,10 +488,36 @@ export const CmsAPI = {
   },
   getCollection: (projectId: string | number, name: string): Promise<CmsCollection> =>
     api<CmsCollection>(cms(projectId, name)),
+  // internal/modules/cms dto.go CreateCollectionRequest requires BOTH `name`
+  // (required) and `slug` (required, min=1, max=80, lowercase snake_case —
+  // becomes the immutable Mongo collection name). The dashboard's schema
+  // form only collects one identifier field (already restricted to
+  // [a-z0-9_]), so it doubles as the slug unless the caller passes one
+  // explicitly. `label`/`fields` have no counterpart in this request (kept
+  // for the caller's own bookkeeping; fields are added afterwards via
+  // addField, same as before).
   createCollection: (
     projectId: string | number,
-    body: { name: string; label?: string; description?: string; primary_field?: string; fields?: CmsField[] }
-  ): Promise<CmsCollection> => api<CmsCollection>(cms(projectId), { method: "POST", json: body }),
+    body: {
+      name: string;
+      slug?: string;
+      label?: string;
+      description?: string;
+      primary_field?: string;
+      fields?: CmsField[];
+    }
+  ): Promise<CmsCollection> => {
+    const slug = slugify(body.slug || body.name);
+    return api<CmsCollection>(cms(projectId), {
+      method: "POST",
+      json: {
+        name: body.name,
+        slug,
+        description: body.description,
+        primary_field: body.primary_field,
+      },
+    });
+  },
   updateCollection: (
     projectId: string | number,
     name: string,
@@ -601,9 +658,14 @@ export const CredentialsAPI = {
   reveal: async (_id: string | number): Promise<Record<string, string>> => {
     throw new Error("Credential reveal hali Go backend'da yo'q (data har doim maskalangan qaytadi)");
   },
-  oauthStart: async (_provider: string, _type_key: string): Promise<{ authorize_url: string }> => {
-    throw new Error("Credential OAuth flow hali Go backend'da yo'q");
-  },
+  // POST /api/v1/credentials/oauth/:provider/start {type_key} -> {authorize_url}
+  // (internal/modules/credential/routes.go). Redirect the browser to authorize_url;
+  // Google's callback is handled at /api/v1/credentials/oauth/:provider/callback.
+  oauthStart: async (provider: string, type_key: string): Promise<{ authorize_url: string }> =>
+    api<{ authorize_url: string }>(`/api/v1/credentials/oauth/${provider}/start`, {
+      method: "POST",
+      json: { type_key },
+    }),
 };
 
 // DASHBOARD

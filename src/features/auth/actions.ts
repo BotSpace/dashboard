@@ -51,7 +51,7 @@ export async function telegramLoginAction(
   try {
     // internal/modules/authbot: LoginRequest.Code is a STRING ("required,len=6,numeric") —
     // sending a JSON number here fails gin's binding, so keep it a string.
-    const res = await apiFetch<unknown>("/authbot/login", {
+    const res = await apiFetch<unknown>("/api/v1/authbot/login", {
       method: "POST",
       json: { code },
       skipAuth: true,

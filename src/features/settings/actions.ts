@@ -1,6 +1,6 @@
 "use server";
 import { revalidatePath } from "next/cache";
-import { api } from "@/shared/api/server";
+import { AuthAPI } from "@/shared/api/services";
 import { readSession, setSessionCookie } from "@/shared/auth/session";
 import { isApiError } from "@/shared/api/client";
 
@@ -9,10 +9,9 @@ export async function updateProfileAction(_prev: unknown, formData: FormData) {
   const last_name = String(formData.get("last_name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   try {
-    await api("/api/auth/user-update/", {
-      method: "PATCH",
-      json: { first_name, last_name, email },
-    });
+    // internal/modules/user routes.go: PATCH /users/me (h.UpdateMe) — the old
+    // Django path "/api/auth/user-update/" 404s against the Go backend.
+    await AuthAPI.updateProfile({ first_name, last_name, email });
     const session = await readSession();
     if (session) {
       await setSessionCookie({
@@ -32,10 +31,9 @@ export async function changePasswordAction(_prev: unknown, formData: FormData) {
   const newPassword = String(formData.get("newPassword") ?? "");
   if (newPassword.length < 8) return { ok: false, message: "Parol kamida 8 ta belgi" };
   try {
-    await api("/api/auth/change-password/", {
-      method: "POST",
-      json: { old_password: oldPassword, new_password: newPassword },
-    });
+    // internal/modules/user routes.go: POST /users/me/password — same wrong-path
+    // class of bug as the profile update above (old Django "/api/auth/change-password/").
+    await AuthAPI.changePassword({ old_password: oldPassword, new_password: newPassword });
     return { ok: true };
   } catch (e) {
     return { ok: false, message: isApiError(e) ? e.message : "Parol o'zgartirishda xatolik" };

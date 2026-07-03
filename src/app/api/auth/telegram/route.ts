@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
   try {
     // internal/modules/authbot: LoginRequest.Code is a STRING; LoginResponse is
     // raw JSON { user, token: {access_token,refresh_token,...} } (no envelope).
-    const res = await apiFetch<Record<string, unknown>>("/authbot/login", {
+    const res = await apiFetch<Record<string, unknown>>("/api/v1/authbot/login", {
       method: "POST",
       json: { code },
       skipAuth: true,

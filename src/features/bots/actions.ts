@@ -184,9 +184,15 @@ export async function createBlankBotAction(
   }
 
   // Project created — now try to bring it online (mirrors DeployButton).
+  // Debug (tokenless) mode uses the shared BotSpace bot via a DEBUG container
+  // (?start=<uuid> deep-link), not a Release — so start debug, not a release.
   let noConnect = false;
   try {
-    await ReleasesAPI.create(project.id);
+    if (body.mode === "debug") {
+      await ProjectsAPI.startDebug(project.id);
+    } else {
+      await ReleasesAPI.create(project.id);
+    }
   } catch (e) {
     if (isApiError(e) && e.status === 400) {
       const raw = e.details as Record<string, unknown> | null;
@@ -344,8 +350,8 @@ export async function addEnvAction(_prev: unknown, formData: FormData) {
   return { ok: true };
 }
 
-export async function removeEnvAction(id: string, projectId: string | number) {
-  await EnvAPI.remove(id);
+export async function removeEnvAction(key: string, projectId: string | number) {
+  await EnvAPI.remove(key, projectId);
   revalidatePath(`/app/bots/${projectId}/env`);
   return { ok: true };
 }

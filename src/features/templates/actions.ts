@@ -121,6 +121,16 @@ export async function createProjectFromTemplateAction(
     const project = await ProjectsAPI.createFromTemplate(body);
     return { ok: true, project, project_id: project.id, project_uuid: project.uuid };
   } catch (e) {
+    // Log the real status/details on the server console instead of letting
+    // every failure collapse into the generic "Server bilan bog'lanib
+    // bo'lmadi" toast — that message previously hid a genuine 501 stub
+    // (createFromTemplate has no backend route yet, see services.ts) behind
+    // what looked like a network error.
+    if (isApiError(e)) {
+      console.error("[createProjectFromTemplateAction] backend error", { status: e.status, details: e.details });
+    } else {
+      console.error("[createProjectFromTemplateAction] non-API error", e);
+    }
     if (isApiError(e)) {
       const details = e.details as
         | {
