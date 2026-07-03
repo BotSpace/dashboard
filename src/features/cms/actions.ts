@@ -213,7 +213,7 @@ export async function restoreDocumentAction(args: {
   id: string;
 }): Promise<CmsResult> {
   try {
-    const d = await CmsAPI.restoreDocument(args.projectId, args.name, args.id);
+    const d = await CmsAPI.restoreDocument();
     return { ok: true, data: d };
   } catch (e) {
     return fail(e);

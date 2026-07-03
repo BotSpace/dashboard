@@ -66,8 +66,8 @@ export interface BotConnectTabsProps {
   onTokenBlur: () => void;
   managedConfig: ManagedBotConfig | null;
   managedBots: ManagedBot[];
-  selectedManagedId: number | null;
-  onSelectManaged: (id: number | null) => void;
+  selectedManagedId: string | null;
+  onSelectManaged: (id: string | null) => void;
   onPollManaged: () => Promise<ManagedBot[]>;
   botMode: BotMode;
   onBotModeChange: (m: BotMode) => void;
@@ -106,7 +106,7 @@ export function BotConnectTabs({
   const [deepLinkOpened, setDeepLinkOpened] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollCount = useRef(0);
-  const knownIds = useRef<Set<number>>(new Set(managedBots.map((b) => b.id)));
+  const knownIds = useRef<Set<string>>(new Set(managedBots.map((b) => b.id)));
 
   // Stop polling on unmount
   useEffect(() => {
@@ -188,18 +188,17 @@ export function BotConnectTabs({
   const usernameInvalid = usernameBase.length > 0 && !usernameValid;
   const canOpenTelegram = !!managedConfig?.deep_link_template && usernameValid;
 
-  // Managed bot mode (enabled:true) → show tabs
-  const managedEnabled = managedConfig?.enabled === true;
-
   return (
     <Tabs value={botMode} onValueChange={(v) => onBotModeChange(v as BotMode)}>
       <TabsList className="w-full">
-        {managedEnabled && (
-          <TabsTrigger value="telegram" className="flex-1 gap-1.5">
-            <Bot className="h-4 w-4" />
-            {labels.managedTabTelegram}
-          </TabsTrigger>
-        )}
+        {/* "Telegram orqali" tab always shows — even when this backend instance
+         * has no manager bot configured (managedConfig.enabled === false) or no
+         * bots are seeded yet (managedBots is empty), it still renders its
+         * "no bots yet / create one" affordance below instead of disappearing. */}
+        <TabsTrigger value="telegram" className="flex-1 gap-1.5">
+          <Bot className="h-4 w-4" />
+          {labels.managedTabTelegram}
+        </TabsTrigger>
         <TabsTrigger value="manual" className="flex-1 gap-1.5">
           <Key className="h-4 w-4" />
           {labels.managedTabManual}
@@ -212,9 +211,8 @@ export function BotConnectTabs({
         )}
       </TabsList>
 
-      {managedEnabled && (
-        /* TELEGRAM tab */
-        <TabsContent value="telegram" className="mt-4 space-y-4">
+      {/* TELEGRAM tab */}
+      <TabsContent value="telegram" className="mt-4 space-y-4">
           {/* Existing bots list */}
           {managedBots.length > 0 && (
             <div className="space-y-2">
@@ -339,7 +337,6 @@ export function BotConnectTabs({
             </div>
           </div>
         </TabsContent>
-      )}
 
       {/* MANUAL tab */}
       <TabsContent value="manual" className="mt-4">

@@ -37,7 +37,9 @@ interface BotLaunchStepProps {
 }
 
 export function BotLaunchStep({ state, project, labels }: BotLaunchStepProps) {
-  const projectId = project?.uuid ?? project?.id;
+  // Raqamli id afzal — backend GET /projects/:id path parametrini uuid emas,
+  // primary key (id) bilan solishtiradi (see shared/api/services.ts ProjectsAPI.get).
+  const projectId = project?.id ?? project?.uuid;
   const projectHref = projectId != null ? `/app/bots/${projectId}` : "/app/bots";
   const isDebug = project?.bot_mode === "debug";
 

@@ -62,7 +62,7 @@ export default async function PublicTemplateDetailPage({
   const original = toNumber(tpl.original_price);
   const hasDiscount = original > 0 && price < original;
   const isFree = price === 0;
-  const isOwned = Boolean(tpl.is_order);
+  const isOwned = Boolean(tpl.is_ordered);
   const isAuthed = Boolean(session);
 
   const productLd = {

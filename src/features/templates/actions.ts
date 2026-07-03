@@ -111,7 +111,7 @@ export async function createProjectFromTemplateAction(
     template: number | string;
     name: string;
     token?: string;
-    managed_bot_id?: number;
+    managed_bot_id?: string;
     mode?: "release" | "debug";
     envs?: Record<string, string>;
     credentials?: Record<string, number | string>;

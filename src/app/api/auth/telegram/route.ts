@@ -31,17 +31,18 @@ export async function GET(req: NextRequest) {
 
   let value: string;
   try {
-    const res = await apiFetch<Record<string, unknown>>("/authbot/login/", {
+    // internal/modules/authbot: LoginRequest.Code is a STRING; LoginResponse is
+    // raw JSON { user, token: {access_token,refresh_token,...} } (no envelope).
+    const res = await apiFetch<Record<string, unknown>>("/authbot/login", {
       method: "POST",
-      json: { code: Number(code) },
+      json: { code },
       skipAuth: true,
     });
-    const root = (res?.data && typeof res.data === "object" ? res.data : res) as Record<string, unknown>;
-    const token = (root.token as Record<string, unknown>) ?? root;
-    const access = (token?.access as string) ?? (root.access as string);
-    const refresh = (token?.refresh as string) ?? (root.refresh as string);
+    const token = (res.token as Record<string, unknown>) ?? res;
+    const access = (token?.access_token as string) ?? (res.access_token as string);
+    const refresh = (token?.refresh_token as string) ?? (res.refresh_token as string);
     if (!access || !refresh) return toLogin("Tokenlar kelmadi");
-    const user = ((root.user as SessionUser) ?? ({ id: 0 } as SessionUser)) as SessionUser;
+    const user = ((res.user as SessionUser) ?? ({ id: 0 } as SessionUser)) as SessionUser;
     value = await encodeSession({ access, refresh, user });
   } catch (e) {
     const msg = isApiError(e)

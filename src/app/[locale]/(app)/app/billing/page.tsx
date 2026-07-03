@@ -37,9 +37,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
   const currentPlanName = subscription?.plan_details?.name ?? "free";
   const tokensUsed =
     usage?.ai_token_usage?.used ?? (usage ? usage.tokens_used_input + usage.tokens_used_output : 0);
-  const tokensLimit =
-    usage?.ai_token_usage?.limit ??
-    (usage ? usage.tokens_limit_input + usage.tokens_limit_output : 200_000);
+  const tokensLimit = usage?.ai_token_usage?.limit ?? usage?.tokens_limit ?? 200_000;
   const tokensRemaining = usage?.ai_token_usage?.remaining ?? usage?.tokens_remaining ?? tokensLimit;
   const inputUsed = usage?.ai_token_usage?.input_used ?? usage?.tokens_used_input ?? 0;
   const outputUsed = usage?.ai_token_usage?.output_used ?? usage?.tokens_used_output ?? 0;
@@ -171,7 +169,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                     <PlanUpgradeButton
                       planId={p.id}
                       planLabel={p.name_display ?? p.name}
-                      price={p.price}
+                      price={Number(p.price)}
                       isCurrent={isCurrent}
                       label={t("upgrade")}
                     />
@@ -214,7 +212,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                         )}
                       </td>
                       <td className="px-4 py-3 text-right font-medium">
-                        {formatCurrency(h.amount, h.currency ?? "UZS", locale)}
+                        {formatCurrency(Number(h.amount), h.currency ?? "UZS", locale)}
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant="secondary">{h.status ?? "—"}</Badge>

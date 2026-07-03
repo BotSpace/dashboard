@@ -2,6 +2,12 @@ import { z } from "zod";
 
 const schema = z.object({
   NEXT_PUBLIC_API_URL: z.string().url(),
+  // Backend paths in the code are hardcoded as "/api/v1/...". In prod this
+  // gateway host rewrites "/api/v2" -> the new Go backend's "/api/v1", so we
+  // rewrite the leading "/api/v1" segment to this prefix at request time
+  // (see shared/api/client.ts#buildUrl). Localhost keeps hitting the Go
+  // backend's real "/api/v1" directly, so the default stays "/api/v1".
+  NEXT_PUBLIC_API_PREFIX: z.string().default("/api/v1"),
   NEXT_PUBLIC_TELEGRAM_BOT: z.string().default("botmother_authbot"),
   NEXT_PUBLIC_CONSTRUCTOR_URL: z.string().url().optional(),
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
@@ -17,6 +23,7 @@ const schema = z.object({
 
 const parsed = schema.safeParse({
   NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  NEXT_PUBLIC_API_PREFIX: process.env.NEXT_PUBLIC_API_PREFIX,
   NEXT_PUBLIC_TELEGRAM_BOT: process.env.NEXT_PUBLIC_TELEGRAM_BOT,
   NEXT_PUBLIC_CONSTRUCTOR_URL: process.env.NEXT_PUBLIC_CONSTRUCTOR_URL,
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
@@ -57,6 +64,7 @@ export const env = parsed.success
   ? parsed.data
   : {
       NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? "https://api.botspace.uz",
+      NEXT_PUBLIC_API_PREFIX: process.env.NEXT_PUBLIC_API_PREFIX ?? "/api/v1",
       NEXT_PUBLIC_TELEGRAM_BOT: process.env.NEXT_PUBLIC_TELEGRAM_BOT ?? "botmother_authbot",
       NEXT_PUBLIC_CONSTRUCTOR_URL: process.env.NEXT_PUBLIC_CONSTRUCTOR_URL,
       NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,

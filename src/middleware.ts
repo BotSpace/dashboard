@@ -45,26 +45,23 @@ async function refreshTokens(
   refresh: string
 ): Promise<{ access: string; refresh: string } | null> {
   try {
-    const url = env.NEXT_PUBLIC_API_URL.replace(/\/$/, "") + "/auth/token/refresh/";
+    // Go backend (internal/modules/auth): POST /api/v1/auth/refresh
+    // { refresh_token } -> { access_token, refresh_token, ... } — raw JSON,
+    // no {status,data} envelope. NEXT_PUBLIC_API_PREFIX lets prod rewrite
+    // this to /api/v2 (gateway -> new Go backend) while localhost keeps
+    // hitting /api/v1 directly.
+    const url =
+      env.NEXT_PUBLIC_API_URL.replace(/\/$/, "") + env.NEXT_PUBLIC_API_PREFIX + "/auth/refresh";
     const r = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json", accept: "application/json" },
-      body: JSON.stringify({ refresh }),
+      body: JSON.stringify({ refresh_token: refresh }),
       cache: "no-store",
     });
     if (!r.ok) return null;
     const data = (await r.json()) as Record<string, unknown>;
-    const root =
-      (data?.data && typeof data.data === "object"
-        ? (data.data as Record<string, unknown>)
-        : data) ?? {};
-    const token =
-      (root?.token && typeof root.token === "object"
-        ? (root.token as Record<string, unknown>)
-        : root) ?? {};
-    const access = (token?.access ?? root?.access) as string | undefined;
-    const newRefresh =
-      ((token?.refresh ?? root?.refresh) as string | undefined) ?? refresh;
+    const access = data?.access_token as string | undefined;
+    const newRefresh = (data?.refresh_token as string | undefined) ?? refresh;
     if (!access) return null;
     return { access, refresh: newRefresh };
   } catch {

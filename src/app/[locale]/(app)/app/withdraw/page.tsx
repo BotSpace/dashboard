@@ -97,7 +97,7 @@ export default async function WithdrawPage({ params }: { params: Promise<{ local
             ) : (
               <ul className="divide-y">
                 {withdrawals.map((w) => {
-                  const meta = STATUS_META[w.status] ?? STATUS_META.pending;
+                  const meta = STATUS_META[w.status as WithdrawalStatus] ?? STATUS_META.pending;
                   return (
                     <li key={w.id} className="flex items-center justify-between gap-4 px-4 py-3">
                       <div className="min-w-0">

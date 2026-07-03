@@ -11,16 +11,14 @@ export type ActionState = {
 
 type Tokens = { access: string; refresh: string };
 
-// Backend response shapes vary by endpoint:
-//   /authbot/login/      { user, token: {access, refresh} }
-//   /api/v1/auth/google  { data: { user, token: {access, refresh} } }
+// Go backend (internal/modules/authbot) LoginResponse: raw JSON, no envelope —
+// { user: {id,phone,first_name,last_name,role}, token: {access_token,refresh_token,...} }.
 function extractTokens(res: unknown): { tokens: Tokens | null; user: SessionUser | null } {
   if (!res || typeof res !== "object") return { tokens: null, user: null };
-  const r = res as Record<string, unknown>;
-  const root = (r.data && typeof r.data === "object" ? (r.data as Record<string, unknown>) : r) as Record<string, unknown>;
+  const root = res as Record<string, unknown>;
   const token = root.token as Record<string, unknown> | undefined;
-  const access = (token?.access as string | undefined) ?? (root.access as string | undefined);
-  const refresh = (token?.refresh as string | undefined) ?? (root.refresh as string | undefined);
+  const access = (token?.access_token as string | undefined) ?? (root.access_token as string | undefined);
+  const refresh = (token?.refresh_token as string | undefined) ?? (root.refresh_token as string | undefined);
   const user = (root.user as SessionUser | undefined) ?? (root as SessionUser);
   if (!access || !refresh) return { tokens: null, user: user ?? null };
   return { tokens: { access, refresh }, user };
@@ -28,10 +26,8 @@ function extractTokens(res: unknown): { tokens: Tokens | null; user: SessionUser
 
 async function fetchMe(access: string): Promise<SessionUser | undefined> {
   try {
-    const d = await apiFetch<{ status?: boolean; data?: SessionUser } & SessionUser>("/auth/me/", {
-      token: access,
-    });
-    return (d?.data as SessionUser) ?? (d as SessionUser);
+    // GET /api/v1/users/me -> UserResponse, raw JSON (no envelope).
+    return await apiFetch<SessionUser>("/api/v1/users/me", { token: access });
   } catch {
     return undefined;
   }
@@ -53,18 +49,18 @@ export async function telegramLoginAction(
   if (!/^\d{6}$/.test(code)) return { ok: false, message: "Kod 6 xonali raqam bo'lishi kerak" };
 
   try {
-    const res = await apiFetch<unknown>("/authbot/login/", {
+    // internal/modules/authbot: LoginRequest.Code is a STRING ("required,len=6,numeric") —
+    // sending a JSON number here fails gin's binding, so keep it a string.
+    const res = await apiFetch<unknown>("/authbot/login", {
       method: "POST",
-      json: { code: Number(code) },
+      json: { code },
       skipAuth: true,
     });
     await persistSession(res);
     return { ok: true };
   } catch (e) {
     if (isApiError(e)) {
-      const details = e.details as { code?: string[]; detail?: string } | undefined;
-      const msg = details?.code?.[0] ?? details?.detail ?? e.message;
-      return { ok: false, message: msg || "Kod noto'g'ri yoki muddati o'tgan" };
+      return { ok: false, message: e.message || "Kod noto'g'ri yoki muddati o'tgan" };
     }
     return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
   }

@@ -55,7 +55,7 @@ export function RecentBotsV2({ bots }: { bots: Project[] }) {
       {items.map((bot) => (
         <li key={bot.id}>
           <Link
-            href={`/app/bots/${bot.uuid ?? bot.id}`}
+            href={`/app/bots/${bot.id}`}
             className="group flex items-center gap-3 rounded-xl border border-border/40 bg-card/50 p-3 transition-all duration-150 hover:border-border hover:bg-card"
           >
             {/* Avatar */}

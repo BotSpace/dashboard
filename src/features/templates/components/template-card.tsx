@@ -47,7 +47,7 @@ export function TemplateCard({
               <Tag className="h-10 w-10" />
             </div>
           )}
-          {ownedLabel && tpl.is_order && (
+          {ownedLabel && tpl.is_ordered && (
             <Badge className="absolute right-2 top-2" variant="success">
               {ownedLabel}
             </Badge>

@@ -22,7 +22,7 @@ export default async function TemplateCreatePage({
   if (!tpl) notFound();
 
   // Only owned templates can create projects
-  const isOwned = Boolean(tpl.is_order);
+  const isOwned = Boolean(tpl.is_ordered);
   const isFree = Number(tpl.price ?? 0) === 0;
   if (!isOwned && !isFree) notFound();
 

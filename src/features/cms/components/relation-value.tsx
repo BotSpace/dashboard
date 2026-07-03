@@ -39,7 +39,7 @@ export function RelationValue({
 }: {
   projectId: string;
   collections: CmsCollection[];
-  relationCollectionId: number | null | undefined;
+  relationCollectionId: string | null | undefined;
   value: unknown;
   serverLabel?: string | string[] | null;
 }) {

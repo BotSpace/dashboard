@@ -19,19 +19,23 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // NOTE: the Go backend (internal/modules/auth) does not expose a Google
+    // OAuth endpoint yet — only phone+password and the Telegram authbot flow
+    // (see internal/modules/auth/routes.go, internal/modules/authbot/routes.go).
+    // This call 404s until that's ported; caught below and surfaced as a
+    // normal login failure instead of crashing.
     const res = await apiFetch<Record<string, unknown>>("/api/v1/auth/google", {
       method: "POST",
       json: { id_token: idToken },
       skipAuth: true,
     });
-    const root = (res?.data && typeof res.data === "object" ? res.data : res) as Record<string, unknown>;
-    const token = (root.token as Record<string, unknown>) ?? root;
-    const access = (token?.access as string) ?? (root.access as string);
-    const refresh = (token?.refresh as string) ?? (root.refresh as string);
+    const token = (res.token as Record<string, unknown>) ?? res;
+    const access = (token?.access_token as string) ?? (res.access_token as string);
+    const refresh = (token?.refresh_token as string) ?? (res.refresh_token as string);
     if (!access || !refresh) {
       return NextResponse.json({ ok: false, message: "Tokenlar kelmadi" }, { status: 400 });
     }
-    const user = ((root.user as SessionUser) ?? ({ id: 0 } as SessionUser)) as SessionUser;
+    const user = ((res.user as SessionUser) ?? ({ id: 0 } as SessionUser)) as SessionUser;
     const value = await encodeSession({ access, refresh, user });
 
     const out = NextResponse.json({ ok: true });

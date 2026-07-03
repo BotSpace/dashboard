@@ -13,9 +13,24 @@ export type ApiOptions = RequestInit & {
   skipAuth?: boolean;
 };
 
+// All call sites hardcode paths as "/api/v1/...". Rewrite that leading
+// segment to NEXT_PUBLIC_API_PREFIX so prod can point at the gateway's
+// "/api/v2" (-> new Go backend) without touching every call site, while
+// localhost dev keeps hitting the backend's real "/api/v1" unchanged.
+// Non-"/api/v1" paths (e.g. legacy Django-only routes) pass through as-is.
+export function applyApiPrefix(path: string): string {
+  const prefix = env.NEXT_PUBLIC_API_PREFIX;
+  if (prefix === "/api/v1") return path;
+  if (path === "/api/v1" || path.startsWith("/api/v1/")) {
+    return prefix + path.slice("/api/v1".length);
+  }
+  return path;
+}
+
 function buildUrl(path: string, query?: ApiOptions["query"]): string {
   const root = env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
-  const full = path.startsWith("/") ? root + path : root + "/" + path;
+  const prefixed = applyApiPrefix(path);
+  const full = prefixed.startsWith("/") ? root + prefixed : root + "/" + prefixed;
   if (!query) return full;
   const url = new URL(full);
   for (const [k, v] of Object.entries(query)) {
@@ -72,17 +87,25 @@ function pickMessage(d: Record<string, unknown>): string | undefined {
   return undefined;
 }
 
+/** Go backend's error envelope (internal/shared/httpx.ErrorResponse): `{ error: { code, message, details } }`. */
+type BackendErrorBody = { code?: string; message?: string; details?: unknown };
+
 function extractMessage(data: unknown): string | undefined {
   if (!data || typeof data !== "object") return undefined;
-  const d = data as Record<string, unknown>;
-  // Backend xatolarni {status:false, data:{detail|message}} konvertida qaytaradi —
-  // shuning uchun avval tashqi obyektni, keyin ichki `data`ni ham tekshiramiz.
-  const top = pickMessage(d);
-  if (top) return top;
-  const inner = d.data;
-  if (typeof inner === "string") return inner;
-  if (inner && typeof inner === "object") return pickMessage(inner as Record<string, unknown>);
-  return undefined;
+  const d = data as Record<string, unknown> & { error?: BackendErrorBody };
+  if (d.error && typeof d.error === "object") {
+    const msg = d.error.message;
+    if (typeof msg === "string" && msg) return msg;
+  }
+  // Fallback for any endpoint that doesn't follow the standard envelope.
+  return pickMessage(d);
+}
+
+/** Machine-readable error code from the Go backend's envelope, e.g. "auth.invalid_token". */
+export function apiErrorCode(e: unknown): string | undefined {
+  if (!isApiError(e)) return undefined;
+  const d = e.details as { error?: BackendErrorBody } | undefined;
+  return d?.error?.code;
 }
 
 export function isApiError(e: unknown): e is ApiError {

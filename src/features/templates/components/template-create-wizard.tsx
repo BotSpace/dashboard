@@ -161,8 +161,8 @@ interface StepBotProps {
   // managed bot
   managedConfig: ManagedBotConfig | null;
   managedBots: ManagedBot[];
-  selectedManagedId: number | null;
-  onSelectManaged: (id: number | null) => void;
+  selectedManagedId: string | null;
+  onSelectManaged: (id: string | null) => void;
   onPollManaged: () => Promise<ManagedBot[]>;
   botMode: BotMode;
   onBotModeChange: (m: BotMode) => void;
@@ -511,7 +511,7 @@ export function TemplateCreateWizard({
   // Managed bot state
   const [managedConfig, setManagedConfig] = useState<ManagedBotConfig | null>(null);
   const [managedBots, setManagedBots] = useState<ManagedBot[]>([]);
-  const [selectedManagedId, setSelectedManagedId] = useState<number | null>(null);
+  const [selectedManagedId, setSelectedManagedId] = useState<string | null>(null);
   const [botMode, setBotMode] = useState<BotMode>("telegram");
 
   // Fetch managed bot config + list on mount
@@ -523,15 +523,6 @@ export function TemplateCreateWizard({
       if (res.ok) setManagedBots(res.data);
     });
   }, []);
-
-  // Agar "Telegram orqali" o'chirilgan bo'lsa va foydalanuvchi hali tanlov
-  // qilmagan bo'lsa (default "telegram"), mavjud bo'lmagan tabga tushib
-  // qolmaslik uchun "manual"ga o'tkazamiz.
-  useEffect(() => {
-    if (managedConfig && !managedConfig.enabled && botMode === "telegram") {
-      setBotMode("manual");
-    }
-  }, [managedConfig, botMode]);
 
   // Launch step (post-create) state — shared poller, see features/bots/hooks.
   const [pollTargetId, setPollTargetId] = useState<string | number | null>(null);
@@ -559,7 +550,10 @@ export function TemplateCreateWizard({
   // Validation per step
   // ---------------------------------------------------------------------------
 
-  const isManagedMode = managedConfig?.enabled && botMode === "telegram";
+  // "Telegram orqali" tabi managedConfig.enabled'dan qat'i nazar ko'rinadi
+  // (see bot-connect-tabs.tsx) — shuning uchun bu yerda ham faqat tab
+  // tanlanganini tekshiramiz.
+  const isManagedMode = botMode === "telegram";
   const isDebugMode = botMode === "debug";
 
   const botStepValid = isDebugMode

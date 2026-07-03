@@ -50,7 +50,7 @@ export function BotTokenDialog({ open, onClose, projectId }: Props) {
   const [loading, setLoading] = useState(true);
   const [managedConfig, setManagedConfig] = useState<ManagedBotConfig | null>(null);
   const [managedBots, setManagedBots] = useState<ManagedBot[]>([]);
-  const [selectedManagedId, setSelectedManagedId] = useState<number | null>(null);
+  const [selectedManagedId, setSelectedManagedId] = useState<string | null>(null);
   const [botMode, setBotMode] = useState<BotMode>("manual");
 
   const [name, setName] = useState("");

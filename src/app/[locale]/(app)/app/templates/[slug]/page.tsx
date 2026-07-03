@@ -35,7 +35,7 @@ export default async function TemplateDetailPage({
   const original = toNumber(tpl.original_price);
   const hasDiscount = original > 0 && price < original;
   const isFree = price === 0;
-  const isOwned = Boolean(tpl.is_order);
+  const isOwned = Boolean(tpl.is_ordered);
 
   return (
     <div className="space-y-6">

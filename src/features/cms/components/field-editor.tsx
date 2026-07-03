@@ -219,7 +219,7 @@ export function FieldEditor({ projectId, collectionName, initialFields, collecti
                       setFields((arr) =>
                         arr.map((x, idx) =>
                           idx === i
-                            ? { ...x, relation_collection: e.target.value ? Number(e.target.value) : null }
+                            ? { ...x, relation_collection: e.target.value ? e.target.value : null }
                             : x
                         )
                       )
@@ -314,7 +314,7 @@ export function FieldEditor({ projectId, collectionName, initialFields, collecti
                   onChange={(e) =>
                     setNewField({
                       ...newField,
-                      relation_collection: e.target.value ? Number(e.target.value) : null,
+                      relation_collection: e.target.value ? e.target.value : null,
                     })
                   }
                   className="h-8 rounded-md border bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground px-2 text-sm"

@@ -1,3 +1,16 @@
+// Types mirror the Go backend's DTOs (backend/go/internal/modules/*/dto.go).
+// Every list endpoint uses the SAME envelope: `{ items, total, limit, offset }`
+// (see shared/api/services.ts `unwrapList`/`unwrapPaginated`). Single-item
+// endpoints return the resource directly — there is no `{status,data}`
+// wrapper like the old Django API had. IDs are UUID strings everywhere.
+//
+// Some fields below are kept OPTIONAL even though the current Go backend
+// never sends them — they're old Django-era fields still read by UI
+// components (avatar, bot status/mode, etc.) that have no backend equivalent
+// yet. Marking them optional keeps those components compiling/rendering
+// (with a graceful "unknown" fallback) without a UI redesign; see the
+// mission report for the full list of gaps.
+
 export type Paginated<T> = {
   count: number;
   next: string | null;
@@ -34,127 +47,148 @@ export type ProjectMonitoringHistory = {
   };
 };
 
+// project.ProjectResponse (internal/modules/project/dto.go)
 export type Project = {
-  id: number | string;
-  uuid?: string;
+  id: string;
+  uuid: string;
   name: string;
   description?: string;
-  token?: string;
   username?: string;
-  avatar?: string;
-  created_at?: string;
-  updated_at?: string;
-  status?: "active" | "inactive" | "draft";
+  owner_id: string;
   flow?: unknown;
-  // Additive fields returned by create-from-template (and project detail):
-  // which mode the bot is running in, and how to reach it on Telegram.
+  is_template: boolean;
+  release_webhook_uuid: string;
+  debug_webhook_uuid: string;
+  created_at: string;
+  updated_at: string;
+
+  // ── No backend equivalent yet (see report) — kept optional so existing
+  // bot-list/bot-detail UI still renders a graceful fallback instead of
+  // crashing on a missing field.
+  avatar?: string;
+  token?: string;
+  status?: "active" | "inactive" | "draft";
   bot_mode?: "release" | "debug";
   bot_username?: string | null;
   bot_link?: string | null;
-  // Present on project detail (RetrieveProjectSerializer → RetrieveDebugSerializer)
-  // when the project has a debug (tokenless) container. status: "initializing" |
-  // "pending" | "running" | "failed" | "stopped" (container lifecycle, not a
-  // release — debug mode never creates a Release row).
   debug?: { status?: string } | null;
-  // Additive booleans on RetrieveProjectSerializer — which connection mode the
-  // bot is currently running under (own/managed token vs. tokenless debug bot).
   release_bot?: boolean;
   debug_bot?: boolean;
 };
 
+// release.ReleaseResponse
 export type Release = {
-  id: number | string;
-  project: number | string;
-  version?: number | string;
+  id: string;
+  project_id: string;
+  version?: number;
   service_id?: string;
   status?: "running" | "stopped" | "failed" | "pending";
   created_at?: string;
 };
 
+// release.EnvironmentResponse (path: /enviroment, keyed by `key`, not numeric id)
 export type EnvVar = {
-  id: number | string;
-  project: number | string;
+  id: string;
   key: string;
   value: string;
+  secret?: boolean;
+  created_at?: string;
+  updated_at?: string;
 };
 
+// plan.PlanResponse
 export type Plan = {
-  id: number | string;
+  id: string;
   name: string;
   name_display?: string;
-  price: number;
+  price: number | string;
   currency?: string;
   max_bots?: number;
+  max_tokens?: number;
+  /** @deprecated backend reports a single `max_tokens` pool — kept for old callers */
   max_output_tokens?: number;
+  /** @deprecated see max_output_tokens */
   max_input_tokens?: number;
   features?: string[] | Record<string, unknown>;
+  is_top?: boolean;
   is_default?: boolean;
   is_active?: boolean;
+  description?: string;
 };
 
+// plan.SubscriptionResponse
 export type Subscription = {
-  id: number | string;
-  // Backend `plan` ni FK id (raqam) qilib qaytaradi; to'liq obyekt `plan_details`da.
-  plan: number | string;
+  id: string;
+  plan: string;
   plan_details?: Plan;
-  status: "active" | "suspended" | "cancelled";
+  status: "active" | "suspended" | "grace_period" | "cancelled";
+  status_display?: string;
   started_at?: string;
-  expires_at?: string;
+  expires_at?: string | null;
   tokens_used_input: number;
   tokens_used_output: number;
+  tokens_remaining?: number;
+  is_token_limit_exceeded?: boolean;
   token_reset_at?: string;
   bots_count: number;
+  can_create_bot?: boolean;
 };
 
+// plan.UsageResponse
 export type SubscriptionUsage = {
+  plan?: string;
+  status: string;
+  plan_name: string;
+  tokens_used_input: number;
+  tokens_used_output: number;
+  tokens_limit: number;
+  tokens_remaining: number;
+  bots_count: number;
+  max_bots: number;
+  usage_percentage: number;
   ai_token_usage?: {
     limit: number;
     used: number;
     remaining: number;
     input_used: number;
     output_used: number;
-    plan?: { id?: number | string; name?: string; display?: string } | string | null;
+    plan?: { id?: string; name?: string; display?: string } | null;
     status?: string | null;
     token_reset_at?: string | null;
   };
-  tokens_used_input: number;
-  tokens_used_output: number;
-  tokens_limit_output: number;
-  tokens_limit_input: number;
-  tokens_remaining: number;
-  bots_count: number;
-  max_bots: number;
-  plan_name: string;
-  status: string;
-  usage_percentage: number;
   token_reset_at?: string;
+  expires_at?: string | null;
 };
 
+// file.FileResponse
 export type FileItem = {
-  id: number | string;
-  uuid?: string;
+  id: string;
+  uuid: string;
+  project_id?: string | null;
   name: string;
   url?: string;
   size?: number;
+  filetype?: string;
+  /** @deprecated old Django field name — use `filetype` */
   mime?: string;
-  project?: number | string | null;
   created_at?: string;
   expires_at?: string | null;
 };
 
 export type TemplateCategory = {
-  id: number | string;
+  id: string;
   name: string;
 };
 
 export type TemplateFeature = {
-  id: number | string;
+  id: string;
   name: string;
   value?: string | null;
 };
 
+// template.TemplateResponse
 export type Template = {
-  id: number | string;
+  id: string;
   name: string;
   slug: string;
   image?: string | null;
@@ -164,12 +198,15 @@ export type Template = {
   price: number | string;
   original_price: number | string;
   discount?: number | string;
-  discount_type?: "PERCENT" | "AMOUNT";
+  discount_type?: "PERCENT" | "AMOUNT" | "percent" | "amount";
   categories: TemplateCategory[];
   features: TemplateFeature[];
   views?: number;
+  likes_count?: number;
+  /** @deprecated old field name — use likes_count */
   likes?: number;
-  is_order?: boolean;
+  is_liked?: boolean;
+  is_ordered?: boolean;
   demo_url?: string | null;
   required_envs?: { key: string; description?: string }[];
 };
@@ -200,16 +237,19 @@ export type TemplateRequirements = {
   envs: TemplateRequirementEnv[];
 };
 
+// ticket.TicketMessageResponse / TicketResponse
 export type TicketMessage = {
-  id: number | string;
+  id: string;
   sender: "user" | "admin";
   message: string;
+  attachment_url?: string | null;
+  /** @deprecated old field name — use attachment_url */
   attachment?: string | null;
   created_at?: string;
 };
 
 export type Ticket = {
-  id: number | string;
+  id: string;
   subject: string;
   status: "open" | "closed" | "pending";
   last_message?: { sender: string; message: string } | null;
@@ -218,18 +258,21 @@ export type Ticket = {
   updated_at?: string;
 };
 
+// payment.TransactionResponse / HistoryResponse
 export type Transaction = {
-  id: number | string;
-  amount: number;
+  id: string;
+  amount: number | string;
   currency?: string;
   type?: string;
-  status?: string;
+  status?: string | boolean;
+  comment?: string;
   created_at?: string;
 };
 
+// message.MessageResponse
 export type BroadcastMessage = {
-  id: number | string;
-  project: number | string;
+  id: string;
+  project_id: string;
   caption: string;
   message_type: "text" | "photo" | "video";
   button_type?: "inline" | "reply";
@@ -238,11 +281,11 @@ export type BroadcastMessage = {
   total?: number;
   done?: number;
   fail?: number;
-  file_id?: string;
+  file_id?: string | null;
 };
 
 export type ResourceMetric = {
-  project: number | string;
+  project_id: string;
   cpu?: number;
   ram?: number;
   traffic?: number;
@@ -284,22 +327,22 @@ export type CmsIndexKind =
 export type CmsCascadeMode = "cascade" | "restrict" | "set_null";
 
 export type CmsField = {
-  id?: number;
+  id?: string;
   name: string;
   label?: string;
   kind: CmsFieldKind;
   required: boolean;
   default?: unknown;
   validators?: Record<string, unknown>;
-  relation_collection?: number | null;
+  relation_collection?: string | null;
   cascade?: CmsCascadeMode;
   index: CmsIndexKind;
   order?: number;
 };
 
 export type CmsCollection = {
-  id: number;
-  project: number;
+  id: string;
+  project_id: string;
   name: string;
   label?: string;
   description?: string;
@@ -339,6 +382,11 @@ export type CmsDocumentCursorResponse = {
 };
 
 // ── Dashboard ──────────────────────────────────────────────────────────────
+// NOTE: the Go backend has no user-facing "/dashboard/overview" endpoint
+// (only an admin-only "/admin/stats/dashboard"). This shape is synthesized
+// client-side in DashboardAPI.overview() from /projects + /subscription/usage
+// — see services.ts and the mission report for what's missing (per-bot
+// message counts, revenue, audience distribution, daily performance series).
 
 export type DashboardOverview = {
   totals: {
@@ -351,14 +399,14 @@ export type DashboardOverview = {
     currency: string;
   };
   performance: { date: string; value: number }[];
-  top_bots: { id: number | string; name: string; messages: number; delta: number | null }[];
+  top_bots: { id: string; name: string; messages: number; delta: number | null }[];
   distribution: { private: number; group: number; channel: number; other: number };
 };
 
 export type CmsAuditEntry = {
-  id: number;
+  id: string;
   action: string;
-  actor_id: number | null;
+  actor_id: string | null;
   document_id: string;
   before: CmsDocument | null;
   after: CmsDocument | null;
@@ -366,17 +414,17 @@ export type CmsAuditEntry = {
   created_at: string;
 };
 
-// EARNINGS (bot to'lov daromadlari)
+// EARNINGS (bot to'lov daromadlari) — payment.ProjectEarningResponse / OrderResponse
 export type BotEarning = {
-  project_id: number | string;
+  project_id: string;
   project_name: string;
   total_earned: string;
   count: number;
 };
 
 export type EarningsOrder = {
-  id: number | string;
-  project_id: number | string;
+  id: string;
+  project_id: string;
   project_name?: string;
   payer_chat_id?: number | string;
   payer_first_name?: string | null;
@@ -390,7 +438,7 @@ export type EarningsOrder = {
   comment?: string;
   external_id?: string | null;
   created_at?: string;
-  paid_at?: string;
+  paid_at?: string | null;
 };
 
 export type EarningsSummary = {
@@ -401,36 +449,36 @@ export type EarningsSummary = {
   by_bot: BotEarning[];
   orders: EarningsOrder[];
   count?: number;
-  next?: string | null;
-  previous?: string | null;
+  limit?: number;
+  offset?: number;
 };
 
-// WITHDRAWAL (pul yechish)
+// WITHDRAWAL (pul yechish) — payment.WithdrawalResponse
 export type WithdrawalStatus = "pending" | "approved" | "rejected";
 
 export type WithdrawalRequest = {
-  id: number | string;
-  project: number | string | null;
+  id: string;
+  project_id?: string | null;
   project_name?: string | null;
   amount: string;
   card_number: string;
   card_owner: string;
-  status: WithdrawalStatus;
+  status: WithdrawalStatus | string;
   rejection_reason?: string | null;
   created_at?: string;
   updated_at?: string;
 };
 
-// KYC verifikatsiya
+// KYC verifikatsiya — kyc.VerificationResponse / StatusResponse
 export type KycStatus = "pending" | "approved" | "rejected";
 
 export type KycVerification = {
-  id: number | string;
+  id: string;
   full_name: string;
   passport_image: string;
   selfie_image: string;
   residence_reference: string;
-  status: KycStatus;
+  status: KycStatus | string;
   rejection_reason?: string | null;
   created_at?: string;
   updated_at?: string;
@@ -441,8 +489,8 @@ export type KycStatusResponse = {
   verification: KycVerification | null;
 };
 
-// CREDENTIALS (owner-scoped global)
-export type CredentialFieldType = "text" | "password" | "number" | "select" | "textarea";
+// CREDENTIALS (owner-scoped global) — credential.CredentialResponse / TypeDef
+export type CredentialFieldType = "text" | "password" | "number" | "select" | "textarea" | "url" | "switch";
 
 export type CredentialFieldOption = {
   value: string;
@@ -474,9 +522,15 @@ export type CredentialType = {
 };
 
 export type Credential = {
-  id: number | string;
+  id: string;
+  owner_id?: string;
   name: string;
   type_key: string;
+  label?: string;
+  mode?: string;
+  // Old UI code reads `type.key/label/mode` — kept as a derived nested shape
+  // (populated in services.ts from the flat type_key/label/mode fields the
+  // Go backend actually sends).
   type: {
     key: string;
     label: string;
@@ -494,9 +548,9 @@ export type CredentialListResponse = {
   page_size: number;
 };
 
-// Managed Bot
+// Managed Bot — internal/modules/webhook (still Django-shaped IDs pending port)
 export type ManagedBot = {
-  id: number;
+  id: string;
   tg_bot_id: string;
   username: string;
   name: string;
@@ -510,9 +564,9 @@ export type ManagedBotConfig = {
   deep_link_template?: string;
 };
 
-// Blog (publik)
+// Blog (publik) — blog.PublicListItemResponse / PublicDetailResponse
 export type BlogPostListItem = {
-  id: number;
+  id: string;
   title: string;
   slug: string;
   excerpt: string;

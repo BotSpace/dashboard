@@ -134,7 +134,7 @@ export type CreateBlankBotBody = {
   name: string;
   description?: string;
   token?: string;
-  managed_bot_id?: number;
+  managed_bot_id?: string;
   mode?: "debug";
 };
 
@@ -303,7 +303,7 @@ export async function rollbackReleaseAction(
 
 export async function setBotTokenAction(
   projectId: string | number,
-  body: { token?: string; managed_bot_id?: number },
+  body: { token?: string; managed_bot_id?: string },
 ): Promise<SetBotTokenResult> {
   try {
     const res = await ProjectsAPI.setBotToken(projectId, body);
@@ -344,7 +344,7 @@ export async function addEnvAction(_prev: unknown, formData: FormData) {
   return { ok: true };
 }
 
-export async function removeEnvAction(id: string | number, projectId: string | number) {
+export async function removeEnvAction(id: string, projectId: string | number) {
   await EnvAPI.remove(id);
   revalidatePath(`/app/bots/${projectId}/env`);
   return { ok: true };

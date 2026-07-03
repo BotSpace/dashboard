@@ -159,7 +159,7 @@ export function SchemaBuilder({ projectId, collections }: { projectId: string; c
                       value={f.relation_collection ?? ""}
                       onChange={(e) =>
                         updateField(i, {
-                          relation_collection: e.target.value ? Number(e.target.value) : null,
+                          relation_collection: e.target.value ? e.target.value : null,
                         })
                       }
                       className="h-8 rounded-md border bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground px-2 text-sm"
