@@ -297,17 +297,20 @@ export const TemplatesAPI = {
   // BARCHA template'larni oladi (sitemap uchun) — katta page_size bilan bitta
   // so'rov (A+B), backend page_size'ni cheklab qo'ysa qolgan sahifalarni loop
   // qiladi. MAX_PAGES — runaway backstop (50×500=25k, real sondan ancha katta).
+  // DIQQAT: yo'l oxirida TRAILING SLASH shart. /api/v2 cutover (API_PREFIX)
+  // slashsiz `/template/list`ni query'ni tashlab yuboradigan 301'ga uzatadi
+  // (natijada 20 ta default qaytadi); slash bilan page_size to'g'ri o'tadi (186).
   listAll: async (params: TemplateListParams = {}): Promise<Template[]> => {
     const PAGE_SIZE = 500;
     const MAX_PAGES = 50;
-    const first = await api<unknown>("/api/v1/template/list", {
+    const first = await api<unknown>("/api/v1/template/list/", {
       query: { ...params, page: 1, page_size: PAGE_SIZE },
     });
     const { items, totalPages } = readTemplatePage(first);
     const all = [...items];
     const lastPage = Math.min(totalPages, MAX_PAGES);
     for (let page = 2; page <= lastPage; page++) {
-      const d = await api<unknown>("/api/v1/template/list", {
+      const d = await api<unknown>("/api/v1/template/list/", {
         query: { ...params, page, page_size: PAGE_SIZE },
       });
       all.push(...readTemplatePage(d).items);
