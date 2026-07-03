@@ -3,8 +3,12 @@ import { BlogAPI, TemplatesAPI } from "@/shared/api/services";
 import { languageAlternates, localizedUrl } from "@/shared/lib/seo";
 import { routing } from "@/shared/i18n/routing";
 
-// Re-generate hourly so new blog posts / templates appear without a redeploy.
-export const revalidate = 3600;
+// Har so'rovda JONLI generatsiya (build-vaqtida bakelanmasin). ISR (revalidate)
+// build paytida bir marta snapshot oladi — agar shu payt backend flaky bo'lsa
+// (masalan deploy churn) noto'g'ri/chala ro'yxat image ichiga muzlab qoladi va
+// revalidate muddatigacha (soat) shunday qolardi. Sitemap kamdan-kam (crawler)
+// so'raladi, shuning uchun har so'rovda jonli API to'g'ri va arzon.
+export const dynamic = "force-dynamic";
 
 type EntryOpts = {
   lastModified?: Date;
