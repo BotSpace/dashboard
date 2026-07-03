@@ -30,7 +30,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry("/docs/mcp", { changeFrequency: "monthly", priority: 0.6 }),
   ];
 
-  const templates = await TemplatesAPI.list().catch(() => []);
+  // list() emas listAll() — list() paginatsiya sabab faqat 1-sahifani (10 ta)
+  // qaytaradi, sitemapga barcha template kirishi kerak.
+  const templates = await TemplatesAPI.listAll().catch(() => []);
   const templateEntries: MetadataRoute.Sitemap = templates
     .filter((t) => t.slug)
     .map((t) => entry(`/templates/${t.slug}`, { changeFrequency: "weekly", priority: 0.7 }));

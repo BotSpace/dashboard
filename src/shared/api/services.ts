@@ -246,7 +246,26 @@ export type TemplateListParams = {
   price_min?: number | string;
   price_max?: number | string;
   page?: number | string;
+  page_size?: number | string;
 };
+
+// Template list javobidan massiv + jami sahifani ISHONCHLI o'qiydi. Backend
+// ikki xil konvertda kelishi mumkin (eski `{items,...}` yoki yangi DRF
+// `{status,data:{results,total_pages}}`) — sitemap kabi to'liq ro'yxat kerak
+// bo'lganda ikkalasini ham qamrab olamiz (unwrapList faqat `items` o'qigani
+// sabab yangi konvertda bo'sh qaytarardi).
+function readTemplatePage(d: unknown): { items: Template[]; totalPages: number } {
+  const root =
+    d && typeof d === "object" && "data" in d ? (d as { data: unknown }).data : d;
+  if (Array.isArray(root)) return { items: root as Template[], totalPages: 1 };
+  const e = (root ?? {}) as {
+    items?: Template[];
+    results?: Template[];
+    total_pages?: number;
+  };
+  const items = e.results ?? e.items ?? [];
+  return { items, totalPages: Number(e.total_pages) || 1 };
+}
 
 export type PaginatedTemplates = {
   items: Template[];
@@ -274,6 +293,29 @@ export const TemplatesAPI = {
   listPaginated: async (params: TemplateListParams = {}): Promise<PaginatedTemplates> => {
     const d = await api<unknown>("/api/v1/template/list", { query: params });
     return unwrapPaginatedTemplates(d);
+  },
+  // BARCHA template'larni oladi (sitemap uchun) — katta page_size bilan bitta
+  // so'rov (A+B), backend page_size'ni cheklab qo'ysa qolgan sahifalarni loop
+  // qiladi. MAX_PAGES — runaway backstop (50×500=25k, real sondan ancha katta).
+  listAll: async (params: TemplateListParams = {}): Promise<Template[]> => {
+    const PAGE_SIZE = 500;
+    const MAX_PAGES = 50;
+    const first = await api<unknown>("/api/v1/template/list", {
+      query: { ...params, page: 1, page_size: PAGE_SIZE },
+    });
+    const { items, totalPages } = readTemplatePage(first);
+    const all = [...items];
+    const lastPage = Math.min(totalPages, MAX_PAGES);
+    for (let page = 2; page <= lastPage; page++) {
+      const d = await api<unknown>("/api/v1/template/list", {
+        query: { ...params, page, page_size: PAGE_SIZE },
+      });
+      all.push(...readTemplatePage(d).items);
+    }
+    if (totalPages > MAX_PAGES) {
+      console.warn(`[sitemap] template sahifalari cheklandi: ${totalPages} dan ${MAX_PAGES}`);
+    }
+    return all;
   },
   get: (slug: string) => api<Template>(`/api/v1/template/list/${slug}`),
   categories: async () => {
