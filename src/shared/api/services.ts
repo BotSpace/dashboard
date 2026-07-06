@@ -150,27 +150,18 @@ export const ProjectsAPI = {
   },
   startDebug: (id: string | number) => api<void>(`/api/v1/projects/${id}/debug`),
   stopDebug: (id: string | number) => api<void>(`/api/v1/projects/${id}/debug/stop`),
-  // Monitoring (Prometheus-backed) has no route in the Go backend yet —
-  // engine orchestrator is a no-op stub (internal/server/server.go: engine.NewStub()).
-  monitoring: async (_id: string | number): Promise<ProjectMonitoring> => ({
-    cpu_cores: null,
-    memory_bytes: null,
-    net_rx_bps: null,
-    net_tx_bps: null,
-    disk_bytes: null,
-    disk_files_bytes: null,
-    disk_cms_bytes: null,
-    prometheus_available: false,
-  }),
+  monitoring: async (id: string | number): Promise<ProjectMonitoring> =>
+    api<ProjectMonitoring>(`/api/v1/projects/${id}/monitoring`),
   monitoringHistory: async (
-    _id: string | number,
+    id: string | number,
     range: MonitoringRange = "24h",
-  ): Promise<ProjectMonitoringHistory> => ({
-    range,
-    step: "",
-    prometheus_available: false,
-    series: { cpu_cores: [], memory_bytes: [], net_rx_bps: [], net_tx_bps: [], disk_bytes: [] },
-  }),
+  ): Promise<ProjectMonitoringHistory> => {
+    const data = await api<Omit<ProjectMonitoringHistory, "range" | "step">>(
+      `/api/v1/projects/${id}/monitoring/history`,
+      { query: { range } },
+    );
+    return { range, step: "", ...data };
+  },
 };
 
 // RELEASES — internal/modules/release ("/relase", mirrors legacy Django path)

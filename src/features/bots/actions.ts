@@ -147,9 +147,9 @@ export type CreateBlankBotResult =
 // wizard's "Ishga tushirish" step has something to poll, mirroring the
 // template-create wizard's UX.
 //
-// KNOWN BACKEND GAP: `/api/project/` (ProjectsAPI.create) is not documented to
-// accept `managed_bot_id` / `mode` — those are currently only wired into
-// `/api/project/create-from-template/`. We pass them through opportunistically
+// KNOWN BACKEND GAP: the project create endpoint is not documented to accept
+// `managed_bot_id` / `mode` — those are currently only wired into
+// create-from-template. We pass them through opportunistically
 // (best-effort, ignored if unsupported) and then try to deploy a release; if
 // that fails with `bot_token_required` the project simply has no token yet
 // (managed-bot linking didn't take, or "Tokensiz sinov" was chosen and the
