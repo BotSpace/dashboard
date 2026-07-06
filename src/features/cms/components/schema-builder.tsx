@@ -8,6 +8,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Badge } from "@/shared/components/ui/badge";
 import { createCollectionAction } from "../actions";
 import type { CmsCascadeMode, CmsCollection, CmsField, CmsFieldKind, CmsIndexKind } from "@/shared/types/api";
+import { cmsCollectionHref, cmsCollectionSlug } from "../lib/href";
 
 const KINDS: CmsFieldKind[] = [
   "text", "longtext", "int", "float", "bool", "datetime", "date",
@@ -61,7 +62,8 @@ export function SchemaBuilder({ projectId, collections }: { projectId: string; c
         return;
       }
       toast.success("Collection yaratildi");
-      router.push(`/app/bots/${projectId}/cms/${name.trim().toLowerCase()}`);
+      const collection = res.data as CmsCollection | undefined;
+      router.push(cmsCollectionHref(projectId, collection ? cmsCollectionSlug(collection) : name.trim().toLowerCase()));
       router.refresh();
     });
   };

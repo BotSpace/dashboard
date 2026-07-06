@@ -8,6 +8,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { FieldEditor } from "@/features/cms/components/field-editor";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { Section } from "@/shared/components/common/section";
+import { cmsCollectionHref, cmsCollectionSlug, getCollectionByRouteParam } from "@/features/cms/lib/routing";
 
 export default async function BotCmsDetailPage({
   params,
@@ -18,7 +19,7 @@ export default async function BotCmsDetailPage({
   setRequestLocale(locale);
   const t = await getTranslations("cms");
 
-  const collection = await CmsAPI.getCollection(id, name).catch(() => null);
+  const collection = await getCollectionByRouteParam(id, name);
   if (!collection) notFound();
 
   const collections = await CmsAPI.listCollections(id).catch(() => []);
@@ -57,7 +58,7 @@ export default async function BotCmsDetailPage({
               </Link>
             </Button>
             <Button asChild>
-              <Link href={`/app/bots/${id}/cms/${name}/data`} className="gap-2">
+              <Link href={cmsCollectionHref(id, cmsCollectionSlug(collection), "/data")} className="gap-2">
                 <Table className="h-4 w-4" />
                 {t("openData")}
               </Link>
@@ -72,7 +73,7 @@ export default async function BotCmsDetailPage({
       >
         <FieldEditor
           projectId={id}
-          collectionName={collection.name}
+          collectionName={cmsCollectionSlug(collection)}
           initialFields={collection.fields ?? []}
           collections={collections}
           primaryField={collection.primary_field}

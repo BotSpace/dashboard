@@ -20,6 +20,7 @@ import { deleteDocumentAction, listDocumentsAction } from "../actions";
 import type { CmsCollection, CmsDocument, CmsField } from "@/shared/types/api";
 import { ExcelExportButton } from "./excel-export";
 import { ExcelImportButton } from "./excel-import";
+import { cmsCollectionHref } from "../lib/href";
 import { DocumentViewDrawer } from "./document-view-drawer";
 import { RelationValue } from "./relation-value";
 
@@ -653,7 +654,7 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
             />
             <Button asChild size="sm">
               <a
-                href={`/app/bots/${projectId}/cms/${collectionName}/data/new`}
+                href={cmsCollectionHref(projectId, collectionName, "/data/new")}
                 className="gap-1 flex items-center"
               >
                 <Plus className="h-3.5 w-3.5" /> Yangi

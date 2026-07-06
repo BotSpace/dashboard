@@ -14,6 +14,7 @@ import {
   type FieldValue,
   type FormValues,
 } from "./document-fields";
+import { cmsCollectionHref } from "../lib/href";
 
 type Props = {
   projectId: string;
@@ -49,7 +50,7 @@ export function DocumentForm({ projectId, collectionName, fields, collections }:
         return;
       }
       toast.success("Hujjat qo'shildi");
-      router.push(`/app/bots/${projectId}/cms/${collectionName}/data`);
+      router.push(cmsCollectionHref(projectId, collectionName, "/data"));
       router.refresh();
     });
   };

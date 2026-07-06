@@ -7,6 +7,7 @@ import { CmsAPI } from "@/shared/api/services";
 import { DocumentEditForm } from "@/features/cms/components/document-edit-form";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { Section } from "@/shared/components/common/section";
+import { cmsCollectionHref, cmsCollectionSlug, getCollectionByRouteParam } from "@/features/cms/lib/routing";
 
 export default async function BotCmsEditDocPage({
   params,
@@ -17,10 +18,11 @@ export default async function BotCmsEditDocPage({
   setRequestLocale(locale);
   const t = await getTranslations("cms");
 
-  const collection = await CmsAPI.getCollection(id, name).catch(() => null);
+  const collection = await getCollectionByRouteParam(id, name, `/data/${encodeURIComponent(docId)}`);
   if (!collection) notFound();
 
-  const doc = await CmsAPI.getDocument(id, name, docId).catch(() => null);
+  const collectionSlug = cmsCollectionSlug(collection);
+  const doc = await CmsAPI.getDocument(id, collectionSlug, docId).catch(() => null);
   if (!doc) notFound();
 
   const collections = await CmsAPI.listCollections(id).catch(() => []);
@@ -39,7 +41,7 @@ export default async function BotCmsEditDocPage({
         }
         actions={
           <Button asChild variant="ghost" size="sm">
-            <Link href={`/app/bots/${id}/cms/${name}/data`} className="gap-1">
+            <Link href={cmsCollectionHref(id, collectionSlug, "/data")} className="gap-1">
               <ArrowLeft className="h-4 w-4" />
               {t("backToData")}
             </Link>
@@ -50,7 +52,7 @@ export default async function BotCmsEditDocPage({
       <Section>
         <DocumentEditForm
           projectId={id}
-          collectionName={collection.name}
+          collectionName={collectionSlug}
           fields={collection.fields ?? []}
           collections={collections}
           doc={doc}

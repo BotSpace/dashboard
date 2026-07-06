@@ -8,6 +8,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { EmptyState } from "@/shared/components/common/empty-state";
 import { DeleteCollectionButton } from "@/features/cms/components/delete-collection-button";
+import { cmsCollectionHref, cmsCollectionSlug } from "@/features/cms/lib/routing";
 
 export default async function BotCmsListPage({
   params,
@@ -55,7 +56,7 @@ export default async function BotCmsListPage({
           {collections.map((c) => (
             <Link
               key={c.id}
-              href={`/app/bots/${projectId}/cms/${c.name}/data`}
+              href={cmsCollectionHref(projectId, cmsCollectionSlug(c), "/data")}
               className="block h-full"
             >
               <Card className="h-full overflow-hidden transition hover:border-blue-500/40">
@@ -75,7 +76,7 @@ export default async function BotCmsListPage({
                     {!c.system && (
                       <DeleteCollectionButton
                         projectId={projectId}
-                        name={c.name}
+                        name={cmsCollectionSlug(c)}
                         label={c.label || c.name}
                       />
                     )}

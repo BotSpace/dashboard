@@ -8,6 +8,7 @@ import { DataGrid } from "@/features/cms/components/data-grid";
 import { DeleteCollectionButton } from "@/features/cms/components/delete-collection-button";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { Section } from "@/shared/components/common/section";
+import { cmsCollectionHref, cmsCollectionSlug, getCollectionByRouteParam } from "@/features/cms/lib/routing";
 
 export default async function BotCmsDataPage({
   params,
@@ -18,7 +19,7 @@ export default async function BotCmsDataPage({
   setRequestLocale(locale);
   const t = await getTranslations("cms");
 
-  const collection = await CmsAPI.getCollection(id, name).catch(() => null);
+  const collection = await getCollectionByRouteParam(id, name, "/data");
   if (!collection) notFound();
   // All collections — used to resolve relation fields to their primary_field label.
   const collections = await CmsAPI.listCollections(id).catch(() => []);
@@ -43,7 +44,7 @@ export default async function BotCmsDataPage({
               </Link>
             </Button>
             <Button asChild variant="outline" size="sm">
-              <Link href={`/app/bots/${id}/cms/${name}`} className="gap-2">
+              <Link href={cmsCollectionHref(id, cmsCollectionSlug(collection))} className="gap-2">
                 <Settings2 className="h-4 w-4" />
                 {t("schema")}
               </Link>
@@ -64,7 +65,7 @@ export default async function BotCmsDataPage({
       <Section>
         <DataGrid
           projectId={id}
-          collectionName={collection.name}
+          collectionName={cmsCollectionSlug(collection)}
           fields={collection.fields ?? []}
           collections={collections}
         />

@@ -5,6 +5,7 @@ import { Pencil, Trash2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/shared/components/ui/button";
+import { cmsCollectionHref } from "../lib/href";
 import { Badge } from "@/shared/components/ui/badge";
 import {
   Dialog,
@@ -219,7 +220,7 @@ export function DocumentViewDrawer({
               {t("noValue")}
             </Button>
             <Button asChild size="sm" className="gap-1.5">
-              <Link href={`/app/bots/${projectId}/cms/${collectionName}/data/${docId}`}>
+              <Link href={cmsCollectionHref(projectId, collectionName, `/data/${encodeURIComponent(docId)}`)}>
                 <Pencil className="h-3.5 w-3.5" />
                 {t("editDoc")}
               </Link>

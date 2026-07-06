@@ -7,6 +7,7 @@ import { CmsAPI } from "@/shared/api/services";
 import { DocumentForm } from "@/features/cms/components/document-form";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { Section } from "@/shared/components/common/section";
+import { cmsCollectionHref, cmsCollectionSlug, getCollectionByRouteParam } from "@/features/cms/lib/routing";
 
 export default async function BotCmsNewDocPage({
   params,
@@ -17,7 +18,7 @@ export default async function BotCmsNewDocPage({
   setRequestLocale(locale);
   const t = await getTranslations("cms");
 
-  const collection = await CmsAPI.getCollection(id, name).catch(() => null);
+  const collection = await getCollectionByRouteParam(id, name, "/data/new");
   if (!collection) notFound();
 
   const collections = await CmsAPI.listCollections(id).catch(() => []);
@@ -30,7 +31,7 @@ export default async function BotCmsNewDocPage({
         subtitle={<code className="font-mono">{collection.name}</code>}
         actions={
           <Button asChild variant="ghost" size="sm">
-            <Link href={`/app/bots/${id}/cms/${name}/data`} className="gap-1">
+            <Link href={cmsCollectionHref(id, cmsCollectionSlug(collection), "/data")} className="gap-1">
               <ArrowLeft className="h-4 w-4" />
               {t("backToData")}
             </Link>
@@ -41,7 +42,7 @@ export default async function BotCmsNewDocPage({
       <Section>
         <DocumentForm
           projectId={id}
-          collectionName={collection.name}
+          collectionName={cmsCollectionSlug(collection)}
           fields={collection.fields ?? []}
           collections={collections}
         />

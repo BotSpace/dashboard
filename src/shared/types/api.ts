@@ -344,6 +344,7 @@ export type CmsCollection = {
   id: string;
   project_id: string;
   name: string;
+  slug?: string;
   label?: string;
   description?: string;
   primary_field?: string;
