@@ -13,6 +13,7 @@ import { formatCurrency, formatNumber } from "@/shared/lib/utils";
 import { OrderButton } from "@/features/templates/components/order-button";
 import { JsonLd } from "@/shared/components/common/json-ld";
 import { buildMetadata, localizedUrl } from "@/shared/lib/seo";
+import { sanitizeRichText } from "@/shared/lib/sanitize";
 import type { Locale } from "@/shared/i18n/routing";
 
 function toNumber(v: number | string | undefined | null): number {
@@ -118,7 +119,7 @@ export default async function PublicTemplateDetailPage({
               </div>
             )}
             {tpl.short_description && (
-              <div className="mt-4 text-base text-muted-foreground" dangerouslySetInnerHTML={{ __html: tpl.short_description }} />
+              <div className="mt-4 text-base text-muted-foreground" dangerouslySetInnerHTML={{ __html: sanitizeRichText(tpl.short_description) }} />
             )}
           </div>
 
@@ -135,7 +136,7 @@ export default async function PublicTemplateDetailPage({
                 <h2 className="text-lg font-semibold">{t("about")}</h2>
                 <div
                   className="mt-3 text-sm leading-relaxed text-muted-foreground"
-                  dangerouslySetInnerHTML={{ __html: tpl.description }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichText(tpl.description) }}
                 />
               </CardContent>
             </Card>
@@ -150,7 +151,7 @@ export default async function PublicTemplateDetailPage({
                     <li key={f.id} className="rounded-md border p-3">
                       <div className="text-sm font-medium">{f.name}</div>
                       {f.value && (
-                        <div className="mt-1 text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: f.value }} />
+                        <div className="mt-1 text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: sanitizeRichText(f.value) }} />
                       )}
                     </li>
                   ))}

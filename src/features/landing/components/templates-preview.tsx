@@ -3,6 +3,7 @@ import { ArrowRight, Eye, Heart, Tag } from "lucide-react";
 import { TemplatesAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { formatCurrency, formatNumber } from "@/shared/lib/utils";
+import { sanitizeRichText } from "@/shared/lib/sanitize";
 
 function toNumber(v: number | string | undefined | null): number {
   if (v === undefined || v === null) return 0;
@@ -63,7 +64,7 @@ export async function TemplatesPreview({ locale }: { locale: string }) {
                   <div className="flex flex-col gap-2 p-5">
                     <h3 className="line-clamp-1 text-sm font-semibold text-white/80">{tpl.name}</h3>
                     {tpl.short_description && (
-                      <div className="line-clamp-2 text-xs leading-relaxed text-white/30" dangerouslySetInnerHTML={{ __html: tpl.short_description }} />
+                      <div className="line-clamp-2 text-xs leading-relaxed text-white/30" dangerouslySetInnerHTML={{ __html: sanitizeRichText(tpl.short_description) }} />
                     )}
                     <div className="mt-2 flex items-end justify-between">
                       <div>
