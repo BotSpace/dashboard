@@ -31,7 +31,7 @@ export async function uploadFileAction(formData: FormData): Promise<FilesResult>
   const ttl = formData.get("ttl");
   const out = new FormData();
   out.append("file", file, file.name);
-  if (project && String(project)) out.append("project", String(project));
+  if (project && String(project)) out.append("project_id", String(project));
   if (ttl && Number(ttl) > 0) out.append("ttl", String(ttl));
 
   try {
