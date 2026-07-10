@@ -9,7 +9,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { EmptyState } from "@/shared/components/common/empty-state";
 import { formatNumber } from "@/shared/lib/utils";
-import { FileUploader } from "@/features/files/components/file-uploader";
+import { fileDownloadUrl } from "@/shared/lib/file-url";
 
 import { fileExpiryLabel } from "@/shared/lib/file-expiry";
 
@@ -55,13 +55,11 @@ export default async function FilesPage({
         icon={<Files className="h-5 w-5" />}
       />
 
-      <FileUploader />
-
       {files.length === 0 ? (
         <EmptyState
           icon={<FileIcon className="h-7 w-7" />}
           title="Hech qanday fayl yo'q"
-          description="Yuqoridagi forma orqali fayl yuklang"
+          description="Fayllar bot ichida (loyiha sahifasida) yuklanadi"
         />
       ) : (
         <Card>
@@ -81,13 +79,19 @@ export default async function FilesPage({
                 {files.map((f) => (
                   <tr key={f.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
                     <td className="px-4 py-3 font-medium">
-                      {f.url ? (
-                        <a href={f.url} target="_blank" rel="noreferrer" className="hover:underline hover:text-blue-400 transition-colors">
-                          {f.name}
-                        </a>
-                      ) : (
-                        f.name
-                      )}
+                      {(() => {
+                        const dl = fileDownloadUrl(f.url);
+                        return dl ? (
+                          <span className="inline-flex items-center gap-1">
+                            <a href={dl} target="_blank" rel="noreferrer" className="hover:underline hover:text-blue-400 transition-colors">
+                              {f.name}
+                            </a>
+                            <CopyButton value={dl} label="Yuklab olish havolasi" className="p-1" />
+                          </span>
+                        ) : (
+                          f.name
+                        );
+                      })()}
                       {f.uuid && (
                         <div className="mt-0.5 flex items-center gap-1">
                           <span className="truncate font-mono text-[11px] font-normal text-muted-foreground" title={f.uuid}>

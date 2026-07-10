@@ -7,6 +7,7 @@ import { EmptyState } from "@/shared/components/common/empty-state";
 import { FileUploader } from "@/features/files/components/file-uploader";
 import { FileDeleteButton } from "@/features/files/components/file-delete-button";
 import { CopyButton } from "@/shared/components/common/copy-button";
+import { fileDownloadUrl } from "@/shared/lib/file-url";
 import { Pagination } from "@/shared/components/common/pagination";
 
 import { fileExpiryLabel } from "@/shared/lib/file-expiry";
@@ -62,18 +63,24 @@ export default async function BotFilesPage({
               {files.map((f) => (
                 <li key={f.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm transition-colors hover:bg-muted/20">
                   <div className="min-w-0 flex-1">
-                    {f.url ? (
-                      <a
-                        href={f.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="block truncate font-medium hover:underline hover:text-blue-400 transition-colors"
-                      >
-                        {f.name}
-                      </a>
-                    ) : (
-                      <span className="block truncate font-medium">{f.name}</span>
-                    )}
+                    {(() => {
+                      const dl = fileDownloadUrl(f.url);
+                      return dl ? (
+                        <div className="flex items-center gap-1">
+                          <a
+                            href={dl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="block truncate font-medium hover:underline hover:text-blue-400 transition-colors"
+                          >
+                            {f.name}
+                          </a>
+                          <CopyButton value={dl} label="Yuklab olish havolasi" className="shrink-0 p-1" />
+                        </div>
+                      ) : (
+                        <span className="block truncate font-medium">{f.name}</span>
+                      );
+                    })()}
                     <span className="block text-xs text-muted-foreground">
                       {f.mime ?? "—"} · {humanSize(f.size)}
                     </span>
