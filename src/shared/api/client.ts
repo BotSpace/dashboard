@@ -13,16 +13,29 @@ export type ApiOptions = RequestInit & {
   skipAuth?: boolean;
 };
 
-// All call sites hardcode paths as "/api/v1/...". Rewrite that leading
-// segment to NEXT_PUBLIC_API_PREFIX so prod can point at the gateway's
-// "/api/v2" (-> new Go backend) without touching every call site, while
-// localhost dev keeps hitting the backend's real "/api/v1" unchanged.
-// Non-"/api/v1" paths (e.g. legacy Django-only routes) pass through as-is.
+// Every backend path is authored as "/api/v1/...". Rewrite that leading segment
+// to NEXT_PUBLIC_API_PREFIX so prod can point at the gateway's "/api/v2" (-> new
+// Go backend's "/api/v1") without touching every call site, while localhost dev
+// keeps hitting the real "/api/v1" unchanged.
+//
+// A path that starts with "/api/" but NOT "/api/v1" (e.g. a missing version
+// segment like the old "/api/cms/...") bypasses this rewrite and can only 404 —
+// it used to pass through silently and render empty lists. So it now throws in
+// development to surface the mistake immediately; in production it warns and
+// falls through rather than crash the page.
+const CANONICAL_API_PREFIX = "/api/v1";
+
 export function applyApiPrefix(path: string): string {
   const prefix = env.NEXT_PUBLIC_API_PREFIX;
-  if (prefix === "/api/v1") return path;
-  if (path === "/api/v1" || path.startsWith("/api/v1/")) {
-    return prefix + path.slice("/api/v1".length);
+
+  if (path === CANONICAL_API_PREFIX || path.startsWith(CANONICAL_API_PREFIX + "/")) {
+    return prefix === CANONICAL_API_PREFIX ? path : prefix + path.slice(CANONICAL_API_PREFIX.length);
+  }
+
+  if (path.startsWith("/api/")) {
+    const msg = `[api] backend path "${path}" must start with "${CANONICAL_API_PREFIX}/" — non-v1 /api path (likely a missing version segment); this request would 404`;
+    if (process.env.NODE_ENV !== "production") throw new Error(msg);
+    console.warn(msg);
   }
   return path;
 }
