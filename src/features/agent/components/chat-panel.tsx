@@ -442,7 +442,6 @@ function ChatThread({
         />
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
-          <UsageBadge refreshKey={usageKey} liveDelta={stream.liveTokens} />
           <ProjectPicker projects={projects} current={projectId} />
           <Button
             variant="ghost"
@@ -615,12 +614,17 @@ function ChatThread({
               </Button>
             )}
           </div>
-          {isRunning && stream.phase !== "waiting" && (
-            <div className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
-              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-              <span>Agent javob tayyorlamoqda</span>
+          <div className="mt-1.5 flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+            <div className="flex min-h-4 items-center gap-1.5">
+              {isRunning && stream.phase !== "waiting" && (
+                <>
+                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                  <span>Agent javob tayyorlamoqda</span>
+                </>
+              )}
             </div>
-          )}
+            <UsageBadge refreshKey={usageKey} liveDelta={stream.liveTokens} />
+          </div>
         </div>
       </div>
 
