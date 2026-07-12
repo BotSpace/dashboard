@@ -17,7 +17,7 @@ export default async function AgentPage({
   const projectId = sp.project ?? "global";
 
   return (
-    <div className="flex h-[calc(100dvh-8.5rem)] flex-col lg:h-[calc(100dvh-9rem)]">
+    <div className="flex h-[calc(100dvh-12.5rem)] flex-col lg:h-[calc(100dvh-13rem)]">
       <div className="min-h-0 flex-1">
         <ChatPanel key={projectId} projectId={projectId} projects={projects} />
       </div>
