@@ -34,6 +34,8 @@ type State = {
   approval: ApprovalPayload | null;
   clarify: ClarifyPayload | null;
   usageRefreshTick: number;
+  /** This run's cumulative tokens (in+out) from live `token_usage` events. */
+  liveTokens: number;
   finished: boolean;
   error: string | null;
   thinking: string;
@@ -81,6 +83,7 @@ export function useAgentStream({
     approval: null,
     clarify: null,
     usageRefreshTick: 0,
+    liveTokens: 0,
     finished: Boolean(initialFinished),
     error: null,
     thinking: "",
@@ -172,6 +175,7 @@ export function useAgentStream({
             next.error = null;
             next.phase = "thinking";
             next.currentTool = null;
+            next.liveTokens = 0;
             break;
           case "thinking_delta": {
             const delta = (ev.payload as { delta?: string }).delta ?? "";
@@ -390,6 +394,19 @@ export function useAgentStream({
             next.usageRefreshTick = s.usageRefreshTick + 1;
             break;
           }
+          case "token_usage": {
+            // Live per-turn usage — this run's cumulative tokens so the badge
+            // ticks up in real time.
+            const p = ev.payload as {
+              total_tokens?: number;
+              input_tokens?: number;
+              output_tokens?: number;
+            };
+            const total =
+              p.total_tokens ?? (p.input_tokens ?? 0) + (p.output_tokens ?? 0);
+            if (typeof total === "number") next.liveTokens = total;
+            break;
+          }
           case "run_completed":
           case "run_failed":
           case "close":
@@ -452,6 +469,7 @@ export function useAgentStream({
       "clarification_required",
       "clarification_resolved",
       "usage_updated",
+      "token_usage",
       "sub_agent_started",
       "sub_agent_finished",
       "run_completed",

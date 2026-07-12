@@ -5,9 +5,12 @@ import type { AgentUsage } from "@/shared/api/agent";
 
 type Props = {
   refreshKey?: unknown;
+  /** Live tokens consumed by the CURRENT run — subtracted from remaining in
+   * real time so the badge ticks down as the agent works. */
+  liveDelta?: number;
 };
 
-export function UsageBadge({ refreshKey }: Props) {
+export function UsageBadge({ refreshKey, liveDelta = 0 }: Props) {
   const [usage, setUsage] = useState<AgentUsage | null>(null);
 
   const load = useCallback(async () => {
@@ -19,7 +22,9 @@ export function UsageBadge({ refreshKey }: Props) {
 
   if (!usage) return null;
 
-  const { used, limit, remaining } = usage;
+  const { limit } = usage;
+  const used = usage.used + liveDelta;
+  const remaining = Math.max(0, usage.remaining - liveDelta);
   const pct = limit > 0 ? (used / limit) * 100 : 0;
 
   const formatTokens = (value: number) => {

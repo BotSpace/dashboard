@@ -442,7 +442,7 @@ function ChatThread({
         />
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
-          <UsageBadge refreshKey={usageKey} />
+          <UsageBadge refreshKey={usageKey} liveDelta={stream.liveTokens} />
           <ProjectPicker projects={projects} current={projectId} />
           <Button
             variant="ghost"
