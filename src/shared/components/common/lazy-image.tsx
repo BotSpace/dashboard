@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/shared/lib/utils";
 
 /**
@@ -21,6 +21,15 @@ export function LazyImage({
   eager?: boolean;
 }) {
   const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // On a hard reload the <img> can finish loading (often from cache) BEFORE React
+  // hydrates and attaches onLoad, so the event is missed and the image stays
+  // opacity-0. Check `complete` on mount to catch that case.
+  useEffect(() => {
+    const el = imgRef.current;
+    if (el?.complete && el.naturalWidth > 0) setLoaded(true);
+  }, [src]);
 
   return (
     <>
@@ -29,11 +38,13 @@ export function LazyImage({
       )}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        ref={imgRef}
         src={src}
         alt={alt}
         loading={eager ? "eager" : "lazy"}
         decoding="async"
         onLoad={() => setLoaded(true)}
+        onError={() => setLoaded(true)}
         className={cn(
           "h-full w-full object-cover transition-opacity duration-500",
           loaded ? "opacity-100" : "opacity-0",

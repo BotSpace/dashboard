@@ -51,6 +51,10 @@
 
 :root {
   --radius: 0.75rem;
+  /* Tie native controls (select dropdown, scrollbars, date pickers) to the app
+   * theme CLASS, not the OS. Without this, a dark app on a light-OS renders the
+   * native <select> dropdown white. See also the .dark override below. */
+  color-scheme: light;
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -91,6 +95,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
 
