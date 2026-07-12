@@ -14,6 +14,12 @@ type PageProps = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
+function withoutDuplicateTitle(content: string, title: string): string {
+  const firstHeading = content.match(/^\s*#\s+(.+?)\s*(?:\r?\n|$)/);
+  if (!firstHeading || firstHeading[1].trim() !== title.trim()) return content;
+  return content.slice(firstHeading[0].length).trimStart();
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug } = await params;
   const t = await getTranslations({ locale, namespace: "blog" });
@@ -48,7 +54,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
   if (!post) notFound();
 
   return (
-    <article className="container-page max-w-3xl py-10 space-y-6">
+    <article className="container-page max-w-3xl space-y-6 pb-12 pt-28 md:pt-32">
       <Button asChild variant="ghost" size="sm">
         <Link href="/blog" className="gap-1">
           <ArrowLeft className="h-4 w-4" />
@@ -67,7 +73,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
         </div>
       </header>
 
-      <BlogMarkdown>{post.content}</BlogMarkdown>
+      <BlogMarkdown>{withoutDuplicateTitle(post.content, post.title)}</BlogMarkdown>
     </article>
   );
 }

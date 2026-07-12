@@ -36,7 +36,7 @@ export default async function BlogListPage({ params, searchParams }: PageProps) 
   const posts = result?.results ?? [];
 
   return (
-    <div className="container-page py-12 space-y-8">
+    <div className="container-page space-y-8 pb-12 pt-28 md:pt-32">
       <header className="mx-auto max-w-2xl text-center">
         <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{t("title")}</h1>
         <p className="mt-3 text-lg text-white/60">{t("subtitle")}</p>
