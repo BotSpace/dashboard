@@ -19,6 +19,8 @@ import {
   PanelLeftOpen,
   Plus,
   ArrowDown,
+  Wrench,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
@@ -407,6 +409,28 @@ function ChatThread({
     [stream.turns, stream.phase]
   );
 
+  const toolCallCount = useMemo(() => {
+    let n = 0;
+    for (const t of stream.turns) {
+      if (t.kind === "tool") n += 1;
+      else if (t.kind === "sub_agent") n += t.toolCalls;
+    }
+    return n;
+  }, [stream.turns]);
+
+  const msgCount = useMemo(
+    () => stream.turns.filter((t) => t.kind === "user").length,
+    [stream.turns]
+  );
+
+  const projectName = useMemo(
+    () =>
+      projectId === "global"
+        ? "Umumiy"
+        : projects.find((p) => String(p.id) === projectId)?.name ?? `#${projectId}`,
+    [projectId, projects]
+  );
+
   const isEmpty = items.length === 0 && !isRunning;
 
   const autoResize = (el: HTMLTextAreaElement) => {
@@ -614,16 +638,26 @@ function ChatThread({
               </Button>
             )}
           </div>
-          <div className="mt-1.5 flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-            <div className="flex min-h-4 items-center gap-1.5">
-              {isRunning && stream.phase !== "waiting" && (
-                <>
-                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                  <span>Agent javob tayyorlamoqda</span>
-                </>
-              )}
-            </div>
+          <div className="mt-1.5 flex min-h-4 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
             <UsageBadge refreshKey={usageKey} liveDelta={stream.liveTokens} />
+            <span className="flex items-center gap-1" title="Tool chaqiruvlar soni">
+              <Wrench className="h-3 w-3" />
+              {toolCallCount}
+            </span>
+            <span className="flex items-center gap-1" title="Xabarlar soni">
+              <MessageSquare className="h-3 w-3" />
+              {msgCount}
+            </span>
+            <span className="flex min-w-0 items-center gap-1" title="Joriy loyiha">
+              <Bot className="h-3 w-3 shrink-0" />
+              <span className="max-w-[140px] truncate">{projectName}</span>
+            </span>
+            {isRunning && stream.phase !== "waiting" && (
+              <span className="flex items-center gap-1.5 text-emerald-500">
+                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                Agent javob tayyorlamoqda
+              </span>
+            )}
           </div>
         </div>
       </div>
