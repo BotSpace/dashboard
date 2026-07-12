@@ -1,5 +1,13 @@
 "use client";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bot,
@@ -38,44 +46,35 @@ import { UsageBadge } from "./usage-badge";
 import type { ChatTurn, ToolCallView } from "../types";
 import type { Project } from "@/shared/types/api";
 import {
-  deleteThread,
-  clearAllThreads,
-  loadActiveRun,
-  loadThread,
-  loadThreads,
   newThreadId,
-  saveActiveRun,
-  saveThread,
   titleFromPrompt,
-  upsertThreadMeta,
   type ThreadMeta,
 } from "../storage";
 
 /**
- * Merges backend thread list with localStorage list.
- * Backend entries take precedence for title/lastUpdated.
- * Result is sorted newest-first and deduplicated by id.
+ * Pure upsert of a thread meta into a list, newest-first, deduped by id.
+ * Chat history lives in the backend now (no localStorage); this only keeps the
+ * in-memory sidebar list in sync while the user works.
  */
-function mergeThreadLists(
-  local: ThreadMeta[],
+function upsertMeta(list: ThreadMeta[], meta: ThreadMeta): ThreadMeta[] {
+  const rest = list.filter((t) => t.id !== meta.id);
+  return [meta, ...rest].sort((a, b) => b.lastUpdated - a.lastUpdated).slice(0, 50);
+}
+
+/** Map the backend thread list into the sidebar's ThreadMeta shape. */
+function backendToMeta(
   backendRaw: { thread_id: string; title: string; updated_at: string }[]
 ): ThreadMeta[] {
-  const map = new Map<string, ThreadMeta>();
-  // Start with local entries as the base
-  for (const t of local) {
-    map.set(t.id, t);
-  }
-  // Backend entries overwrite local ones (backend is source of truth for title/time)
-  for (const b of backendRaw) {
-    const ts = new Date(b.updated_at).getTime();
-    const existing = map.get(b.thread_id);
-    map.set(b.thread_id, {
-      id: b.thread_id,
-      title: b.title || existing?.title || "Suhbat",
-      lastUpdated: isNaN(ts) ? (existing?.lastUpdated ?? Date.now()) : ts,
-    });
-  }
-  return Array.from(map.values()).sort((a, b) => b.lastUpdated - a.lastUpdated);
+  return backendRaw
+    .map((b) => {
+      const ts = new Date(b.updated_at).getTime();
+      return {
+        id: b.thread_id,
+        title: b.title || "Suhbat",
+        lastUpdated: isNaN(ts) ? Date.now() : ts,
+      };
+    })
+    .sort((a, b) => b.lastUpdated - a.lastUpdated);
 }
 
 type Props = {
@@ -145,36 +144,25 @@ export function ChatPanel(props: Props) {
   return <ChatPanelInner {...props} />;
 }
 
-function pickInitialThreadId(projectId: string): string {
-  const list = loadThreads(projectId);
-  return list[0]?.id ?? newThreadId();
-}
-
 function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
-  const [threads, setThreads] = useState<ThreadMeta[]>(() => loadThreads(projectId));
-  const [threadId, setThreadId] = useState<string>(() => pickInitialThreadId(projectId));
+  // Chat history is backend-only now — start empty, load the thread list from
+  // the API on mount. A fresh threadId is used until the list arrives.
+  const [threads, setThreads] = useState<ThreadMeta[]>([]);
+  const [threadId, setThreadId] = useState<string>(() => newThreadId());
+  const [threadPicked, setThreadPicked] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // On mount: fetch backend thread list and merge with localStorage
+  // On mount: load the thread list from the backend and open the most recent one
+  // (unless the user has already picked/started a thread).
   useEffect(() => {
     let cancelled = false;
     listThreadsAction(projectId).then((res) => {
       if (cancelled || !res) return;
-      const local = loadThreads(projectId);
-      const merged = mergeThreadLists(local, res.threads);
-      setThreads(merged);
-      // Persist merged list back to localStorage as write-through cache
-      // (import saveThreads lazily to avoid circular issues — it's already imported via storage)
-      try {
-        localStorage.setItem(
-          `bm.agent.threads:${projectId}`,
-          JSON.stringify(merged.slice(0, 50))
-        );
-      } catch {
-        /* quota — ignore */
+      const list = backendToMeta(res.threads);
+      setThreads(list);
+      if (!threadPicked && list.length > 0) {
+        setThreadId(list[0].id);
       }
-      // If current threadId is not in merged list and merged list is non-empty,
-      // keep it (the user might have just created it locally).
     });
     return () => {
       cancelled = true;
@@ -183,31 +171,31 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
   }, [projectId]);
 
   const handleNewThread = () => {
+    setThreadPicked(true);
     setThreadId(newThreadId());
     setSidebarOpen(false);
   };
 
   const handleSelectThread = (id: string) => {
+    setThreadPicked(true);
     setThreadId(id);
     setSidebarOpen(false);
   };
 
   const handleDeleteThread = (id: string) => {
-    const next = deleteThread(projectId, id);
+    const next = threads.filter((t) => t.id !== id);
     setThreads(next);
     if (id === threadId) {
+      setThreadPicked(true);
       setThreadId(next[0]?.id ?? newThreadId());
     }
-    // Also delete on the backend — otherwise the next mount's listThreadsAction
-    // merge re-adds it and the deletion "comes back" on refresh.
     void deleteThreadAction(projectId, id);
   };
 
   const handleClearAllThreads = () => {
-    clearAllThreads(projectId);
     setThreads([]);
+    setThreadPicked(true);
     setThreadId(newThreadId());
-    // Wipe on the backend too so the merge on next mount doesn't restore them.
     void clearAllThreadsAction(projectId);
   };
 
@@ -280,7 +268,7 @@ type ThreadProps = {
   projects: Project[];
   threadId: string;
   initialPrompt?: string;
-  onThreadsChange: (threads: ThreadMeta[]) => void;
+  onThreadsChange: Dispatch<SetStateAction<ThreadMeta[]>>;
   onToggleSidebar: () => void;
   onNewThread: () => void;
 };
@@ -294,10 +282,8 @@ function ChatThread({
   onToggleSidebar,
   onNewThread,
 }: ThreadProps) {
-  const [stored] = useState(() => loadActiveRun(projectId, threadId));
-  const [initialThread] = useState(() => loadThread(projectId, threadId));
   const [input, setInput] = useState(initialPrompt ?? "");
-  const [requestId, setRequestId] = useState<string | null>(stored?.requestId ?? null);
+  const [requestId, setRequestId] = useState<string | null>(null);
   const [pending, start] = useTransition();
   const [usageKey, setUsageKey] = useState(0);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
@@ -308,51 +294,32 @@ function ChatThread({
   const stream = useAgentStream({
     projectId,
     requestId,
-    initialTurns: initialThread?.turns,
-    initialSeq: initialThread?.lastSeq ?? 0,
-    initialFinished: initialThread?.finished ?? false,
-    onPersist: (snapshot) =>
-      saveThread(projectId, threadId, {
-        turns: snapshot.turns,
-        lastSeq: snapshot.lastSeq,
-        finished: snapshot.finished,
-      }),
+    // History is loaded from the backend below (no localStorage seed) and no
+    // longer written to localStorage on each turn — the agent persists every
+    // run/message/event in Postgres.
+    initialTurns: undefined,
+    initialSeq: 0,
+    initialFinished: false,
   });
 
-  // Load history from backend when local turns are absent and there is no
-  // active streaming run in progress (to avoid disturbing live SSE).
+  // Load this thread's history from the backend when it opens (single source of
+  // truth). Skip while a run is actively streaming so we don't disturb live SSE.
   useEffect(() => {
-    // Skip if: already have local turns, active run exists, already attempted
     if (backendLoadedRef.current) return;
-    if (initialThread?.turns && initialThread.turns.length > 0) return;
-    if (stored?.requestId) return;
+    if (requestId) return;
     backendLoadedRef.current = true;
 
     let cancelled = false;
     loadThreadHistoryAction(projectId, threadId).then((res) => {
       if (cancelled || !res || res.turns.length === 0) return;
-      // Map backend turns to ChatTurn format (they are already compatible)
-      const turns = res.turns as unknown as ChatTurn[];
-      // Inject into stream state (only applies if stream is still idle/empty)
-      stream.seedTurnsFromBackend(turns);
-      // Write-through cache: persist to localStorage so next open is instant
-      saveThread(projectId, threadId, {
-        turns,
-        lastSeq: 0,
-        finished: true,
-      });
+      // Backend turns are already ChatTurn-compatible.
+      stream.seedTurnsFromBackend(res.turns as unknown as ChatTurn[]);
     });
     return () => {
       cancelled = true;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, threadId]);
-
-  useEffect(() => {
-    if (stream.finished && requestId) {
-      saveActiveRun(projectId, threadId, null);
-    }
-  }, [stream.finished, requestId, projectId, threadId]);
 
   useEffect(() => {
     if (stream.finished) setUsageKey((k) => k + 1);
@@ -399,14 +366,13 @@ function ChatThread({
     const msg = (text ?? input).trim();
     if (!msg || pending) return;
 
-    const existingMeta = loadThreads(projectId).find((t) => t.id === threadId);
-    const title = existingMeta?.title ?? titleFromPrompt(msg);
-    const updated = upsertThreadMeta(projectId, {
-      id: threadId,
-      title,
-      lastUpdated: Date.now(),
+    // Keep the in-memory sidebar list in sync; the backend creates/updates the
+    // thread on run creation (single source of truth).
+    onThreadsChange((prev) => {
+      const existing = prev.find((t) => t.id === threadId);
+      const title = existing?.title ?? titleFromPrompt(msg);
+      return upsertMeta(prev, { id: threadId, title, lastUpdated: Date.now() });
     });
-    onThreadsChange(updated);
 
     stream.pushUserTurn(msg);
     setInput("");
@@ -421,7 +387,6 @@ function ChatThread({
         return;
       }
       setRequestId(res.request_id);
-      saveActiveRun(projectId, threadId, { requestId: res.request_id, threadId });
     });
   };
 
