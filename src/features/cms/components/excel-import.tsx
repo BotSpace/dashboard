@@ -89,13 +89,45 @@ type ParsedSheet = {
 };
 
 async function parseFile(file: File): Promise<ParsedSheet> {
-  const XLSX = await import("xlsx");
-  const buffer = await file.arrayBuffer();
-  const wb = XLSX.read(buffer, { type: "array", cellDates: true });
-  const ws = wb.Sheets[wb.SheetNames[0]];
-  const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: "" });
-  const headers = json.length > 0 ? Object.keys(json[0]) : [];
-  return { headers, rows: json };
+  if (file.name.toLowerCase().endsWith(".csv")) {
+    const Papa = await import("papaparse");
+    return new Promise((resolve, reject) => {
+      Papa.parse<Record<string, unknown>>(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: ({ data, meta, errors }) => {
+          if (errors.length > 0) {
+            reject(new Error(errors[0].message));
+            return;
+          }
+          resolve({ headers: meta.fields ?? [], rows: data });
+        },
+        error: reject,
+      });
+    });
+  }
+
+  const { Workbook } = await import("exceljs");
+  const workbook = new Workbook();
+  await workbook.xlsx.load(await file.arrayBuffer());
+  const worksheet = workbook.worksheets[0];
+  if (!worksheet) return { headers: [], rows: [] };
+
+  const headers = (worksheet.getRow(1).values as unknown[])
+    .slice(1)
+    .map((value) => String(value ?? "").trim());
+  const rows: Record<string, unknown>[] = [];
+  worksheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return;
+    const record: Record<string, unknown> = {};
+    headers.forEach((header, index) => {
+      if (!header) return;
+      const cell = row.getCell(index + 1);
+      record[header] = cell.type === 4 ? cell.value : cell.text;
+    });
+    rows.push(record);
+  });
+  return { headers: headers.filter(Boolean), rows };
 }
 
 export function ExcelImportButton({ projectId, collectionName, fields, onImported }: Props) {
@@ -218,7 +250,7 @@ export function ExcelImportButton({ projectId, collectionName, fields, onImporte
       <input
         ref={fileRef}
         type="file"
-        accept=".xlsx,.csv,.xls"
+        accept=".xlsx,.csv"
         className="hidden"
         onChange={handleFileChange}
       />
