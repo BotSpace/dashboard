@@ -43,7 +43,7 @@ import { ProjectPicker } from "./project-picker";
 import { ThreadsSidebar } from "./threads-sidebar";
 import { ToolStrip } from "./tool-strip";
 import { SubAgentAccordion } from "./sub-agent-accordion";
-import { RunStatusChip, TypingIndicator } from "./typing-indicator";
+import { RunStatusChip } from "./typing-indicator";
 import { UsageBadge } from "./usage-badge";
 import type { ChatTurn, ToolCallView } from "../types";
 import type { Project } from "@/shared/types/api";
@@ -516,12 +516,6 @@ function ChatThread({
                   </div>
                 </div>
               )}
-
-              <TypingIndicator
-                phase={stream.phase}
-                currentTool={stream.currentSubAgent ? stream.currentTool : null}
-                currentSubAgent={stream.currentSubAgent}
-              />
 
               {/* Inline approval prompt — renders when agent gates a destructive action */}
               {stream.approval && requestId && (
