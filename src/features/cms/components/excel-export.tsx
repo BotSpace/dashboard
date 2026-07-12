@@ -15,36 +15,43 @@ type Props = {
   fields: CmsField[];
 };
 
-function buildXlsx(docs: CmsDocument[], fields: CmsField[], fileName: string) {
-  // Dynamic import of xlsx to avoid SSR issues
-  return import("xlsx").then((XLSX) => {
-    // Build header row: schema fields + system fields
-    const schemaHeaders = fields.map((f) => f.label || f.name);
-    const schemaNames = fields.map((f) => f.name);
-    const headers = ["_id", ...schemaHeaders, "_created_at", "_updated_at"];
+async function buildXlsx(docs: CmsDocument[], fields: CmsField[], fileName: string) {
+  // Dynamic import keeps the spreadsheet library out of SSR and initial bundles.
+  const { Workbook } = await import("exceljs");
+  const workbook = new Workbook();
+  const worksheet = workbook.addWorksheet("Data");
+  // Build header row: schema fields + system fields
+  const schemaHeaders = fields.map((f) => f.label || f.name);
+  const schemaNames = fields.map((f) => f.name);
+  const headers = ["_id", ...schemaHeaders, "_created_at", "_updated_at"];
 
-    // Build rows
-    const rows = docs.map((doc) => {
-      const row: (string | number | boolean | null)[] = [
-        String(doc._id ?? ""),
-        ...schemaNames.map((name) => {
-          const v = doc[name];
-          if (v === null || v === undefined) return "";
-          if (typeof v === "object") return JSON.stringify(v);
-          return v as string | number | boolean;
-        }),
-        String(doc._created_at ?? ""),
-        String(doc._updated_at ?? ""),
-      ];
-      return row;
-    });
-
-    const wsData = [headers, ...rows];
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Data");
-    XLSX.writeFile(wb, fileName);
+  // Build rows
+  const rows = docs.map((doc) => {
+    const row: (string | number | boolean | null)[] = [
+      String(doc._id ?? ""),
+      ...schemaNames.map((name) => {
+        const v = doc[name];
+        if (v === null || v === undefined) return "";
+        if (typeof v === "object") return JSON.stringify(v);
+        return v as string | number | boolean;
+      }),
+      String(doc._created_at ?? ""),
+      String(doc._updated_at ?? ""),
+    ];
+    return row;
   });
+
+  worksheet.addRows([headers, ...rows]);
+  const data = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([data], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = fileName;
+  anchor.click();
+  URL.revokeObjectURL(url);
 }
 
 export function ExcelExportButton({ projectId, collectionName, fields }: Props) {
