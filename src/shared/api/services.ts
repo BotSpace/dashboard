@@ -285,13 +285,29 @@ function unwrapPaginatedTemplates(d: unknown): PaginatedTemplates {
   return { items, page, totalPages, hasMore: page < totalPages };
 }
 
+// The UI/URL uses `categories`/`features`/`price_min`/`price_max`, but the
+// backend filter reads `category_id`/`feature_id`/`min_price`/`max_price`
+// (see template handler List). Map here so every list call filters correctly.
+function toTemplateQuery(
+  params: TemplateListParams
+): Record<string, string | number | boolean | null | undefined> {
+  const { categories, features, price_min, price_max, ...rest } = params;
+  return {
+    ...rest,
+    category_id: categories || undefined,
+    feature_id: features || undefined,
+    min_price: price_min || undefined,
+    max_price: price_max || undefined,
+  };
+}
+
 export const TemplatesAPI = {
   list: async (params: TemplateListParams = {}) => {
-    const d = await api<unknown>("/api/v1/template/list", { query: params });
+    const d = await api<unknown>("/api/v1/template/list", { query: toTemplateQuery(params) });
     return unwrapList<Template>(d);
   },
   listPaginated: async (params: TemplateListParams = {}): Promise<PaginatedTemplates> => {
-    const d = await api<unknown>("/api/v1/template/list", { query: params });
+    const d = await api<unknown>("/api/v1/template/list", { query: toTemplateQuery(params) });
     return unwrapPaginatedTemplates(d);
   },
   // BARCHA template'larni oladi (sitemap uchun) — katta page_size bilan bitta
@@ -304,14 +320,14 @@ export const TemplatesAPI = {
     const PAGE_SIZE = 500;
     const MAX_PAGES = 50;
     const first = await api<unknown>("/api/v1/template/list/", {
-      query: { ...params, page: 1, page_size: PAGE_SIZE },
+      query: { ...toTemplateQuery(params), page: 1, page_size: PAGE_SIZE },
     });
     const { items, totalPages } = readTemplatePage(first);
     const all = [...items];
     const lastPage = Math.min(totalPages, MAX_PAGES);
     for (let page = 2; page <= lastPage; page++) {
       const d = await api<unknown>("/api/v1/template/list/", {
-        query: { ...params, page, page_size: PAGE_SIZE },
+        query: { ...toTemplateQuery(params), page, page_size: PAGE_SIZE },
       });
       all.push(...readTemplatePage(d).items);
     }

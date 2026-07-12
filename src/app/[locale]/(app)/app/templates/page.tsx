@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { PackageOpen, Search } from "lucide-react";
+import { ChevronDown, PackageOpen, Search } from "lucide-react";
 import { TemplatesAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { Input } from "@/shared/components/ui/input";
@@ -71,18 +71,23 @@ export default async function TemplatesPage({
             className="pl-9 bg-muted/40 focus-visible:bg-background"
           />
         </div>
-        <select
-          name="categories"
-          defaultValue={activeCategory}
-          className="h-9 rounded-md border border-input bg-transparent px-3 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <option value="">{t("allCategories")}</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
+        <div className="relative">
+          <select
+            name="categories"
+            defaultValue={activeCategory}
+            className="h-9 w-full appearance-none rounded-md border border-input bg-muted/40 px-3 pr-8 text-sm text-foreground shadow-xs focus-visible:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="" className="bg-background text-foreground">
+              {t("allCategories")}
             </option>
-          ))}
-        </select>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id} className="bg-background text-foreground">
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        </div>
         <Input
           name="price_min"
           type="number"
