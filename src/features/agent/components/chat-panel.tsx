@@ -21,6 +21,8 @@ import {
   ArrowDown,
   Wrench,
   MessageSquare,
+  Cpu,
+  ListPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
@@ -289,6 +291,8 @@ function ChatThread({
   // Set when a refresh re-attaches to an in-flight run so the SSE reconnects
   // with the right seq cursor (replay only unseen events, no duplicate turns).
   const [resume, setResume] = useState<{ requestId: string; sinceSeq: number } | null>(null);
+  // Messages typed while the agent is busy — sent one-by-one as each run ends.
+  const [queue, setQueue] = useState<string[]>([]);
   const [pending, start] = useTransition();
   const [usageKey, setUsageKey] = useState(0);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
@@ -388,10 +392,8 @@ function ChatThread({
   const isRunning =
     pending || (!stream.finished && stream.phase !== "idle" && stream.phase !== "error");
 
-  const send = (text?: string) => {
-    const msg = (text ?? input).trim();
-    if (!msg || pending) return;
-
+  // Actually start a run for `msg`. Assumes the agent is idle (no active run).
+  const doSend = (msg: string) => {
     // Keep the in-memory sidebar list in sync; the backend creates/updates the
     // thread on run creation (single source of truth).
     onThreadsChange((prev) => {
@@ -416,6 +418,59 @@ function ChatThread({
       setRequestId(res.request_id);
     });
   };
+
+  // Submit handler: if the agent is busy, queue the message (auto-sent when the
+  // run ends); otherwise send it right away.
+  const send = (text?: string) => {
+    const msg = (text ?? input).trim();
+    if (!msg) return;
+    if (isRunning) {
+      setQueue((q) => [...q, msg]);
+    } else {
+      doSend(msg);
+    }
+    setInput("");
+    if (inputRef.current) inputRef.current.style.height = "auto";
+  };
+
+  // Drain the queue: when the agent goes idle and messages are waiting, send the
+  // next one. doSend flips the run back to busy, so this fires once per run end.
+  useEffect(() => {
+    if (!isRunning && queue.length > 0) {
+      const [next, ...rest] = queue;
+      setQueue(rest);
+      doSend(next);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRunning, queue]);
+
+  // After a reply completes, return focus to the input so the user can keep
+  // typing without reaching for the mouse.
+  useEffect(() => {
+    if (stream.finished && !pending) inputRef.current?.focus();
+  }, [stream.finished, pending]);
+
+  // "Type to focus": pressing a printable key while not already in a field
+  // focuses the input so the keystroke lands there (like a chat app).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key.length !== 1) return; // only printable single chars
+      const el = document.activeElement as HTMLElement | null;
+      if (
+        el &&
+        (el.tagName === "INPUT" ||
+          el.tagName === "TEXTAREA" ||
+          el.isContentEditable)
+      )
+        return;
+      // Don't steal focus from an open dialog (approval / clarify / sidebar).
+      if (document.querySelector('[role="dialog"], [role="alertdialog"]')) return;
+      inputRef.current?.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const stopRun = () => {
     if (!requestId) return;
@@ -602,8 +657,7 @@ function ChatThread({
         <div className="mx-auto max-w-3xl">
           <div
             className={cn(
-              "flex items-end gap-2 rounded-2xl border bg-card px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-2 focus-within:ring-ring/20",
-              isRunning && "opacity-70"
+              "flex items-end gap-2 rounded-2xl border bg-card px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-2 focus-within:ring-ring/20"
             )}
           >
             <textarea
@@ -624,11 +678,10 @@ function ChatThread({
                 stream.phase === "waiting"
                   ? "Yuqoridagi savolga javob bering…"
                   : isRunning
-                  ? "Agent ishlamoqda…"
+                  ? "Yozing — navbatga qo'shiladi…"
                   : "Xabar yozing…"
               }
               className="max-h-40 min-h-[24px] flex-1 resize-none bg-transparent text-sm leading-6 placeholder:text-muted-foreground/60 focus:outline-none"
-              disabled={isRunning}
             />
             {isRunning && requestId ? (
               <Button
@@ -671,6 +724,27 @@ function ChatThread({
               <Bot className="h-3 w-3 shrink-0" />
               <span className="max-w-[140px] truncate">{projectName}</span>
             </span>
+            {(stream.model || stream.provider) && (
+              <span
+                className="flex min-w-0 items-center gap-1"
+                title="Ishlayotgan model / provayder"
+              >
+                <Cpu className="h-3 w-3 shrink-0" />
+                <span className="max-w-[200px] truncate">
+                  {stream.provider ? `${stream.provider} · ` : ""}
+                  {stream.model ?? "—"}
+                </span>
+              </span>
+            )}
+            {queue.length > 0 && (
+              <span
+                className="flex items-center gap-1 text-sky-500"
+                title="Navbatdagi xabarlar"
+              >
+                <ListPlus className="h-3 w-3 shrink-0" />
+                {queue.length} navbatda
+              </span>
+            )}
             {isRunning &&
               stream.phase !== "waiting" &&
               (() => {

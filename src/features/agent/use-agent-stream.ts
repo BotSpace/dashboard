@@ -55,6 +55,10 @@ type State = {
    * `assistant_chunk`; null when no reply is streaming. The final
    * `assistant_message` finalizes this turn instead of appending a new one. */
   streamingId: string | null;
+  /** Model + provider that produced the latest reply (from assistant_message /
+   * run_started) — surfaced in the footer so the user sees what's running. */
+  model: string | null;
+  provider: string | null;
 };
 
 /**
@@ -106,6 +110,8 @@ export function useAgentStream({
     pendingTool: null,
     currentSubAgent: null,
     streamingId: null,
+    model: null,
+    provider: null,
   });
   const esRef = useRef<EventSource | null>(null);
   const finishedRef = useRef(Boolean(initialFinished));
@@ -198,14 +204,17 @@ export function useAgentStream({
       setState((s) => {
         const next = { ...s };
         switch (ev.type) {
-          case "run_started":
+          case "run_started": {
             next.error = null;
             next.phase = "thinking";
             next.currentTool = null;
             next.pendingTool = null;
             next.liveTokens = 0;
             next.streamingId = null;
+            const rp = ev.payload as { provider?: string };
+            if (rp.provider) next.provider = rp.provider;
             break;
+          }
           case "tool_call_pending": {
             // Model is mid-stream composing a tool call — show its name before
             // the real tool_call/execution. Sub-agents don't stream, so main only.
@@ -245,8 +254,18 @@ export function useAgentStream({
             break;
           }
           case "assistant_message": {
-            const p = ev.payload as { text?: string; sub_agent_id?: string };
+            const p = ev.payload as {
+              text?: string;
+              sub_agent_id?: string;
+              model?: string;
+              provider?: string;
+            };
             const text = p.text ?? "";
+            // Track the main agent's current model + provider for the footer.
+            if (!p.sub_agent_id) {
+              if (p.model) next.model = p.model;
+              if (p.provider) next.provider = p.provider;
+            }
             if (text && p.sub_agent_id && subAgentTurnIdMap.current[p.sub_agent_id]) {
               // Sub-agent narrate matni — accordion ichida tool qadamlari
               // orasida (xronologik) ko'rsatamiz.
