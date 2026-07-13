@@ -62,6 +62,8 @@ type State = {
    * run_started) — surfaced in the footer so the user sees what's running. */
   model: string | null;
   provider: string | null;
+  /** True once the agent has compacted older context into a summary this run. */
+  compacted: boolean;
 };
 
 /**
@@ -116,6 +118,7 @@ export function useAgentStream({
     streamingId: null,
     model: null,
     provider: null,
+    compacted: false,
   });
   const esRef = useRef<EventSource | null>(null);
   const finishedRef = useRef(Boolean(initialFinished));
@@ -217,8 +220,12 @@ export function useAgentStream({
             next.streamingId = null;
             const rp = ev.payload as { provider?: string };
             if (rp.provider) next.provider = rp.provider;
+            next.compacted = false;
             break;
           }
+          case "context_compacted":
+            next.compacted = true;
+            break;
           case "tool_call_pending": {
             // Model is mid-stream composing a tool call — show its name before
             // the real tool_call/execution. Sub-agents don't stream, so main only.
@@ -578,6 +585,7 @@ export function useAgentStream({
       "token_usage",
       "sub_agent_started",
       "sub_agent_finished",
+      "context_compacted",
       "run_completed",
       "run_failed",
       "close",

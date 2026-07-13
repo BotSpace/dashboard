@@ -9,6 +9,7 @@ export type AgentEventType =
   | "plan_set"
   | "plan_update"
   | "flow_changed"
+  | "context_compacted"
   | "approval_required"
   | "approval_resolved"
   | "clarification_required"

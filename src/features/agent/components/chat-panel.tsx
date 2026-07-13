@@ -23,6 +23,7 @@ import {
   MessageSquare,
   Cpu,
   ListPlus,
+  Archive,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
@@ -767,6 +768,15 @@ function ChatThread({
               >
                 <ListPlus className="h-3 w-3 shrink-0" />
                 {queue.length} navbatda
+              </span>
+            )}
+            {stream.compacted && (
+              <span
+                className="flex items-center gap-1 text-muted-foreground/70"
+                title="Kontekst to'lgani uchun eski suhbat ixcham xulosaga yig'ildi (yo'qotilmadi)"
+              >
+                <Archive className="h-3 w-3 shrink-0" />
+                qisqartirildi
               </span>
             )}
             {isRunning &&
