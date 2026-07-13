@@ -746,7 +746,11 @@
     "approve": "Ruxsat berish",
     "deny": "Rad etish",
     "redirecting": "Tasdiqlandi. Qaytish...",
-    "redirectNote": "Tasdiqlangach {uri} manziliga qaytarilasiz"
+    "redirectNote": "Tasdiqlangach {uri} manziliga qaytarilasiz",
+    "errorServer": "Avtorizatsiya serverida vaqtincha nosozlik. Iltimos, birozdan so'ng qayta urinib ko'ring.",
+    "errorAuth": "Sessiya muddati tugagan bo'lishi mumkin. Qaytadan kiring va urinib ko'ring.",
+    "errorGeneric": "Tasdiqlashda xatolik yuz berdi.",
+    "retry": "Qayta urinish"
   },
   "earnings": {
     "title": "Daromad",

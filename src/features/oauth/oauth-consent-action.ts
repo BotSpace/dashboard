@@ -1,8 +1,10 @@
 "use server";
 
 import { readSession } from "@/shared/auth/session";
-import { apiFetch } from "@/shared/api/client";
+import { apiFetch, isApiError } from "@/shared/api/client";
 import { env } from "@/shared/lib/env";
+
+export type ApproveErrorKind = "server" | "auth" | "generic";
 
 export type OAuthParams = {
   client_id: string;
@@ -53,10 +55,10 @@ export async function fetchOAuthMeta(params: OAuthParams): Promise<{ meta?: OAut
 
 export async function approveOAuthAction(
   params: OAuthParams
-): Promise<{ redirectUrl?: string; error?: string }> {
+): Promise<{ redirectUrl?: string; error?: string; errorKind?: ApproveErrorKind }> {
   const session = await readSession();
   if (!session) {
-    return { error: "Avval tizimga kiring" };
+    return { error: "Avval tizimga kiring", errorKind: "auth" };
   }
   try {
     const raw = await apiFetch<Envelope<{ redirect_url: string }>>(
@@ -68,13 +70,20 @@ export async function approveOAuthAction(
       }
     );
     const data = unwrap<{ redirect_url: string }>(raw);
-    if (!data?.redirect_url) return { error: "Kutilmagan server javobi" };
+    if (!data?.redirect_url) return { error: "Kutilmagan server javobi", errorKind: "server" };
     return { redirectUrl: data.redirect_url };
   } catch (e: unknown) {
+    // A 5xx from the (legacy) authorization server is an infrastructure fault,
+    // not something the user did — surface a friendly, localizable kind instead
+    // of leaking a raw "Internal server error" string onto the consent screen.
+    if (isApiError(e)) {
+      if (e.status >= 500) return { error: e.message, errorKind: "server" };
+      if (e.status === 401 || e.status === 403) return { error: e.message, errorKind: "auth" };
+    }
     const msg =
       e && typeof e === "object" && "message" in e
         ? String((e as { message: unknown }).message)
         : "Tasdiqlashda xatolik";
-    return { error: msg };
+    return { error: msg, errorKind: "generic" };
   }
 }

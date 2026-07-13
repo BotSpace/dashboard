@@ -2,10 +2,15 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Bot, CheckCircle2, Loader2, Shield, AlertTriangle, User } from "lucide-react";
+import { Bot, CheckCircle2, Loader2, Shield, AlertTriangle, User, Lock } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
-import { approveOAuthAction, type OAuthParams, type OAuthMeta } from "./oauth-consent-action";
+import {
+  approveOAuthAction,
+  type OAuthParams,
+  type OAuthMeta,
+  type ApproveErrorKind,
+} from "./oauth-consent-action";
 
 type SessionUser = {
   id: string | number;
@@ -31,20 +36,33 @@ export function OAuthConsent({ params, meta, user }: Props) {
   const t = useTranslations("oauth");
   const [pending, start] = useTransition();
   const [error, setError] = useState("");
+  const [errorKind, setErrorKind] = useState<ApproveErrorKind | null>(null);
   const [approved, setApproved] = useState(false);
 
   const handleApprove = () => {
     start(async () => {
       setError("");
+      setErrorKind(null);
       const res = await approveOAuthAction(params);
       if (res.error) {
         setError(res.error);
+        setErrorKind(res.errorKind ?? "generic");
       } else if (res.redirectUrl) {
         setApproved(true);
         window.location.href = res.redirectUrl;
       }
     });
   };
+
+  // Prefer a friendly, localized message by kind; fall back to the raw server
+  // string only when we have no better classification.
+  const errorMessage = errorKind
+    ? errorKind === "server"
+      ? t("errorServer")
+      : errorKind === "auth"
+        ? t("errorAuth")
+        : t("errorGeneric")
+    : error;
 
   const handleDeny = () => {
     const base = params.redirect_uri;
@@ -130,10 +148,23 @@ export function OAuthConsent({ params, meta, user }: Props) {
           </ul>
         </div>
 
-        {error && (
-          <div className="flex items-start gap-2.5 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-            <p className="text-sm text-destructive">{error}</p>
+        {errorMessage && (
+          <div className="space-y-2.5 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3">
+            <div className="flex items-start gap-2.5">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+              <p className="text-sm text-destructive">{errorMessage}</p>
+            </div>
+            {errorKind === "server" && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 border-destructive/30 bg-transparent text-xs text-destructive hover:bg-destructive/15 hover:text-destructive"
+                onClick={handleApprove}
+                disabled={pending}
+              >
+                {t("retry")}
+              </Button>
+            )}
           </div>
         )}
 
@@ -158,7 +189,10 @@ export function OAuthConsent({ params, meta, user }: Props) {
           </Button>
         </div>
 
-        <p className="text-center text-[11px] text-white/30">{t("redirectNote", { uri: meta.redirect_uri })}</p>
+        <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-white/30">
+          <Lock className="h-3 w-3 shrink-0" />
+          {t("redirectNote", { uri: meta.redirect_uri })}
+        </p>
       </CardContent>
     </Card>
   );

@@ -750,7 +750,11 @@
     "approve": "Allow access",
     "deny": "Deny",
     "redirecting": "Authorized. Redirecting...",
-    "redirectNote": "You will be redirected to {uri} upon approval"
+    "redirectNote": "You will be redirected to {uri} upon approval",
+    "errorServer": "The authorization server is temporarily unavailable. Please try again in a moment.",
+    "errorAuth": "Your session may have expired. Sign in again and retry.",
+    "errorGeneric": "Something went wrong while approving the request.",
+    "retry": "Try again"
   },
   "earnings": {
     "title": "Earnings",
