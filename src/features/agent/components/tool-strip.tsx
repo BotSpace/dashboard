@@ -1,10 +1,33 @@
 "use client";
 import { useState } from "react";
-import { ChevronRight, ChevronDown, Loader2, Wrench, CheckCircle2 } from "lucide-react";
+import { ChevronRight, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/shared/lib/utils";
 import type { ToolCallView } from "../types";
 import { summarizeArgs, summarizeName, summarizeResult } from "../lib/summarize-tool";
+
+type ToolState = "running" | "done" | "error";
+
+function toolState(c: ToolCallView): ToolState {
+  if (c.result === undefined) return "running";
+  return c.isError ? "error" : "done";
+}
+
+// Small Claude-Code-style status dot: amber pulse while running, red on error,
+// green when done.
+function StatusDot({ state, className }: { state: ToolState; className?: string }) {
+  return (
+    <span
+      className={cn(
+        "inline-block h-1.5 w-1.5 shrink-0 rounded-full",
+        state === "running" && "animate-pulse bg-amber-400",
+        state === "done" && "bg-emerald-500",
+        state === "error" && "bg-red-500",
+        className,
+      )}
+    />
+  );
+}
 
 type Props = {
   calls: ToolCallView[];
@@ -20,6 +43,7 @@ export function ToolStrip({ calls, pending }: Props) {
   const count = calls.length;
   const lastLabel = summarizeName(last.name);
   const lastArgs = summarizeArgs(last.name, last.arguments);
+  const headState: ToolState = pending ? "running" : hasError ? "error" : "done";
 
   return (
     <motion.div
@@ -31,30 +55,24 @@ export function ToolStrip({ calls, pending }: Props) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "inline-flex max-w-full items-center gap-2 rounded-lg px-3 py-1.5 transition-colors",
-          "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+          "inline-flex max-w-full items-center gap-2 rounded-lg px-2.5 py-1 transition-colors",
+          "text-muted-foreground/70 hover:bg-muted/50 hover:text-muted-foreground",
         )}
       >
         {open ? (
-          <ChevronDown className="h-3 w-3 shrink-0" />
+          <ChevronDown className="h-3 w-3 shrink-0 opacity-60" />
         ) : (
-          <ChevronRight className="h-3 w-3 shrink-0" />
+          <ChevronRight className="h-3 w-3 shrink-0 opacity-60" />
         )}
-        {pending ? (
-          <Loader2 className="h-3 w-3 shrink-0 animate-spin text-primary" />
-        ) : hasError ? (
-          <Wrench className="h-3 w-3 shrink-0 text-destructive" />
-        ) : (
-          <CheckCircle2 className="h-3 w-3 shrink-0 text-emerald-500" />
-        )}
-        <span className={cn("font-medium", pending && "text-primary")}>
+        <StatusDot state={headState} />
+        <span className={cn("font-medium", pending && "text-amber-500/90")}>
           {lastLabel}
         </span>
         {lastArgs && (
-          <span className="truncate text-muted-foreground/80">· {lastArgs}</span>
+          <span className="truncate text-muted-foreground/50">· {lastArgs}</span>
         )}
         {count > 1 && (
-          <span className="shrink-0 text-muted-foreground/70">
+          <span className="shrink-0 text-muted-foreground/50">
             {pending ? `(${count - 1} tugadi)` : `+${count - 1}`}
           </span>
         )}
@@ -73,25 +91,29 @@ export function ToolStrip({ calls, pending }: Props) {
               const label = summarizeName(c.name);
               const argLine = summarizeArgs(c.name, c.arguments);
               const resLine = summarizeResult(c.result);
+              const st = toolState(c);
               return (
-                <li key={c.id} className="rounded-lg border bg-card/50 px-3 py-2 text-xs">
+                <li key={c.id} className="rounded-lg border bg-card/40 px-3 py-2 text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-muted text-[9px] font-medium text-muted-foreground">
+                    <StatusDot state={st} />
+                    <span className="shrink-0 text-[9px] tabular-nums text-muted-foreground/40">
                       {i + 1}
                     </span>
                     <span
                       className={cn(
                         "font-medium",
-                        c.isError ? "text-destructive" : "text-foreground",
+                        c.isError ? "text-red-500" : "text-muted-foreground/80",
                       )}
                     >
                       {label}
                     </span>
                     {argLine && (
-                      <span className="truncate text-muted-foreground/80">· {argLine}</span>
+                      <span className="truncate text-muted-foreground/50">· {argLine}</span>
                     )}
-                    {c.result === undefined && (
-                      <Loader2 className="ml-auto h-3 w-3 shrink-0 animate-spin text-primary" />
+                    {st === "running" && (
+                      <span className="ml-auto shrink-0 text-[10px] font-medium text-amber-500/90">
+                        bajarilmoqda…
+                      </span>
                     )}
                   </div>
                   {resLine && (

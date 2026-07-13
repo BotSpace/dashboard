@@ -647,9 +647,26 @@ function ChatThread({
               <span className="max-w-[140px] truncate">{projectName}</span>
             </span>
             {isRunning && stream.phase !== "waiting" && (
-              <span className="flex items-center gap-1.5 text-emerald-500">
-                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                Agent javob tayyorlamoqda
+              <span
+                className={cn(
+                  "flex items-center gap-1.5",
+                  stream.currentTool ? "text-amber-500/90" : "text-emerald-500",
+                )}
+              >
+                <span
+                  className={cn(
+                    "inline-block h-1.5 w-1.5 animate-pulse rounded-full",
+                    stream.currentTool ? "bg-amber-400" : "bg-emerald-500",
+                  )}
+                />
+                {stream.currentTool ? (
+                  <>
+                    <span className="font-medium">{stream.currentTool}</span>
+                    <span className="text-muted-foreground/60">bajarilmoqda…</span>
+                  </>
+                ) : (
+                  "Agent javob tayyorlamoqda"
+                )}
               </span>
             )}
           </div>
