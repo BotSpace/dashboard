@@ -373,9 +373,18 @@ function ChatThread({
       ? lastTurn.text.length
       : 0;
 
+  // A discrete new turn (or phase change) → animate smoothly once.
   useEffect(() => {
-    if (stickToBottomRef.current) scrollToBottom();
-  }, [stream.turns.length, lastTurnLen, stream.thinking, stream.phase]);
+    if (stickToBottomRef.current) scrollToBottom(true);
+  }, [stream.turns.length, stream.phase]);
+
+  // Streaming token growth (reply text AND thinking deltas) fires every few ms; a
+  // fresh `smooth` animation on each token restarts and fights the previous one →
+  // visible jitter on mobile. Follow the growing text with an INSTANT scroll
+  // instead so it stays glued to the bottom without stutter.
+  useEffect(() => {
+    if (stickToBottomRef.current) scrollToBottom(false);
+  }, [lastTurnLen, stream.thinking]);
 
   useEffect(() => {
     const el = scroller.current;
@@ -566,7 +575,7 @@ function ChatThread({
         {isEmpty ? (
           <EmptyState onSend={send} />
         ) : (
-          <div className="mx-auto max-w-3xl px-3 py-4 sm:px-6 xl:max-w-5xl 2xl:max-w-6xl">
+          <div className="mx-auto max-w-3xl px-3 pt-4 pb-28 sm:px-6 xl:max-w-5xl 2xl:max-w-6xl">
             <div className="space-y-5">
               {items.map((item) => {
                 if (item.kind === "user") {
@@ -792,7 +801,7 @@ function ChatThread({
                 return (
                   <span
                     className={cn(
-                      "flex min-w-0 max-w-full items-center gap-1.5",
+                      "flex min-w-0 basis-full items-center gap-1.5",
                       tool
                         ? "text-amber-500/90"
                         : pending

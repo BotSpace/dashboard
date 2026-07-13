@@ -106,14 +106,14 @@ export function ToolStrip({ calls, pending }: Props) {
                     </span>
                     <span
                       className={cn(
-                        "font-medium",
+                        "shrink-0 whitespace-nowrap font-medium",
                         c.isError ? "text-red-500" : "text-muted-foreground/80",
                       )}
                     >
                       {label}
                     </span>
                     {argLine && (
-                      <span className="truncate text-muted-foreground/50">· {argLine}</span>
+                      <span className="min-w-0 truncate text-muted-foreground/50">· {argLine}</span>
                     )}
                     {st === "running" && (
                       <span className="ml-auto shrink-0 text-[10px] font-medium text-amber-500/90">
