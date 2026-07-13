@@ -51,9 +51,15 @@ export async function GET(req: NextRequest) {
     return toLogin(msg);
   }
 
+  // callbackUrl is expected locale-less (handler adds it), but guard against a
+  // caller that already prefixed the locale so we don't double it (/uz/uz/...).
+  const alreadyLocalized =
+    callbackUrl === `/${locale}` || callbackUrl.startsWith(`/${locale}/`);
   const target =
     callbackUrl && callbackUrl.startsWith("/") && callbackUrl !== "/"
-      ? `/${locale}${callbackUrl}`
+      ? alreadyLocalized
+        ? callbackUrl
+        : `/${locale}${callbackUrl}`
       : `/${locale}/app`;
 
   const res = redirectTo(target);

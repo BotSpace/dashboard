@@ -10,7 +10,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Separator } from "@/shared/components/ui/separator";
 import { Link } from "@/shared/i18n/routing";
 import { formatCurrency, formatNumber } from "@/shared/lib/utils";
-import { OrderButton } from "@/features/templates/components/order-button";
+import { TemplateActions } from "@/features/templates/components/template-actions";
 import { JsonLd } from "@/shared/components/common/json-ld";
 import { buildMetadata, localizedUrl } from "@/shared/lib/seo";
 import { sanitizeRichText } from "@/shared/lib/sanitize";
@@ -200,17 +200,19 @@ export default async function PublicTemplateDetailPage({
 
               {isAuthed ? (
                 <>
-                  <OrderButton
+                  <TemplateActions
                     templateId={tpl.id}
+                    templateSlug={tpl.slug ?? String(tpl.id)}
                     isFree={isFree}
                     isOwned={isOwned}
-                    labels={{
+                    orderLabels={{
                       buy: t("buy"),
                       use: t("use"),
                       owned: t("owned"),
                       success: t("orderSuccess"),
                       error: t("orderError"),
                     }}
+                    createLabel={t("createProject")}
                   />
                   <Button asChild variant="outline" className="w-full" size="lg">
                     <Link href={`/app/templates/${tpl.slug}`}>
@@ -221,7 +223,7 @@ export default async function PublicTemplateDetailPage({
                 </>
               ) : (
                 <Button asChild className="w-full" size="lg">
-                  <Link href={`/login?from=/${locale}/templates/${tpl.slug}`}>
+                  <Link href={`/login?from=/templates/${tpl.slug}`}>
                     <LogIn className="h-4 w-4" />
                     {t("loginToBuy")}
                   </Link>
