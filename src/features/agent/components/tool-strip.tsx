@@ -55,7 +55,7 @@ export function ToolStrip({ calls, pending }: Props) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "inline-flex max-w-full items-center gap-2 rounded-lg px-2.5 py-1 transition-colors",
+          "flex w-full min-w-0 items-center gap-2 rounded-lg px-2.5 py-1 transition-colors",
           "text-muted-foreground/70 hover:bg-muted/50 hover:text-muted-foreground",
         )}
       >
@@ -65,11 +65,16 @@ export function ToolStrip({ calls, pending }: Props) {
           <ChevronRight className="h-3 w-3 shrink-0 opacity-60" />
         )}
         <StatusDot state={headState} />
-        <span className={cn("font-medium", pending && "text-amber-500/90")}>
+        <span
+          className={cn(
+            "shrink-0 whitespace-nowrap font-medium",
+            pending && "text-amber-500/90",
+          )}
+        >
           {lastLabel}
         </span>
         {lastArgs && (
-          <span className="truncate text-muted-foreground/50">· {lastArgs}</span>
+          <span className="min-w-0 truncate text-muted-foreground/50">· {lastArgs}</span>
         )}
         {count > 1 && (
           <span className="shrink-0 text-muted-foreground/50">
