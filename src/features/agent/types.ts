@@ -71,6 +71,7 @@ export type ChatTurn =
   | { kind: "user"; id: string; text: string }
   | { kind: "assistant"; id: string; text: string; inputTokens?: number; outputTokens?: number }
   | { kind: "tool"; id: string; call: ToolCallView }
+  | { kind: "plan"; id: string; plan: PlanItem[] }
   | SubAgentTurn;
 
 export type ApprovalPayload = {

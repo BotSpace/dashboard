@@ -48,7 +48,7 @@ import { ToolStrip } from "./tool-strip";
 import { SubAgentAccordion } from "./sub-agent-accordion";
 import { RunStatusChip } from "./typing-indicator";
 import { UsageBadge } from "./usage-badge";
-import type { ChatTurn, ToolCallView } from "../types";
+import type { ChatTurn, ToolCallView, PlanItem } from "../types";
 import type { Project } from "@/shared/types/api";
 import {
   newThreadId,
@@ -92,6 +92,7 @@ type RenderItem =
   | { kind: "user"; id: string; text: string }
   | { kind: "assistant"; id: string; text: string; inputTokens?: number; outputTokens?: number }
   | { kind: "tool-group"; id: string; calls: ToolCallView[]; pending: boolean }
+  | { kind: "plan"; id: string; plan: PlanItem[] }
   | { kind: "sub_agent"; id: string; turn: Extract<ChatTurn, { kind: "sub_agent" }> };
 
 function renderTurns(turns: ChatTurn[], phase: string): RenderItem[] {
@@ -584,6 +585,13 @@ function ChatThread({
                 if (item.kind === "sub_agent") {
                   return <SubAgentAccordion key={item.id} turn={item.turn} />;
                 }
+                if (item.kind === "plan") {
+                  return (
+                    <div key={item.id} className="ml-11 max-w-md">
+                      <PlanPanel plan={item.plan} />
+                    </div>
+                  );
+                }
                 return <ToolStrip key={item.id} calls={item.calls} pending={item.pending} />;
               })}
 
@@ -622,11 +630,6 @@ function ChatThread({
                 </div>
               )}
 
-              {stream.plan.length > 0 && (
-                <div className="ml-11 max-w-md">
-                  <PlanPanel plan={stream.plan} />
-                </div>
-              )}
             </div>
           </div>
         )}

@@ -64,6 +64,8 @@ type State = {
   provider: string | null;
   /** True once the agent has compacted older context into a summary this run. */
   compacted: boolean;
+  /** Id of the inline plan turn for the current run (plan_update refreshes it). */
+  planTurnId: string | null;
 };
 
 /**
@@ -119,6 +121,7 @@ export function useAgentStream({
     model: null,
     provider: null,
     compacted: false,
+    planTurnId: null,
   });
   const esRef = useRef<EventSource | null>(null);
   const finishedRef = useRef(Boolean(initialFinished));
@@ -221,6 +224,7 @@ export function useAgentStream({
             const rp = ev.payload as { provider?: string };
             if (rp.provider) next.provider = rp.provider;
             next.compacted = false;
+            next.planTurnId = null;
             break;
           }
           case "context_compacted":
@@ -418,16 +422,38 @@ export function useAgentStream({
           }
           case "plan_set": {
             const p = ev.payload as { plan?: PlanItem[] };
-            if (Array.isArray(p.plan)) next.plan = p.plan;
+            if (Array.isArray(p.plan)) {
+              next.plan = p.plan;
+              // Render the plan inline in the message flow, at the point it was
+              // created. plan_update refreshes this same turn.
+              if (s.planTurnId) {
+                next.turns = s.turns.map((t) =>
+                  t.kind === "plan" && t.id === s.planTurnId
+                    ? { ...t, plan: p.plan! }
+                    : t,
+                );
+              } else {
+                const id = `plan-${requestId ?? "x"}-${ev.seq ?? Date.now()}`;
+                next.planTurnId = id;
+                next.turns = [...s.turns, { kind: "plan", id, plan: p.plan }];
+              }
+            }
             next.phase = "thinking";
             break;
           }
           case "plan_update": {
             const p = ev.payload as { plan?: PlanItem[]; item?: PlanItem };
+            let newPlan = s.plan;
             if (Array.isArray(p.plan)) {
-              next.plan = p.plan;
+              newPlan = p.plan;
             } else if (p.item?.id) {
-              next.plan = s.plan.map((item) => (item.id === p.item?.id ? p.item : item));
+              newPlan = s.plan.map((item) => (item.id === p.item?.id ? p.item! : item));
+            }
+            next.plan = newPlan;
+            if (s.planTurnId) {
+              next.turns = s.turns.map((t) =>
+                t.kind === "plan" && t.id === s.planTurnId ? { ...t, plan: newPlan } : t,
+              );
             }
             next.phase = "thinking";
             break;
@@ -633,6 +659,7 @@ export function useAgentStream({
         pendingTool: null,
         currentSubAgent: null,
         streamingId: null,
+        planTurnId: null,
       };
       if (persistRef.current) {
         persistRef.current({ turns: next.turns, lastSeq: 0, finished: false });
