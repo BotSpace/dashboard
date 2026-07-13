@@ -792,7 +792,7 @@ function ChatThread({
                 return (
                   <span
                     className={cn(
-                      "flex items-center gap-1.5",
+                      "flex min-w-0 max-w-full items-center gap-1.5",
                       tool
                         ? "text-amber-500/90"
                         : pending
@@ -802,22 +802,22 @@ function ChatThread({
                   >
                     <span
                       className={cn(
-                        "inline-block h-1.5 w-1.5 animate-pulse rounded-full",
+                        "inline-block h-1.5 w-1.5 shrink-0 animate-pulse rounded-full",
                         tool ? "bg-amber-400" : pending ? "bg-sky-400" : "bg-emerald-500",
                       )}
                     />
                     {tool ? (
                       <>
-                        <span className="font-medium">{tool}</span>
-                        <span className="text-muted-foreground/60">bajarilmoqda…</span>
+                        <span className="max-w-[110px] truncate font-medium">{tool}</span>
+                        <span className="shrink-0 text-muted-foreground/60">bajarilmoqda…</span>
                       </>
                     ) : pending ? (
                       <>
-                        <span className="font-medium">🔧 {pending}</span>
-                        <span className="text-muted-foreground/60">yozilmoqda…</span>
+                        <span className="max-w-[110px] truncate font-medium">🔧 {pending}</span>
+                        <span className="shrink-0 text-muted-foreground/60">yozilmoqda…</span>
                       </>
                     ) : (
-                      "Agent javob tayyorlamoqda"
+                      <span className="whitespace-nowrap">Agent javob tayyorlamoqda</span>
                     )}
                   </span>
                 );

@@ -49,7 +49,7 @@ export function UsageBadge({ refreshKey, liveDelta = 0 }: Props) {
   ].join(" · ");
 
   return (
-    <div className="hidden items-center gap-1.5 sm:flex" title={title}>
+    <div className="flex shrink-0 items-center gap-1.5" title={title}>
       <div className="relative h-1.5 w-10 overflow-hidden rounded-full bg-muted">
         <div
           className={`h-full rounded-full transition-all ${barColor}`}
