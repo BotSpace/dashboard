@@ -181,6 +181,16 @@ export type AgentThreadTurn =
   | AgentThreadTurnAssistant
   | AgentThreadTurnTool;
 
+/** A still-running run for a thread, so a refreshed page can re-attach to its
+ * live SSE (reconnect with `since_seq=last_seq` to replay only unseen events). */
+export type AgentActiveRun = {
+  request_id: string;
+  status: string;
+  last_seq: number;
+  pending_approval?: Record<string, unknown> | null;
+  pending_clarification?: Record<string, unknown> | null;
+};
+
 export async function listAgentThreads(
   projectId: string
 ): Promise<{ threads: AgentThreadMeta[] }> {
@@ -194,7 +204,7 @@ export async function listAgentThreads(
 export async function getAgentThreadHistory(
   projectId: string,
   threadId: string
-): Promise<{ thread_id: string; turns: AgentThreadTurn[] }> {
+): Promise<{ thread_id: string; turns: AgentThreadTurn[]; active_run?: AgentActiveRun | null }> {
   const res = await agentFetch(
     `/projects/${encodeURIComponent(projectId)}/threads/${encodeURIComponent(threadId)}`
   );

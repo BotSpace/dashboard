@@ -18,6 +18,12 @@ type Args = {
   initialSeq?: number;
   /** Persisted "run finished" flag from the previous session (refresh). */
   initialFinished?: boolean;
+  /**
+   * Re-attach to an in-flight run after a page refresh. When `requestId`
+   * matches, the SSE reconnects with `since_seq=sinceSeq` so only events the
+   * seeded history hasn't already shown are replayed (no duplicate turns).
+   */
+  resume?: { requestId: string; sinceSeq: number } | null;
   onPersist?: (snapshot: { turns: ChatTurn[]; lastSeq: number; finished: boolean }) => void;
 };
 
@@ -42,6 +48,10 @@ type State = {
   phase: RunPhase;
   currentTool: string | null;
   currentSubAgent: CurrentSubAgent | null;
+  /** Id of the assistant turn currently being streamed token-by-token via
+   * `assistant_chunk`; null when no reply is streaming. The final
+   * `assistant_message` finalizes this turn instead of appending a new one. */
+  streamingId: string | null;
 };
 
 /**
@@ -69,6 +79,7 @@ export function useAgentStream({
   initialTurns,
   initialSeq,
   initialFinished,
+  resume,
   onPersist,
 }: Args) {
   // Refresh paytida oldingi sessiya "tugagan" bo'lsa, tugallanmagan
@@ -90,6 +101,7 @@ export function useAgentStream({
     phase: initialFinished ? "done" : "idle",
     currentTool: null,
     currentSubAgent: null,
+    streamingId: null,
   });
   const esRef = useRef<EventSource | null>(null);
   const finishedRef = useRef(Boolean(initialFinished));
@@ -101,6 +113,10 @@ export function useAgentStream({
   const lastSeqRef = useRef<number>(initialSeq ?? 0);
   const persistRef = useRef(onPersist);
   persistRef.current = onPersist;
+  // Kept in a ref so the connect effect can read the latest resume target
+  // without re-running when `resume` changes on an unrelated render.
+  const resumeRef = useRef(resume);
+  resumeRef.current = resume;
 
   const close = useCallback(() => {
     esRef.current?.close();
@@ -112,6 +128,13 @@ export function useAgentStream({
     // Oldingi sessiya allaqachon tugagan (refresh + run finished/abort) — o'lik
     // run'ning SSE'siga ulanmaymiz. Aks holda phase "queued"ga o'tib osilardi.
     if (finishedRef.current) return;
+    // On refresh, re-attach to the in-flight run: prime the seq cursor from the
+    // resume target (only when it belongs to THIS run — a fresh prompt gets a
+    // new requestId, so a stale resume never skips its opening events).
+    const rsm = resumeRef.current;
+    if (rsm && rsm.requestId === requestId && rsm.sinceSeq > (lastSeqRef.current ?? 0)) {
+      lastSeqRef.current = rsm.sinceSeq;
+    }
     const sinceSeq = lastSeqRef.current ?? 0;
     const url =
       `/api/agent/${encodeURIComponent(projectId)}/runs/${encodeURIComponent(requestId)}/events` +
@@ -176,7 +199,31 @@ export function useAgentStream({
             next.phase = "thinking";
             next.currentTool = null;
             next.liveTokens = 0;
+            next.streamingId = null;
             break;
+          case "assistant_chunk": {
+            // Live token delta for the main agent's reply (ephemeral, not
+            // persisted). Build/append the streaming assistant turn so text
+            // renders as it arrives; sub-agent chunks aren't streamed.
+            const p = ev.payload as { delta?: string; sub_agent_id?: string };
+            const delta = p.delta ?? "";
+            if (!delta || p.sub_agent_id) break;
+            if (s.streamingId) {
+              const id = s.streamingId;
+              next.turns = s.turns.map((t) =>
+                t.kind === "assistant" && t.id === id
+                  ? { ...t, text: t.text + delta }
+                  : t,
+              );
+            } else {
+              const id = `stream-${requestId ?? "x"}-${Date.now()}-${s.turns.length}`;
+              next.streamingId = id;
+              next.turns = [...s.turns, { kind: "assistant", id, text: delta }];
+            }
+            next.thinking = "";
+            next.phase = "thinking";
+            break;
+          }
           case "thinking_delta": {
             const delta = (ev.payload as { delta?: string }).delta ?? "";
             next.thinking = s.thinking + delta;
@@ -199,16 +246,28 @@ export function useAgentStream({
                   ? { ...t, steps: [...t.steps, narration] }
                   : t,
               );
-            } else if (text && !p.sub_agent_id) {
-              // Main agent matni — asosiy chatga.
-              next.turns = [
-                ...s.turns,
-                {
-                  kind: "assistant",
-                  id: `a-${requestId ?? "x"}-${ev.seq ?? Date.now()}-${s.turns.length}`,
-                  text,
-                },
-              ];
+            } else if (!p.sub_agent_id) {
+              // Main agent turn. If it was streamed via assistant_chunk,
+              // finalize THAT turn with the authoritative final text (no
+              // duplicate); otherwise append a fresh turn (non-streamed path).
+              const streamId = s.streamingId;
+              if (streamId) {
+                next.turns = s.turns.map((t) =>
+                  t.kind === "assistant" && t.id === streamId
+                    ? { ...t, text: text || t.text }
+                    : t,
+                );
+                next.streamingId = null;
+              } else if (text) {
+                next.turns = [
+                  ...s.turns,
+                  {
+                    kind: "assistant",
+                    id: `a-${requestId ?? "x"}-${ev.seq ?? Date.now()}-${s.turns.length}`,
+                    text,
+                  },
+                ];
+              }
             }
             next.thinking = "";
             // Stay in `thinking` — the model might dispatch tools next.
@@ -414,6 +473,7 @@ export function useAgentStream({
             finishedRef.current = true;
             next.currentTool = null;
             next.currentSubAgent = null;
+            next.streamingId = null;
             // Run tugadi/to'xtadi — tugallanmagan sub_agent turn'larni yopamiz,
             // aks holda accordion abadiy "ishlamoqda" bo'lib qoladi.
             next.turns = closeDanglingSubAgents(s.turns);
@@ -459,6 +519,7 @@ export function useAgentStream({
     const types: AgentEventType[] = [
       "run_started",
       "thinking_delta",
+      "assistant_chunk",
       "assistant_message",
       "tool_call",
       "tool_result",
@@ -517,6 +578,7 @@ export function useAgentStream({
         phase: "queued",
         currentTool: null,
         currentSubAgent: null,
+        streamingId: null,
       };
       if (persistRef.current) {
         persistRef.current({ turns: next.turns, lastSeq: 0, finished: false });

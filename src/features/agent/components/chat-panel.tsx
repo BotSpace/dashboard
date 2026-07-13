@@ -286,6 +286,9 @@ function ChatThread({
 }: ThreadProps) {
   const [input, setInput] = useState(initialPrompt ?? "");
   const [requestId, setRequestId] = useState<string | null>(null);
+  // Set when a refresh re-attaches to an in-flight run so the SSE reconnects
+  // with the right seq cursor (replay only unseen events, no duplicate turns).
+  const [resume, setResume] = useState<{ requestId: string; sinceSeq: number } | null>(null);
   const [pending, start] = useTransition();
   const [usageKey, setUsageKey] = useState(0);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
@@ -302,6 +305,7 @@ function ChatThread({
     initialTurns: undefined,
     initialSeq: 0,
     initialFinished: false,
+    resume,
   });
 
   // Load this thread's history from the backend when it opens (single source of
@@ -313,9 +317,20 @@ function ChatThread({
 
     let cancelled = false;
     loadThreadHistoryAction(projectId, threadId).then((res) => {
-      if (cancelled || !res || res.turns.length === 0) return;
+      if (cancelled || !res) return;
       // Backend turns are already ChatTurn-compatible.
-      stream.seedTurnsFromBackend(res.turns as unknown as ChatTurn[]);
+      if (res.turns.length > 0) {
+        stream.seedTurnsFromBackend(res.turns as unknown as ChatTurn[]);
+      }
+      // A still-running run for this thread — re-attach to its live SSE so a
+      // refresh mid-run keeps streaming instead of freezing the transcript.
+      if (res.active_run) {
+        setResume({
+          requestId: res.active_run.request_id,
+          sinceSeq: res.active_run.last_seq,
+        });
+        setRequestId(res.active_run.request_id);
+      }
     });
     return () => {
       cancelled = true;
@@ -377,6 +392,7 @@ function ChatThread({
     });
 
     stream.pushUserTurn(msg);
+    setResume(null); // a fresh run supersedes any prior resume target
     setInput("");
     if (inputRef.current) {
       inputRef.current.style.height = "auto";

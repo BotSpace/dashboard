@@ -14,6 +14,7 @@ import {
   type AgentUsage,
   type AgentThreadMeta,
   type AgentThreadTurn,
+  type AgentActiveRun,
 } from "@/shared/api/agent";
 
 export type RunCreateState = { ok: boolean; request_id?: string; message?: string };
@@ -129,7 +130,7 @@ export async function clearAllThreadsAction(
 export async function loadThreadHistoryAction(
   projectId: string,
   threadId: string
-): Promise<{ thread_id: string; turns: AgentThreadTurn[] } | null> {
+): Promise<{ thread_id: string; turns: AgentThreadTurn[]; active_run?: AgentActiveRun | null } | null> {
   try {
     return await getAgentThreadHistory(projectId, threadId);
   } catch {
