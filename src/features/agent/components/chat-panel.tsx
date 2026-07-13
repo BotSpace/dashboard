@@ -564,7 +564,7 @@ function ChatThread({
         {isEmpty ? (
           <EmptyState onSend={send} />
         ) : (
-          <div className="mx-auto max-w-3xl px-3 py-4 sm:px-6">
+          <div className="mx-auto max-w-3xl px-3 py-4 sm:px-6 xl:max-w-5xl 2xl:max-w-6xl">
             <div className="space-y-5">
               {items.map((item) => {
                 if (item.kind === "user") {
@@ -654,7 +654,7 @@ function ChatThread({
 
       {/* Input area */}
       <div className="border-t bg-background px-3 pb-3 pt-2 sm:px-6 sm:pb-4 sm:pt-3">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-3xl xl:max-w-5xl 2xl:max-w-6xl">
           <div
             className={cn(
               "flex items-end gap-2 rounded-2xl border bg-card px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-2 focus-within:ring-ring/20"
