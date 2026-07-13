@@ -671,29 +671,46 @@ function ChatThread({
               <Bot className="h-3 w-3 shrink-0" />
               <span className="max-w-[140px] truncate">{projectName}</span>
             </span>
-            {isRunning && stream.phase !== "waiting" && (
-              <span
-                className={cn(
-                  "flex items-center gap-1.5",
-                  stream.currentTool ? "text-amber-500/90" : "text-emerald-500",
-                )}
-              >
-                <span
-                  className={cn(
-                    "inline-block h-1.5 w-1.5 animate-pulse rounded-full",
-                    stream.currentTool ? "bg-amber-400" : "bg-emerald-500",
-                  )}
-                />
-                {stream.currentTool ? (
-                  <>
-                    <span className="font-medium">{stream.currentTool}</span>
-                    <span className="text-muted-foreground/60">bajarilmoqda…</span>
-                  </>
-                ) : (
-                  "Agent javob tayyorlamoqda"
-                )}
-              </span>
-            )}
+            {isRunning &&
+              stream.phase !== "waiting" &&
+              (() => {
+                // Priority: executing tool (amber) → tool being composed
+                // mid-stream (sky "🔧 … yozilmoqda") → default reply (emerald).
+                const tool = stream.currentTool;
+                const pending = !tool ? stream.pendingTool : null;
+                return (
+                  <span
+                    className={cn(
+                      "flex items-center gap-1.5",
+                      tool
+                        ? "text-amber-500/90"
+                        : pending
+                          ? "text-sky-500/90"
+                          : "text-emerald-500",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "inline-block h-1.5 w-1.5 animate-pulse rounded-full",
+                        tool ? "bg-amber-400" : pending ? "bg-sky-400" : "bg-emerald-500",
+                      )}
+                    />
+                    {tool ? (
+                      <>
+                        <span className="font-medium">{tool}</span>
+                        <span className="text-muted-foreground/60">bajarilmoqda…</span>
+                      </>
+                    ) : pending ? (
+                      <>
+                        <span className="font-medium">🔧 {pending}</span>
+                        <span className="text-muted-foreground/60">yozilmoqda…</span>
+                      </>
+                    ) : (
+                      "Agent javob tayyorlamoqda"
+                    )}
+                  </span>
+                );
+              })()}
           </div>
         </div>
       </div>

@@ -47,6 +47,9 @@ type State = {
   thinking: string;
   phase: RunPhase;
   currentTool: string | null;
+  /** Name of a tool the model is still COMPOSING mid-stream (tool_call_pending),
+   * shown as "🔧 <name> yozilmoqda…" until its real tool_call fires. */
+  pendingTool: string | null;
   currentSubAgent: CurrentSubAgent | null;
   /** Id of the assistant turn currently being streamed token-by-token via
    * `assistant_chunk`; null when no reply is streaming. The final
@@ -100,6 +103,7 @@ export function useAgentStream({
     thinking: "",
     phase: initialFinished ? "done" : "idle",
     currentTool: null,
+    pendingTool: null,
     currentSubAgent: null,
     streamingId: null,
   });
@@ -198,9 +202,19 @@ export function useAgentStream({
             next.error = null;
             next.phase = "thinking";
             next.currentTool = null;
+            next.pendingTool = null;
             next.liveTokens = 0;
             next.streamingId = null;
             break;
+          case "tool_call_pending": {
+            // Model is mid-stream composing a tool call — show its name before
+            // the real tool_call/execution. Sub-agents don't stream, so main only.
+            const p = ev.payload as { name?: string; sub_agent_id?: string };
+            if (!p.name || p.sub_agent_id) break;
+            next.pendingTool = p.name;
+            next.phase = "thinking";
+            break;
+          }
           case "assistant_chunk": {
             // Live token delta for the main agent's reply (ephemeral, not
             // persisted). Build/append the streaming assistant turn so text
@@ -283,6 +297,8 @@ export function useAgentStream({
               sub_agent_id?: string;
             };
             if (!p.id || !p.name) break;
+            // Real tool call dispatched — the "yozilmoqda…" pending state is over.
+            next.pendingTool = null;
             // `task.run` main agent tomonidan chaqirilsa, uning natijasi
             // SubAgentAccordion (sub_agent_started/finished orqali) sifatida
             // ko'rsatiladi. Tool-strip'da takror chiqarmaymiz — `hidden=true`.
@@ -472,6 +488,7 @@ export function useAgentStream({
             next.finished = true;
             finishedRef.current = true;
             next.currentTool = null;
+            next.pendingTool = null;
             next.currentSubAgent = null;
             next.streamingId = null;
             // Run tugadi/to'xtadi — tugallanmagan sub_agent turn'larni yopamiz,
@@ -521,6 +538,7 @@ export function useAgentStream({
       "thinking_delta",
       "assistant_chunk",
       "assistant_message",
+      "tool_call_pending",
       "tool_call",
       "tool_result",
       "plan_set",
@@ -577,6 +595,7 @@ export function useAgentStream({
         error: null,
         phase: "queued",
         currentTool: null,
+        pendingTool: null,
         currentSubAgent: null,
         streamingId: null,
       };

@@ -3,6 +3,7 @@ export type AgentEventType =
   | "thinking_delta"
   | "assistant_chunk"
   | "assistant_message"
+  | "tool_call_pending"
   | "tool_call"
   | "tool_result"
   | "plan_set"
