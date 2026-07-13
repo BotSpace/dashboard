@@ -358,9 +358,18 @@ function ChatThread({
     stickToBottomRef.current = true;
   };
 
+  // Growing length of the last turn's text — during streaming, tokens append to
+  // the SAME turn (turns.length is unchanged), so we key auto-scroll on this too;
+  // otherwise a streamed reply grows below the fold without following.
+  const lastTurn = stream.turns[stream.turns.length - 1];
+  const lastTurnLen =
+    lastTurn && (lastTurn.kind === "assistant" || lastTurn.kind === "user")
+      ? lastTurn.text.length
+      : 0;
+
   useEffect(() => {
     if (stickToBottomRef.current) scrollToBottom();
-  }, [stream.turns.length, stream.thinking, stream.phase]);
+  }, [stream.turns.length, lastTurnLen, stream.thinking, stream.phase]);
 
   useEffect(() => {
     const el = scroller.current;
