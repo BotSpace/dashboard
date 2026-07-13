@@ -22,11 +22,19 @@ declare global {
   }
 }
 
-export function GoogleButton({ label }: { label: string }) {
+export function GoogleButton({ label, from }: { label: string; from?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
   const locale = useLocale();
   const clientId = env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+  // `from` is locale-less (e.g. "/templates/slug"); land there after login,
+  // falling back to the app. Guard against an already-localized value.
+  const target = (() => {
+    if (!from || !from.startsWith("/") || from === "/") return `/${locale}/app`;
+    if (from === `/${locale}` || from.startsWith(`/${locale}/`)) return from;
+    return `/${locale}${from}`;
+  })();
 
   useEffect(() => {
     if (!clientId) return;
@@ -56,7 +64,7 @@ export function GoogleButton({ label }: { label: string }) {
             body: JSON.stringify({ id_token: credential }),
           });
           if (r.ok) {
-            window.location.href = `/${locale}/app`;
+            window.location.href = target;
           } else {
             toast.error("Google login failed");
           }
@@ -71,7 +79,7 @@ export function GoogleButton({ label }: { label: string }) {
       width: ref.current.clientWidth,
       text: "continue_with",
     });
-  }, [loaded, clientId, locale]);
+  }, [loaded, clientId, locale, target]);
 
   if (!clientId) {
     return (
