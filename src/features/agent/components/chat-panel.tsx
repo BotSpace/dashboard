@@ -712,6 +712,30 @@ function ChatThread({
           </div>
           <div className="mt-1.5 flex min-h-4 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
             <UsageBadge refreshKey={usageKey} liveDelta={stream.liveTokens} />
+            {(() => {
+              // Tokens used in THIS session (thread), updated in real time as the
+              // agent works. Shown right next to the remaining-limit badge.
+              const t = stream.sessionTokens + stream.liveTokens;
+              if (t <= 0) return null;
+              const label =
+                t >= 1_000_000
+                  ? `${(t / 1_000_000).toFixed(1)}M`
+                  : t >= 1_000
+                  ? `${Math.round(t / 1_000)}K`
+                  : `${t}`;
+              return (
+                <span
+                  className={cn(
+                    "flex items-center gap-1 tabular-nums",
+                    stream.liveTokens > 0 && "text-emerald-500"
+                  )}
+                  title={`Shu sessiyada ishlatilgan token (realtime): ${t.toLocaleString()}`}
+                >
+                  <Sparkles className="h-3 w-3 shrink-0" />
+                  {label}
+                </span>
+              );
+            })()}
             <span className="flex items-center gap-1" title="Tool chaqiruvlar soni">
               <Wrench className="h-3 w-3" />
               {toolCallCount}

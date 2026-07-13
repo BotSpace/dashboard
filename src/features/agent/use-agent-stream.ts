@@ -42,6 +42,9 @@ type State = {
   usageRefreshTick: number;
   /** This run's cumulative tokens (in+out) from live `token_usage` events. */
   liveTokens: number;
+  /** Tokens from all FINISHED runs in this session (thread). Session realtime
+   * usage = sessionTokens + liveTokens. */
+  sessionTokens: number;
   finished: boolean;
   error: string | null;
   thinking: string;
@@ -102,6 +105,7 @@ export function useAgentStream({
     clarify: null,
     usageRefreshTick: 0,
     liveTokens: 0,
+    sessionTokens: 0,
     finished: Boolean(initialFinished),
     error: null,
     thinking: "",
@@ -510,6 +514,10 @@ export function useAgentStream({
             next.pendingTool = null;
             next.currentSubAgent = null;
             next.streamingId = null;
+            // Roll this run's tokens into the session total, then zero the live
+            // counter so a trailing `close` after run_completed doesn't re-add.
+            next.sessionTokens = s.sessionTokens + s.liveTokens;
+            next.liveTokens = 0;
             // Run tugadi/to'xtadi — tugallanmagan sub_agent turn'larni yopamiz,
             // aks holda accordion abadiy "ishlamoqda" bo'lib qoladi.
             next.turns = closeDanglingSubAgents(s.turns);
