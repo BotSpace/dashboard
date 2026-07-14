@@ -146,6 +146,8 @@ export type AgentUsage = {
   plan?: { id?: number | string; name?: string; display?: string } | string | null;
   status?: string | null;
   token_reset_at?: string | null;
+  /** Whether the user's plan allows Max reasoning effort (paid-only). */
+  max_thinking_allowed?: boolean;
 };
 
 export async function getAgentUsage(): Promise<AgentUsage> {

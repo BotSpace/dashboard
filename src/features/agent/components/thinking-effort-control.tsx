@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Brain } from "lucide-react";
-import { getThinkingEffortAction, setThinkingEffortAction } from "../actions";
+import { Brain, Lock } from "lucide-react";
+import { toast } from "sonner";
+import { getThinkingEffortAction, setThinkingEffortAction, getUsageAction } from "../actions";
 import type { ThinkingEffort } from "@/shared/api/agent";
 import {
   Select,
@@ -13,7 +14,7 @@ import {
 
 /** Compact per-project reasoning-effort selector for the agent footer.
  * DeepSeek supports only high/max ("low"/"medium" map up to high), plus off to
- * disable reasoning. null (unset) → provider default, shown as High. */
+ * disable reasoning. Max is a PAID-plan feature — locked for free users. */
 const OPTIONS: { value: ThinkingEffort; label: string }[] = [
   { value: "off", label: "O'chiq" },
   { value: "high", label: "High" },
@@ -22,6 +23,7 @@ const OPTIONS: { value: ThinkingEffort; label: string }[] = [
 
 export function ThinkingEffortControl({ projectId }: { projectId: string }) {
   const [effort, setEffort] = useState<ThinkingEffort>("high");
+  const [maxAllowed, setMaxAllowed] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -29,12 +31,21 @@ export function ThinkingEffortControl({ projectId }: { projectId: string }) {
     getThinkingEffortAction(projectId).then((e) => {
       if (alive && e) setEffort(e);
     });
+    getUsageAction().then((u) => {
+      if (alive && u) setMaxAllowed(u.max_thinking_allowed !== false);
+    });
     return () => {
       alive = false;
     };
   }, [projectId]);
 
   const onChange = async (next: ThinkingEffort) => {
+    if (next === "max" && !maxAllowed) {
+      toast.info("Max fikrlash faqat pullik tarifda", {
+        description: "Tarifni yangilab, chuqurroq fikrlashni yoqing.",
+      });
+      return; // keep current selection
+    }
     const prev = effort;
     setEffort(next);
     setSaving(true);
@@ -53,11 +64,17 @@ export function ThinkingEffortControl({ projectId }: { projectId: string }) {
         <SelectValue />
       </SelectTrigger>
       <SelectContent align="end" className="min-w-[7rem]">
-        {OPTIONS.map((o) => (
-          <SelectItem key={o.value} value={o.value} className="text-xs">
-            {o.label}
-          </SelectItem>
-        ))}
+        {OPTIONS.map((o) => {
+          const locked = o.value === "max" && !maxAllowed;
+          return (
+            <SelectItem key={o.value} value={o.value} className="text-xs">
+              <span className="flex items-center gap-1.5">
+                {o.label}
+                {locked && <Lock className="h-3 w-3 opacity-60" />}
+              </span>
+            </SelectItem>
+          );
+        })}
       </SelectContent>
     </Select>
   );
