@@ -25,9 +25,31 @@ function consumeCookie(): boolean {
   return has;
 }
 
+// Below the `lg` breakpoint the sidebar collapses into a drawer, so its nav
+// anchors live in a portal that's only mounted while the drawer is open.
+const DRAWER_EVENT = "bs:tour-drawer";
+const SIDEBAR_BREAKPOINT = 1024;
+
+function isSmallScreen(): boolean {
+  return typeof window !== "undefined" && window.innerWidth < SIDEBAR_BREAKPOINT;
+}
+
+function setDrawer(open: boolean) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(DRAWER_EVENT, { detail: open }));
+}
+
+// Pick the first *visible* match: on small screens the desktop sidebar is
+// display:none (zero-size rect) while the drawer copy is the real target.
 function findTarget(target?: string): HTMLElement | null {
   if (!target || typeof document === "undefined") return null;
-  return document.querySelector<HTMLElement>(`[data-tour="${target}"]`);
+  const els = Array.from(document.querySelectorAll<HTMLElement>(`[data-tour="${target}"]`));
+  return (
+    els.find((el) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && r.height > 0;
+    }) ?? null
+  );
 }
 
 export function OnboardingClient({ firstName }: { firstName?: string }) {
@@ -55,6 +77,7 @@ export function OnboardingClient({ firstName }: { firstName?: string }) {
 
   const finish = useCallback(() => {
     if (typeof window !== "undefined") localStorage.setItem(DONE_KEY, "1");
+    setDrawer(false);
     setPhase("closed");
     setStepIndex(0);
     setRect(null);
@@ -70,6 +93,11 @@ export function OnboardingClient({ firstName }: { firstName?: string }) {
   useEffect(() => {
     if (phase !== "tour") return;
     const step = TOUR_STEPS[stepIndex];
+
+    // On small screens, open the mobile drawer for sidebar steps (and close it
+    // again for anything else) so the anchor is actually on screen.
+    const needsDrawer = isSmallScreen() && !!step.target?.startsWith("nav-");
+    setDrawer(needsDrawer);
 
     // Navigate first if this step lives on another page.
     if (step.navigateTo && pathname !== step.navigateTo) {
@@ -146,34 +174,33 @@ export function OnboardingClient({ firstName }: { firstName?: string }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] grid place-items-center bg-[rgba(2,6,23,0.6)] p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[200] grid place-items-center bg-black/55 p-4 backdrop-blur-sm"
           >
             <motion.div
               initial={{ opacity: 0, y: 16, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 16, scale: 0.96 }}
               transition={{ duration: 0.28, ease: "easeOut" }}
-              className="relative w-full max-w-md overflow-hidden rounded-3xl border border-cyan-300/30 bg-card/95 p-7 text-center shadow-[0_30px_90px_rgba(8,47,73,0.4)] backdrop-blur-xl dark:border-cyan-300/20"
+              className="w-full max-w-md rounded-2xl border border-border bg-card p-7 shadow-2xl"
             >
-              <span className="pointer-events-none absolute -top-16 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-[conic-gradient(from_120deg,rgba(34,211,238,0.25),rgba(132,204,22,0.2),rgba(34,211,238,0.0))] blur-2xl" />
-              <div className="relative mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl border border-white/50 bg-gradient-to-br from-cyan-200 via-white to-lime-100 shadow-inner dark:border-white/15 dark:from-cyan-300/30 dark:via-slate-900 dark:to-lime-300/20">
-                <Wand2 className="h-7 w-7 text-cyan-600 dark:text-cyan-300" />
+              <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-blue-600/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
+                <Wand2 className="h-5 w-5" />
               </div>
-              <h2 className="relative text-xl font-bold text-foreground">{greeting}</h2>
-              <p className="relative mt-2 text-sm leading-relaxed text-muted-foreground">
+              <h2 className="text-lg font-semibold text-foreground">{greeting}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 {t("welcome.body")}
               </p>
-              <div className="relative mt-6 flex flex-col gap-2">
+              <div className="mt-6 flex items-center gap-2">
                 <button
                   onClick={startTour}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:brightness-110"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
                 >
                   <Sparkles className="h-4 w-4" />
                   {t("welcome.start")}
                 </button>
                 <button
                   onClick={finish}
-                  className="rounded-xl px-5 py-2 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+                  className="rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
                 >
                   {t("welcome.skip")}
                 </button>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Sparkles, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import type { TourPlacement } from "@/features/onboarding/steps";
 
@@ -108,46 +108,43 @@ export function Spotlight(props: SpotlightProps) {
       className="pointer-events-auto fixed z-[201] w-[320px] max-w-[calc(100vw-24px)]"
     >
     <motion.div
-      initial={{ opacity: 0, y: 6, scale: 0.97 }}
+      initial={{ opacity: 0, y: 6, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.22, ease: "easeOut" }}
-      className="rounded-2xl border border-cyan-300/40 bg-card/95 p-4 shadow-[0_24px_70px_rgba(8,47,73,0.35)] backdrop-blur-xl dark:border-cyan-300/20"
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      className="rounded-xl border border-border bg-card p-4 shadow-xl"
     >
-      <div className="mb-1.5 flex items-center gap-2">
-        <span className="grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-cyan-300 to-lime-200 text-slate-900 shadow-inner">
-          <Sparkles className="h-3.5 w-3.5" />
-        </span>
-        <span className="text-xs font-semibold uppercase tracking-wide text-cyan-500 dark:text-cyan-300">
+      <div className="mb-2 flex items-center gap-2">
+        <span className="text-[11px] font-medium tabular-nums text-muted-foreground">
           {props.index + 1} / {props.total}
         </span>
         <button
           onClick={props.onSkip}
           aria-label={props.skipLabel}
-          className="ml-auto rounded-full p-1 text-muted-foreground/70 transition hover:bg-muted hover:text-foreground"
+          className="-mr-1 ml-auto rounded-md p-1 text-muted-foreground/60 transition hover:bg-muted hover:text-foreground"
         >
-          <X className="h-4 w-4" />
+          <X className="h-3.5 w-3.5" />
         </button>
       </div>
       <h3 className="text-sm font-semibold text-foreground">{props.title}</h3>
       <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{props.body}</p>
 
-      <div className="mt-3 flex items-center justify-between gap-2">
-        <div className="flex gap-1">
+      <div className="mt-4 flex items-center justify-between gap-2">
+        <div className="flex gap-1.5">
           {Array.from({ length: props.total }).map((_, i) => (
             <span
               key={i}
               className={cn(
                 "h-1.5 rounded-full transition-all",
-                i === props.index ? "w-4 bg-cyan-400" : "w-1.5 bg-muted-foreground/30"
+                i === props.index ? "w-4 bg-blue-600 dark:bg-blue-500" : "w-1.5 bg-muted-foreground/25"
               )}
             />
           ))}
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           {props.index > 0 && (
             <button
               onClick={props.onPrev}
-              className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               {props.backLabel}
@@ -155,7 +152,7 @@ export function Spotlight(props: SpotlightProps) {
           )}
           <button
             onClick={props.onNext}
-            className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-400 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-110"
+            className="inline-flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700"
           >
             {props.isLast ? props.doneLabel : props.nextLabel}
             {!props.isLast && <ArrowRight className="h-3.5 w-3.5" />}
@@ -176,17 +173,17 @@ export function Spotlight(props: SpotlightProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
-          className="pointer-events-auto absolute rounded-xl ring-2 ring-cyan-300/70"
+          className="pointer-events-auto absolute rounded-lg ring-2 ring-blue-500/70"
           style={{
             top: cut.top,
             left: cut.left,
             width: cut.width,
             height: cut.height,
-            boxShadow: "0 0 0 9999px rgba(2, 6, 23, 0.62)",
+            boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.55)",
           }}
         />
       ) : (
-        <div className="pointer-events-auto absolute inset-0 bg-[rgba(2,6,23,0.62)]" />
+        <div className="pointer-events-auto absolute inset-0 bg-black/55" />
       )}
       <AnimatePresence mode="wait">{card}</AnimatePresence>
     </div>,

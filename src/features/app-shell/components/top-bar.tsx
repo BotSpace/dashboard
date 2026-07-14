@@ -1,6 +1,6 @@
 "use client";
 import { Bell, Menu, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -12,6 +12,13 @@ export function TopBar({ user }: { user: UserMenuUser }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
   const router = useRouter();
+
+  // The onboarding tour drives the drawer open/closed for its sidebar steps.
+  useEffect(() => {
+    const onDrawer = (e: Event) => setMobileOpen(Boolean((e as CustomEvent).detail));
+    window.addEventListener("bs:tour-drawer", onDrawer);
+    return () => window.removeEventListener("bs:tour-drawer", onDrawer);
+  }, []);
 
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault();
