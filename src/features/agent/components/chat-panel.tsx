@@ -810,6 +810,7 @@ function ChatThread({
             </Select>
             <textarea
               ref={inputRef}
+              data-tour="agent-input"
               value={input}
               onChange={(e) => {
                 setInput(e.target.value);

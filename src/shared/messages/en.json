@@ -832,5 +832,41 @@
     "org": {
       "description": "BotSpace is a no-code visual builder, AI agent and marketplace platform for creating Telegram bots."
     }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome to BotSpace! 🎉",
+      "hello": "Welcome, {name}! 🎉",
+      "body": "I'm the BotSpace AI assistant. Let me show you around in a few seconds — then we'll build your first bot together.",
+      "start": "Start the tour",
+      "skip": "Maybe later"
+    },
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip",
+    "done": "Let's go 🚀",
+    "example": "Build me a simple bot that greets users and shows a help menu",
+    "steps": {
+      "agent": {
+        "title": "AI Agent",
+        "body": "This is your AI assistant. Describe your bot idea in plain words and it builds a ready-to-use bot for you."
+      },
+      "bots": {
+        "title": "Your bots",
+        "body": "Every bot you create lives here — edit, launch and monitor them all in one place."
+      },
+      "templates": {
+        "title": "Templates",
+        "body": "Don't want to start from scratch? Pick a ready-made template and launch in seconds."
+      },
+      "fab": {
+        "title": "Quick access",
+        "body": "You can summon the AI Agent from any page with this button."
+      },
+      "write": {
+        "title": "Your first bot",
+        "body": "Here we go! An example request is ready. Write your own or just send it — I'll start building 🚀"
+      }
+    }
   }
 }

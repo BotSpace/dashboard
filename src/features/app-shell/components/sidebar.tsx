@@ -65,6 +65,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             label={t(i.key)}
             active={isActive(i.href)}
             onClick={onNavigate}
+            tourId={`nav-${i.key}`}
           />
         ))}
         <div className="my-3 px-3 pt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
@@ -152,17 +153,20 @@ function NavLink({
   label,
   active,
   onClick,
+  tourId,
 }: {
   href: string;
   icon: typeof LayoutDashboard;
   label: string;
   active: boolean;
   onClick?: () => void;
+  tourId?: string;
 }) {
   return (
     <Link
       href={href}
       onClick={onClick}
+      data-tour={tourId}
       className={cn(
         "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
         active

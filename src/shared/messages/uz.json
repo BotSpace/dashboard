@@ -829,5 +829,41 @@
     "org": {
       "description": "BotSpace — kod yozmasdan Telegram botlar yaratish uchun vizual konstruktor, AI agent va marketplace platformasi."
     }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "BotSpace'ga xush kelibsiz! 🎉",
+      "hello": "Xush kelibsiz, {name}! 🎉",
+      "body": "Men BotSpace AI yordamchisiman. Bir necha soniyada platformani ko'rsataman — so'ng birinchi botingizni birga yaratamiz.",
+      "start": "Tanishtiruvni boshlash",
+      "skip": "Keyinroq"
+    },
+    "next": "Keyingi",
+    "back": "Orqaga",
+    "skip": "O'tkazib yuborish",
+    "done": "Boshladik 🚀",
+    "example": "Menga foydalanuvchilarni salomlaydigan va yordam menyusini ko'rsatadigan oddiy bot yasab ber",
+    "steps": {
+      "agent": {
+        "title": "AI Agent",
+        "body": "Bu — sun'iy intellekt yordamchisi. Bot g'oyangizni oddiy so'zlar bilan yozing, u sizga tayyor botni quradi."
+      },
+      "bots": {
+        "title": "Botlaringiz",
+        "body": "Yaratgan barcha botlaringiz shu yerda turadi — ularni tahrirlash, ishga tushirish va kuzatish mumkin."
+      },
+      "templates": {
+        "title": "Shablonlar",
+        "body": "Noldan boshlashni istamasangiz — tayyor shablonlardan birini tanlab, bir zumda ishga tushiring."
+      },
+      "fab": {
+        "title": "Tez chaqiruv",
+        "body": "Istalgan sahifada shu tugma orqali AI Agentni chaqira olasiz."
+      },
+      "write": {
+        "title": "Birinchi botingiz",
+        "body": "Mana! Namuna so'rov tayyor turibdi. O'zingiznikini yozing yoki shunchaki yuboring — men qurishni boshlayman 🚀"
+      }
+    }
   }
 }

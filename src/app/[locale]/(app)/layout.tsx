@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { readSession } from "@/shared/auth/session";
 import { UmamiIdentify } from "@/shared/analytics/umami";
 import { AgentFloatingButton } from "@/features/app-shell/components/agent-floating-button";
+import { OnboardingClient } from "@/features/onboarding/onboarding-client";
 
 // Authenticated app — keep out of search indexes.
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -38,6 +39,7 @@ export default async function AppLayout({
         </main>
       </div>
       <AgentFloatingButton />
+      <OnboardingClient firstName={session.user.first_name} />
     </div>
   );
 }

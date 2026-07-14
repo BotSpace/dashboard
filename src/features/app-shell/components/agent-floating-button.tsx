@@ -17,6 +17,7 @@ export function AgentFloatingButton() {
   return (
     <Link
       href="/app/agent"
+      data-tour="agent-fab"
       aria-label={t("agentFabAria")}
       className="group fixed bottom-5 right-4 z-40 flex items-center gap-2 overflow-hidden rounded-full border border-cyan-300/50 bg-background/90 px-2.5 py-2 pr-4 shadow-[0_16px_45px_rgba(8,47,73,0.22)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_22px_60px_rgba(8,47,73,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 sm:bottom-6 sm:right-6 dark:border-cyan-300/20 dark:bg-card/90 dark:shadow-[0_18px_50px_rgba(0,0,0,0.45)]"
     >

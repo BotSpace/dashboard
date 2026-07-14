@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiFetch, isApiError } from "@/shared/api/client";
 import { encodeSession, type SessionUser } from "@/shared/auth/session";
 import { env } from "@/shared/lib/env";
-import { REFRESH_TOKEN_TTL_SEC } from "@/shared/lib/constants";
+import { ONBOARDING_COOKIE, REFRESH_TOKEN_TTL_SEC } from "@/shared/lib/constants";
 
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
   if (!/^\d{6}$/.test(code)) return toLogin("Kod yaroqsiz");
 
   let value: string;
+  let isNew = false;
   try {
     // internal/modules/authbot: LoginRequest.Code is a STRING; LoginResponse is
     // raw JSON { user, token: {access_token,refresh_token,...} } (no envelope).
@@ -43,6 +44,7 @@ export async function GET(req: NextRequest) {
     const refresh = (token?.refresh_token as string) ?? (res.refresh_token as string);
     if (!access || !refresh) return toLogin("Tokenlar kelmadi");
     const user = ((res.user as SessionUser) ?? ({ id: 0 } as SessionUser)) as SessionUser;
+    isNew = Boolean((res.user as { is_new?: boolean } | undefined)?.is_new);
     value = await encodeSession({ access, refresh, user });
   } catch (e) {
     const msg = isApiError(e)
@@ -71,5 +73,18 @@ export async function GET(req: NextRequest) {
     maxAge: REFRESH_TOKEN_TTL_SEC,
     ...(env.SESSION_COOKIE_DOMAIN ? { domain: env.SESSION_COOKIE_DOMAIN } : {}),
   });
+  // First-ever sign-in → seed the client onboarding tour (non-httpOnly so the
+  // browser can read+clear it). Short-lived; the client marks completion in
+  // localStorage so it never repeats.
+  if (isNew) {
+    res.cookies.set(ONBOARDING_COOKIE, "1", {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 30,
+      ...(env.SESSION_COOKIE_DOMAIN ? { domain: env.SESSION_COOKIE_DOMAIN } : {}),
+    });
+  }
   return res;
 }
