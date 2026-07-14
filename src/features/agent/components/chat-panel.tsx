@@ -28,6 +28,8 @@ import {
   ChevronRight,
   ChevronDown,
   ClipboardList,
+  Check,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
@@ -691,28 +693,33 @@ function ChatThread({
       <div className="border-t bg-background px-3 pb-3 pt-2 sm:px-6 sm:pb-4 sm:pt-3">
         <div className="mx-auto max-w-3xl xl:max-w-5xl 2xl:max-w-6xl">
           {pendingPlan && (
-            <div className="mb-2 flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs">
-              <ClipboardList className="h-3.5 w-3.5 shrink-0 text-amber-500" />
-              <span className="text-muted-foreground">Reja tayyor — bajaramizmi?</span>
-              <div className="ml-auto flex gap-1.5">
+            <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border bg-muted/30 px-3 py-2">
+              <div className="flex items-center gap-2">
+                <ClipboardList className="h-4 w-4 shrink-0 text-amber-500" />
+                <span className="text-xs font-medium">Reja tayyor</span>
+                <span className="text-xs text-muted-foreground">— bajaraymi?</span>
+              </div>
+              <div className="ml-auto flex items-center gap-2">
                 <Button
                   size="sm"
-                  className="h-7 gap-1 px-2.5 text-xs"
+                  className="h-8 gap-1.5 px-3.5 text-xs font-medium"
                   onClick={() => {
                     const plan = pendingPlan;
                     setPendingPlan(null);
                     doSend(`Ushbu rejani bajar:\n\n${plan}`);
                   }}
                 >
-                  ✅ Tasdiqlash
+                  <Check className="h-3.5 w-3.5" />
+                  Tasdiqlash
                 </Button>
                 <Button
                   size="sm"
-                  variant="ghost"
-                  className="h-7 px-2.5 text-xs"
+                  variant="outline"
+                  className="h-8 gap-1.5 px-3.5 text-xs"
                   onClick={() => setPendingPlan(null)}
                 >
-                  ✏️ O'zgartirish
+                  <Pencil className="h-3.5 w-3.5" />
+                  O'zgartirish
                 </Button>
               </div>
             </div>
