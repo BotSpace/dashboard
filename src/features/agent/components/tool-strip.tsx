@@ -98,7 +98,7 @@ export function ToolStrip({ calls, pending }: Props) {
               const resLine = summarizeResult(c.result);
               const st = toolState(c);
               return (
-                <li key={c.id} className="rounded-lg border bg-card/40 px-3 py-2 text-xs">
+                <li key={c.id} className="px-1 py-1.5 text-xs">
                   <div className="flex items-center gap-2">
                     <StatusDot state={st} />
                     <span className="shrink-0 text-[9px] tabular-nums text-muted-foreground/40">
