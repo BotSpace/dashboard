@@ -274,8 +274,12 @@ export function useAgentStream({
               sub_agent_id?: string;
               model?: string;
               provider?: string;
+              reasoning?: string;
             };
             const text = p.text ?? "";
+            // Reasoning to attach to the finalized main-agent turn: prefer the
+            // authoritative payload, fall back to what streamed live this turn.
+            const reasoning = p.sub_agent_id ? undefined : (p.reasoning || s.thinking || undefined);
             // Track the main agent's current model + provider for the footer.
             if (!p.sub_agent_id) {
               if (p.model) next.model = p.model;
@@ -302,7 +306,7 @@ export function useAgentStream({
               if (streamId) {
                 next.turns = s.turns.map((t) =>
                   t.kind === "assistant" && t.id === streamId
-                    ? { ...t, text: text || t.text }
+                    ? { ...t, text: text || t.text, ...(reasoning ? { reasoning } : {}) }
                     : t,
                 );
                 next.streamingId = null;
@@ -313,6 +317,7 @@ export function useAgentStream({
                     kind: "assistant",
                     id: `a-${requestId ?? "x"}-${ev.seq ?? Date.now()}-${s.turns.length}`,
                     text,
+                    ...(reasoning ? { reasoning } : {}),
                   },
                 ];
               }

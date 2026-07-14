@@ -69,7 +69,16 @@ export type SubAgentTurn = {
 
 export type ChatTurn =
   | { kind: "user"; id: string; text: string }
-  | { kind: "assistant"; id: string; text: string; inputTokens?: number; outputTokens?: number }
+  | {
+      kind: "assistant";
+      id: string;
+      text: string;
+      inputTokens?: number;
+      outputTokens?: number;
+      /** Chain-of-thought captured during this turn (DeepSeek reasoning). Shown
+       * as a collapsible "Fikrlash" section; persisted via history. */
+      reasoning?: string;
+    }
   | { kind: "tool"; id: string; call: ToolCallView }
   | { kind: "plan"; id: string; plan: PlanItem[] }
   | SubAgentTurn;

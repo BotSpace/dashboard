@@ -24,6 +24,9 @@ import {
   Cpu,
   ListPlus,
   Archive,
+  Brain,
+  ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
@@ -43,6 +46,7 @@ import { ClarifyDialog } from "./clarify-dialog";
 import { MessageMarkdown } from "./message-markdown";
 import { PlanPanel } from "./plan-panel";
 import { ProjectPicker } from "./project-picker";
+import { ThinkingEffortControl } from "./thinking-effort-control";
 import { ThreadsSidebar } from "./threads-sidebar";
 import { ToolStrip } from "./tool-strip";
 import { SubAgentAccordion } from "./sub-agent-accordion";
@@ -90,7 +94,14 @@ type Props = {
 
 type RenderItem =
   | { kind: "user"; id: string; text: string }
-  | { kind: "assistant"; id: string; text: string; inputTokens?: number; outputTokens?: number }
+  | {
+      kind: "assistant";
+      id: string;
+      text: string;
+      inputTokens?: number;
+      outputTokens?: number;
+      reasoning?: string;
+    }
   | { kind: "tool-group"; id: string; calls: ToolCallView[]; pending: boolean }
   | { kind: "plan"; id: string; plan: PlanItem[] }
   | { kind: "sub_agent"; id: string; turn: Extract<ChatTurn, { kind: "sub_agent" }> };
@@ -588,6 +599,7 @@ function ChatThread({
                       text={item.text}
                       inputTokens={item.inputTokens}
                       outputTokens={item.outputTokens}
+                      reasoning={item.reasoning}
                     />
                   );
                 }
@@ -605,14 +617,7 @@ function ChatThread({
               })}
 
               {stream.thinking && stream.phase === "thinking" && (
-                <div className="flex gap-3">
-                  <BotAvatar />
-                  <div className="min-w-0 flex-1 rounded-2xl bg-muted/40 px-4 py-3">
-                    <div className="whitespace-pre-wrap text-sm text-muted-foreground">
-                      {stream.thinking}
-                    </div>
-                  </div>
-                </div>
+                <LiveThinking text={stream.thinking} />
               )}
 
               {/* Inline approval prompt — renders when agent gates a destructive action */}
@@ -761,6 +766,7 @@ function ChatThread({
               <Bot className="h-3 w-3 shrink-0" />
               <span className="max-w-[140px] truncate">{projectName}</span>
             </span>
+            <ThinkingEffortControl projectId={projectId} />
             {(stream.model || stream.provider) && (
               <span
                 className="flex min-w-0 items-center gap-1"
@@ -865,14 +871,68 @@ function UserMessage({ text }: { text: string }) {
   );
 }
 
+// Live reasoning stream: a short fixed-height window (~5 lines) that keeps the
+// newest text at the bottom and lets older lines scroll up and fade out. No card
+// background — it blends into the page.
+function LiveThinking({ text }: { text: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
+  }, [text]);
+  return (
+    <div className="flex gap-3">
+      <BotAvatar />
+      <div className="min-w-0 flex-1">
+        <div className="mb-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground/60">
+          <Brain className="h-3 w-3 animate-pulse" /> Fikrlaymoqda…
+        </div>
+        <div
+          ref={ref}
+          className="max-h-[6.5rem] overflow-y-auto whitespace-pre-wrap text-xs leading-5 text-muted-foreground/60 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          style={{
+            maskImage: "linear-gradient(to bottom, transparent, black 1.75rem)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent, black 1.75rem)",
+          }}
+        >
+          {text}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ReasoningDisclosure({ reasoning }: { reasoning: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mb-1.5">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/70 transition-colors hover:text-foreground"
+      >
+        {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+        <Brain className="h-3 w-3" />
+        Fikrlash
+      </button>
+      {open && (
+        <div className="mt-1 whitespace-pre-wrap border-l-2 border-muted pl-3 text-xs leading-5 text-muted-foreground/70">
+          {reasoning}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AssistantMessage({
   text,
   inputTokens,
   outputTokens,
+  reasoning,
 }: {
   text: string;
   inputTokens?: number;
   outputTokens?: number;
+  reasoning?: string;
 }) {
   const total = (inputTokens ?? 0) + (outputTokens ?? 0);
   return (
@@ -884,6 +944,7 @@ function AssistantMessage({
     >
       <BotAvatar />
       <div className="min-w-0 flex-1">
+        {reasoning ? <ReasoningDisclosure reasoning={reasoning} /> : null}
         <MessageMarkdown className="pt-1">{text}</MessageMarkdown>
         {total > 0 && (
           <div className="mt-1 text-[11px] text-muted-foreground" title="Bu javob uchun sarflangan tokenlar (sub-agentlar bilan)">

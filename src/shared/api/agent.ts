@@ -154,6 +154,29 @@ export async function getAgentUsage(): Promise<AgentUsage> {
   return res.json();
 }
 
+// ── Per-project agent settings (DeepSeek thinking effort) ──────────────────────
+
+export type ThinkingEffort = "off" | "high" | "max";
+export type ProjectSettings = { project_id: string; thinking_effort: ThinkingEffort | null };
+
+export async function getProjectSettings(projectId: string): Promise<ProjectSettings> {
+  const res = await agentFetch(`/projects/${encodeURIComponent(projectId)}/settings`);
+  if (!res.ok) throw new Error(`agent settings get failed: ${res.status}`);
+  return res.json();
+}
+
+export async function setProjectSettings(
+  projectId: string,
+  thinking_effort: ThinkingEffort | null,
+): Promise<ProjectSettings> {
+  const res = await agentFetch(`/projects/${encodeURIComponent(projectId)}/settings`, {
+    method: "PUT",
+    body: JSON.stringify({ thinking_effort }),
+  });
+  if (!res.ok) throw new Error(await errorMessage(res, `agent settings set failed: ${res.status}`));
+  return res.json();
+}
+
 // ── Thread history endpoints ──────────────────────────────────────────────────
 
 export type AgentThreadMeta = {
@@ -164,7 +187,12 @@ export type AgentThreadMeta = {
 };
 
 export type AgentThreadTurnUser = { kind: "user"; id: string; text: string };
-export type AgentThreadTurnAssistant = { kind: "assistant"; id: string; text: string };
+export type AgentThreadTurnAssistant = {
+  kind: "assistant";
+  id: string;
+  text: string;
+  reasoning?: string;
+};
 export type AgentThreadTurnTool = {
   kind: "tool";
   id: string;

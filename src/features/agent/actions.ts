@@ -10,11 +10,14 @@ import {
   getAgentThreadHistory,
   deleteAgentThread,
   deleteAllAgentThreads,
+  getProjectSettings,
+  setProjectSettings,
   type AgentRunStatus,
   type AgentUsage,
   type AgentThreadMeta,
   type AgentThreadTurn,
   type AgentActiveRun,
+  type ThinkingEffort,
 } from "@/shared/api/agent";
 
 export type RunCreateState = { ok: boolean; request_id?: string; message?: string };
@@ -91,6 +94,28 @@ export async function getUsageAction(): Promise<AgentUsage | null> {
     return await getAgentUsage();
   } catch {
     return null;
+  }
+}
+
+export async function getThinkingEffortAction(
+  projectId: string,
+): Promise<ThinkingEffort | null> {
+  try {
+    return (await getProjectSettings(projectId)).thinking_effort;
+  } catch {
+    return null;
+  }
+}
+
+export async function setThinkingEffortAction(
+  projectId: string,
+  effort: ThinkingEffort | null,
+): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await setProjectSettings(projectId, effort);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "failed" };
   }
 }
 
