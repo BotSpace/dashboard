@@ -801,7 +801,7 @@ function ChatThread({
                 return (
                   <span
                     className={cn(
-                      "flex min-w-0 basis-full items-center gap-1.5",
+                      "flex min-w-0 max-w-full shrink items-center gap-1.5",
                       tool
                         ? "text-amber-500/90"
                         : pending
