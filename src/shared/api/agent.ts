@@ -55,6 +55,8 @@ export type AgentRunCreate = {
   prompt: string;
   thread_id?: string;
   baseline_flow?: unknown;
+  /** Plan mode: research read-only + present a plan, don't build. */
+  plan_mode?: boolean;
 };
 
 export type AgentRunStatus = {

@@ -26,11 +26,13 @@ export async function startRunAction(args: {
   projectId: string;
   prompt: string;
   threadId?: string;
+  planMode?: boolean;
 }): Promise<RunCreateState> {
   try {
     const res = await createAgentRun(args.projectId, {
       prompt: args.prompt,
       thread_id: args.threadId,
+      plan_mode: args.planMode,
     });
     return { ok: true, request_id: res.request_id };
   } catch (e) {

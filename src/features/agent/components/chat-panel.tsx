@@ -27,6 +27,7 @@ import {
   Brain,
   ChevronRight,
   ChevronDown,
+  ClipboardList,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
@@ -44,7 +45,6 @@ import { useAgentStream } from "../use-agent-stream";
 import { ApprovalDialog } from "./approval-dialog";
 import { ClarifyDialog } from "./clarify-dialog";
 import { MessageMarkdown } from "./message-markdown";
-import { PlanPanel } from "./plan-panel";
 import { ProjectPicker } from "./project-picker";
 import { ThinkingEffortControl } from "./thinking-effort-control";
 import { ThreadsSidebar } from "./threads-sidebar";
@@ -301,6 +301,11 @@ function ChatThread({
 }: ThreadProps) {
   const [input, setInput] = useState(initialPrompt ?? "");
   const [requestId, setRequestId] = useState<string | null>(null);
+  // Plan mode (Claude-Code style): the run researches + presents a plan without
+  // building. When such a run ends, its final message (the plan) awaits approval.
+  const [planMode, setPlanMode] = useState(false);
+  const [pendingPlan, setPendingPlan] = useState<string | null>(null);
+  const planRunRef = useRef(false);
   // Set when a refresh re-attaches to an in-flight run so the SSE reconnects
   // with the right seq cursor (replay only unseen events, no duplicate turns).
   const [resume, setResume] = useState<{ requestId: string; sinceSeq: number } | null>(null);
@@ -431,15 +436,31 @@ function ChatThread({
       inputRef.current.style.height = "auto";
     }
     analytics.agentPrompt({ projectId, length: msg.length });
+    const wasPlan = planMode;
+    planRunRef.current = wasPlan;
     start(async () => {
-      const res = await startRunAction({ projectId, prompt: msg, threadId });
+      const res = await startRunAction({ projectId, prompt: msg, threadId, planMode: wasPlan });
       if (!res.ok || !res.request_id) {
         toast.error(res.message ?? "Run boshlanmadi");
+        planRunRef.current = false;
         return;
       }
       setRequestId(res.request_id);
     });
   };
+
+  // When a PLAN-mode run finishes, its final message is the plan → surface an
+  // approve bar. Approving runs it for real (direct mode); editing dismisses it.
+  useEffect(() => {
+    if (isRunning || !planRunRef.current) return;
+    planRunRef.current = false;
+    const lastAssistant = [...stream.turns].reverse().find((t) => t.kind === "assistant");
+    if (lastAssistant && lastAssistant.kind === "assistant" && lastAssistant.text.trim()) {
+      setPendingPlan(lastAssistant.text);
+    }
+    setPlanMode(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRunning]);
 
   // Submit handler: if the agent is busy, queue the message (auto-sent when the
   // run ends); otherwise send it right away.
@@ -607,11 +628,7 @@ function ChatThread({
                   return <SubAgentAccordion key={item.id} turn={item.turn} />;
                 }
                 if (item.kind === "plan") {
-                  return (
-                    <div key={item.id} className="ml-11 max-w-md">
-                      <PlanPanel plan={item.plan} />
-                    </div>
-                  );
+                  return null; // legacy step-checklist plans are no longer shown
                 }
                 return <ToolStrip key={item.id} calls={item.calls} pending={item.pending} />;
               })}
@@ -673,11 +690,53 @@ function ChatThread({
       {/* Input area */}
       <div className="border-t bg-background px-3 pb-3 pt-2 sm:px-6 sm:pb-4 sm:pt-3">
         <div className="mx-auto max-w-3xl xl:max-w-5xl 2xl:max-w-6xl">
+          {pendingPlan && (
+            <div className="mb-2 flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs">
+              <ClipboardList className="h-3.5 w-3.5 shrink-0 text-amber-500" />
+              <span className="text-muted-foreground">Reja tayyor — bajaramizmi?</span>
+              <div className="ml-auto flex gap-1.5">
+                <Button
+                  size="sm"
+                  className="h-7 gap-1 px-2.5 text-xs"
+                  onClick={() => {
+                    const plan = pendingPlan;
+                    setPendingPlan(null);
+                    doSend(`Ushbu rejani bajar:\n\n${plan}`);
+                  }}
+                >
+                  ✅ Tasdiqlash
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2.5 text-xs"
+                  onClick={() => setPendingPlan(null)}
+                >
+                  ✏️ O'zgartirish
+                </Button>
+              </div>
+            </div>
+          )}
           <div
             className={cn(
-              "flex items-end gap-2 rounded-2xl border bg-card px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-2 focus-within:ring-ring/20"
+              "flex items-end gap-2 rounded-2xl border bg-card px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-2 focus-within:ring-ring/20",
+              planMode && "border-amber-500/50 ring-1 ring-amber-500/30"
             )}
           >
+            <Button
+              type="button"
+              size="icon"
+              variant={planMode ? "default" : "ghost"}
+              onClick={() => setPlanMode((v) => !v)}
+              title={planMode ? "Plan rejimi YONIQ — reja tuzadi, qurmaydi" : "Plan rejimi (avval reja tuzsin)"}
+              className={cn(
+                "h-8 w-8 shrink-0 rounded-xl",
+                planMode ? "bg-amber-500 text-white hover:bg-amber-500/90" : "text-muted-foreground"
+              )}
+              aria-label="Plan rejimi"
+            >
+              <ClipboardList className="h-4 w-4" />
+            </Button>
             <textarea
               ref={inputRef}
               value={input}
@@ -697,6 +756,8 @@ function ChatThread({
                   ? "Yuqoridagi savolga javob bering…"
                   : isRunning
                   ? "Yozing — navbatga qo'shiladi…"
+                  : planMode
+                  ? "Reja tuzish uchun vazifani yozing…"
                   : "Xabar yozing…"
               }
               className="max-h-40 min-h-[24px] flex-1 resize-none bg-transparent text-sm leading-6 placeholder:text-muted-foreground/60 focus:outline-none"
