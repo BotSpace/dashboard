@@ -308,6 +308,21 @@ function ChatThread({
   const [planMode, setPlanMode] = useState(false);
   const [pendingPlan, setPendingPlan] = useState<string | null>(null);
   const planRunRef = useRef(false);
+  // Persist the plan-mode toggle across page refreshes (it's per-project).
+  useEffect(() => {
+    try {
+      setPlanMode(localStorage.getItem(`planMode:${projectId}`) === "1");
+    } catch {
+      /* ignore */
+    }
+  }, [projectId]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(`planMode:${projectId}`, planMode ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  }, [planMode, projectId]);
   // Set when a refresh re-attaches to an in-flight run so the SSE reconnects
   // with the right seq cursor (replay only unseen events, no duplicate turns).
   const [resume, setResume] = useState<{ requestId: string; sinceSeq: number } | null>(null);
@@ -354,6 +369,16 @@ function ChatThread({
           sinceSeq: res.active_run.last_seq,
         });
         setRequestId(res.active_run.request_id);
+        // Refresh mid plan-run: plan mode is persisted per project, so if it's on
+        // treat the resumed run as a plan run → its final message gets the approve
+        // bar (read localStorage directly to avoid state-restore timing races).
+        try {
+          if (localStorage.getItem(`planMode:${projectId}`) === "1") {
+            planRunRef.current = true;
+          }
+        } catch {
+          /* ignore */
+        }
       }
     });
     return () => {
@@ -692,6 +717,12 @@ function ChatThread({
       {/* Input area */}
       <div className="border-t bg-background px-3 pb-3 pt-2 sm:px-6 sm:pb-4 sm:pt-3">
         <div className="mx-auto max-w-3xl xl:max-w-5xl 2xl:max-w-6xl">
+          {planMode && isRunning && !pendingPlan && (
+            <div className="mb-2 flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-1.5 text-xs text-amber-600 dark:text-amber-400">
+              <ClipboardList className="h-3.5 w-3.5 animate-pulse" />
+              Reja tuzilmoqda…
+            </div>
+          )}
           {pendingPlan && (
             <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border bg-muted/30 px-3 py-2">
               <div className="flex items-center gap-2">
