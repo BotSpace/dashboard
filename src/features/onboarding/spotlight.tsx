@@ -87,12 +87,15 @@ export function Spotlight(props: SpotlightProps) {
     : null;
 
   const card = (
+    // Positioning lives on this OUTER element and animates opacity only, so
+    // framer never writes to `transform` and our translateY(-100%) survives.
+    // The inner element owns the entrance transform (scale/slide).
     <motion.div
       key={props.index}
-      initial={{ opacity: 0, y: 8, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 8, scale: 0.98 }}
-      transition={{ duration: 0.22, ease: "easeOut" }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
       style={
         pos.centered
           ? { left: "50%", top: "50%", transform: "translate(-50%, -50%)" }
@@ -102,7 +105,13 @@ export function Spotlight(props: SpotlightProps) {
               transform: pos.translateUp ? "translateY(-100%)" : undefined,
             }
       }
-      className="pointer-events-auto fixed z-[201] w-[320px] max-w-[calc(100vw-24px)] rounded-2xl border border-cyan-300/40 bg-card/95 p-4 shadow-[0_24px_70px_rgba(8,47,73,0.35)] backdrop-blur-xl dark:border-cyan-300/20"
+      className="pointer-events-auto fixed z-[201] w-[320px] max-w-[calc(100vw-24px)]"
+    >
+    <motion.div
+      initial={{ opacity: 0, y: 6, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+      className="rounded-2xl border border-cyan-300/40 bg-card/95 p-4 shadow-[0_24px_70px_rgba(8,47,73,0.35)] backdrop-blur-xl dark:border-cyan-300/20"
     >
       <div className="mb-1.5 flex items-center gap-2">
         <span className="grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-cyan-300 to-lime-200 text-slate-900 shadow-inner">
@@ -153,6 +162,7 @@ export function Spotlight(props: SpotlightProps) {
           </button>
         </div>
       </div>
+    </motion.div>
     </motion.div>
   );
 
