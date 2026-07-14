@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiFetch } from "@/shared/api/client";
 import { encodeSession, type SessionUser } from "@/shared/auth/session";
 import { env } from "@/shared/lib/env";
-import { REFRESH_TOKEN_TTL_SEC } from "@/shared/lib/constants";
+import { ONBOARDING_COOKIE, REFRESH_TOKEN_TTL_SEC } from "@/shared/lib/constants";
 
 export async function POST(req: NextRequest) {
   let idToken = "";
@@ -35,8 +35,18 @@ export async function POST(req: NextRequest) {
     if (!access || !refresh) {
       return NextResponse.json({ ok: false, message: "Tokenlar kelmadi" }, { status: 400 });
     }
-    const user = ((res.user as SessionUser) ?? ({ id: 0 } as SessionUser)) as SessionUser;
-    const value = await encodeSession({ access, refresh, user });
+    // The /auth/google endpoint returns only tokens (no user), so resolve the
+    // profile from /users/me — otherwise the session carries an empty {id:0}
+    // user and the app shows blank name/email everywhere.
+    let user = res.user as SessionUser | undefined;
+    if (!user || user.id === undefined || user.id === 0) {
+      user = await apiFetch<SessionUser>("/api/v1/users/me", { token: access }).catch(
+        () => undefined
+      );
+    }
+    const finalUser = user ?? ({ id: 0 } as SessionUser);
+    const value = await encodeSession({ access, refresh, user: finalUser });
+    const isNew = Boolean((res as { is_new?: boolean }).is_new);
 
     const out = NextResponse.json({ ok: true });
     out.cookies.set(env.SESSION_COOKIE_NAME, value, {
@@ -47,6 +57,18 @@ export async function POST(req: NextRequest) {
       maxAge: REFRESH_TOKEN_TTL_SEC,
       ...(env.SESSION_COOKIE_DOMAIN ? { domain: env.SESSION_COOKIE_DOMAIN } : {}),
     });
+    // First-ever Google sign-in → seed the onboarding tour (non-httpOnly,
+    // short-lived; the client marks completion in localStorage).
+    if (isNew) {
+      out.cookies.set(ONBOARDING_COOKIE, "1", {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 30,
+        ...(env.SESSION_COOKIE_DOMAIN ? { domain: env.SESSION_COOKIE_DOMAIN } : {}),
+      });
+    }
     return out;
   } catch {
     return NextResponse.json({ ok: false, message: "Google login amalga oshmadi" }, { status: 401 });
