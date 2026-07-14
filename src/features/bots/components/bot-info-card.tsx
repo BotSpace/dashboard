@@ -58,7 +58,7 @@ export function BotInfoCard({ projectId, username, releaseBot, debugBot }: Props
           <span className="text-muted-foreground">{t("usernameLabel")}</span>
           {username ? (
             <a
-              href={`https://t.me/${username}`}
+              href={`https://telegram.me/${username}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 font-medium text-primary hover:underline"

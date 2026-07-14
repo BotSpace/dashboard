@@ -423,7 +423,7 @@ export function ManualTokenInput({
       <p className="text-xs text-muted-foreground">
         {labels.tokenHelp}{" "}
         <a
-          href="https://t.me/BotFather"
+          href="https://telegram.me/BotFather"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-0.5 underline hover:text-foreground"

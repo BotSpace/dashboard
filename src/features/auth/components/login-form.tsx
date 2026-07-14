@@ -27,7 +27,7 @@ export function LoginForm({ from }: { from?: string }) {
   const [reverseCanvasVisible, setReverseCanvasVisible] = useState(false);
 
   const botUsername = env.NEXT_PUBLIC_TELEGRAM_BOT;
-  const botUrl = `https://t.me/${botUsername}`;
+  const botUrl = `https://telegram.me/${botUsername}`;
 
   // Cookie'ni ishonchli o'rnatish uchun login ROUTE HANDLER orqali ketadi
   // (server action cookies().set() ni brauzerga qo'llamasdi). Route handler

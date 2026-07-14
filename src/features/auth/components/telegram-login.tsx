@@ -45,7 +45,7 @@ export function TelegramLogin({ from }: { from?: string }) {
   }, [state, from, locale, router]);
 
   const botUsername = env.NEXT_PUBLIC_TELEGRAM_BOT;
-  const botUrl = `https://t.me/${botUsername}`;
+  const botUrl = `https://telegram.me/${botUsername}`;
 
   return (
     <div className="space-y-6">

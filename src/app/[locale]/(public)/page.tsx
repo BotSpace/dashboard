@@ -45,7 +45,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       url: SITE_URL,
       logo: `${SITE_URL}/logo-light.png`,
       description: tSeo("org.description"),
-      sameAs: ["https://t.me/botspace_uz", "https://x.com/botspace_uz"],
+      sameAs: ["https://telegram.me/botspace_uz", "https://x.com/botspace_uz"],
     },
     {
       "@context": "https://schema.org",

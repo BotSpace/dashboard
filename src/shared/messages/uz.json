@@ -389,7 +389,7 @@
       "description": "Tavsif",
       "token": "Telegram bot token",
       "tokenPlaceholder": "12345:ABC-DEF...",
-      "tokenHint": "BotFather'dan oling: t.me/BotFather",
+      "tokenHint": "BotFather'dan oling: telegram.me/BotFather",
       "submit": "Yaratish",
       "blank": "Bo'sh boshlash",
       "fromTemplate": "Shablondan",

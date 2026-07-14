@@ -393,7 +393,7 @@
       "description": "Description",
       "token": "Telegram bot token",
       "tokenPlaceholder": "12345:ABC-DEF...",
-      "tokenHint": "Get one from BotFather: t.me/BotFather",
+      "tokenHint": "Get one from BotFather: telegram.me/BotFather",
       "submit": "Create",
       "blank": "Start blank",
       "fromTemplate": "From template",

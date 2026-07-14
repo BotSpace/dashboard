@@ -93,7 +93,7 @@ export function PublicFooter() {
           </span>
           <div className="flex items-center gap-3">
             {[
-              { name: "Telegram", href: "https://t.me/botspace_uz", Icon: Send },
+              { name: "Telegram", href: "https://telegram.me/botspace_uz", Icon: Send },
               { name: "GitHub", href: "https://github.com/botspace", Icon: Github },
               { name: "X", href: "https://x.com/botspace_uz", Icon: XIcon },
             ].map(({ name, href, Icon }) => (
