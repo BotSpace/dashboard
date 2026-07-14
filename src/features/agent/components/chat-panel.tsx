@@ -30,7 +30,14 @@ import {
   ClipboardList,
   Check,
   Pencil,
+  ShieldCheck,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/shared/components/ui/select";
 import { toast } from "sonner";
 import { cn } from "@/shared/lib/utils";
 import { analytics } from "@/shared/analytics/umami";
@@ -305,24 +312,26 @@ function ChatThread({
   const [requestId, setRequestId] = useState<string | null>(null);
   // Plan mode (Claude-Code style): the run researches + presents a plan without
   // building. When such a run ends, its final message (the plan) awaits approval.
-  const [planMode, setPlanMode] = useState(false);
+  // Run mode: "agent" (normal), "plan" (research + present a plan, no build),
+  // "full" (auto-approve destructive actions). Persisted per project.
+  const [mode, setMode] = useState<"agent" | "plan" | "full">("agent");
   const [pendingPlan, setPendingPlan] = useState<string | null>(null);
   const planRunRef = useRef(false);
-  // Persist the plan-mode toggle across page refreshes (it's per-project).
   useEffect(() => {
     try {
-      setPlanMode(localStorage.getItem(`planMode:${projectId}`) === "1");
+      const saved = localStorage.getItem(`agentMode:${projectId}`);
+      if (saved === "plan" || saved === "full" || saved === "agent") setMode(saved);
     } catch {
       /* ignore */
     }
   }, [projectId]);
   useEffect(() => {
     try {
-      localStorage.setItem(`planMode:${projectId}`, planMode ? "1" : "0");
+      localStorage.setItem(`agentMode:${projectId}`, mode);
     } catch {
       /* ignore */
     }
-  }, [planMode, projectId]);
+  }, [mode, projectId]);
   // Set when a refresh re-attaches to an in-flight run so the SSE reconnects
   // with the right seq cursor (replay only unseen events, no duplicate turns).
   const [resume, setResume] = useState<{ requestId: string; sinceSeq: number } | null>(null);
@@ -373,7 +382,7 @@ function ChatThread({
         // treat the resumed run as a plan run → its final message gets the approve
         // bar (read localStorage directly to avoid state-restore timing races).
         try {
-          if (localStorage.getItem(`planMode:${projectId}`) === "1") {
+          if (localStorage.getItem(`agentMode:${projectId}`) === "plan") {
             planRunRef.current = true;
           }
         } catch {
@@ -463,10 +472,16 @@ function ChatThread({
       inputRef.current.style.height = "auto";
     }
     analytics.agentPrompt({ projectId, length: msg.length });
-    const wasPlan = planMode;
+    const wasPlan = mode === "plan";
     planRunRef.current = wasPlan;
     start(async () => {
-      const res = await startRunAction({ projectId, prompt: msg, threadId, planMode: wasPlan });
+      const res = await startRunAction({
+        projectId,
+        prompt: msg,
+        threadId,
+        planMode: wasPlan,
+        autoApprove: mode === "full",
+      });
       if (!res.ok || !res.request_id) {
         toast.error(res.message ?? "Run boshlanmadi");
         planRunRef.current = false;
@@ -485,7 +500,7 @@ function ChatThread({
     if (lastAssistant && lastAssistant.kind === "assistant" && lastAssistant.text.trim()) {
       setPendingPlan(lastAssistant.text);
     }
-    setPlanMode(false);
+    setMode("agent"); // after presenting a plan, drop to normal so approve executes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRunning]);
 
@@ -717,7 +732,7 @@ function ChatThread({
       {/* Input area */}
       <div className="border-t bg-background px-3 pb-3 pt-2 sm:px-6 sm:pb-4 sm:pt-3">
         <div className="mx-auto max-w-3xl xl:max-w-5xl 2xl:max-w-6xl">
-          {planMode && isRunning && !pendingPlan && (
+          {mode === "plan" && isRunning && !pendingPlan && (
             <div className="mb-2 flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-1.5 text-xs text-amber-600 dark:text-amber-400">
               <ClipboardList className="h-3.5 w-3.5 animate-pulse" />
               Reja tuzilmoqda…
@@ -758,23 +773,41 @@ function ChatThread({
           <div
             className={cn(
               "flex items-end gap-2 rounded-2xl border bg-card px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-2 focus-within:ring-ring/20",
-              planMode && "border-amber-500/50 ring-1 ring-amber-500/30"
+              mode === "plan" && "border-amber-500/50 ring-1 ring-amber-500/30",
+              mode === "full" && "border-red-500/50 ring-1 ring-red-500/30"
             )}
           >
-            <Button
-              type="button"
-              size="icon"
-              variant={planMode ? "default" : "ghost"}
-              onClick={() => setPlanMode((v) => !v)}
-              title={planMode ? "Plan rejimi YONIQ — reja tuzadi, qurmaydi" : "Plan rejimi (avval reja tuzsin)"}
-              className={cn(
-                "h-8 w-8 shrink-0 rounded-xl",
-                planMode ? "bg-amber-500 text-white hover:bg-amber-500/90" : "text-muted-foreground"
-              )}
-              aria-label="Plan rejimi"
-            >
-              <ClipboardList className="h-4 w-4" />
-            </Button>
+            <Select value={mode} onValueChange={(v) => setMode(v as "agent" | "plan" | "full")}>
+              <SelectTrigger
+                title="Rejim: Agent (oddiy) / Plan (avval reja) / Full (barchasiga ruxsat)"
+                className={cn(
+                  "h-8 w-auto shrink-0 gap-1 rounded-xl border-none bg-transparent px-2 text-xs font-medium shadow-none focus:ring-0 focus:ring-offset-0 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:opacity-60",
+                  mode === "plan" && "text-amber-600 dark:text-amber-400",
+                  mode === "full" && "text-red-600 dark:text-red-400",
+                  mode === "agent" && "text-muted-foreground"
+                )}
+              >
+                {mode === "plan" ? (
+                  <ClipboardList className="h-4 w-4" />
+                ) : mode === "full" ? (
+                  <ShieldCheck className="h-4 w-4" />
+                ) : (
+                  <Bot className="h-4 w-4" />
+                )}
+                <span>{mode === "plan" ? "Plan" : mode === "full" ? "Full" : "Agent"}</span>
+              </SelectTrigger>
+              <SelectContent align="start" className="min-w-[13rem]">
+                <SelectItem value="agent" className="text-xs">
+                  <span className="flex items-center gap-2"><Bot className="h-3.5 w-3.5" /> Agent — oddiy</span>
+                </SelectItem>
+                <SelectItem value="plan" className="text-xs">
+                  <span className="flex items-center gap-2"><ClipboardList className="h-3.5 w-3.5" /> Plan — avval reja tuzadi</span>
+                </SelectItem>
+                <SelectItem value="full" className="text-xs">
+                  <span className="flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5" /> Full — barchasiga ruxsat</span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
             <textarea
               ref={inputRef}
               value={input}
@@ -794,7 +827,7 @@ function ChatThread({
                   ? "Yuqoridagi savolga javob bering…"
                   : isRunning
                   ? "Yozing — navbatga qo'shiladi…"
-                  : planMode
+                  : mode === "plan"
                   ? "Reja tuzish uchun vazifani yozing…"
                   : "Xabar yozing…"
               }

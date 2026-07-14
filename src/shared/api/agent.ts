@@ -57,6 +57,8 @@ export type AgentRunCreate = {
   baseline_flow?: unknown;
   /** Plan mode: research read-only + present a plan, don't build. */
   plan_mode?: boolean;
+  /** Full-permission mode: auto-approve destructive actions. */
+  auto_approve?: boolean;
 };
 
 export type AgentRunStatus = {
