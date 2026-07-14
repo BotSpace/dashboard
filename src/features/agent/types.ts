@@ -34,6 +34,8 @@ export type AgentEvent = {
 export type PlanItem = {
   id: string;
   title: string;
+  /** Detailed description of the step — what/how (Claude Code-style plan). */
+  detail?: string | null;
   status: "pending" | "in_progress" | "completed" | "blocked";
   notes?: string | null;
 };

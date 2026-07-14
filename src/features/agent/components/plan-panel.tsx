@@ -63,14 +63,24 @@ export function PlanPanel({ plan }: { plan: PlanItem[] }) {
                   <div className="min-w-0 flex-1">
                     <div
                       className={cn(
-                        "text-xs leading-snug",
+                        "text-xs font-medium leading-snug",
                         item.status === "completed" && "text-muted-foreground line-through"
                       )}
                     >
                       {item.title}
                     </div>
+                    {item.detail && (
+                      <div
+                        className={cn(
+                          "mt-0.5 whitespace-pre-wrap text-[11px] leading-snug text-muted-foreground",
+                          item.status === "completed" && "opacity-60"
+                        )}
+                      >
+                        {item.detail}
+                      </div>
+                    )}
                     {item.notes && (
-                      <div className="mt-0.5 text-[10px] text-muted-foreground">{item.notes}</div>
+                      <div className="mt-0.5 text-[10px] text-muted-foreground/70">{item.notes}</div>
                     )}
                   </div>
                 </li>
