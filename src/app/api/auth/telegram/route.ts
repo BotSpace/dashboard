@@ -10,7 +10,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiFetch, isApiError } from "@/shared/api/client";
 import { encodeSession, type SessionUser } from "@/shared/auth/session";
 import { env } from "@/shared/lib/env";
-import { ONBOARDING_COOKIE, REFRESH_TOKEN_TTL_SEC } from "@/shared/lib/constants";
+import {
+  AUTH_EVENT_COOKIE,
+  AUTH_EVENT_TTL_SEC,
+  ONBOARDING_COOKIE,
+  REFRESH_TOKEN_TTL_SEC,
+} from "@/shared/lib/constants";
 
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
@@ -72,6 +77,15 @@ export async function GET(req: NextRequest) {
     path: "/",
     maxAge: REFRESH_TOKEN_TTL_SEC,
     ...(env.SESSION_COOKIE_DOMAIN ? { domain: env.SESSION_COOKIE_DOMAIN } : {}),
+  });
+  // Sign-in succeeded → let the landing page report it to Umami. Host-only (no
+  // domain) so the client can clear it after firing exactly once.
+  res.cookies.set(AUTH_EVENT_COOKIE, `${isNew ? "register" : "login"}:telegram`, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: AUTH_EVENT_TTL_SEC,
   });
   // First-ever sign-in → seed the client onboarding tour (non-httpOnly so the
   // browser can read+clear it). Short-lived; the client marks completion in

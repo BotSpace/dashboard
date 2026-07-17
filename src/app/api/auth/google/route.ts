@@ -5,7 +5,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiFetch } from "@/shared/api/client";
 import { encodeSession, type SessionUser } from "@/shared/auth/session";
 import { env } from "@/shared/lib/env";
-import { ONBOARDING_COOKIE, REFRESH_TOKEN_TTL_SEC } from "@/shared/lib/constants";
+import {
+  AUTH_EVENT_COOKIE,
+  AUTH_EVENT_TTL_SEC,
+  ONBOARDING_COOKIE,
+  REFRESH_TOKEN_TTL_SEC,
+} from "@/shared/lib/constants";
 
 export async function POST(req: NextRequest) {
   let idToken = "";
@@ -56,6 +61,15 @@ export async function POST(req: NextRequest) {
       path: "/",
       maxAge: REFRESH_TOKEN_TTL_SEC,
       ...(env.SESSION_COOKIE_DOMAIN ? { domain: env.SESSION_COOKIE_DOMAIN } : {}),
+    });
+    // Sign-in succeeded → let the landing page report it to Umami. Host-only
+    // (no domain) so the client can clear it after firing exactly once.
+    out.cookies.set(AUTH_EVENT_COOKIE, `${isNew ? "register" : "login"}:google`, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: AUTH_EVENT_TTL_SEC,
     });
     // First-ever Google sign-in → seed the onboarding tour (non-httpOnly,
     // short-lived; the client marks completion in localStorage).

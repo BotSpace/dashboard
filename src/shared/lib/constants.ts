@@ -21,3 +21,11 @@ export const REFRESH_TOKEN_TTL_SEC = 60 * 60 * 24 * 7; // 7d
 // The client onboarding tour reads it, clears it, then tracks completion in
 // localStorage so the tour only ever runs once for a freshly registered user.
 export const ONBOARDING_COOKIE = "bs_onboarding";
+
+// Non-httpOnly one-shot cookie carrying "<login|register>:<method>" from the
+// auth route handlers. Both flows finish with a hard navigation, so an event
+// fired before it would be dropped in flight; instead the landing page reads
+// this cookie and reports the sign-in to Umami. Deliberately host-only (no
+// domain) so the client can actually clear it and the event fires exactly once.
+export const AUTH_EVENT_COOKIE = "bs_auth_event";
+export const AUTH_EVENT_TTL_SEC = 60;

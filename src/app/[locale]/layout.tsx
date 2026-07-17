@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import Script from "next/script";
 import { notFound } from "next/navigation";
 import { routing } from "@/shared/i18n/routing";
+import { UmamiAuthEvent } from "@/shared/analytics/umami";
 import { ThemeProvider } from "@/shared/providers/theme-provider";
 import { Toaster } from "@/shared/providers/toaster";
 
@@ -32,6 +33,10 @@ export default async function LocaleLayout({
           data-website-id="2699cd62-0385-4c4a-9d52-2c47e5512e53"
           strategy="afterInteractive"
         />
+        {/* Login/register oqimlari qattiq navigatsiya bilan tugaydi — eventni
+            kelib tushgan sahifa yuboradi (callbackUrl istalgan sahifa bo'lishi
+            mumkin, shuning uchun (app) emas, shu yerda). */}
+        <UmamiAuthEvent />
         <ThemeProvider>
           <NextIntlClientProvider>
             {children}
