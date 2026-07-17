@@ -19,6 +19,7 @@ import {
 } from "@/features/bots/components/bot-connect-tabs";
 import { BotLaunchStep, type BotLaunchLabels } from "@/features/bots/components/bot-launch-step";
 import { useLaunchPolling } from "@/features/bots/hooks/use-launch-polling";
+import { analytics } from "@/shared/analytics/umami";
 import {
   createBlankBotAction,
   getManagedBotConfigAction,
@@ -61,6 +62,8 @@ export interface CreateBotWizardLabels extends BotConnectLabels, BotLaunchLabels
 
 interface Props {
   labels: CreateBotWizardLabels;
+  /** Qaysi "yangi bot" tugmasidan kelingani (?src=…) — analitika uchun. */
+  source?: string;
 }
 
 const STEP_LABEL_KEYS: Record<StepId, "stepBot" | "stepConfirm" | "stepLaunch"> = {
@@ -243,8 +246,14 @@ function StepConfirm({ name, description, token, botMode, managedBot, labels }: 
 // Main wizard
 // ---------------------------------------------------------------------------
 
-export function CreateBotWizard({ labels }: Props) {
+export function CreateBotWizard({ labels, source }: Props) {
   const router = useRouter();
+
+  // Sehrgarga kirish = "yangi bot yaratish" tugmasi bosilgani. Voronkaning
+  // boshi: bundan keyin nechtasi haqiqatan bot yaratganini shu bilan solishtiramiz.
+  useEffect(() => {
+    analytics.botCreateClicked({ source: source ?? "direct" });
+  }, [source]);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -266,8 +275,10 @@ export function CreateBotWizard({ labels }: Props) {
   }, []);
 
   const [pollTargetId, setPollTargetId] = useState<string | number | null>(null);
-  const { launchState, setLaunchState, launchProject, setLaunchProject } =
-    useLaunchPolling(pollTargetId);
+  const { launchState, setLaunchState, launchProject, setLaunchProject } = useLaunchPolling(
+    pollTargetId,
+    { source: "blank", mode: botMode },
+  );
 
   const pollManagedBots = async (): Promise<ManagedBot[]> => {
     const res = await listManagedBotsAction();
@@ -281,6 +292,14 @@ export function CreateBotWizard({ labels }: Props) {
   const [stepIndex, setStepIndex] = useState(0);
   const currentStep = STEPS[stepIndex];
   const [pending, startTransition] = useTransition();
+
+  // Har bir qadam ko'rilganda — Umami'da qadamlarni sanab, qaysi birida
+  // foydalanuvchilar to'xtab qolayotganini ko'ramiz.
+  useEffect(() => {
+    analytics.botCreateStep({ source: "blank", step: currentStep, mode: botMode });
+    // Rejim o'zgarishi qadamni qayta yozmasligi kerak — faqat qadam bo'yicha.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep]);
 
   // Tab tanlangan bo'lsa managed rejim — managedConfig.enabled bu yerda shart
   // emas, chunki "Telegram orqali" tabi konfiguratsiyadan qat'i nazar ko'rinadi
@@ -305,6 +324,8 @@ export function CreateBotWizard({ labels }: Props) {
     if (stepIndex > 0) {
       setStepIndex((i) => i - 1);
     } else {
+      // Birinchi qadamdan orqaga = sehrgarni tashlab ketdi.
+      analytics.botCreateExit({ source: "blank", step: currentStep, mode: botMode });
       router.push("/app/bots");
     }
   }
@@ -324,6 +345,7 @@ export function CreateBotWizard({ labels }: Props) {
       });
 
       if (res.ok) {
+        analytics.projectCreated({ source: "blank", mode: botMode, connected: !res.noConnect });
         toast.success(labels.success);
         const project = res.project;
         // Raqamli id afzal — barcha status endpointlari pk bilan bir xil ishlaydi.
@@ -341,11 +363,18 @@ export function CreateBotWizard({ labels }: Props) {
           // No token/managed-bot ended up attached (see createBlankBotAction's
           // gap note) — polling would just spin to a timeout, so skip it.
           setLaunchState("no_connect");
+          // Hook faqat poll qilingan holatlarni yozadi; buni shu yerda yozamiz.
+          analytics.botLaunchResult({ state: "no_connect", source: "blank", mode: botMode });
         } else {
           setLaunchState("starting");
           setPollTargetId(targetId);
         }
       } else {
+        analytics.botCreateFailed({
+          source: "blank",
+          mode: botMode,
+          reason: res.message ?? "unknown",
+        });
         toast.error(res.message ?? labels.error);
       }
     });

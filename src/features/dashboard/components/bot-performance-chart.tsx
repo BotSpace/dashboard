@@ -77,7 +77,7 @@ export function BotPerformanceChart({ data, labels }: BotPerformanceChartProps) 
           <p className="mt-0.5 text-xs text-muted-foreground">{labels.emptyDesc}</p>
         </div>
         <Link
-          href="/app/bots/new"
+          href="/app/bots/new?src=chart-empty"
           className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-3 py-1.5 text-xs font-medium text-blue-400 transition-colors hover:bg-blue-500/20"
         >
           <Plus className="h-3.5 w-3.5" />

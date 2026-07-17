@@ -9,6 +9,7 @@ import { Label } from "@/shared/components/ui/label";
 import { Badge } from "@/shared/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui/tabs";
 import { claimManagedBotAction } from "@/features/bots/actions";
+import { analytics } from "@/shared/analytics/umami";
 import type { ManagedBot, ManagedBotConfig } from "@/shared/types/api";
 
 // ---------------------------------------------------------------------------
@@ -159,9 +160,14 @@ export function BotConnectTabs({
       // (internal/modules/webhook/usecase.go ManagedBotConfig) — a
       // deployment gap, not a user input problem. Surface it instead of
       // silently no-op'ing on click.
+      analytics.managedBotLinkOpened({ ok: false, reason: "no_deep_link_template" });
       toast.error(labels.managedCopyLinkFail);
       return;
     }
+    // Havola ochilgani — voronkaning "urinib ko'rdi" qadami. Buni keyingi
+    // `managed-bot-connected` bilan solishtirib, nechta foydalanuvchi
+    // BotFather'ga o'tib, lekin botni ulamay qolganini ko'ramiz.
+    analytics.managedBotLinkOpened({ ok: true });
     // Oynani AVVAL ochamiz (user-gesture popup-blocker'ga tushmasin), keyin claim.
     window.open(link, "_blank");
     // Botni SHU (login qilgan) foydalanuvchiga bog'lash uchun claim (fire-and-forget) —
@@ -182,13 +188,20 @@ export function BotConnectTabs({
           stopPolling();
           onSelectManaged(newBot.id);
           if (!name.trim()) onNameChange(newBot.name || newBot.username);
+          analytics.managedBotConnected({ waitedSec: pollCount.current * 3 });
           toast.success(labels.managedConnected);
           return;
         }
       } catch {
         // e'tiborsiz — keyingi tick qayta urinadi
       }
-      if (pollCount.current >= 40) stopPolling();
+      if (pollCount.current >= 40) {
+        // 2 daqiqa kutdi, bot ulanmadi. UI'da spinner jimgina yo'qoladi —
+        // foydalanuvchi uchun ham, biz uchun ham signalsiz. Aynan shu joyda
+        // BotFather oqimida qiynalganlarni yo'qotamiz.
+        analytics.managedBotTimeout();
+        stopPolling();
+      }
     }, 3000);
   }
 

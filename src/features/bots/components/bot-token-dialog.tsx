@@ -25,6 +25,7 @@ import {
   getManagedBotConfigAction,
   listManagedBotsAction,
 } from "@/features/bots/actions";
+import { analytics } from "@/shared/analytics/umami";
 import type { ManagedBot, ManagedBotConfig } from "@/shared/types/api";
 
 interface Props {
@@ -127,9 +128,11 @@ export function BotTokenDialog({ open, onClose, projectId }: Props) {
 
       const setResult = await setBotTokenAction(projectId, body);
       if (!setResult.ok) {
+        analytics.botTokenSetFailed({ mode: botMode, reason: setResult.message ?? "unknown" });
         setError(setResult.message);
         return;
       }
+      analytics.botTokenSet({ mode: botMode });
 
       // Token/managed bot saqlandi — deployni avtomatik qayta urinamiz.
       const deployResult = await deployReleaseAction(projectId);

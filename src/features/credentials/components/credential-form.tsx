@@ -411,19 +411,31 @@ function OAuthConnect({
   const handleConnect = async () => {
     if (connecting || !type.provider) return;
     setConnecting(true);
+    analytics.credentialOauthStart({ type: type.key });
 
     let settled = false;
-    const finish = (ok: boolean, errMsg?: string | null) => {
+    /** @param reason Nima uchun tugadi — muvaffaqiyatsiz holatlar uchun. */
+    const finish = (ok: boolean, errMsg?: string | null, reason?: string) => {
       if (settled) return;
       settled = true;
       cleanupRef.current?.();
       cleanupRef.current = null;
       setConnecting(false);
       if (ok) {
+        analytics.credentialOauthDone({ type: type.key });
+        // OAuth orqali yaratilgan credential ham umumiy "yaratildi" sanog'iga
+        // kirishi kerak — aks holda Google/OAuth tiplari hisobotda yo'qoladi.
+        analytics.credentialCreated({ type: type.key, via: "oauth" });
         toast.success("Muvaffaqiyatli ulandi");
         onSuccess();
-      } else if (errMsg) {
-        toast.error(errMsg);
+      } else {
+        // Bu tarmoqning eng jim joyi: quyidagi ikki holat (oynani yopdi /
+        // 3 daqiqa kutdi) foydalanuvchiga ham, bizga ham hech nima ko'rsatmaydi.
+        analytics.credentialOauthAbandoned({
+          type: type.key,
+          reason: reason ?? errMsg ?? "unknown",
+        });
+        if (errMsg) toast.error(errMsg);
       }
     };
 
@@ -431,6 +443,7 @@ function OAuthConnect({
       // Server Action fetches the authorize_url (keeps access token server-side)
       const res = await oauthStartAction(type.provider, type.key);
       if (!res.ok) {
+        analytics.credentialCreateFailed({ type: type.key, reason: "oauth_start_failed" });
         toast.error(res.message ?? "OAuth boshlashda xatolik");
         setConnecting(false);
         return;
@@ -460,7 +473,8 @@ function OAuthConnect({
         else
           finish(
             false,
-            e.data.error ? `OAuth xatoligi: ${e.data.error}` : "OAuth ulashda xatolik"
+            e.data.error ? `OAuth xatoligi: ${e.data.error}` : "OAuth ulashda xatolik",
+            "callback_error",
           );
       };
       window.addEventListener("message", handler);
@@ -484,10 +498,10 @@ function OAuthConnect({
       // If the user closes the popup, give the poll a few cycles, then silently cancel.
       let graceTicks = 0;
       const closeWatch = setInterval(() => {
-        if (popup?.closed && ++graceTicks >= 8) finish(false, null);
+        if (popup?.closed && ++graceTicks >= 8) finish(false, null, "popup_closed");
       }, 500);
 
-      const timeout = setTimeout(() => finish(false, null), 180000);
+      const timeout = setTimeout(() => finish(false, null, "timeout"), 180000);
 
       cleanupRef.current = () => {
         window.removeEventListener("message", handler);
@@ -628,6 +642,9 @@ export function CredentialForm({
   const [pending, setPending] = useState(false);
 
   const handleTypeSelect = (type: CredentialType) => {
+    // Voronkaning birinchi ayrilishi: dialog ochib tip tanlamaganlarni
+    // tip tanlab, formani to'ldira olmaganlardan ajratadi.
+    analytics.credentialTypeSelected({ type: type.key });
     setSelectedType(type);
     // Pre-fill defaults
     const defaults: Record<string, string> = {};
@@ -691,6 +708,7 @@ export function CredentialForm({
   const handleSubmit = async () => {
     if (!selectedType) return;
     if (!name.trim()) {
+      analytics.credentialCreateFailed({ type: selectedType.key, reason: "validation:name" });
       toast.error("Nom kiriting");
       return;
     }
@@ -700,6 +718,12 @@ export function CredentialForm({
       if (field.required && !val.trim()) {
         // On edit, empty secret = unchanged → ok
         if (isEdit && field.secret) continue;
+        // Qaysi maydon to'ldirilmagani — formaning qaysi joyi tushunarsizligini
+        // ko'rsatadi (bu yerda server'ga umuman bormaymiz).
+        analytics.credentialCreateFailed({
+          type: selectedType.key,
+          reason: `validation:${field.name}`,
+        });
         toast.error(`"${field.label}" majburiy`);
         return;
       }
@@ -728,9 +752,16 @@ export function CredentialForm({
 
       if (result.ok && result.data) {
         toast.success(isEdit ? "Credential yangilandi" : "Credential yaratildi");
-        if (!isEdit) analytics.credentialCreated({ type: selectedType.key });
+        if (isEdit) analytics.credentialUpdated({ type: selectedType.key });
+        else analytics.credentialCreated({ type: selectedType.key });
         onSuccess(result.data as Credential);
       } else {
+        if (!isEdit) {
+          analytics.credentialCreateFailed({
+            type: selectedType.key,
+            reason: result.message ?? "unknown",
+          });
+        }
         toast.error(result.message ?? "Xatolik");
       }
     } finally {

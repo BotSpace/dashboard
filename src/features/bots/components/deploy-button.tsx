@@ -29,10 +29,15 @@ export function DeployButton({ projectId }: { projectId: string | number }) {
           return;
         }
         if (result.code === "running_bot_limit" && result.running) {
+          // Botni ishga tushirmoqchi, lekin tarif limiti to'sib turibdi —
+          // eng kuchli "tarif oshirish" niyati signali.
+          analytics.runningBotLimitHit({ limit: result.limit ?? 10 });
           setLimitState({ limit: result.limit ?? 10, running: result.running });
           return;
         }
         if (result.code === "bot_token_required") {
+          // Bot yaratilgan, lekin token ulanmagan — aktivatsiya to'sig'i.
+          analytics.botTokenSetFailed({ reason: "bot_token_required" });
           setBotTokenOpen(true);
           return;
         }

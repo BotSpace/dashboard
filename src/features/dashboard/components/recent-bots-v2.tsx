@@ -41,7 +41,7 @@ export function RecentBotsV2({ bots }: { bots: Project[] }) {
         </div>
         <p className="text-sm text-muted-foreground">Hali bot yo&apos;q</p>
         <Link
-          href="/app/bots/new"
+          href="/app/bots/new?src=recent-empty"
           className="text-xs font-medium text-blue-400 hover:text-blue-300"
         >
           Birinchi botni yarating

@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { upgradePlanAction } from "@/features/billing/actions";
+import { analytics } from "@/shared/analytics/umami";
 import { formatCurrency } from "@/shared/lib/utils";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -54,6 +55,7 @@ export function PlanUpgradeButton({
     startTransition(async () => {
       const res = await upgradePlanAction(planId);
       if (res.ok) {
+        analytics.planUpgrade({ plan: planLabel, price: Number(price) });
         setConfirmOpen(false);
         toast.success("Tarif yangilandi", {
           description:
@@ -63,6 +65,14 @@ export function PlanUpgradeButton({
         });
         router.refresh();
       } else {
+        // Sabab muhim: "balansda mablag' yetarli emas" — bu tarif olmoqchi
+        // bo'lgan, lekin puli yo'q foydalanuvchi (hisob to'ldirishga yo'naltirish
+        // kerak bo'lgan joy), oddiy server xatosidan butunlay boshqacha holat.
+        analytics.planUpgradeFailed({
+          plan: planLabel,
+          price: Number(price),
+          reason: res.message ?? "unknown",
+        });
         toast.error(res.message ?? "Tarifni yangilashda xatolik");
       }
     });
@@ -70,7 +80,14 @@ export function PlanUpgradeButton({
 
   return (
     <>
-      <Button className="w-full" size="sm" onClick={() => setConfirmOpen(true)}>
+      <Button
+        className="w-full"
+        size="sm"
+        onClick={() => {
+          analytics.planUpgradeClicked({ plan: planLabel, price: Number(price) });
+          setConfirmOpen(true);
+        }}
+      >
         {label}
       </Button>
 

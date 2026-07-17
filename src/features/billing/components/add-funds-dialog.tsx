@@ -3,6 +3,7 @@ import { useActionState, useEffect, useState } from "react";
 import { Loader2, Plus, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { createTopUpAction } from "@/features/billing/actions";
+import { analytics } from "@/shared/analytics/umami";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
@@ -33,6 +34,7 @@ export function AddFundsDialog({ label }: { label: string }) {
       // Tashqi to'lov sahifasiga o'tamiz.
       window.location.href = state.link;
     } else if (state?.message) {
+      analytics.topUpFailed({ reason: state.message });
       toast.error(state.message);
     }
   }, [state]);
@@ -47,7 +49,13 @@ export function AddFundsDialog({ label }: { label: string }) {
 
   return (
     <>
-      <Button size="sm" onClick={() => setOpen(true)}>
+      <Button
+        size="sm"
+        onClick={() => {
+          analytics.topUpClicked();
+          setOpen(true);
+        }}
+      >
         <Plus className="h-4 w-4" />
         {label}
       </Button>
@@ -64,7 +72,15 @@ export function AddFundsDialog({ label }: { label: string }) {
             </DialogDescription>
           </DialogHeader>
 
-          <form action={action} className="space-y-4">
+          {/* Event submit paytida ketadi, redirect paytida emas: Umami so'rovni
+              keepalive'siz yuboradi, shuning uchun `location.href` dan oldin
+              yuborilgani yo'lda uzilib qolardi. Bu yerda server action javobi
+              kutilayotgani uchun ulgurib ketadi. */}
+          <form
+            action={action}
+            onSubmit={() => analytics.paymentStarted({ amount: Number(amount) })}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="topup-amount">Summa</Label>
               <input type="hidden" name="amount" value={amount === "" ? "" : String(amount)} />

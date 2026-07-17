@@ -23,6 +23,7 @@ import { WizardStepper } from "@/shared/components/common/wizard-stepper";
 import { BotConnectTabs, TOKEN_RE } from "@/features/bots/components/bot-connect-tabs";
 import { BotLaunchStep } from "@/features/bots/components/bot-launch-step";
 import { useLaunchPolling } from "@/features/bots/hooks/use-launch-polling";
+import { analytics } from "@/shared/analytics/umami";
 import { CredentialSlot } from "./credential-slot";
 import {
   createProjectFromTemplateAction,
@@ -526,8 +527,15 @@ export function TemplateCreateWizard({
 
   // Launch step (post-create) state — shared poller, see features/bots/hooks.
   const [pollTargetId, setPollTargetId] = useState<string | number | null>(null);
-  const { launchState, setLaunchState, launchProject, setLaunchProject } =
-    useLaunchPolling(pollTargetId);
+  const { launchState, setLaunchState, launchProject, setLaunchProject } = useLaunchPolling(
+    pollTargetId,
+    { source: "template", template: templateSlug, mode: botMode },
+  );
+
+  // Sehrgar ochildi — shablondan bot yaratish voronkasining boshi.
+  useEffect(() => {
+    analytics.templateCreateClicked({ template: templateSlug });
+  }, [templateSlug]);
 
   // StepBot poll'i chaqiradi: managed botlarni olib state'ni yangilaydi va ro'yxatni qaytaradi
   const pollManagedBots = async (): Promise<ManagedBot[]> => {
@@ -545,6 +553,19 @@ export function TemplateCreateWizard({
   const currentStep = steps[stepIndex];
 
   const [pending, startTransition] = useTransition();
+
+  // Qadam nomi bo'yicha yozamiz, indeks bo'yicha emas: qadamlar soni
+  // shablonga qarab o'zgaradi (envs/credentials bor-yo'qligiga qarab 3–5 ta),
+  // shuning uchun indeks turli shablonlarda turli qadamni bildiradi.
+  useEffect(() => {
+    analytics.botCreateStep({
+      source: "template",
+      template: templateSlug,
+      step: currentStep,
+      mode: botMode,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, templateSlug]);
 
   // ---------------------------------------------------------------------------
   // Validation per step
@@ -590,6 +611,13 @@ export function TemplateCreateWizard({
     if (stepIndex > 0) {
       setStepIndex((i) => i - 1);
     } else {
+      // Birinchi qadamdan orqaga = sehrgarni tashlab ketdi.
+      analytics.botCreateExit({
+        source: "template",
+        template: templateSlug,
+        step: currentStep,
+        mode: botMode,
+      });
       router.push(`/app/templates/${templateSlug}`);
     }
   }
@@ -639,6 +667,7 @@ export function TemplateCreateWizard({
       const res = await createProjectFromTemplateAction(body);
 
       if (res.ok && res.project) {
+        analytics.projectCreated({ source: "template", template: templateSlug, mode: botMode });
         toast.success(labels.success);
         const project = res.project;
         // Raqamli id afzal — barcha status endpointlari pk bilan bir xil ishlaydi.
@@ -655,6 +684,12 @@ export function TemplateCreateWizard({
         setStepIndex(steps.length - 1); // "launch" — always the final step
         setPollTargetId(targetId);
       } else {
+        analytics.botCreateFailed({
+          source: "template",
+          template: templateSlug,
+          mode: botMode,
+          reason: res.message ?? "unknown",
+        });
         toast.error(res.message ?? labels.error);
       }
     });

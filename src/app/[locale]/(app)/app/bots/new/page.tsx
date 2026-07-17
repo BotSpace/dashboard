@@ -7,11 +7,20 @@ import { Button } from "@/shared/components/ui/button";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { Section } from "@/shared/components/common/section";
 
-export default async function NewBotPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function NewBotPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ src?: string }>;
+}) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("bots.create");
   const w = await getTranslations("bots.wizard");
+  // Qaysi tugmadan kelingani — analitika uchun. Tugmaning o'zida track qilib
+  // bo'lmaydi: Link darhol boshqa sahifaga o'tkazadi va event yo'lda uziladi.
+  const { src } = await searchParams;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -42,6 +51,7 @@ export default async function NewBotPage({ params }: { params: Promise<{ locale:
 
       <Section>
         <CreateBotWizard
+          source={src}
           labels={{
             stepBot: w("stepBot"),
             stepConfirm: w("stepConfirm"),

@@ -50,6 +50,7 @@ import {
   listCredentialsAction,
   testCredentialAction,
 } from "../actions";
+import { analytics } from "@/shared/analytics/umami";
 import { CredentialForm } from "./credential-form";
 
 // ---------------------------------------------------------------------------
@@ -94,6 +95,14 @@ export function CredentialsPanel({ initialData, types }: CredentialsPanelProps) 
 
   // Dialogs
   const [createOpen, setCreateOpen] = useState(false);
+
+  // Voronkaning boshi: dialog ochilgani. Keyingi `credential-type-selected` va
+  // `credential-created` bilan solishtirib, qayerda to'xtab qolishlarini ko'ramiz.
+  const openCreate = (source: string) => {
+    analytics.credentialCreateStarted({ source });
+    setCreateOpen(true);
+  };
+
   const [editTarget, setEditTarget] = useState<Credential | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Credential | null>(null);
   const [deleting, startDelete] = useTransition();
@@ -184,7 +193,7 @@ export function CredentialsPanel({ initialData, types }: CredentialsPanelProps) 
         </Select>
 
         <div className="ml-auto">
-          <Button onClick={() => setCreateOpen(true)} size="sm">
+          <Button onClick={() => openCreate("header")} size="sm">
             <Plus className="mr-1.5 h-3.5 w-3.5" />
             Yangi credential
           </Button>
@@ -202,7 +211,7 @@ export function CredentialsPanel({ initialData, types }: CredentialsPanelProps) 
           title="Credential yo'q"
           description="API key, token yoki autentifikatsiya ma'lumotlarini saqlang"
           action={
-            <Button size="sm" onClick={() => setCreateOpen(true)}>
+            <Button size="sm" onClick={() => openCreate("empty-state")}>
               <Plus className="mr-1.5 h-3.5 w-3.5" />
               Yangi credential
             </Button>

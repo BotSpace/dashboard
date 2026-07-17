@@ -55,7 +55,7 @@ export default async function DashboardPage({
         </div>
 
         <Button asChild className="gap-2 shadow-lg shadow-blue-500/20">
-          <Link href="/app/bots/new">
+          <Link href="/app/bots/new?src=dashboard-header">
             <Plus className="h-4 w-4" />
             {t("newBot")}
           </Link>

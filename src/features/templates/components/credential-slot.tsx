@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Loader2, Plus } from "lucide-react";
 import { listCredentialsAction, listCredentialTypesAction } from "@/features/credentials/actions";
 import { CredentialForm } from "@/features/credentials/components/credential-form";
+import { analytics } from "@/shared/analytics/umami";
 import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 import {
@@ -129,7 +130,10 @@ export function CredentialSlot({
             variant="outline"
             size="icon"
             title={labels.credentialCreateNew}
-            onClick={() => setCreateOpen(true)}
+            onClick={() => {
+              analytics.credentialCreateStarted({ source: "template-wizard", type: typeKey });
+              setCreateOpen(true);
+            }}
           >
             <Plus className="h-4 w-4" />
           </Button>

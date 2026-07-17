@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getBotLaunchStatusAction } from "@/features/bots/actions";
+import { analytics } from "@/shared/analytics/umami";
 import type { Project } from "@/shared/types/api";
 
 // Shared by the template-create wizard and the blank-bot wizard's final
@@ -17,9 +18,22 @@ export type LaunchProject = Pick<
   "id" | "uuid" | "name" | "bot_mode" | "bot_username" | "bot_link"
 >;
 
-export function useLaunchPolling(pollTargetId: string | number | null) {
+/**
+ * @param meta Analitika uchun kontekst (`source`, `mode`) — yakuniy holat
+ *   `bot-launch-result` eventiga qo'shiladi. "Bot yaratildi" ≠ "bot ishlayapti":
+ *   failed/timeout jimgina yuz beradi, aynan shu yerda yo'qotamiz.
+ */
+export function useLaunchPolling(
+  pollTargetId: string | number | null,
+  meta?: Record<string, unknown>,
+) {
   const [launchState, setLaunchState] = useState<LaunchStatus>("starting");
   const [launchProject, setLaunchProject] = useState<LaunchProject | null>(null);
+
+  // Ref orqali: meta har renderda yangi obyekt bo'ladi, uni effect dep'iga
+  // qo'ysak polling qayta ishga tushib ketardi.
+  const metaRef = useRef(meta);
+  metaRef.current = meta;
 
   // Bot ishga tushishini poll qilish — releases/page.tsx bilan bir xil
   // endpoint (ReleasesAPI.list) dan foydalanadigan getBotLaunchStatusAction
@@ -39,12 +53,14 @@ export function useLaunchPolling(pollTargetId: string | number | null) {
         }
         if (res.status === "running") {
           setLaunchState("running");
+          analytics.botLaunchResult({ state: "running", ...metaRef.current });
           stopped = true;
           clearInterval(timer);
           return;
         }
         if (res.status === "failed") {
           setLaunchState("failed");
+          analytics.botLaunchResult({ state: "failed", ...metaRef.current });
           stopped = true;
           clearInterval(timer);
           return;
@@ -52,6 +68,7 @@ export function useLaunchPolling(pollTargetId: string | number | null) {
       }
       if (attempts >= 40) {
         setLaunchState("timeout");
+        analytics.botLaunchResult({ state: "timeout", ...metaRef.current });
         stopped = true;
         clearInterval(timer);
       }

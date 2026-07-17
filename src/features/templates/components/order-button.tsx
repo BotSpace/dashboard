@@ -3,6 +3,7 @@ import { useTransition } from "react";
 import { Loader2, ShoppingCart, Check } from "lucide-react";
 import { toast } from "sonner";
 import { orderTemplateAction } from "@/features/templates/actions";
+import { analytics } from "@/shared/analytics/umami";
 import { Button } from "@/shared/components/ui/button";
 
 type Props = {
@@ -35,9 +36,16 @@ export function OrderButton({ templateId, isFree, isOwned, labels, onOrdered }: 
     start(async () => {
       const res = await orderTemplateAction(templateId);
       if (res.ok) {
+        analytics.templateOrdered({ template: String(templateId), free: isFree });
         toast.success(labels.success);
         onOrdered?.();
       } else {
+        analytics.templateOrdered({
+          template: String(templateId),
+          free: isFree,
+          ok: false,
+          reason: res.message || "unknown",
+        });
         toast.error(res.message || labels.error);
       }
     });
