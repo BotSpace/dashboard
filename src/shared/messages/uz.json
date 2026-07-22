@@ -32,7 +32,7 @@
     "dashboard": "Boshqaruv",
     "agent": "AI Agent",
     "bots": "Botlar",
-    "boards": "Ishlar",
+    "boards": "Board",
     "cms": "Ma'lumotlar",
     "templates": "Shablonlar",
     "files": "Fayllar",
@@ -401,7 +401,7 @@
       "env": "Sozlamalar",
       "releases": "Versiyalar",
       "monitoring": "Monitoring",
-      "boards": "Ishlar",
+      "boards": "Board",
       "plan": "Tarif"
     },
     "release": {
@@ -827,7 +827,7 @@
     }
   },
   "kanban": {
-    "title": "Ishlar",
+    "title": "Board",
     "subtitle": "Lead, vazifa, buyurtma va boshqa jarayonlarni boshqaring",
     "linkedSubtitle": "{name} botiga bog‘langan boardlar",
     "filtered": "{name} bo‘yicha filtr",
@@ -850,6 +850,18 @@
     "saved": "Saqlandi",
     "cancel": "Bekor qilish",
     "archive": "Arxivlash",
+    "archiveTitle": "Arxivlangan boardlar",
+    "archiveSubtitle": "Arxivlangan boardlarni ko‘ring va qayta tiklang",
+    "activeBoards": "Faol boardlar",
+    "archiveEmpty": "Arxivlangan board yo‘q",
+    "archiveEmptyHint": "Arxivlangan boardlar shu yerda ko‘rinadi.",
+    "archivedCards": "Arxivlangan kartalar",
+    "archivedCardsEmpty": "Arxivlangan karta yo‘q.",
+    "archiveLoadFailed": "Arxivni yuklab bo‘lmadi",
+    "restore": "Qayta tiklash",
+    "boardRestored": "Board qayta tiklandi",
+    "cardRestored": "Karta qayta tiklandi",
+    "restoreFailed": "Qayta tiklab bo‘lmadi",
     "titleField": "Sarlavha",
     "descriptionField": "Tavsif",
     "priority": "Muhimlik",
@@ -876,6 +888,7 @@
       "updated": "Yangilandi",
       "moved": "Ko‘chirildi",
       "archived": "Arxivlandi",
+      "restored": "Qayta tiklandi",
       "commented": "Izoh qo‘shildi"
     },
     "templates": {

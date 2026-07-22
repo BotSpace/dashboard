@@ -22,8 +22,10 @@ import {
   Calendar,
   Clock3,
   Inbox,
+  Loader2,
   MessageSquare,
   Plus,
+  RotateCcw,
   Search,
   Send,
 } from "lucide-react";
@@ -62,7 +64,9 @@ import {
   archiveCardAction,
   createCardAction,
   getCardTimelineAction,
+  listArchivedCardsAction,
   moveCardAction,
+  restoreCardAction,
   updateCardAction,
 } from "../actions";
 
@@ -86,6 +90,10 @@ export function KanbanBoard({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("all");
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [archivedCards, setArchivedCards] = useState<KanbanCard[]>([]);
+  const [archiveLoading, setArchiveLoading] = useState(false);
+  const [restoringCard, setRestoringCard] = useState<string | null>(null);
   const router = useRouter();
   const t = useTranslations("kanban");
   const sensors = useSensors(
@@ -100,22 +108,63 @@ export function KanbanBoard({
       refreshTimer = window.setTimeout(() => router.refresh(), 120);
     };
     const source = new EventSource("/api/boards/events");
-    const eventNames = [
+    const refreshEvents = [
       "kanban_board_updated",
-      "kanban_board_archived",
       "kanban_board_linked",
       "kanban_board_unlinked",
       "kanban_column_created",
       "kanban_column_updated",
       "kanban_column_deleted",
       "kanban_columns_reordered",
+    ];
+    refreshEvents.forEach((name) => source.addEventListener(name, refresh));
+    const readCard = (event: Event) => {
+      try {
+        const card = JSON.parse((event as MessageEvent).data) as KanbanCard;
+        return card.board_id === initialBoard.id ? card : null;
+      } catch {
+        return null;
+      }
+    };
+    const upsertCard = (event: Event) => {
+      const card = readCard(event);
+      if (!card) return;
+      setCards((current) =>
+        current.some((item) => item.id === card.id)
+          ? current.map((item) => (item.id === card.id ? card : item))
+          : [...current, card],
+      );
+      setArchivedCards((current) =>
+        current.filter((item) => item.id !== card.id),
+      );
+    };
+    const archiveCard = (event: Event) => {
+      const card = readCard(event);
+      if (!card) return;
+      setCards((current) => current.filter((item) => item.id !== card.id));
+      setArchivedCards((current) =>
+        current.some((item) => item.id === card.id)
+          ? current
+          : [card, ...current],
+      );
+    };
+    [
       "kanban_card_created",
       "kanban_card_updated",
       "kanban_card_moved",
-      "kanban_card_archived",
-      "kanban_comment_created",
-    ];
-    eventNames.forEach((name) => source.addEventListener(name, refresh));
+      "kanban_card_restored",
+    ].forEach((name) => source.addEventListener(name, upsertCard));
+    source.addEventListener("kanban_card_archived", archiveCard);
+    source.addEventListener("kanban_board_archived", (event) => {
+      try {
+        const data = JSON.parse((event as MessageEvent).data) as {
+          id?: string;
+        };
+        if (data.id === initialBoard.id) router.push("/app/boards");
+      } catch {
+        // Ignore malformed events; the connection stays active.
+      }
+    });
     const mutationFailed = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data) as {
@@ -139,6 +188,42 @@ export function KanbanBoard({
       window.removeEventListener("focus", refresh);
     };
   }, [router]);
+
+  async function openArchive() {
+    setArchiveOpen(true);
+    setArchiveLoading(true);
+    try {
+      setArchivedCards(
+        await listArchivedCardsAction(initialBoard.id, projectFilter),
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : t("archiveLoadFailed"),
+      );
+    } finally {
+      setArchiveLoading(false);
+    }
+  }
+
+  async function restoreArchivedCard(card: KanbanCard) {
+    setRestoringCard(card.id);
+    try {
+      const restored = await restoreCardAction(card.id);
+      setArchivedCards((current) =>
+        current.filter((item) => item.id !== card.id),
+      );
+      setCards((current) =>
+        current.some((item) => item.id === restored.id)
+          ? current.map((item) => (item.id === restored.id ? restored : item))
+          : [...current, restored],
+      );
+      toast.success(t("cardRestored"));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("restoreFailed"));
+    } finally {
+      setRestoringCard(null);
+    }
+  }
 
   const visibleCards = useMemo(
     () =>
@@ -247,6 +332,10 @@ export function KanbanBoard({
             <SelectItem value="urgent">{t("priorities.urgent")}</SelectItem>
           </SelectContent>
         </Select>
+        <Button variant="outline" onClick={openArchive}>
+          <Archive className="mr-2 h-4 w-4" />
+          {t("archive")}
+        </Button>
       </div>
       <DndContext
         sensors={sensors}
@@ -271,6 +360,55 @@ export function KanbanBoard({
           {activeCard ? <CardTile card={activeCard} overlay /> : null}
         </DragOverlay>
       </DndContext>
+      <Dialog open={archiveOpen} onOpenChange={setArchiveOpen}>
+        <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t("archivedCards")}</DialogTitle>
+          </DialogHeader>
+          {archiveLoading ? (
+            <div className="flex min-h-40 items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : archivedCards.length === 0 ? (
+            <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+              {t("archivedCardsEmpty")}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {archivedCards.map((card) => (
+                <div
+                  key={card.id}
+                  className="flex items-center gap-3 rounded-xl border bg-card p-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium">
+                      {card.title}
+                    </div>
+                    {card.description && (
+                      <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+                        {card.description}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={restoringCard === card.id}
+                    onClick={() => restoreArchivedCard(card)}
+                  >
+                    {restoringCard === card.id ? (
+                      <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <RotateCcw className="mr-2 h-3.5 w-3.5" />
+                    )}
+                    {t("restore")}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
       <CardEditor
         board={initialBoard}
         card={selected}
@@ -510,6 +648,7 @@ function CardEditor({
     updated: t("activities.updated"),
     moved: t("activities.moved"),
     archived: t("activities.archived"),
+    restored: t("activities.restored"),
     commented: t("activities.commented"),
   };
   const open = Boolean(card || createColumnId);

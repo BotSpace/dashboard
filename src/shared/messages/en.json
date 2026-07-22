@@ -32,7 +32,7 @@
     "dashboard": "Dashboard",
     "agent": "AI Agent",
     "bots": "Bots",
-    "boards": "Work",
+    "boards": "Board",
     "cms": "Data",
     "templates": "Templates",
     "files": "Files",
@@ -405,7 +405,7 @@
       "env": "Settings",
       "releases": "Releases",
       "monitoring": "Monitoring",
-      "boards": "Work",
+      "boards": "Board",
       "plan": "Plan"
     },
     "release": {
@@ -830,7 +830,7 @@
     }
   },
   "kanban": {
-    "title": "Work",
+    "title": "Board",
     "subtitle": "Manage leads, tasks, orders, and any other workflow",
     "linkedSubtitle": "Boards linked to {name}",
     "filtered": "Filtered by {name}",
@@ -853,6 +853,18 @@
     "saved": "Saved",
     "cancel": "Cancel",
     "archive": "Archive",
+    "archiveTitle": "Archived boards",
+    "archiveSubtitle": "Review and restore archived boards",
+    "activeBoards": "Active boards",
+    "archiveEmpty": "No archived boards",
+    "archiveEmptyHint": "Archived boards will appear here.",
+    "archivedCards": "Archived cards",
+    "archivedCardsEmpty": "No archived cards.",
+    "archiveLoadFailed": "Could not load the archive",
+    "restore": "Restore",
+    "boardRestored": "Board restored",
+    "cardRestored": "Card restored",
+    "restoreFailed": "Could not restore",
     "titleField": "Title",
     "descriptionField": "Description",
     "priority": "Priority",
@@ -879,6 +891,7 @@
       "updated": "Updated",
       "moved": "Moved",
       "archived": "Archived",
+      "restored": "Restored",
       "commented": "Comment added"
     },
     "templates": {

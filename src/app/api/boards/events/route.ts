@@ -13,10 +13,11 @@ export async function GET() {
   const upstream = await fetch(`${base}${prefix}/boards/events`, {
     headers: { Authorization: `Bearer ${token}`, Accept: "text/event-stream" },
     cache: "no-store",
-    signal: AbortSignal.timeout(55_000),
   }).catch(() => null);
   if (!upstream?.ok || !upstream.body) {
-    return new Response("Realtime stream unavailable", { status: upstream?.status ?? 502 });
+    return new Response("Realtime stream unavailable", {
+      status: upstream?.status ?? 502,
+    });
   }
   return new Response(upstream.body, {
     headers: {

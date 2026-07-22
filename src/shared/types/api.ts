@@ -103,6 +103,7 @@ export type KanbanCard = {
   due_at: string | null;
   external_key: string | null;
   custom_fields: Record<string, unknown>;
+  archived_at?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -139,6 +140,7 @@ export type KanbanBoard = {
   projects?: Array<{ id: string; name: string }>;
   columns?: KanbanColumn[];
   cards?: KanbanCard[];
+  archived_at?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -383,13 +385,7 @@ export type CmsFieldKind =
   | "geo";
 
 export type CmsIndexKind =
-  | "none"
-  | "asc"
-  | "desc"
-  | "text"
-  | "hashed"
-  | "unique"
-  | "ttl";
+  "none" | "asc" | "desc" | "text" | "hashed" | "unique" | "ttl";
 
 export type CmsCascadeMode = "cascade" | "restrict" | "set_null";
 
@@ -467,8 +463,18 @@ export type DashboardOverview = {
     currency: string;
   };
   performance: { date: string; value: number }[];
-  top_bots: { id: string; name: string; messages: number; delta: number | null }[];
-  distribution: { private: number; group: number; channel: number; other: number };
+  top_bots: {
+    id: string;
+    name: string;
+    messages: number;
+    delta: number | null;
+  }[];
+  distribution: {
+    private: number;
+    group: number;
+    channel: number;
+    other: number;
+  };
 };
 
 export type CmsAuditEntry = {
@@ -558,7 +564,8 @@ export type KycStatusResponse = {
 };
 
 // CREDENTIALS (owner-scoped global) — credential.CredentialResponse / TypeDef
-export type CredentialFieldType = "text" | "password" | "number" | "select" | "textarea" | "url" | "switch";
+export type CredentialFieldType =
+  "text" | "password" | "number" | "select" | "textarea" | "url" | "switch";
 
 export type CredentialFieldOption = {
   value: string;

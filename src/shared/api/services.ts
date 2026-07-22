@@ -37,10 +37,10 @@ import type {
   CredentialListResponse,
   ManagedBot,
   ManagedBotConfig,
-	KanbanBoard,
-	KanbanCard,
-	KanbanActivity,
-	KanbanComment,
+  KanbanBoard,
+  KanbanCard,
+  KanbanActivity,
+  KanbanComment,
 } from "@/shared/types/api";
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -52,7 +52,12 @@ import type {
 // the old envelope-guessing unwrap*/ItemEnvelope logic entirely.
 // ─────────────────────────────────────────────────────────────────────────
 
-type BackendListEnvelope<T> = { items?: T[]; total?: number; limit?: number; offset?: number };
+type BackendListEnvelope<T> = {
+  items?: T[];
+  total?: number;
+  limit?: number;
+  offset?: number;
+};
 
 function unwrapList<T>(d: unknown): T[] {
   if (Array.isArray(d)) return d as T[];
@@ -70,16 +75,24 @@ export type PaginatedResult<T> = {
 };
 
 /** UI pagination (1-based page/page_size) -> backend pagination (limit/offset). */
-function toLimitOffset(params: { page?: number; page_size?: number }): { limit?: number; offset?: number } {
+function toLimitOffset(params: { page?: number; page_size?: number }): {
+  limit?: number;
+  offset?: number;
+} {
   const limit = params.page_size;
   if (!limit) return {};
   const page = Math.max(1, params.page ?? 1);
   return { limit, offset: (page - 1) * limit };
 }
 
-function unwrapPaginated<T>(d: unknown, fallbackLimit?: number): PaginatedResult<T> {
+function unwrapPaginated<T>(
+  d: unknown,
+  fallbackLimit?: number,
+): PaginatedResult<T> {
   const results = unwrapList<T>(d);
-  const e = (d && typeof d === "object" ? (d as BackendListEnvelope<T>) : {}) as BackendListEnvelope<T>;
+  const e = (
+    d && typeof d === "object" ? (d as BackendListEnvelope<T>) : {}
+  ) as BackendListEnvelope<T>;
   const total = Number(e.total) || results.length;
   const limit = Number(e.limit) || fallbackLimit || results.length || 1;
   const offset = Number(e.offset) || 0;
@@ -98,9 +111,13 @@ export const ProjectsAPI = {
     const d = await api<unknown>("/api/v1/projects", { query: { search } });
     return unwrapList<Project>(d);
   },
-  listPaged: async (params: { search?: string; page?: number; page_size?: number } = {}): Promise<PaginatedResult<Project>> => {
+  listPaged: async (
+    params: { search?: string; page?: number; page_size?: number } = {},
+  ): Promise<PaginatedResult<Project>> => {
     const { limit, offset } = toLimitOffset(params);
-    const d = await api<unknown>("/api/v1/projects", { query: { search: params.search, limit, offset } });
+    const d = await api<unknown>("/api/v1/projects", {
+      query: { search: params.search, limit, offset },
+    });
     return unwrapPaginated<Project>(d, params.page_size);
   },
   // NOTE: GET /projects/:id resolves the path param against the project's
@@ -108,10 +125,12 @@ export const ProjectsAPI = {
   // pathID() -> uuid.Parse(c.Param("id")) against the PK). Callers must link
   // with project.id, not project.uuid.
   get: async (id: string | number) => api<Project>(`/api/v1/projects/${id}`),
-  create: (body: Partial<Project>) => api<Project>("/api/v1/projects", { method: "POST", json: body }),
+  create: (body: Partial<Project>) =>
+    api<Project>("/api/v1/projects", { method: "POST", json: body }),
   update: (id: string | number, body: Partial<Project>) =>
     api<Project>(`/api/v1/projects/${id}`, { method: "PATCH", json: body }),
-  remove: (id: string | number) => api<void>(`/api/v1/projects/${id}`, { method: "DELETE" }),
+  remove: (id: string | number) =>
+    api<void>(`/api/v1/projects/${id}`, { method: "DELETE" }),
 
   // ── No backend equivalent yet — see mission report. Kept as no-op/throwing
   // stubs so existing callers (bot wizard, token dialog, monitoring tab)
@@ -120,7 +139,9 @@ export const ProjectsAPI = {
     _projectId: string | number,
     _body: { token?: string; managed_bot_id?: string },
   ): Promise<{ detail: string; username: string }> => {
-    throw new Error("Bot token ulash hali Go backend'da yo'q (project modulida deploy/engine ulanmagan)");
+    throw new Error(
+      "Bot token ulash hali Go backend'da yo'q (project modulida deploy/engine ulanmagan)",
+    );
   },
   // internal/modules/project: POST /projects/create-from-template — resolves
   // + purchase-checks the template (buyer must already hold a paid order,
@@ -137,7 +158,11 @@ export const ProjectsAPI = {
     mode?: "release" | "debug";
     envs?: Record<string, string>;
     credentials?: Record<string, number | string>;
-  }): Promise<Project> => api<Project>("/api/v1/projects/create-from-template", { method: "POST", json: body }),
+  }): Promise<Project> =>
+    api<Project>("/api/v1/projects/create-from-template", {
+      method: "POST",
+      json: body,
+    }),
   managedBotConfig: async (): Promise<ManagedBotConfig> => {
     const d = await api<unknown>("/api/v1/managed-bot/config");
     return d as ManagedBotConfig;
@@ -147,13 +172,20 @@ export const ProjectsAPI = {
     return unwrapList<ManagedBot>(d);
   },
   claimManagedBot: async (username: string): Promise<void> => {
-    await api<unknown>("/api/v1/managed-bot/claim", { method: "POST", json: { username } });
+    await api<unknown>("/api/v1/managed-bot/claim", {
+      method: "POST",
+      json: { username },
+    });
   },
-  templateRequirements: async (_templateId: string | number): Promise<TemplateRequirements> => {
+  templateRequirements: async (
+    _templateId: string | number,
+  ): Promise<TemplateRequirements> => {
     return { credentials: [], modules: [], envs: [] };
   },
-  startDebug: (id: string | number) => api<void>(`/api/v1/projects/${id}/debug`),
-  stopDebug: (id: string | number) => api<void>(`/api/v1/projects/${id}/debug/stop`),
+  startDebug: (id: string | number) =>
+    api<void>(`/api/v1/projects/${id}/debug`),
+  stopDebug: (id: string | number) =>
+    api<void>(`/api/v1/projects/${id}/debug/stop`),
   monitoring: async (id: string | number): Promise<ProjectMonitoring> =>
     api<ProjectMonitoring>(`/api/v1/projects/${id}/monitoring`),
   monitoringHistory: async (
@@ -170,39 +202,93 @@ export const ProjectsAPI = {
 
 export const KanbanAPI = {
   list: async (projectId?: string): Promise<KanbanBoard[]> => {
-    const data = await api<unknown>("/api/v1/boards", { query: { project_id: projectId } });
+    const data = await api<unknown>("/api/v1/boards", {
+      query: { project_id: projectId },
+    });
+    return unwrapList<KanbanBoard>(data);
+  },
+  archivedBoards: async (projectId?: string): Promise<KanbanBoard[]> => {
+    const data = await api<unknown>("/api/v1/boards/archived", {
+      query: { project_id: projectId },
+    });
     return unwrapList<KanbanBoard>(data);
   },
   get: (id: string, projectId?: string) =>
-    api<KanbanBoard>(`/api/v1/boards/${id}`, { query: { project_id: projectId } }),
+    api<KanbanBoard>(`/api/v1/boards/${id}`, {
+      query: { project_id: projectId },
+    }),
   create: (body: Record<string, unknown>) =>
     api<KanbanBoard>("/api/v1/boards", { method: "POST", json: body }),
   update: (id: string, body: Record<string, unknown>) =>
     api<KanbanBoard>(`/api/v1/boards/${id}`, { method: "PUT", json: body }),
-  archive: (id: string) => api<void>(`/api/v1/boards/${id}`, { method: "DELETE" }),
+  archive: (id: string) =>
+    api<void>(`/api/v1/boards/${id}`, { method: "DELETE" }),
+  restore: (id: string) =>
+    api<KanbanBoard>(`/api/v1/boards/${id}/restore`, { method: "POST" }),
   linkProject: (id: string, projectId: string) =>
-    api<void>(`/api/v1/boards/${id}/projects`, { method: "POST", json: { project_id: projectId } }),
+    api<void>(`/api/v1/boards/${id}/projects`, {
+      method: "POST",
+      json: { project_id: projectId },
+    }),
   unlinkProject: (id: string, projectId: string) =>
-    api<void>(`/api/v1/boards/${id}/projects/${projectId}`, { method: "DELETE" }),
+    api<void>(`/api/v1/boards/${id}/projects/${projectId}`, {
+      method: "DELETE",
+    }),
   createColumn: (boardId: string, body: Record<string, unknown>) =>
     api(`/api/v1/boards/${boardId}/columns`, { method: "POST", json: body }),
-  updateColumn: (boardId: string, columnId: string, body: Record<string, unknown>) =>
-    api(`/api/v1/boards/${boardId}/columns/${columnId}`, { method: "PUT", json: body }),
+  updateColumn: (
+    boardId: string,
+    columnId: string,
+    body: Record<string, unknown>,
+  ) =>
+    api(`/api/v1/boards/${boardId}/columns/${columnId}`, {
+      method: "PUT",
+      json: body,
+    }),
   removeColumn: (boardId: string, columnId: string) =>
-    api<void>(`/api/v1/boards/${boardId}/columns/${columnId}`, { method: "DELETE" }),
+    api<void>(`/api/v1/boards/${boardId}/columns/${columnId}`, {
+      method: "DELETE",
+    }),
   reorderColumns: (boardId: string, columnIds: string[]) =>
-    api(`/api/v1/boards/${boardId}/columns/reorder`, { method: "POST", json: { column_ids: columnIds } }),
+    api(`/api/v1/boards/${boardId}/columns/reorder`, {
+      method: "POST",
+      json: { column_ids: columnIds },
+    }),
   createCard: (boardId: string, body: Record<string, unknown>) =>
-    api<KanbanCard>(`/api/v1/boards/${boardId}/cards`, { method: "POST", json: body }),
+    api<KanbanCard>(`/api/v1/boards/${boardId}/cards`, {
+      method: "POST",
+      json: body,
+    }),
   updateCard: (id: string, body: Record<string, unknown>) =>
     api<KanbanCard>(`/api/v1/cards/${id}`, { method: "PUT", json: body }),
   moveCard: (id: string, columnId: string, position: number) =>
-    api<KanbanCard>(`/api/v1/cards/${id}/move`, { method: "POST", json: { column_id: columnId, position } }),
-  archiveCard: (id: string) => api<KanbanCard>(`/api/v1/cards/${id}`, { method: "DELETE" }),
-  activities: (id: string) => api<KanbanActivity[]>(`/api/v1/cards/${id}/activities`),
-  comments: (id: string) => api<KanbanComment[]>(`/api/v1/cards/${id}/comments`),
+    api<KanbanCard>(`/api/v1/cards/${id}/move`, {
+      method: "POST",
+      json: { column_id: columnId, position },
+    }),
+  archiveCard: (id: string) =>
+    api<KanbanCard>(`/api/v1/cards/${id}`, { method: "DELETE" }),
+  archivedCards: async (
+    boardId: string,
+    projectId?: string,
+  ): Promise<KanbanCard[]> => {
+    const data = await api<unknown>(
+      `/api/v1/boards/${boardId}/cards/archived`,
+      { query: { project_id: projectId } },
+    );
+    return unwrapList<KanbanCard>(data);
+  },
+  restoreCard: (id: string) =>
+    api<KanbanCard>(`/api/v1/cards/${id}/restore`, { method: "POST" }),
+  activities: (id: string) =>
+    api<KanbanActivity[]>(`/api/v1/cards/${id}/activities`),
+  comments: (id: string) =>
+    api<KanbanComment[]>(`/api/v1/cards/${id}/comments`),
   comment: (id: string, body: string) =>
-    api<KanbanComment>(`/api/v1/cards/${id}/comments`, { method: "POST", json: { body } }),
+    api<KanbanComment>(`/api/v1/cards/${id}/comments`, {
+      method: "POST",
+      json: { body },
+    }),
 };
 
 // RELEASES — internal/modules/release ("/relase", mirrors legacy Django path)
@@ -212,10 +298,14 @@ export const ReleasesAPI = {
     return unwrapList<Release>(d);
   },
   create: (project: string | number) =>
-    api<Release>("/api/v1/relase", { method: "POST", json: { project_id: project } }),
+    api<Release>("/api/v1/relase", {
+      method: "POST",
+      json: { project_id: project },
+    }),
   // NOTE: StopRelease is a GET in the Go backend (internal/modules/release/routes.go),
   // not a POST — mirrored here even though it's an odd verb for a mutation.
-  stop: (releaseId: string | number) => api<void>(`/api/v1/relase/${releaseId}/stop`),
+  stop: (releaseId: string | number) =>
+    api<void>(`/api/v1/relase/${releaseId}/stop`),
   rollback: (_releaseId: string | number): Promise<Release> => {
     throw new Error("Release rollback hali Go backend'da yo'q");
   },
@@ -230,13 +320,26 @@ export const EnvAPI = {
     const d = await api<unknown>("/api/v1/enviroment", { query: { project } });
     return unwrapList<EnvVar>(d);
   },
-  create: (body: { project: string | number; key: string; value: string; secret?: boolean }) =>
+  create: (body: {
+    project: string | number;
+    key: string;
+    value: string;
+    secret?: boolean;
+  }) =>
     api<EnvVar>("/api/v1/enviroment", {
       method: "POST",
-      json: { project_id: body.project, key: body.key, value: body.value, secret: body.secret ?? false },
+      json: {
+        project_id: body.project,
+        key: body.key,
+        value: body.value,
+        secret: body.secret ?? false,
+      },
     }),
   remove: (key: string, project: string | number) =>
-    api<void>(`/api/v1/enviroment/${encodeURIComponent(key)}`, { method: "DELETE", query: { project } }),
+    api<void>(`/api/v1/enviroment/${encodeURIComponent(key)}`, {
+      method: "DELETE",
+      query: { project },
+    }),
 };
 
 // PLANS — public, no auth needed
@@ -256,27 +359,42 @@ export const SubscriptionAPI = {
   current: async () => api<Subscription>("/api/v1/subscription"),
   usage: async () => api<SubscriptionUsage>("/api/v1/subscription/usage"),
   upgrade: (planId: number | string, months = 1) =>
-    api<{ message: string; previous_plan: string; new_plan: string; data: Subscription }>(
-      "/api/v1/subscription/upgrade",
-      { method: "POST", json: { plan_id: planId, months } },
-    ),
+    api<{
+      message: string;
+      previous_plan: string;
+      new_plan: string;
+      data: Subscription;
+    }>("/api/v1/subscription/upgrade", {
+      method: "POST",
+      json: { plan_id: planId, months },
+    }),
 };
 
 // FILES — internal/modules/file
 export const FilesAPI = {
   list: async (project?: string | number) => {
-    const d = await api<unknown>("/api/v1/file", { query: { project_id: project } });
+    const d = await api<unknown>("/api/v1/file", {
+      query: { project_id: project },
+    });
     return unwrapList<FileItem>(d);
   },
   listPaged: async (
-    params: { project?: string | number; page?: number; page_size?: number } = {},
+    params: {
+      project?: string | number;
+      page?: number;
+      page_size?: number;
+    } = {},
   ): Promise<PaginatedResult<FileItem>> => {
     const { limit, offset } = toLimitOffset(params);
-    const d = await api<unknown>("/api/v1/file", { query: { project_id: params.project, limit, offset } });
+    const d = await api<unknown>("/api/v1/file", {
+      query: { project_id: params.project, limit, offset },
+    });
     return unwrapPaginated<FileItem>(d, params.page_size);
   },
-  upload: async (body: FormData) => api<FileItem>("/api/v1/file", { method: "POST", body }),
-  remove: (uuid: string | number) => api<void>(`/api/v1/file/${uuid}`, { method: "DELETE" }),
+  upload: async (body: FormData) =>
+    api<FileItem>("/api/v1/file", { method: "POST", body }),
+  remove: (uuid: string | number) =>
+    api<void>(`/api/v1/file/${uuid}`, { method: "DELETE" }),
 };
 
 // TEMPLATES — internal/modules/template
@@ -295,9 +413,14 @@ export type TemplateListParams = {
 // `{status,data:{results,total_pages}}`) — sitemap kabi to'liq ro'yxat kerak
 // bo'lganda ikkalasini ham qamrab olamiz (unwrapList faqat `items` o'qigani
 // sabab yangi konvertda bo'sh qaytarardi).
-function readTemplatePage(d: unknown): { items: Template[]; totalPages: number } {
+function readTemplatePage(d: unknown): {
+  items: Template[];
+  totalPages: number;
+} {
   const root =
-    d && typeof d === "object" && "data" in d ? (d as { data: unknown }).data : d;
+    d && typeof d === "object" && "data" in d
+      ? (d as { data: unknown }).data
+      : d;
   if (Array.isArray(root)) return { items: root as Template[], totalPages: 1 };
   const e = (root ?? {}) as {
     items?: Template[];
@@ -317,7 +440,9 @@ export type PaginatedTemplates = {
 
 function unwrapPaginatedTemplates(d: unknown): PaginatedTemplates {
   const items = unwrapList<Template>(d);
-  const e = (d && typeof d === "object" ? (d as BackendListEnvelope<Template>) : {}) as BackendListEnvelope<Template>;
+  const e = (
+    d && typeof d === "object" ? (d as BackendListEnvelope<Template>) : {}
+  ) as BackendListEnvelope<Template>;
   const total = Number(e.total) || items.length;
   const limit = Number(e.limit) || items.length || 1;
   const offset = Number(e.offset) || 0;
@@ -330,7 +455,7 @@ function unwrapPaginatedTemplates(d: unknown): PaginatedTemplates {
 // backend filter reads `category_id`/`feature_id`/`min_price`/`max_price`
 // (see template handler List). Map here so every list call filters correctly.
 function toTemplateQuery(
-  params: TemplateListParams
+  params: TemplateListParams,
 ): Record<string, string | number | boolean | null | undefined> {
   const { categories, features, price_min, price_max, ...rest } = params;
   return {
@@ -344,11 +469,17 @@ function toTemplateQuery(
 
 export const TemplatesAPI = {
   list: async (params: TemplateListParams = {}) => {
-    const d = await api<unknown>("/api/v1/template/list", { query: toTemplateQuery(params) });
+    const d = await api<unknown>("/api/v1/template/list", {
+      query: toTemplateQuery(params),
+    });
     return unwrapList<Template>(d);
   },
-  listPaginated: async (params: TemplateListParams = {}): Promise<PaginatedTemplates> => {
-    const d = await api<unknown>("/api/v1/template/list", { query: toTemplateQuery(params) });
+  listPaginated: async (
+    params: TemplateListParams = {},
+  ): Promise<PaginatedTemplates> => {
+    const d = await api<unknown>("/api/v1/template/list", {
+      query: toTemplateQuery(params),
+    });
     return unwrapPaginatedTemplates(d);
   },
   // BARCHA template'larni oladi (sitemap uchun) — katta page_size bilan bitta
@@ -373,7 +504,9 @@ export const TemplatesAPI = {
       all.push(...readTemplatePage(d).items);
     }
     if (totalPages > MAX_PAGES) {
-      console.warn(`[sitemap] template sahifalari cheklandi: ${totalPages} dan ${MAX_PAGES}`);
+      console.warn(
+        `[sitemap] template sahifalari cheklandi: ${totalPages} dan ${MAX_PAGES}`,
+      );
     }
     return all;
   },
@@ -387,13 +520,21 @@ export const TemplatesAPI = {
     return unwrapList<TemplateFeature>(d);
   },
   order: (templateId: string | number) =>
-    api("/api/v1/template/orders", { method: "POST", json: { template_id: templateId } }),
+    api("/api/v1/template/orders", {
+      method: "POST",
+      json: { template_id: templateId },
+    }),
 };
 
 // BLOG (publik — login talab qilinmaydi)
 export const BlogAPI = {
-  list: async (params: { page?: number } = {}): Promise<PaginatedResult<BlogPostListItem>> => {
-    const { limit, offset } = toLimitOffset({ page: params.page, page_size: 10 });
+  list: async (
+    params: { page?: number } = {},
+  ): Promise<PaginatedResult<BlogPostListItem>> => {
+    const { limit, offset } = toLimitOffset({
+      page: params.page,
+      page_size: 10,
+    });
     const d = await api<unknown>("/api/v1/blog", { query: { limit, offset } });
     return unwrapPaginated<BlogPostListItem>(d, 10);
   },
@@ -407,7 +548,8 @@ export const TicketsAPI = {
     return unwrapList<Ticket>(d);
   },
   get: (id: string | number) => api<Ticket>(`/api/v1/tickets/${id}`),
-  create: (body: FormData) => api<Ticket>("/api/v1/tickets", { method: "POST", body }),
+  create: (body: FormData) =>
+    api<Ticket>("/api/v1/tickets", { method: "POST", body }),
   reply: (id: string | number, body: FormData) =>
     api<Ticket>(`/api/v1/tickets/${id}/reply`, { method: "POST", body }),
 };
@@ -423,15 +565,24 @@ export const BillingAPI = {
     return unwrapList<Transaction>(d);
   },
   balance: async () => {
-    const d = await api<{ balance: number; template_balance?: string }>("/api/v1/users/me/balance");
-    return { balance: d.balance, template_balance: d.template_balance, currency: "UZS" };
+    const d = await api<{ balance: number; template_balance?: string }>(
+      "/api/v1/users/me/balance",
+    );
+    return {
+      balance: d.balance,
+      template_balance: d.template_balance,
+      currency: "UZS",
+    };
   },
   // Balansni to'ldirish — Click/Payme pay link qaytaradi.
   // internal/modules/payment/dto.go CreatePaymentLinkRequest: `method` (click|payme)
   // + `amount` as a STRING (validate:"required" on a string field — a bare
   // number in the JSON body fails Go's json.Unmarshal into string, hence the
   // old "invalid request body" error).
-  createTopUp: async (body: { method: "click" | "payme"; amount: number | string }): Promise<{ link: string }> => {
+  createTopUp: async (body: {
+    method: "click" | "payme";
+    amount: number | string;
+  }): Promise<{ link: string }> => {
     const d = await api<{ link: string }>("/api/v1/payment/link", {
       method: "POST",
       json: { method: body.method, amount: String(body.amount) },
@@ -443,14 +594,29 @@ export const BillingAPI = {
 // EARNINGS — bot to'lov daromadlari (balans + bot bo'yicha taqsimot + orderlar)
 export const EarningsAPI = {
   summary: async (
-    params: { project_in?: string; status?: string; provider?: string; page?: number } = {}
+    params: {
+      project_in?: string;
+      status?: string;
+      provider?: string;
+      page?: number;
+    } = {},
   ): Promise<EarningsSummary> => {
-    const { limit, offset } = toLimitOffset({ page: params.page, page_size: 20 });
+    const { limit, offset } = toLimitOffset({
+      page: params.page,
+      page_size: 20,
+    });
     return api<EarningsSummary>("/api/v1/payment/earnings", {
-      query: { project_id: params.project_in, status: params.status, provider: params.provider, limit, offset },
+      query: {
+        project_id: params.project_in,
+        status: params.status,
+        provider: params.provider,
+        limit,
+        offset,
+      },
     });
   },
-  detail: async (id: number | string): Promise<EarningsOrder> => api<EarningsOrder>(`/api/v1/payment/earnings/${id}`),
+  detail: async (id: number | string): Promise<EarningsOrder> =>
+    api<EarningsOrder>(`/api/v1/payment/earnings/${id}`),
 };
 
 // WITHDRAWAL — bot daromadlaridan pul yechish
@@ -474,19 +640,23 @@ export const WithdrawalAPI = {
         card_owner: body.card_owner,
       },
     }),
-  remove: (id: number | string) => api<void>(`/api/v1/payment/withdrawals/${id}`, { method: "DELETE" }),
+  remove: (id: number | string) =>
+    api<void>(`/api/v1/payment/withdrawals/${id}`, { method: "DELETE" }),
 };
 
 // KYC — verifikatsiya (pasport, rasm, ma'lumotnoma)
 export const KycAPI = {
   status: async () => api<KycStatusResponse>("/api/v1/kyc/status"),
-  submit: async (body: FormData) => api<KycVerification>("/api/v1/kyc", { method: "POST", body }),
+  submit: async (body: FormData) =>
+    api<KycVerification>("/api/v1/kyc", { method: "POST", body }),
 };
 
 // MESSAGES (broadcast) — internal/modules/message
 export const MessagesAPI = {
   list: async (project?: string | number) => {
-    const d = await api<unknown>("/api/v1/messages", { query: { project_id: project } });
+    const d = await api<unknown>("/api/v1/messages", {
+      query: { project_id: project },
+    });
     return unwrapList<BroadcastMessage>(d);
   },
   send: (body: {
@@ -504,8 +674,10 @@ export const MessagesAPI = {
         button_type: body.button_type ?? "reply",
       },
     }),
-  sendForm: (body: FormData) => api<BroadcastMessage>("/api/v1/messages", { method: "POST", body }),
-  remove: (id: string | number) => api<void>(`/api/v1/messages/${id}`, { method: "DELETE" }),
+  sendForm: (body: FormData) =>
+    api<BroadcastMessage>("/api/v1/messages", { method: "POST", body }),
+  remove: (id: string | number) =>
+    api<void>(`/api/v1/messages/${id}`, { method: "DELETE" }),
 };
 
 // CMSv2 — collection schema in Postgres, documents in Mongo (internal/modules/cms)
@@ -524,18 +696,25 @@ function slugify(raw: string): string {
   return s || "collection";
 }
 
-function cms(projectId: string | number, ...parts: (string | number)[]): string {
+function cms(
+  projectId: string | number,
+  ...parts: (string | number)[]
+): string {
   const tail = parts.map((p) => encodeURIComponent(p)).join("/");
   return `/api/v1/cms/projects/${projectId}/collections${tail ? "/" + tail : ""}`;
 }
 
 export const CmsAPI = {
-  listCollections: async (projectId: string | number): Promise<CmsCollection[]> => {
+  listCollections: async (
+    projectId: string | number,
+  ): Promise<CmsCollection[]> => {
     const d = await api<unknown>(cms(projectId));
     return unwrapList<CmsCollection>(d);
   },
-  getCollection: (projectId: string | number, name: string): Promise<CmsCollection> =>
-    api<CmsCollection>(cms(projectId, name)),
+  getCollection: (
+    projectId: string | number,
+    name: string,
+  ): Promise<CmsCollection> => api<CmsCollection>(cms(projectId, name)),
   // internal/modules/cms dto.go CreateCollectionRequest requires BOTH `name`
   // (required) and `slug` (required, min=1, max=80, lowercase snake_case —
   // becomes the immutable Mongo collection name). The dashboard's schema
@@ -553,7 +732,7 @@ export const CmsAPI = {
       description?: string;
       primary_field?: string;
       fields?: CmsField[];
-    }
+    },
   ): Promise<CmsCollection> => {
     const slug = slugify(body.slug || body.name);
     return api<CmsCollection>(cms(projectId), {
@@ -569,27 +748,47 @@ export const CmsAPI = {
   updateCollection: (
     projectId: string | number,
     name: string,
-    patch: { label?: string; description?: string; primary_field?: string }
-  ): Promise<CmsCollection> => api<CmsCollection>(cms(projectId, name), { method: "PATCH", json: patch }),
+    patch: { label?: string; description?: string; primary_field?: string },
+  ): Promise<CmsCollection> =>
+    api<CmsCollection>(cms(projectId, name), { method: "PATCH", json: patch }),
   deleteCollection: (projectId: string | number, name: string): Promise<void> =>
     api<void>(cms(projectId, name), { method: "DELETE" }),
-  addField: (projectId: string | number, name: string, field: CmsField): Promise<CmsField> =>
-    api<CmsField>(cms(projectId, name, "fields"), { method: "POST", json: field }),
+  addField: (
+    projectId: string | number,
+    name: string,
+    field: CmsField,
+  ): Promise<CmsField> =>
+    api<CmsField>(cms(projectId, name, "fields"), {
+      method: "POST",
+      json: field,
+    }),
   updateField: (
     projectId: string | number,
     name: string,
     fieldName: string,
-    patch: Partial<CmsField>
+    patch: Partial<CmsField>,
   ): Promise<CmsField> =>
-    api<CmsField>(cms(projectId, name, "fields", fieldName), { method: "PATCH", json: patch }),
-  removeField: (projectId: string | number, name: string, fieldName: string): Promise<void> =>
+    api<CmsField>(cms(projectId, name, "fields", fieldName), {
+      method: "PATCH",
+      json: patch,
+    }),
+  removeField: (
+    projectId: string | number,
+    name: string,
+    fieldName: string,
+  ): Promise<void> =>
     api<void>(cms(projectId, name, "fields", fieldName), { method: "DELETE" }),
 
   // Documents
   listDocuments: (
     projectId: string | number,
     name: string,
-    params: { filter?: Record<string, unknown>; sort?: string; limit?: number; skip?: number } = {}
+    params: {
+      filter?: Record<string, unknown>;
+      sort?: string;
+      limit?: number;
+      skip?: number;
+    } = {},
   ): Promise<CmsDocumentListResponse> => {
     const query: Record<string, string | number | undefined> = {
       limit: params.limit ?? 50,
@@ -599,14 +798,16 @@ export const CmsAPI = {
       query.filter = JSON.stringify(params.filter);
     }
     if (params.sort) query.sort = params.sort;
-    return api<CmsDocumentListResponse>(cms(projectId, name, "documents"), { query });
+    return api<CmsDocumentListResponse>(cms(projectId, name, "documents"), {
+      query,
+    });
   },
   // Cursor pagination for relation pickers: pass the previous page's
   // next_cursor to fetch the next batch; optional search hits primary_field.
   listDocumentsCursor: (
     projectId: string | number,
     name: string,
-    params: { cursor?: string | null; search?: string; limit?: number } = {}
+    params: { cursor?: string | null; search?: string; limit?: number } = {},
   ): Promise<CmsDocumentCursorResponse> => {
     const query: Record<string, string | number | undefined> = {
       paginate: "cursor",
@@ -614,20 +815,29 @@ export const CmsAPI = {
     };
     if (params.cursor) query.cursor = params.cursor;
     if (params.search) query.search = params.search;
-    return api<CmsDocumentCursorResponse>(cms(projectId, name, "documents"), { query });
+    return api<CmsDocumentCursorResponse>(cms(projectId, name, "documents"), {
+      query,
+    });
   },
-  getDocument: (projectId: string | number, name: string, id: string): Promise<CmsDocument> =>
+  getDocument: (
+    projectId: string | number,
+    name: string,
+    id: string,
+  ): Promise<CmsDocument> =>
     api<CmsDocument>(cms(projectId, name, "documents", id)),
   insertDocument: (
     projectId: string | number,
     name: string,
-    document: Record<string, unknown>
+    document: Record<string, unknown>,
   ): Promise<CmsDocument> =>
-    api<CmsDocument>(cms(projectId, name, "documents"), { method: "POST", json: document }),
+    api<CmsDocument>(cms(projectId, name, "documents"), {
+      method: "POST",
+      json: document,
+    }),
   bulkInsert: async (
     _projectId: string | number,
     _name: string,
-    _documents: Record<string, unknown>[]
+    _documents: Record<string, unknown>[],
   ): Promise<{ inserted_ids: string[]; count: number }> => {
     throw new Error("CMS bulk insert hali Go backend'da yo'q");
   },
@@ -635,10 +845,17 @@ export const CmsAPI = {
     projectId: string | number,
     name: string,
     id: string,
-    patch: Record<string, unknown>
+    patch: Record<string, unknown>,
   ): Promise<CmsDocument> =>
-    api<CmsDocument>(cms(projectId, name, "documents", id), { method: "PATCH", json: patch }),
-  deleteDocument: (projectId: string | number, name: string, id: string): Promise<void> =>
+    api<CmsDocument>(cms(projectId, name, "documents", id), {
+      method: "PATCH",
+      json: patch,
+    }),
+  deleteDocument: (
+    projectId: string | number,
+    name: string,
+    id: string,
+  ): Promise<void> =>
     api<void>(cms(projectId, name, "documents", id), { method: "DELETE" }),
   restoreDocument: async (): Promise<unknown> => {
     throw new Error("CMS document restore hali Go backend'da yo'q");
@@ -649,7 +866,7 @@ export const CmsAPI = {
   audit: async (
     _projectId: string | number,
     _name: string,
-    _params: { action?: string; document_id?: string } = {}
+    _params: { action?: string; document_id?: string } = {},
   ): Promise<CmsAuditEntry[]> => [],
 };
 
@@ -678,9 +895,13 @@ export const CredentialsAPI = {
     const d = await api<unknown>("/api/v1/credentials/types");
     return unwrapList<CredentialType>(d);
   },
-  list: async (params: { type_key?: string; page?: number; page_size?: number } = {}): Promise<CredentialListResponse> => {
+  list: async (
+    params: { type_key?: string; page?: number; page_size?: number } = {},
+  ): Promise<CredentialListResponse> => {
     const { limit, offset } = toLimitOffset(params);
-    const d = await api<unknown>("/api/v1/credentials", { query: { type_key: params.type_key, limit, offset } });
+    const d = await api<unknown>("/api/v1/credentials", {
+      query: { type_key: params.type_key, limit, offset },
+    });
     const p = unwrapPaginated<unknown>(d, params.page_size);
     return {
       results: p.results.map(toCredential),
@@ -692,11 +913,24 @@ export const CredentialsAPI = {
   },
   get: async (id: string | number): Promise<Credential> =>
     toCredential(await api<unknown>(`/api/v1/credentials/${id}`)),
-  create: (body: { type_key: string; name: string; data: Record<string, string> }): Promise<Credential> =>
-    api<unknown>("/api/v1/credentials", { method: "POST", json: body }).then(toCredential),
-  update: (id: string | number, body: { name?: string; data?: Record<string, string> }): Promise<Credential> =>
-    api<unknown>(`/api/v1/credentials/${id}`, { method: "PATCH", json: body }).then(toCredential),
-  remove: (id: string | number): Promise<void> => api<void>(`/api/v1/credentials/${id}`, { method: "DELETE" }),
+  create: (body: {
+    type_key: string;
+    name: string;
+    data: Record<string, string>;
+  }): Promise<Credential> =>
+    api<unknown>("/api/v1/credentials", { method: "POST", json: body }).then(
+      toCredential,
+    ),
+  update: (
+    id: string | number,
+    body: { name?: string; data?: Record<string, string> },
+  ): Promise<Credential> =>
+    api<unknown>(`/api/v1/credentials/${id}`, {
+      method: "PATCH",
+      json: body,
+    }).then(toCredential),
+  remove: (id: string | number): Promise<void> =>
+    api<void>(`/api/v1/credentials/${id}`, { method: "DELETE" }),
 
   // ── No route in the Go backend yet (internal/modules/credential/routes.go
   // exposes only list/create/types/get/patch/delete) — see mission report.
@@ -704,16 +938,24 @@ export const CredentialsAPI = {
     throw new Error("Credential test hali Go backend'da yo'q");
   },
   reveal: async (_id: string | number): Promise<Record<string, string>> => {
-    throw new Error("Credential reveal hali Go backend'da yo'q (data har doim maskalangan qaytadi)");
+    throw new Error(
+      "Credential reveal hali Go backend'da yo'q (data har doim maskalangan qaytadi)",
+    );
   },
   // POST /api/v1/credentials/oauth/:provider/start {type_key} -> {authorize_url}
   // (internal/modules/credential/routes.go). Redirect the browser to authorize_url;
   // Google's callback is handled at /api/v1/credentials/oauth/:provider/callback.
-  oauthStart: async (provider: string, type_key: string): Promise<{ authorize_url: string }> =>
-    api<{ authorize_url: string }>(`/api/v1/credentials/oauth/${provider}/start`, {
-      method: "POST",
-      json: { type_key },
-    }),
+  oauthStart: async (
+    provider: string,
+    type_key: string,
+  ): Promise<{ authorize_url: string }> =>
+    api<{ authorize_url: string }>(
+      `/api/v1/credentials/oauth/${provider}/start`,
+      {
+        method: "POST",
+        json: { type_key },
+      },
+    ),
 };
 
 // DASHBOARD
@@ -740,7 +982,9 @@ export const DashboardAPI = {
         currency: "UZS",
       },
       performance: [],
-      top_bots: projects.slice(0, 5).map((p) => ({ id: p.id, name: p.name, messages: 0, delta: null })),
+      top_bots: projects
+        .slice(0, 5)
+        .map((p) => ({ id: p.id, name: p.name, messages: 0, delta: null })),
       distribution: { private: 0, group: 0, channel: 0, other: 0 },
     };
     // `usage` is fetched (and available to future callers) but the current
@@ -754,8 +998,18 @@ export const DashboardAPI = {
 // routes registered in internal/server/server.go). Kept as an empty/throwing
 // stub so the settings page compiles; see mission report.
 export const APITokensAPI = {
-  list: async (): Promise<{ id: number; name: string; prefix: string; last_used_at: string | null; created_at: string }[]> => [],
-  create: async (_name: string): Promise<{ id: number; name: string; token: string; prefix: string }> => {
+  list: async (): Promise<
+    {
+      id: number;
+      name: string;
+      prefix: string;
+      last_used_at: string | null;
+      created_at: string;
+    }[]
+  > => [],
+  create: async (
+    _name: string,
+  ): Promise<{ id: number; name: string; token: string; prefix: string }> => {
     throw new Error("API tokenlar hali Go backend'da yo'q");
   },
   remove: async (_id: number | string): Promise<void> => {
@@ -766,13 +1020,27 @@ export const APITokensAPI = {
 // AUTH (profile) — internal/modules/user
 export const AuthAPI = {
   me: async () =>
-    api<{ id: string; first_name?: string; last_name?: string; email?: string; phone?: string; avatar?: string }>(
-      "/api/v1/users/me"
-    ),
-  updateProfile: (body: { name?: string; email?: string; first_name?: string; last_name?: string }) =>
+    api<{
+      id: string;
+      first_name?: string;
+      last_name?: string;
+      email?: string;
+      phone?: string;
+      avatar?: string;
+    }>("/api/v1/users/me"),
+  updateProfile: (body: {
+    name?: string;
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+  }) =>
     api("/api/v1/users/me", {
       method: "PATCH",
-      json: { first_name: body.first_name, last_name: body.last_name, email: body.email },
+      json: {
+        first_name: body.first_name,
+        last_name: body.last_name,
+        email: body.email,
+      },
     }),
   changePassword: (body: { old_password: string; new_password: string }) =>
     api("/api/v1/users/me/password", { method: "POST", json: body }),

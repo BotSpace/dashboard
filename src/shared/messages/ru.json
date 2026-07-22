@@ -32,7 +32,7 @@
     "dashboard": "Панель",
     "agent": "AI Агент",
     "bots": "Боты",
-    "boards": "Работа",
+    "boards": "Board",
     "cms": "Данные",
     "templates": "Шаблоны",
     "files": "Файлы",
@@ -405,7 +405,7 @@
       "env": "Настройки",
       "releases": "Релизы",
       "monitoring": "Мониторинг",
-      "boards": "Работа",
+      "boards": "Board",
       "plan": "Тариф"
     },
     "release": {
@@ -829,7 +829,7 @@
     }
   },
   "kanban": {
-    "title": "Работа",
+    "title": "Board",
     "subtitle": "Управляйте лидами, задачами, заказами и другими процессами",
     "linkedSubtitle": "Доски, связанные с ботом {name}",
     "filtered": "Фильтр по {name}",
@@ -852,6 +852,18 @@
     "saved": "Сохранено",
     "cancel": "Отмена",
     "archive": "Архивировать",
+    "archiveTitle": "Архивные доски",
+    "archiveSubtitle": "Просматривайте и восстанавливайте архивные доски",
+    "activeBoards": "Активные доски",
+    "archiveEmpty": "Архивных досок нет",
+    "archiveEmptyHint": "Архивные доски появятся здесь.",
+    "archivedCards": "Архивные карточки",
+    "archivedCardsEmpty": "Архивных карточек нет.",
+    "archiveLoadFailed": "Не удалось загрузить архив",
+    "restore": "Восстановить",
+    "boardRestored": "Доска восстановлена",
+    "cardRestored": "Карточка восстановлена",
+    "restoreFailed": "Не удалось восстановить",
     "titleField": "Заголовок",
     "descriptionField": "Описание",
     "priority": "Приоритет",
@@ -878,6 +890,7 @@
       "updated": "Обновлено",
       "moved": "Перемещено",
       "archived": "Архивировано",
+      "restored": "Восстановлено",
       "commented": "Добавлен комментарий"
     },
     "templates": {

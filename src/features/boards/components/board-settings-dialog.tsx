@@ -38,12 +38,8 @@ import {
 } from "@/shared/components/ui/select";
 import {
   archiveBoardAction,
-  createColumnAction,
   removeColumnAction,
-  reorderColumnsAction,
-  setBoardProjectAction,
-  updateBoardAction,
-  updateColumnAction,
+  saveBoardSettingsAction,
 } from "../actions";
 
 type Field = { key: string; label: string; type: string; isNew?: boolean };
@@ -93,44 +89,30 @@ export function BoardSettingsDialog({
   function save() {
     startTransition(async () => {
       try {
-        await updateBoardAction(board.id, {
-          name,
-          description,
-          icon: board.icon,
-          color: board.color,
-          card_type_label: cardLabel,
-          field_schema: fields
-            .filter((field) => field.key.trim() && field.label.trim())
-            .map(({ key, label, type }) => ({ key, label, type })),
-        });
-        const savedColumns = await Promise.all(
-          columns.map((column) =>
-            column.id.startsWith("new:")
-              ? createColumnAction(board.id, {
-                  name: column.name,
-                  color: column.color,
-                  wip_limit: column.wip_limit,
-                  is_terminal: column.is_terminal,
-                })
-              : updateColumnAction(board.id, column.id, {
-                  name: column.name,
-                  color: column.color,
-                  wip_limit: column.wip_limit,
-                  is_terminal: column.is_terminal,
-                }),
+        await saveBoardSettingsAction({
+          boardId: board.id,
+          board: {
+            name,
+            description,
+            icon: board.icon,
+            color: board.color,
+            card_type_label: cardLabel,
+            field_schema: fields
+              .filter((field) => field.key.trim() && field.label.trim())
+              .map(({ key, label, type }) => ({ key, label, type })),
+          },
+          columns: columns.map(
+            ({ id, name, color, wip_limit, is_terminal }) => ({
+              id,
+              name,
+              color,
+              wip_limit,
+              is_terminal,
+            }),
           ),
-        );
-        await reorderColumnsAction(
-          board.id,
-          savedColumns.map((column) => (column as { id: string }).id),
-        );
-        const before = new Set(board.project_ids);
-        const after = new Set(linked);
-        await Promise.all(
-          projects
-            .filter((p) => before.has(p.id) !== after.has(p.id))
-            .map((p) => setBoardProjectAction(board.id, p.id, after.has(p.id))),
-        );
+          previousProjectIds: board.project_ids,
+          projectIds: linked,
+        });
         toast.success(t("settingsSaved"));
         setOpen(false);
         router.refresh();
