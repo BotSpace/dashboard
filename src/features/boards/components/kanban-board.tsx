@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -94,13 +94,37 @@ export function KanbanBoard({
   const [archivedCards, setArchivedCards] = useState<KanbanCard[]>([]);
   const [archiveLoading, setArchiveLoading] = useState(false);
   const [restoringCard, setRestoringCard] = useState<string | null>(null);
+  const pendingMovesRef = useRef(
+    new Map<string, { mutationId: number; columnId: string }>(),
+  );
+  const moveSequenceRef = useRef(0);
   const router = useRouter();
   const t = useTranslations("kanban");
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
 
-  useEffect(() => setCards(initialBoard.cards ?? []), [initialBoard.cards]);
+  useEffect(() => {
+    // A router refresh may have started before an optimistic move. Merge the
+    // server snapshot instead of blindly replacing the newer local location.
+    setCards((current) => {
+      const localById = new Map(current.map((card) => [card.id, card]));
+      const incoming = initialBoard.cards ?? [];
+      const merged = incoming.map((serverCard) => {
+        const local = localById.get(serverCard.id);
+        if (!local) return serverCard;
+        if (pendingMovesRef.current.has(serverCard.id)) return local;
+        return Date.parse(serverCard.updated_at) >= Date.parse(local.updated_at)
+          ? serverCard
+          : local;
+      });
+      const incomingIds = new Set(incoming.map((card) => card.id));
+      return [
+        ...merged,
+        ...current.filter((card) => !incomingIds.has(card.id)),
+      ];
+    });
+  }, [initialBoard.cards]);
   useEffect(() => {
     let refreshTimer: number | undefined;
     const refresh = () => {
@@ -129,11 +153,21 @@ export function KanbanBoard({
     const upsertCard = (event: Event) => {
       const card = readCard(event);
       if (!card) return;
-      setCards((current) =>
-        current.some((item) => item.id === card.id)
+      const pendingMove = pendingMovesRef.current.get(card.id);
+      // An earlier update/move event may arrive after the user has already
+      // dragged this card elsewhere. Never let that stale event snap it back.
+      if (pendingMove && card.column_id !== pendingMove.columnId) return;
+      setCards((current) => {
+        const existing = current.find((item) => item.id === card.id);
+        if (
+          existing &&
+          Date.parse(card.updated_at) < Date.parse(existing.updated_at)
+        )
+          return current;
+        return existing
           ? current.map((item) => (item.id === card.id ? card : item))
-          : [...current, card],
-      );
+          : [...current, card];
+      });
       setArchivedCards((current) =>
         current.filter((item) => item.id !== card.id),
       );
@@ -279,6 +313,8 @@ export function KanbanBoard({
     )
       return;
     const before = cards;
+    const mutationId = ++moveSequenceRef.current;
+    pendingMovesRef.current.set(card.id, { mutationId, columnId });
     const reordered = [...destination];
     reordered.splice(position, 0, { ...card, column_id: columnId });
     const positions = new Map(
@@ -294,8 +330,24 @@ export function KanbanBoard({
       ),
     );
     try {
-      await moveCardAction(initialBoard.id, card.id, columnId, position);
+      const moved = await moveCardAction(
+        initialBoard.id,
+        card.id,
+        columnId,
+        position,
+      );
+      const pendingMove = pendingMovesRef.current.get(card.id);
+      if (pendingMove?.mutationId !== mutationId) return;
+      pendingMovesRef.current.delete(card.id);
+      // The mutation response is authoritative and carries the backend's
+      // updated_at/version. Keeping it locally also rejects delayed SSE events.
+      setCards((items) =>
+        items.map((item) => (item.id === moved.id ? moved : item)),
+      );
     } catch (error) {
+      const pendingMove = pendingMovesRef.current.get(card.id);
+      if (pendingMove?.mutationId !== mutationId) return;
+      pendingMovesRef.current.delete(card.id);
       setCards(before);
       toast.error(error instanceof Error ? error.message : t("moveFailed"));
     }
