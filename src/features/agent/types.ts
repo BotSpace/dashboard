@@ -9,6 +9,7 @@ export type AgentEventType =
   | "plan_set"
   | "plan_update"
   | "flow_changed"
+  | "workflow_progress"
   | "context_compacted"
   | "approval_required"
   | "approval_resolved"
@@ -38,6 +39,12 @@ export type PlanItem = {
   detail?: string | null;
   status: "pending" | "in_progress" | "completed" | "blocked";
   notes?: string | null;
+};
+
+export type WorkflowProgressItem = {
+  step: string;
+  status: "pending" | "running" | "done" | "failed" | "skipped";
+  detail: string;
 };
 
 export type ToolCallView = {

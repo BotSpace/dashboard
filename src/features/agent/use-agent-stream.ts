@@ -9,6 +9,7 @@ import type {
   ClarifyPayload,
   SubAgentTurn,
   ToolCallView,
+  WorkflowProgressItem,
 } from "./types";
 
 type Args = {
@@ -74,6 +75,8 @@ type State = {
   compacted: boolean;
   /** Id of the inline plan turn for the current run (plan_update refreshes it). */
   planTurnId: string | null;
+  /** Typed builder pipeline progress. */
+  workflowProgress: WorkflowProgressItem[];
 };
 
 /**
@@ -133,6 +136,7 @@ export function useAgentStream({
     provider: null,
     compacted: false,
     planTurnId: null,
+    workflowProgress: [],
   });
   const esRef = useRef<EventSource | null>(null);
   const [connectionAttempt, setConnectionAttempt] = useState(0);
@@ -290,6 +294,21 @@ export function useAgentStream({
             if (rp.provider) next.provider = rp.provider;
             next.compacted = false;
             next.planTurnId = null;
+            next.workflowProgress = [];
+            break;
+          }
+          case "workflow_progress": {
+            const payload = ev.payload as Partial<WorkflowProgressItem>;
+            if (!payload.step || !payload.status) break;
+            const item: WorkflowProgressItem = {
+              step: payload.step,
+              status: payload.status,
+              detail: payload.detail ?? "",
+            };
+            next.workflowProgress = [
+              ...s.workflowProgress.filter((entry) => entry.step !== item.step),
+              item,
+            ];
             break;
           }
           case "context_compacted":
@@ -713,6 +732,7 @@ export function useAgentStream({
       "tool_result",
       "plan_set",
       "plan_update",
+      "workflow_progress",
       "approval_required",
       "approval_resolved",
       "clarification_required",
@@ -781,6 +801,7 @@ export function useAgentStream({
         currentSubAgent: null,
         streamingId: null,
         planTurnId: null,
+        workflowProgress: [],
       };
       if (persistRef.current) {
         persistRef.current({ turns: next.turns, lastSeq: 0, finished: false });

@@ -64,7 +64,12 @@ import { ToolStrip } from "./tool-strip";
 import { SubAgentAccordion } from "./sub-agent-accordion";
 import { RunStatusChip } from "./typing-indicator";
 import { UsageBadge } from "./usage-badge";
-import type { ChatTurn, ToolCallView, PlanItem } from "../types";
+import type {
+  ChatTurn,
+  ToolCallView,
+  PlanItem,
+  WorkflowProgressItem,
+} from "../types";
 import type { Project } from "@/shared/types/api";
 import { newThreadId, titleFromPrompt, type ThreadMeta } from "../storage";
 
@@ -157,11 +162,18 @@ function renderTurns(turns: ChatTurn[], phase: string): RenderItem[] {
   return items;
 }
 
-const SUGGESTIONS = [
-  "/start uchun salomlashish flow tuz",
-  "VIP foydalanuvchilarga aksiya yubor",
-  "Botga FAQ bo'lim qo'sh",
-  "Foydalanuvchi statistikasini ko'rsat",
+const PROJECT_SUGGESTIONS = [
+  "Menga ism va telefon yig'adigan lead bot yaratib ber",
+  "Collectiondan avtomatik yangilanadigan katalog yarat",
+  "Botni boshidan oxirigacha tekshir va buzuq joylarini tuzat",
+  "Buyurtma qabul qilib, tanlangan mahsulotni to'g'ri saqlaydigan bot yarat",
+];
+
+const GLOBAL_SUGGESTIONS = [
+  "Yangi lead yig'adigan bot yaratib ber",
+  "Mavjud botlarimdan qaysilarida xato borligini tekshir",
+  "Leadlar uchun umumiy Board yaratib botga bog'la",
+  "Menga mos dinamik katalog botini rejalashtir",
 ];
 
 export function ChatPanel(props: Props) {
@@ -713,7 +725,7 @@ function ChatThread({
       {/* Messages */}
       <div ref={scroller} className="relative flex-1 overflow-y-auto">
         {isEmpty ? (
-          <EmptyState onSend={send} />
+          <EmptyState onSend={send} projectSelected={projectId !== "global"} />
         ) : (
           <div className="mx-auto max-w-3xl px-3 pt-4 pb-28 sm:px-6 xl:max-w-5xl 2xl:max-w-6xl">
             <div className="space-y-5">
@@ -749,6 +761,10 @@ function ChatThread({
 
               {stream.thinking && stream.phase === "thinking" && (
                 <LiveThinking text={stream.thinking} />
+              )}
+
+              {stream.workflowProgress.length > 0 && (
+                <WorkflowProgress items={stream.workflowProgress} />
               )}
 
               {/* Inline approval prompt — renders when agent gates a destructive action */}
@@ -1210,6 +1226,66 @@ function LiveThinking({ text }: { text: string }) {
   );
 }
 
+const WORKFLOW_STEP_LABELS: Record<string, string> = {
+  blueprint: "Talab tushunildi",
+  collections: "Ma'lumotlar sxemasi tekshirildi",
+  validation: "Flow tekshirildi",
+  simulation: "Bot sinovdan o'tkazildi",
+  apply: "O'zgarishlar qo'llandi",
+};
+
+function WorkflowProgress({ items }: { items: WorkflowProgressItem[] }) {
+  return (
+    <div className="ml-11 max-w-xl rounded-2xl border bg-card/70 px-4 py-3 shadow-sm">
+      <p className="mb-2 text-xs font-semibold text-foreground">
+        Qurish jarayoni
+      </p>
+      <div className="space-y-2">
+        {items.map((item) => {
+          const failed = item.status === "failed";
+          const complete = item.status === "done";
+          const skipped = item.status === "skipped";
+          return (
+            <div key={item.step} className="flex items-start gap-2.5 text-xs">
+              <span
+                className={cn(
+                  "mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border",
+                  complete && "border-emerald-500 bg-emerald-500 text-white",
+                  failed &&
+                    "border-destructive bg-destructive text-destructive-foreground",
+                  skipped && "border-muted-foreground/30 text-muted-foreground",
+                  !complete &&
+                    !failed &&
+                    !skipped &&
+                    "border-primary text-primary",
+                )}
+              >
+                {complete ? (
+                  <Check className="h-2.5 w-2.5" />
+                ) : failed ? (
+                  <span className="text-[9px] font-bold">!</span>
+                ) : skipped ? (
+                  <span className="h-1 w-1 rounded-full bg-current" />
+                ) : (
+                  <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                )}
+              </span>
+              <div className="min-w-0">
+                <p className={cn("font-medium", failed && "text-destructive")}>
+                  {WORKFLOW_STEP_LABELS[item.step] ?? item.step}
+                </p>
+                {item.detail && (
+                  <p className="mt-0.5 text-muted-foreground">{item.detail}</p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ReasoningDisclosure({ reasoning }: { reasoning: string }) {
   const [open, setOpen] = useState(false);
   return (
@@ -1275,7 +1351,16 @@ function AssistantMessage({
   );
 }
 
-function EmptyState({ onSend }: { onSend: (text: string) => void }) {
+function EmptyState({
+  onSend,
+  projectSelected,
+}: {
+  onSend: (text: string) => void;
+  projectSelected: boolean;
+}) {
+  const suggestions = projectSelected
+    ? PROJECT_SUGGESTIONS
+    : GLOBAL_SUGGESTIONS;
   return (
     <div className="flex h-full flex-col items-center justify-center px-4">
       <motion.div
@@ -1295,7 +1380,7 @@ function EmptyState({ onSend }: { onSend: (text: string) => void }) {
           bilan ishlashda yordam beraman
         </p>
         <div className="grid w-full max-w-lg grid-cols-1 gap-2 sm:grid-cols-2">
-          {SUGGESTIONS.map((s) => (
+          {suggestions.map((s) => (
             <button
               key={s}
               type="button"
