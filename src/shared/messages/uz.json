@@ -32,6 +32,7 @@
     "dashboard": "Boshqaruv",
     "agent": "AI Agent",
     "bots": "Botlar",
+	"boards": "Ishlar",
     "cms": "Ma'lumotlar",
     "templates": "Shablonlar",
     "files": "Fayllar",
@@ -406,6 +407,7 @@
       "env": "Sozlamalar",
       "releases": "Versiyalar",
       "monitoring": "Monitoring",
+	  "boards": "Ishlar",
       "plan": "Tarif"
     },
     "release": {

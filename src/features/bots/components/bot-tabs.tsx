@@ -17,13 +17,14 @@ export function BotTabs({ id }: { id: string | number }) {
     { href: `/app/bots/${id}/env`, label: t("env") },
     { href: `/app/bots/${id}/releases`, label: t("releases") },
     { href: `/app/bots/${id}/monitoring`, label: t("monitoring") },
+	{ href: `/app/boards?bot=${id}`, label: t("boards"), external: true },
   ];
 
   return (
     <nav className="-mb-px flex gap-1 overflow-x-auto border-b">
       {tabs.map((tab) => {
         const full = `/${locale}${tab.href}`;
-        const active = tab.end ? pathname === full : pathname.startsWith(full);
+		const active = tab.external ? false : tab.end ? pathname === full : pathname.startsWith(full);
         return (
           <Link
             key={tab.href}

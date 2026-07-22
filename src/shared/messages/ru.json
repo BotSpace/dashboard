@@ -32,6 +32,7 @@
     "dashboard": "Панель",
     "agent": "AI Агент",
     "bots": "Боты",
+	"boards": "Работа",
     "cms": "Данные",
     "templates": "Шаблоны",
     "files": "Файлы",
@@ -410,6 +411,7 @@
       "env": "Настройки",
       "releases": "Релизы",
       "monitoring": "Мониторинг",
+	  "boards": "Работа",
       "plan": "Тариф"
     },
     "release": {

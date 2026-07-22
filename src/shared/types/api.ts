@@ -76,6 +76,73 @@ export type Project = {
   debug_bot?: boolean;
 };
 
+export type KanbanPriority = "low" | "normal" | "high" | "urgent";
+
+export type KanbanColumn = {
+  id: string;
+  board_id: string;
+  name: string;
+  color: string;
+  position: number;
+  wip_limit: number | null;
+  is_terminal: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type KanbanCard = {
+  id: string;
+  board_id: string;
+  column_id: string;
+  source_project_id: string | null;
+  kind: string;
+  title: string;
+  description: string;
+  priority: KanbanPriority;
+  position: number;
+  due_at: string | null;
+  external_key: string | null;
+  custom_fields: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type KanbanActivity = {
+  id: string;
+  card_id: string;
+  actor_id: string | null;
+  event: string;
+  data: Record<string, unknown>;
+  created_at: string;
+};
+
+export type KanbanComment = {
+  id: string;
+  card_id: string;
+  author_id: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type KanbanBoard = {
+  id: string;
+  owner_id?: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  card_type_label: string;
+  field_schema: Array<{ key: string; label: string; type: string }>;
+  card_count: number;
+  project_ids: string[];
+  projects?: Array<{ id: string; name: string }>;
+  columns?: KanbanColumn[];
+  cards?: KanbanCard[];
+  created_at: string;
+  updated_at: string;
+};
+
 // release.ReleaseResponse
 export type Release = {
   id: string;

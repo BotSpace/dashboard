@@ -32,6 +32,7 @@
     "dashboard": "Dashboard",
     "agent": "AI Agent",
     "bots": "Bots",
+	"boards": "Work",
     "cms": "Data",
     "templates": "Templates",
     "files": "Files",
@@ -410,6 +411,7 @@
       "env": "Settings",
       "releases": "Releases",
       "monitoring": "Monitoring",
+	  "boards": "Work",
       "plan": "Plan"
     },
     "release": {

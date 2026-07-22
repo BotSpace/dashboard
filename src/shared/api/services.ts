@@ -37,6 +37,10 @@ import type {
   CredentialListResponse,
   ManagedBot,
   ManagedBotConfig,
+	KanbanBoard,
+	KanbanCard,
+	KanbanActivity,
+	KanbanComment,
 } from "@/shared/types/api";
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -162,6 +166,41 @@ export const ProjectsAPI = {
     );
     return { range, step: "", ...data };
   },
+};
+
+export const KanbanAPI = {
+  list: async (projectId?: string): Promise<KanbanBoard[]> => {
+    const data = await api<unknown>("/api/v1/boards", { query: { project_id: projectId } });
+    return unwrapList<KanbanBoard>(data);
+  },
+  get: (id: string, projectId?: string) =>
+    api<KanbanBoard>(`/api/v1/boards/${id}`, { query: { project_id: projectId } }),
+  create: (body: Record<string, unknown>) =>
+    api<KanbanBoard>("/api/v1/boards", { method: "POST", json: body }),
+  update: (id: string, body: Record<string, unknown>) =>
+    api<KanbanBoard>(`/api/v1/boards/${id}`, { method: "PUT", json: body }),
+  archive: (id: string) => api<void>(`/api/v1/boards/${id}`, { method: "DELETE" }),
+  linkProject: (id: string, projectId: string) =>
+    api<void>(`/api/v1/boards/${id}/projects`, { method: "POST", json: { project_id: projectId } }),
+  unlinkProject: (id: string, projectId: string) =>
+    api<void>(`/api/v1/boards/${id}/projects/${projectId}`, { method: "DELETE" }),
+  createColumn: (boardId: string, body: Record<string, unknown>) =>
+    api(`/api/v1/boards/${boardId}/columns`, { method: "POST", json: body }),
+  updateColumn: (boardId: string, columnId: string, body: Record<string, unknown>) =>
+    api(`/api/v1/boards/${boardId}/columns/${columnId}`, { method: "PUT", json: body }),
+  removeColumn: (boardId: string, columnId: string) =>
+    api<void>(`/api/v1/boards/${boardId}/columns/${columnId}`, { method: "DELETE" }),
+  createCard: (boardId: string, body: Record<string, unknown>) =>
+    api<KanbanCard>(`/api/v1/boards/${boardId}/cards`, { method: "POST", json: body }),
+  updateCard: (id: string, body: Record<string, unknown>) =>
+    api<KanbanCard>(`/api/v1/cards/${id}`, { method: "PUT", json: body }),
+  moveCard: (id: string, columnId: string, position: number) =>
+    api<KanbanCard>(`/api/v1/cards/${id}/move`, { method: "POST", json: { column_id: columnId, position } }),
+  archiveCard: (id: string) => api<KanbanCard>(`/api/v1/cards/${id}`, { method: "DELETE" }),
+  activities: (id: string) => api<KanbanActivity[]>(`/api/v1/cards/${id}/activities`),
+  comments: (id: string) => api<KanbanComment[]>(`/api/v1/cards/${id}/comments`),
+  comment: (id: string, body: string) =>
+    api<KanbanComment>(`/api/v1/cards/${id}/comments`, { method: "POST", json: { body } }),
 };
 
 // RELEASES — internal/modules/release ("/relase", mirrors legacy Django path)
