@@ -31,6 +31,8 @@ import {
   Check,
   Pencil,
   ShieldCheck,
+  CircleStop,
+  RefreshCw,
 } from "lucide-react";
 import {
   Select,
@@ -63,11 +65,7 @@ import { RunStatusChip } from "./typing-indicator";
 import { UsageBadge } from "./usage-badge";
 import type { ChatTurn, ToolCallView, PlanItem } from "../types";
 import type { Project } from "@/shared/types/api";
-import {
-  newThreadId,
-  titleFromPrompt,
-  type ThreadMeta,
-} from "../storage";
+import { newThreadId, titleFromPrompt, type ThreadMeta } from "../storage";
 
 /**
  * Pure upsert of a thread meta into a list, newest-first, deduped by id.
@@ -76,12 +74,14 @@ import {
  */
 function upsertMeta(list: ThreadMeta[], meta: ThreadMeta): ThreadMeta[] {
   const rest = list.filter((t) => t.id !== meta.id);
-  return [meta, ...rest].sort((a, b) => b.lastUpdated - a.lastUpdated).slice(0, 50);
+  return [meta, ...rest]
+    .sort((a, b) => b.lastUpdated - a.lastUpdated)
+    .slice(0, 50);
 }
 
 /** Map the backend thread list into the sidebar's ThreadMeta shape. */
 function backendToMeta(
-  backendRaw: { thread_id: string; title: string; updated_at: string }[]
+  backendRaw: { thread_id: string; title: string; updated_at: string }[],
 ): ThreadMeta[] {
   return backendRaw
     .map((b) => {
@@ -113,7 +113,11 @@ type RenderItem =
     }
   | { kind: "tool-group"; id: string; calls: ToolCallView[]; pending: boolean }
   | { kind: "plan"; id: string; plan: PlanItem[] }
-  | { kind: "sub_agent"; id: string; turn: Extract<ChatTurn, { kind: "sub_agent" }> };
+  | {
+      kind: "sub_agent";
+      id: string;
+      turn: Extract<ChatTurn, { kind: "sub_agent" }>;
+    };
 
 function renderTurns(turns: ChatTurn[], phase: string): RenderItem[] {
   const items: RenderItem[] = [];
@@ -121,7 +125,12 @@ function renderTurns(turns: ChatTurn[], phase: string): RenderItem[] {
   let groupStartId = "";
   const flushGroup = (pending: boolean) => {
     if (group && group.length) {
-      items.push({ kind: "tool-group", id: `tg-${groupStartId}`, calls: group, pending });
+      items.push({
+        kind: "tool-group",
+        id: `tg-${groupStartId}`,
+        calls: group,
+        pending,
+      });
     }
     group = null;
     groupStartId = "";
@@ -171,40 +180,34 @@ export function ChatPanel(props: Props) {
 }
 
 function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
-  // Chat history is backend-only now — start empty, load the thread list from
-  // the API on mount. A fresh threadId is used until the list arrives.
+  // Chat history is backend-only. Always enter the page with a fresh thread;
+  // existing threads are loaded for the sidebar but only opened explicitly.
   const [threads, setThreads] = useState<ThreadMeta[]>([]);
   const [threadId, setThreadId] = useState<string>(() => newThreadId());
-  const [threadPicked, setThreadPicked] = useState(false);
+  const [historyThreadId, setHistoryThreadId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // On mount: load the thread list from the backend and open the most recent one
-  // (unless the user has already picked/started a thread).
+  // Loading the sidebar must not replace the fresh default thread with history.
   useEffect(() => {
     let cancelled = false;
     listThreadsAction(projectId).then((res) => {
       if (cancelled || !res) return;
-      const list = backendToMeta(res.threads);
-      setThreads(list);
-      if (!threadPicked && list.length > 0) {
-        setThreadId(list[0].id);
-      }
+      setThreads(backendToMeta(res.threads));
     });
     return () => {
       cancelled = true;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
 
   const handleNewThread = () => {
-    setThreadPicked(true);
     setThreadId(newThreadId());
+    setHistoryThreadId(null);
     setSidebarOpen(false);
   };
 
   const handleSelectThread = (id: string) => {
-    setThreadPicked(true);
     setThreadId(id);
+    setHistoryThreadId(id);
     setSidebarOpen(false);
   };
 
@@ -212,16 +215,16 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
     const next = threads.filter((t) => t.id !== id);
     setThreads(next);
     if (id === threadId) {
-      setThreadPicked(true);
-      setThreadId(next[0]?.id ?? newThreadId());
+      setThreadId(newThreadId());
+      setHistoryThreadId(null);
     }
     void deleteThreadAction(projectId, id);
   };
 
   const handleClearAllThreads = () => {
     setThreads([]);
-    setThreadPicked(true);
     setThreadId(newThreadId());
+    setHistoryThreadId(null);
     void clearAllThreadsAction(projectId);
   };
 
@@ -279,6 +282,7 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
           projectId={projectId}
           projects={projects}
           threadId={threadId}
+          loadHistory={historyThreadId === threadId}
           initialPrompt={initialPrompt}
           onThreadsChange={setThreads}
           onToggleSidebar={() => setSidebarOpen((v) => !v)}
@@ -293,6 +297,7 @@ type ThreadProps = {
   projectId: string;
   projects: Project[];
   threadId: string;
+  loadHistory: boolean;
   initialPrompt?: string;
   onThreadsChange: Dispatch<SetStateAction<ThreadMeta[]>>;
   onToggleSidebar: () => void;
@@ -303,6 +308,7 @@ function ChatThread({
   projectId,
   projects,
   threadId,
+  loadHistory,
   initialPrompt,
   onThreadsChange,
   onToggleSidebar,
@@ -320,7 +326,8 @@ function ChatThread({
   useEffect(() => {
     try {
       const saved = localStorage.getItem(`agentMode:${projectId}`);
-      if (saved === "plan" || saved === "full" || saved === "agent") setMode(saved);
+      if (saved === "plan" || saved === "full" || saved === "agent")
+        setMode(saved);
     } catch {
       /* ignore */
     }
@@ -334,7 +341,10 @@ function ChatThread({
   }, [mode, projectId]);
   // Set when a refresh re-attaches to an in-flight run so the SSE reconnects
   // with the right seq cursor (replay only unseen events, no duplicate turns).
-  const [resume, setResume] = useState<{ requestId: string; sinceSeq: number } | null>(null);
+  const [resume, setResume] = useState<{
+    requestId: string;
+    sinceSeq: number;
+  } | null>(null);
   // Messages typed while the agent is busy — sent one-by-one as each run ends.
   const [queue, setQueue] = useState<string[]>([]);
   const [pending, start] = useTransition();
@@ -359,6 +369,9 @@ function ChatThread({
   // Load this thread's history from the backend when it opens (single source of
   // truth). Skip while a run is actively streaming so we don't disturb live SSE.
   useEffect(() => {
+    // A fresh chat is only a client-side draft. Do not even request a backend
+    // thread until the user sends its first message; run creation persists it.
+    if (!loadHistory) return;
     if (backendLoadedRef.current) return;
     if (requestId) return;
     backendLoadedRef.current = true;
@@ -393,8 +406,8 @@ function ChatThread({
     return () => {
       cancelled = true;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, threadId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, threadId, loadHistory]);
 
   useEffect(() => {
     if (stream.finished) setUsageKey((k) => k + 1);
@@ -453,7 +466,8 @@ function ChatThread({
   }, []);
 
   const isRunning =
-    pending || (!stream.finished && stream.phase !== "idle" && stream.phase !== "error");
+    pending ||
+    (!stream.finished && stream.phase !== "idle" && stream.phase !== "error");
 
   // Actually start a run for `msg`. Assumes the agent is idle (no active run).
   const doSend = (msg: string) => {
@@ -496,8 +510,14 @@ function ChatThread({
   useEffect(() => {
     if (isRunning || !planRunRef.current) return;
     planRunRef.current = false;
-    const lastAssistant = [...stream.turns].reverse().find((t) => t.kind === "assistant");
-    if (lastAssistant && lastAssistant.kind === "assistant" && lastAssistant.text.trim()) {
+    const lastAssistant = [...stream.turns]
+      .reverse()
+      .find((t) => t.kind === "assistant");
+    if (
+      lastAssistant &&
+      lastAssistant.kind === "assistant" &&
+      lastAssistant.text.trim()
+    ) {
       setPendingPlan(lastAssistant.text);
     }
     setMode("agent"); // after presenting a plan, drop to normal so approve executes
@@ -550,7 +570,8 @@ function ChatThread({
       )
         return;
       // Don't steal focus from an open dialog (approval / clarify / sidebar).
-      if (document.querySelector('[role="dialog"], [role="alertdialog"]')) return;
+      if (document.querySelector('[role="dialog"], [role="alertdialog"]'))
+        return;
       inputRef.current?.focus();
     };
     window.addEventListener("keydown", onKey);
@@ -571,7 +592,7 @@ function ChatThread({
 
   const items = useMemo(
     () => renderTurns(stream.turns, stream.phase),
-    [stream.turns, stream.phase]
+    [stream.turns, stream.phase],
   );
 
   const toolCallCount = useMemo(() => {
@@ -585,15 +606,16 @@ function ChatThread({
 
   const msgCount = useMemo(
     () => stream.turns.filter((t) => t.kind === "user").length,
-    [stream.turns]
+    [stream.turns],
   );
 
   const projectName = useMemo(
     () =>
       projectId === "global"
         ? "Umumiy"
-        : projects.find((p) => String(p.id) === projectId)?.name ?? `#${projectId}`,
-    [projectId, projects]
+        : (projects.find((p) => String(p.id) === projectId)?.name ??
+          `#${projectId}`),
+    [projectId, projects],
   );
 
   const isEmpty = items.length === 0 && !isRunning;
@@ -672,7 +694,13 @@ function ChatThread({
                 if (item.kind === "plan") {
                   return null; // legacy step-checklist plans are no longer shown
                 }
-                return <ToolStrip key={item.id} calls={item.calls} pending={item.pending} />;
+                return (
+                  <ToolStrip
+                    key={item.id}
+                    calls={item.calls}
+                    pending={item.pending}
+                  />
+                );
               })}
 
               {stream.thinking && stream.phase === "thinking" && (
@@ -698,11 +726,48 @@ function ChatThread({
               )}
 
               {stream.error && (
-                <div className="mx-auto max-w-xl rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-                  {stream.error}
+                <div className="mx-auto flex max-w-xl items-start gap-3 rounded-2xl border border-destructive/20 bg-destructive/[0.04] px-4 py-3.5">
+                  <div className="mt-0.5 rounded-full bg-destructive/10 p-1.5 text-destructive">
+                    <CircleStop className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-destructive">
+                      Jarayon bajarilmadi
+                    </p>
+                    <p className="mt-0.5 break-words text-xs text-muted-foreground">
+                      {stream.error}
+                    </p>
+                  </div>
                 </div>
               )}
 
+              {stream.cancelled && (
+                <div className="mx-auto flex max-w-xl items-center gap-3 rounded-2xl border bg-muted/25 px-4 py-3.5 text-muted-foreground">
+                  <div className="rounded-full border bg-background p-1.5">
+                    <CircleStop className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      Jarayon bekor qilindi
+                    </p>
+                    <p className="mt-0.5 text-xs">
+                      Agent foydalanuvchi so‘roviga ko‘ra to‘xtatildi.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {stream.reconnecting && !stream.finished && (
+                <div className="mx-auto flex max-w-xl items-center gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/[0.04] px-4 py-3 text-amber-700 dark:text-amber-300">
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  <div>
+                    <p className="text-sm font-medium">Qayta ulanmoqda…</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Jarayon davom etmoqda, yangi eventlar avtomatik tiklanadi.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -743,7 +808,9 @@ function ChatThread({
               <div className="flex items-center gap-2">
                 <ClipboardList className="h-4 w-4 shrink-0 text-amber-500" />
                 <span className="text-xs font-medium">Reja tayyor</span>
-                <span className="text-xs text-muted-foreground">— bajaraymi?</span>
+                <span className="text-xs text-muted-foreground">
+                  — bajaraymi?
+                </span>
               </div>
               <div className="ml-auto flex items-center gap-2">
                 <Button
@@ -774,17 +841,20 @@ function ChatThread({
             className={cn(
               "flex items-end gap-2 rounded-2xl border bg-card px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-2 focus-within:ring-ring/20",
               mode === "plan" && "border-amber-500/50 ring-1 ring-amber-500/30",
-              mode === "full" && "border-red-500/50 ring-1 ring-red-500/30"
+              mode === "full" && "border-red-500/50 ring-1 ring-red-500/30",
             )}
           >
-            <Select value={mode} onValueChange={(v) => setMode(v as "agent" | "plan" | "full")}>
+            <Select
+              value={mode}
+              onValueChange={(v) => setMode(v as "agent" | "plan" | "full")}
+            >
               <SelectTrigger
                 title="Rejim: Agent (oddiy) / Plan (avval reja) / Full (barchasiga ruxsat)"
                 className={cn(
                   "h-8 w-auto shrink-0 gap-1 rounded-xl border-none bg-transparent px-2 text-xs font-medium shadow-none focus:ring-0 focus:ring-offset-0 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:opacity-60",
                   mode === "plan" && "text-amber-600 dark:text-amber-400",
                   mode === "full" && "text-red-600 dark:text-red-400",
-                  mode === "agent" && "text-muted-foreground"
+                  mode === "agent" && "text-muted-foreground",
                 )}
               >
                 {mode === "plan" ? (
@@ -794,17 +864,31 @@ function ChatThread({
                 ) : (
                   <Bot className="h-4 w-4" />
                 )}
-                <span>{mode === "plan" ? "Plan" : mode === "full" ? "Full" : "Agent"}</span>
+                <span>
+                  {mode === "plan"
+                    ? "Plan"
+                    : mode === "full"
+                      ? "Full"
+                      : "Agent"}
+                </span>
               </SelectTrigger>
               <SelectContent align="start" className="min-w-[13rem]">
                 <SelectItem value="agent" className="text-xs">
-                  <span className="flex items-center gap-2"><Bot className="h-3.5 w-3.5" /> Agent — oddiy</span>
+                  <span className="flex items-center gap-2">
+                    <Bot className="h-3.5 w-3.5" /> Agent — oddiy
+                  </span>
                 </SelectItem>
                 <SelectItem value="plan" className="text-xs">
-                  <span className="flex items-center gap-2"><ClipboardList className="h-3.5 w-3.5" /> Plan — avval reja tuzadi</span>
+                  <span className="flex items-center gap-2">
+                    <ClipboardList className="h-3.5 w-3.5" /> Plan — avval reja
+                    tuzadi
+                  </span>
                 </SelectItem>
                 <SelectItem value="full" className="text-xs">
-                  <span className="flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5" /> Full — barchasiga ruxsat</span>
+                  <span className="flex items-center gap-2">
+                    <ShieldCheck className="h-3.5 w-3.5" /> Full — barchasiga
+                    ruxsat
+                  </span>
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -827,10 +911,10 @@ function ChatThread({
                 stream.phase === "waiting"
                   ? "Yuqoridagi savolga javob bering…"
                   : isRunning
-                  ? "Yozing — navbatga qo'shiladi…"
-                  : mode === "plan"
-                  ? "Reja tuzish uchun vazifani yozing…"
-                  : "Xabar yozing…"
+                    ? "Yozing — navbatga qo'shiladi…"
+                    : mode === "plan"
+                      ? "Reja tuzish uchun vazifani yozing…"
+                      : "Xabar yozing…"
               }
               className="max-h-40 min-h-[24px] flex-1 resize-none bg-transparent text-sm leading-6 placeholder:text-muted-foreground/60 focus:outline-none"
             />
@@ -872,13 +956,13 @@ function ChatThread({
                 t >= 1_000_000
                   ? `${(t / 1_000_000).toFixed(1)}M`
                   : t >= 1_000
-                  ? `${Math.round(t / 1_000)}K`
-                  : `${t}`;
+                    ? `${Math.round(t / 1_000)}K`
+                    : `${t}`;
               return (
                 <span
                   className={cn(
                     "flex items-center gap-1 tabular-nums",
-                    stream.liveTokens > 0 && "text-emerald-500"
+                    stream.liveTokens > 0 && "text-emerald-500",
                   )}
                   title={`Shu sessiyada ishlatilgan token (realtime): ${t.toLocaleString()}`}
                 >
@@ -887,7 +971,10 @@ function ChatThread({
                 </span>
               );
             })()}
-            <span className="flex items-center gap-1" title="Tool chaqiruvlar soni">
+            <span
+              className="flex items-center gap-1"
+              title="Tool chaqiruvlar soni"
+            >
               <Wrench className="h-3 w-3" />
               {toolCallCount}
             </span>
@@ -895,7 +982,10 @@ function ChatThread({
               <MessageSquare className="h-3 w-3" />
               {msgCount}
             </span>
-            <span className="flex min-w-0 items-center gap-1" title="Joriy loyiha">
+            <span
+              className="flex min-w-0 items-center gap-1"
+              title="Joriy loyiha"
+            >
               <Bot className="h-3 w-3 shrink-0" />
               <span className="max-w-[140px] truncate">{projectName}</span>
             </span>
@@ -951,21 +1041,35 @@ function ChatThread({
                     <span
                       className={cn(
                         "inline-block h-1.5 w-1.5 shrink-0 animate-pulse rounded-full",
-                        tool ? "bg-amber-400" : pending ? "bg-sky-400" : "bg-emerald-500",
+                        tool
+                          ? "bg-amber-400"
+                          : pending
+                            ? "bg-sky-400"
+                            : "bg-emerald-500",
                       )}
                     />
                     {tool ? (
                       <>
-                        <span className="max-w-[110px] truncate font-medium">{tool}</span>
-                        <span className="shrink-0 text-muted-foreground/60">bajarilmoqda…</span>
+                        <span className="max-w-[110px] truncate font-medium">
+                          {tool}
+                        </span>
+                        <span className="shrink-0 text-muted-foreground/60">
+                          bajarilmoqda…
+                        </span>
                       </>
                     ) : pending ? (
                       <>
-                        <span className="max-w-[110px] truncate font-medium">🔧 {pending}</span>
-                        <span className="shrink-0 text-muted-foreground/60">yozilmoqda…</span>
+                        <span className="max-w-[110px] truncate font-medium">
+                          🔧 {pending}
+                        </span>
+                        <span className="shrink-0 text-muted-foreground/60">
+                          yozilmoqda…
+                        </span>
                       </>
                     ) : (
-                      <span className="whitespace-nowrap">Agent javob tayyorlamoqda</span>
+                      <span className="whitespace-nowrap">
+                        Agent javob tayyorlamoqda
+                      </span>
                     )}
                   </span>
                 );
@@ -973,7 +1077,6 @@ function ChatThread({
           </div>
         </div>
       </div>
-
     </>
   );
 }
@@ -998,7 +1101,9 @@ function UserMessage({ text }: { text: string }) {
         <User className="h-4 w-4 text-muted-foreground" />
       </div>
       <div className="min-w-0 flex-1 pt-1">
-        <div className="whitespace-pre-wrap text-sm leading-relaxed">{text}</div>
+        <div className="whitespace-pre-wrap text-sm leading-relaxed">
+          {text}
+        </div>
       </div>
     </motion.div>
   );
@@ -1024,7 +1129,8 @@ function LiveThinking({ text }: { text: string }) {
           className="max-h-[6.5rem] overflow-y-auto whitespace-pre-wrap text-xs leading-5 text-muted-foreground/60 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           style={{
             maskImage: "linear-gradient(to bottom, transparent, black 1.75rem)",
-            WebkitMaskImage: "linear-gradient(to bottom, transparent, black 1.75rem)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, transparent, black 1.75rem)",
           }}
         >
           {text}
@@ -1043,7 +1149,11 @@ function ReasoningDisclosure({ reasoning }: { reasoning: string }) {
         onClick={() => setOpen((v) => !v)}
         className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/70 transition-colors hover:text-foreground"
       >
-        {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+        {open ? (
+          <ChevronDown className="h-3 w-3" />
+        ) : (
+          <ChevronRight className="h-3 w-3" />
+        )}
         <Brain className="h-3 w-3" />
         Fikrlash
       </button>
@@ -1080,7 +1190,10 @@ function AssistantMessage({
         {reasoning ? <ReasoningDisclosure reasoning={reasoning} /> : null}
         <MessageMarkdown className="pt-1">{text}</MessageMarkdown>
         {total > 0 && (
-          <div className="mt-1 text-[11px] text-muted-foreground" title="Bu javob uchun sarflangan tokenlar (sub-agentlar bilan)">
+          <div
+            className="mt-1 text-[11px] text-muted-foreground"
+            title="Bu javob uchun sarflangan tokenlar (sub-agentlar bilan)"
+          >
             🔢 {total.toLocaleString()} token
             {inputTokens != null && outputTokens != null
               ? ` · ${inputTokens.toLocaleString()} in / ${outputTokens.toLocaleString()} out`
@@ -1104,9 +1217,12 @@ function EmptyState({ onSend }: { onSend: (text: string) => void }) {
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent sm:h-20 sm:w-20">
           <Sparkles className="h-8 w-8 text-primary sm:h-10 sm:w-10" />
         </div>
-        <h2 className="mb-1 text-lg font-semibold sm:text-xl">BotSpace Agent</h2>
+        <h2 className="mb-1 text-lg font-semibold sm:text-xl">
+          BotSpace Agent
+        </h2>
         <p className="mb-6 max-w-sm text-center text-sm text-muted-foreground">
-          Botingizni boshqarish, flow&apos;lar yaratish va foydalanuvchilar bilan ishlashda yordam beraman
+          Botingizni boshqarish, flow&apos;lar yaratish va foydalanuvchilar
+          bilan ishlashda yordam beraman
         </p>
         <div className="grid w-full max-w-lg grid-cols-1 gap-2 sm:grid-cols-2">
           {SUGGESTIONS.map((s) => (

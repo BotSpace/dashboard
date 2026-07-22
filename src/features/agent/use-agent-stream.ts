@@ -24,10 +24,15 @@ type Args = {
    * seeded history hasn't already shown are replayed (no duplicate turns).
    */
   resume?: { requestId: string; sinceSeq: number } | null;
-  onPersist?: (snapshot: { turns: ChatTurn[]; lastSeq: number; finished: boolean }) => void;
+  onPersist?: (snapshot: {
+    turns: ChatTurn[];
+    lastSeq: number;
+    finished: boolean;
+  }) => void;
 };
 
-type RunPhase = "idle" | "queued" | "thinking" | "tool" | "waiting" | "done" | "error";
+type RunPhase =
+  "idle" | "queued" | "thinking" | "tool" | "waiting" | "done" | "error";
 
 export type CurrentSubAgent = {
   id: string;
@@ -47,6 +52,8 @@ type State = {
   sessionTokens: number;
   finished: boolean;
   error: string | null;
+  cancelled: boolean;
+  reconnecting: boolean;
   thinking: string;
   phase: RunPhase;
   currentTool: string | null;
@@ -112,6 +119,8 @@ export function useAgentStream({
     sessionTokens: 0,
     finished: Boolean(initialFinished),
     error: null,
+    cancelled: false,
+    reconnecting: false,
     thinking: "",
     phase: initialFinished ? "done" : "idle",
     currentTool: null,
@@ -124,6 +133,7 @@ export function useAgentStream({
     planTurnId: null,
   });
   const esRef = useRef<EventSource | null>(null);
+  const [connectionAttempt, setConnectionAttempt] = useState(0);
   const finishedRef = useRef(Boolean(initialFinished));
   const toolViewMap = useRef<Record<string, ToolCallView>>({});
   // Map sub_agent_id → ChatTurn id (so child tool_call/result events can be
@@ -152,7 +162,11 @@ export function useAgentStream({
     // resume target (only when it belongs to THIS run — a fresh prompt gets a
     // new requestId, so a stale resume never skips its opening events).
     const rsm = resumeRef.current;
-    if (rsm && rsm.requestId === requestId && rsm.sinceSeq > (lastSeqRef.current ?? 0)) {
+    if (
+      rsm &&
+      rsm.requestId === requestId &&
+      rsm.sinceSeq > (lastSeqRef.current ?? 0)
+    ) {
       lastSeqRef.current = rsm.sinceSeq;
     }
     const sinceSeq = lastSeqRef.current ?? 0;
@@ -185,6 +199,10 @@ export function useAgentStream({
       };
     });
 
+    es.onopen = () => {
+      setState((s) => (s.reconnecting ? { ...s, reconnecting: false } : s));
+    };
+
     const handler = (type: AgentEventType) => (e: MessageEvent) => {
       let ev: AgentEvent;
       try {
@@ -192,7 +210,10 @@ export function useAgentStream({
         // SSE data is the whole envelope — unwrap `payload` so consumers see it directly.
         const parsed = JSON.parse(e.data);
         const isEnvelope =
-          parsed && typeof parsed === "object" && "payload" in parsed && "type" in parsed;
+          parsed &&
+          typeof parsed === "object" &&
+          "payload" in parsed &&
+          "type" in parsed;
         ev = isEnvelope
           ? {
               seq: parsed.seq,
@@ -208,14 +229,18 @@ export function useAgentStream({
     };
 
     const apply = (ev: AgentEvent) => {
+      // Reconnects can replay events from the old `since_seq` URL. Ignore
+      // anything already applied so messages/tool calls are never duplicated.
+      if (typeof ev.seq === "number" && ev.seq <= lastSeqRef.current) return;
       if (typeof ev.seq === "number" && ev.seq > lastSeqRef.current) {
         lastSeqRef.current = ev.seq;
       }
       setState((s) => {
-        const next = { ...s };
+        const next = { ...s, reconnecting: false };
         switch (ev.type) {
           case "run_started": {
             next.error = null;
+            next.cancelled = false;
             next.phase = "thinking";
             next.currentTool = null;
             next.pendingTool = null;
@@ -279,13 +304,19 @@ export function useAgentStream({
             const text = p.text ?? "";
             // Reasoning to attach to the finalized main-agent turn: prefer the
             // authoritative payload, fall back to what streamed live this turn.
-            const reasoning = p.sub_agent_id ? undefined : (p.reasoning || s.thinking || undefined);
+            const reasoning = p.sub_agent_id
+              ? undefined
+              : p.reasoning || s.thinking || undefined;
             // Track the main agent's current model + provider for the footer.
             if (!p.sub_agent_id) {
               if (p.model) next.model = p.model;
               if (p.provider) next.provider = p.provider;
             }
-            if (text && p.sub_agent_id && subAgentTurnIdMap.current[p.sub_agent_id]) {
+            if (
+              text &&
+              p.sub_agent_id &&
+              subAgentTurnIdMap.current[p.sub_agent_id]
+            ) {
               // Sub-agent narrate matni — accordion ichida tool qadamlari
               // orasida (xronologik) ko'rsatamiz.
               const turnId = subAgentTurnIdMap.current[p.sub_agent_id];
@@ -306,7 +337,11 @@ export function useAgentStream({
               if (streamId) {
                 next.turns = s.turns.map((t) =>
                   t.kind === "assistant" && t.id === streamId
-                    ? { ...t, text: text || t.text, ...(reasoning ? { reasoning } : {}) }
+                    ? {
+                        ...t,
+                        text: text || t.text,
+                        ...(reasoning ? { reasoning } : {}),
+                      }
                     : t,
                 );
                 next.streamingId = null;
@@ -354,7 +389,11 @@ export function useAgentStream({
               const turnId = subAgentTurnIdMap.current[p.sub_agent_id];
               next.turns = s.turns.map((t) =>
                 t.kind === "sub_agent" && t.id === turnId
-                  ? { ...t, steps: [...t.steps, view], toolCalls: t.toolCalls + 1 }
+                  ? {
+                      ...t,
+                      steps: [...t.steps, view],
+                      toolCalls: t.toolCalls + 1,
+                    }
                   : t,
               );
               next.phase = "tool";
@@ -363,7 +402,10 @@ export function useAgentStream({
             }
             // Main agent tool_call (task.run bundan mustasno — accordion ko'rsatadi)
             if (!view.hidden) {
-              next.turns = [...s.turns, { kind: "tool", id: `t-${p.id}`, call: view }];
+              next.turns = [
+                ...s.turns,
+                { kind: "tool", id: `t-${p.id}`, call: view },
+              ];
               next.phase = "tool";
               next.currentTool = p.name;
             }
@@ -452,12 +494,16 @@ export function useAgentStream({
             if (Array.isArray(p.plan)) {
               newPlan = p.plan;
             } else if (p.item?.id) {
-              newPlan = s.plan.map((item) => (item.id === p.item?.id ? p.item! : item));
+              newPlan = s.plan.map((item) =>
+                item.id === p.item?.id ? p.item! : item,
+              );
             }
             next.plan = newPlan;
             if (s.planTurnId) {
               next.turns = s.turns.map((t) =>
-                t.kind === "plan" && t.id === s.planTurnId ? { ...t, plan: newPlan } : t,
+                t.kind === "plan" && t.id === s.planTurnId
+                  ? { ...t, plan: newPlan }
+                  : t,
               );
             }
             next.phase = "thinking";
@@ -492,7 +538,14 @@ export function useAgentStream({
                   ? {
                       ...t,
                       steps: t.steps.map((step) =>
-                        step.id === id ? { ...step, result: p.content, isError: p.is_error, data: p.data ?? null } : step,
+                        step.id === id
+                          ? {
+                              ...step,
+                              result: p.content,
+                              isError: p.is_error,
+                              data: p.data ?? null,
+                            }
+                          : step,
                       ),
                     }
                   : t,
@@ -560,21 +613,33 @@ export function useAgentStream({
             // aks holda accordion abadiy "ishlamoqda" bo'lib qoladi.
             next.turns = closeDanglingSubAgents(s.turns);
             if (ev.type === "run_failed") {
-              const p = ev.payload as { error?: string };
-              next.error = p.error ?? "Run failed";
-              next.phase = "error";
+              const p = ev.payload as { error?: string; cancelled?: boolean };
+              const cancelled =
+                p.cancelled === true ||
+                (p.error ?? "").trim().toLowerCase() === "cancelled by user";
+              next.cancelled = cancelled;
+              next.error = cancelled ? null : (p.error ?? "Run failed");
+              next.phase = cancelled ? "done" : "error";
             } else {
+              if (ev.type === "run_completed") next.cancelled = false;
               next.phase = "done";
               if (ev.type === "run_completed") {
                 // Per-prompt token usage (includes sub-agent tokens) — attach
                 // to the last assistant turn so the UI can show it.
-                const p = ev.payload as { input_tokens?: number; output_tokens?: number };
+                const p = ev.payload as {
+                  input_tokens?: number;
+                  output_tokens?: number;
+                };
                 if (p.input_tokens != null || p.output_tokens != null) {
                   const turns = [...next.turns];
                   for (let i = turns.length - 1; i >= 0; i--) {
                     const t = turns[i];
                     if (t.kind === "assistant") {
-                      turns[i] = { ...t, inputTokens: p.input_tokens, outputTokens: p.output_tokens };
+                      turns[i] = {
+                        ...t,
+                        inputTokens: p.input_tokens,
+                        outputTokens: p.output_tokens,
+                      };
                       break;
                     }
                   }
@@ -622,26 +687,32 @@ export function useAgentStream({
       "close",
     ];
     for (const t of types) es.addEventListener(t, handler(t) as EventListener);
+    let reconnectTimer: number | undefined;
     es.onerror = () => {
       // If the run already completed (we explicitly closed the source), this
       // is a benign "connection closed" — not a real failure.
       if (finishedRef.current) return;
-      // CONNECTING means the browser is still trying to (re)connect — also benign.
-      if (es.readyState === EventSource.CONNECTING) return;
-      // Ulanish uzildi va qayta urinmayapti — tugallanmagan sub_agent
-      // turn'larni yopamiz, "ishlamoqda" abadiy spin bo'lib qolmasin.
-      setState((s) => ({
-        ...s,
-        error: s.error ?? "Stream connection lost",
-        turns: closeDanglingSubAgents(s.turns),
-      }));
+      // A transport interruption is not a run failure. Native EventSource
+      // retries while CONNECTING; if it becomes CLOSED, recreate it with the
+      // latest seq cursor so persisted events are replayed without gaps.
+      setState((s) => ({ ...s, reconnecting: true }));
+      if (
+        es.readyState === EventSource.CLOSED &&
+        reconnectTimer === undefined
+      ) {
+        reconnectTimer = window.setTimeout(
+          () => setConnectionAttempt((attempt) => attempt + 1),
+          1500,
+        );
+      }
     };
 
     return () => {
+      if (reconnectTimer !== undefined) window.clearTimeout(reconnectTimer);
       es.close();
       esRef.current = null;
     };
-  }, [projectId, requestId]);
+  }, [projectId, requestId, connectionAttempt]);
 
   const pushUserTurn = useCallback((text: string) => {
     finishedRef.current = false;
@@ -659,6 +730,8 @@ export function useAgentStream({
         ],
         finished: false,
         error: null,
+        cancelled: false,
+        reconnecting: false,
         phase: "queued",
         currentTool: null,
         pendingTool: null,

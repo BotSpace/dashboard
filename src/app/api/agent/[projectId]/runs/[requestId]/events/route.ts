@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(
   req: NextRequest,
-  ctx: { params: Promise<{ projectId: string; requestId: string }> }
+  ctx: { params: Promise<{ projectId: string; requestId: string }> },
 ) {
   const { projectId, requestId } = await ctx.params;
   const url = new URL(req.url);
@@ -18,9 +18,15 @@ export async function GET(
       headers: { Accept: "text/event-stream" },
     });
     if (!upstream.ok || !upstream.body) {
-      const fallback = await buildTerminalFallback(projectId, requestId, upstream.status);
+      const fallback = await buildTerminalFallback(
+        projectId,
+        requestId,
+        upstream.status,
+      );
       if (fallback) return fallback;
-      return new Response(`Upstream error ${upstream.status}`, { status: upstream.status });
+      return new Response(`Upstream error ${upstream.status}`, {
+        status: upstream.status,
+      });
     }
     return new Response(upstream.body, {
       status: 200,
@@ -34,9 +40,12 @@ export async function GET(
   } catch (e) {
     const fallback = await buildTerminalFallback(projectId, requestId, 502);
     if (fallback) return fallback;
-    return new Response(`Agent unreachable at ${AGENT_BASE}: ${(e as Error).message}`, {
-      status: 502,
-    });
+    return new Response(
+      `Agent unreachable at ${AGENT_BASE}: ${(e as Error).message}`,
+      {
+        status: 502,
+      },
+    );
   }
 }
 
@@ -50,18 +59,22 @@ type RunStatusPayload = {
 async function buildTerminalFallback(
   projectId: string,
   requestId: string,
-  upstreamStatus: number
+  upstreamStatus: number,
 ): Promise<Response | null> {
   if (upstreamStatus < 500) return null;
 
   try {
     const statusRes = await agentFetch(
-      `/projects/${encodeURIComponent(projectId)}/runs/${encodeURIComponent(requestId)}`
+      `/projects/${encodeURIComponent(projectId)}/runs/${encodeURIComponent(requestId)}`,
     );
     if (!statusRes.ok) return null;
 
     const run = (await statusRes.json()) as RunStatusPayload;
-    if (run.status !== "completed" && run.status !== "failed" && run.status !== "cancelled") {
+    if (
+      run.status !== "completed" &&
+      run.status !== "failed" &&
+      run.status !== "cancelled"
+    ) {
       return null;
     }
 
@@ -72,7 +85,7 @@ async function buildTerminalFallback(
           type: "assistant_message",
           payload: { text: run.final_response, usage: {} },
           at: new Date().toISOString(),
-        })
+        }),
       );
     }
     if (run.status === "completed") {
@@ -81,15 +94,22 @@ async function buildTerminalFallback(
           type: "run_completed",
           payload: { request_id: run.request_id },
           at: new Date().toISOString(),
-        })
+        }),
       );
     } else {
+      const cancelled =
+        run.status === "cancelled" ||
+        (run.error ?? run.final_response ?? "").trim().toLowerCase() ===
+          "cancelled by user";
       chunks.push(
         sse("run_failed", {
           type: "run_failed",
-          payload: { error: run.error ?? run.final_response ?? "Run failed" },
+          payload: {
+            error: run.error ?? run.final_response ?? "Run failed",
+            cancelled,
+          },
           at: new Date().toISOString(),
-        })
+        }),
       );
     }
     chunks.push(sse("close", { reason: "restored_terminal_state" }));
