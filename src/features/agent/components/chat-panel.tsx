@@ -8,6 +8,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bot,
@@ -180,12 +181,47 @@ export function ChatPanel(props: Props) {
 }
 
 function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const urlThreadId = searchParams.get("thread");
   // Chat history is backend-only. Always enter the page with a fresh thread;
-  // existing threads are loaded for the sidebar but only opened explicitly.
+  // existing threads are loaded only when explicitly selected or linked by URL.
   const [threads, setThreads] = useState<ThreadMeta[]>([]);
-  const [threadId, setThreadId] = useState<string>(() => newThreadId());
-  const [historyThreadId, setHistoryThreadId] = useState<string | null>(null);
+  const [threadId, setThreadId] = useState<string>(
+    () => urlThreadId ?? newThreadId(),
+  );
+  const [historyThreadId, setHistoryThreadId] = useState<string | null>(
+    urlThreadId,
+  );
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const updateThreadUrl = (id: string | null, replace = false) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (id) params.set("thread", id);
+    else params.delete("thread");
+    const query = params.toString();
+    const href = query ? `${pathname}?${query}` : pathname;
+    if (replace) router.replace(href, { scroll: false });
+    else router.push(href, { scroll: false });
+  };
+
+  // Browser back/forward and a directly opened ?thread= URL must switch the
+  // visible conversation as well; state-only switching makes links unusable.
+  useEffect(() => {
+    if (urlThreadId) {
+      setThreadId(urlThreadId);
+      setHistoryThreadId(urlThreadId);
+      return;
+    }
+    if (historyThreadId !== null) {
+      setThreadId(newThreadId());
+      setHistoryThreadId(null);
+    }
+    // State changes are optimistic; only an actual URL change should run this
+    // synchronizer, otherwise the old query briefly reverts a clicked thread.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlThreadId]);
 
   // Loading the sidebar must not replace the fresh default thread with history.
   useEffect(() => {
@@ -203,12 +239,14 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
     setThreadId(newThreadId());
     setHistoryThreadId(null);
     setSidebarOpen(false);
+    updateThreadUrl(null);
   };
 
   const handleSelectThread = (id: string) => {
     setThreadId(id);
     setHistoryThreadId(id);
     setSidebarOpen(false);
+    updateThreadUrl(id);
   };
 
   const handleDeleteThread = (id: string) => {
@@ -217,6 +255,7 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
     if (id === threadId) {
       setThreadId(newThreadId());
       setHistoryThreadId(null);
+      updateThreadUrl(null, true);
     }
     void deleteThreadAction(projectId, id);
   };
@@ -225,6 +264,7 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
     setThreads([]);
     setThreadId(newThreadId());
     setHistoryThreadId(null);
+    updateThreadUrl(null, true);
     void clearAllThreadsAction(projectId);
   };
 
@@ -287,6 +327,7 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
           onThreadsChange={setThreads}
           onToggleSidebar={() => setSidebarOpen((v) => !v)}
           onNewThread={handleNewThread}
+          onThreadPersisted={() => updateThreadUrl(threadId, true)}
         />
       </div>
     </div>
@@ -302,6 +343,7 @@ type ThreadProps = {
   onThreadsChange: Dispatch<SetStateAction<ThreadMeta[]>>;
   onToggleSidebar: () => void;
   onNewThread: () => void;
+  onThreadPersisted: () => void;
 };
 
 function ChatThread({
@@ -313,6 +355,7 @@ function ChatThread({
   onThreadsChange,
   onToggleSidebar,
   onNewThread,
+  onThreadPersisted,
 }: ThreadProps) {
   const [input, setInput] = useState(initialPrompt ?? "");
   const [requestId, setRequestId] = useState<string | null>(null);
@@ -501,6 +544,7 @@ function ChatThread({
         planRunRef.current = false;
         return;
       }
+      onThreadPersisted();
       setRequestId(res.request_id);
     });
   };
@@ -765,6 +809,32 @@ function ChatThread({
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       Jarayon davom etmoqda, yangi eventlar avtomatik tiklanadi.
                     </p>
+                  </div>
+                </div>
+              )}
+
+              {stream.connectionError && !stream.finished && (
+                <div className="mx-auto flex max-w-xl items-start gap-3 rounded-2xl border border-destructive/20 bg-destructive/[0.04] px-4 py-3.5">
+                  <div className="mt-0.5 rounded-full bg-destructive/10 p-1.5 text-destructive">
+                    <RefreshCw className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-destructive">
+                      Live aloqa uzildi
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {stream.connectionError}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-3 h-8"
+                      onClick={stream.retryConnection}
+                    >
+                      <RefreshCw className="mr-2 h-3.5 w-3.5" />
+                      Qayta urinish
+                    </Button>
                   </div>
                 </div>
               )}

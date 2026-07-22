@@ -54,6 +54,7 @@ type State = {
   error: string | null;
   cancelled: boolean;
   reconnecting: boolean;
+  connectionError: string | null;
   thinking: string;
   phase: RunPhase;
   currentTool: string | null;
@@ -121,6 +122,7 @@ export function useAgentStream({
     error: null,
     cancelled: false,
     reconnecting: false,
+    connectionError: null,
     thinking: "",
     phase: initialFinished ? "done" : "idle",
     currentTool: null,
@@ -134,6 +136,7 @@ export function useAgentStream({
   });
   const esRef = useRef<EventSource | null>(null);
   const [connectionAttempt, setConnectionAttempt] = useState(0);
+  const reconnectDeadlineRef = useRef<number | null>(null);
   const finishedRef = useRef(Boolean(initialFinished));
   const toolViewMap = useRef<Record<string, ToolCallView>>({});
   // Map sub_agent_id → ChatTurn id (so child tool_call/result events can be
@@ -199,8 +202,34 @@ export function useAgentStream({
       };
     });
 
+    let reconnectTimer: number | undefined;
+    let failureTimer: number | undefined;
+    const armFailureTimeout = () => {
+      if (reconnectDeadlineRef.current === null) {
+        reconnectDeadlineRef.current = Date.now() + 12_000;
+      }
+      if (failureTimer !== undefined) window.clearTimeout(failureTimer);
+      const remaining = Math.max(0, reconnectDeadlineRef.current - Date.now());
+      failureTimer = window.setTimeout(() => {
+        es.close();
+        setState((s) => ({
+          ...s,
+          reconnecting: false,
+          connectionError:
+            "Agent bilan live aloqa tiklanmadi. Internetni tekshirib, qayta urinib ko‘ring.",
+        }));
+      }, remaining);
+    };
+    if (reconnectDeadlineRef.current !== null) armFailureTimeout();
+
     es.onopen = () => {
-      setState((s) => (s.reconnecting ? { ...s, reconnecting: false } : s));
+      reconnectDeadlineRef.current = null;
+      if (failureTimer !== undefined) window.clearTimeout(failureTimer);
+      setState((s) =>
+        s.reconnecting || s.connectionError
+          ? { ...s, reconnecting: false, connectionError: null }
+          : s,
+      );
     };
 
     const handler = (type: AgentEventType) => (e: MessageEvent) => {
@@ -231,12 +260,23 @@ export function useAgentStream({
     const apply = (ev: AgentEvent) => {
       // Reconnects can replay events from the old `since_seq` URL. Ignore
       // anything already applied so messages/tool calls are never duplicated.
-      if (typeof ev.seq === "number" && ev.seq <= lastSeqRef.current) return;
+      if (
+        typeof ev.seq === "number" &&
+        ev.seq > 0 &&
+        ev.seq <= lastSeqRef.current
+      )
+        return;
       if (typeof ev.seq === "number" && ev.seq > lastSeqRef.current) {
         lastSeqRef.current = ev.seq;
       }
       setState((s) => {
-        const next = { ...s, reconnecting: false };
+        reconnectDeadlineRef.current = null;
+        if (failureTimer !== undefined) window.clearTimeout(failureTimer);
+        const next = {
+          ...s,
+          reconnecting: false,
+          connectionError: null,
+        };
         switch (ev.type) {
           case "run_started": {
             next.error = null;
@@ -687,7 +727,6 @@ export function useAgentStream({
       "close",
     ];
     for (const t of types) es.addEventListener(t, handler(t) as EventListener);
-    let reconnectTimer: number | undefined;
     es.onerror = () => {
       // If the run already completed (we explicitly closed the source), this
       // is a benign "connection closed" — not a real failure.
@@ -696,6 +735,7 @@ export function useAgentStream({
       // retries while CONNECTING; if it becomes CLOSED, recreate it with the
       // latest seq cursor so persisted events are replayed without gaps.
       setState((s) => ({ ...s, reconnecting: true }));
+      armFailureTimeout();
       if (
         es.readyState === EventSource.CLOSED &&
         reconnectTimer === undefined
@@ -709,12 +749,14 @@ export function useAgentStream({
 
     return () => {
       if (reconnectTimer !== undefined) window.clearTimeout(reconnectTimer);
+      if (failureTimer !== undefined) window.clearTimeout(failureTimer);
       es.close();
       esRef.current = null;
     };
   }, [projectId, requestId, connectionAttempt]);
 
   const pushUserTurn = useCallback((text: string) => {
+    reconnectDeadlineRef.current = null;
     finishedRef.current = false;
     lastSeqRef.current = 0; // new run — reset seq cursor
     setState((s) => {
@@ -732,6 +774,7 @@ export function useAgentStream({
         error: null,
         cancelled: false,
         reconnecting: false,
+        connectionError: null,
         phase: "queued",
         currentTool: null,
         pendingTool: null,
@@ -746,6 +789,17 @@ export function useAgentStream({
     });
   }, []);
 
+  const retryConnection = useCallback(() => {
+    reconnectDeadlineRef.current = Date.now() + 12_000;
+    finishedRef.current = false;
+    setState((s) => ({
+      ...s,
+      reconnecting: true,
+      connectionError: null,
+    }));
+    setConnectionAttempt((attempt) => attempt + 1);
+  }, []);
+
   /**
    * Seed turns from an external source (e.g. backend history fetch) when the
    * stream has not yet received any turns and is idle (no live run).
@@ -758,5 +812,11 @@ export function useAgentStream({
     });
   }, []);
 
-  return { ...state, pushUserTurn, close, seedTurnsFromBackend };
+  return {
+    ...state,
+    pushUserTurn,
+    close,
+    retryConnection,
+    seedTurnsFromBackend,
+  };
 }
