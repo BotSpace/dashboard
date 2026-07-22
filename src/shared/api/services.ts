@@ -190,6 +190,8 @@ export const KanbanAPI = {
     api(`/api/v1/boards/${boardId}/columns/${columnId}`, { method: "PUT", json: body }),
   removeColumn: (boardId: string, columnId: string) =>
     api<void>(`/api/v1/boards/${boardId}/columns/${columnId}`, { method: "DELETE" }),
+  reorderColumns: (boardId: string, columnIds: string[]) =>
+    api(`/api/v1/boards/${boardId}/columns/reorder`, { method: "POST", json: { column_ids: columnIds } }),
   createCard: (boardId: string, body: Record<string, unknown>) =>
     api<KanbanCard>(`/api/v1/boards/${boardId}/cards`, { method: "POST", json: body }),
   updateCard: (id: string, body: Record<string, unknown>) =>

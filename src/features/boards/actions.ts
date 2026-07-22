@@ -75,3 +75,14 @@ export async function removeColumnAction(boardId: string, columnId: string) {
   await KanbanAPI.removeColumn(boardId, columnId);
   revalidatePath(`/app/boards/${boardId}`);
 }
+
+export async function reorderColumnsAction(boardId: string, columnIds: string[]) {
+  const columns = await KanbanAPI.reorderColumns(boardId, columnIds);
+  revalidatePath(`/app/boards/${boardId}`);
+  return columns;
+}
+
+export async function archiveBoardAction(boardId: string) {
+  await KanbanAPI.archive(boardId);
+  revalidatePath("/app/boards");
+}
