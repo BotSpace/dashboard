@@ -17,6 +17,7 @@ import type {
   CmsDocumentListResponse,
   CmsDocumentCursorResponse,
   CmsField,
+  CmsFieldKind,
   Template,
   TemplateCategory,
   TemplateFeature,
@@ -704,17 +705,52 @@ function cms(
   return `/api/v1/cms/projects/${projectId}/collections${tail ? "/" + tail : ""}`;
 }
 
+type GoCmsField = Omit<Partial<CmsField>, "kind"> & {
+  type?: CmsFieldKind;
+  kind?: CmsFieldKind;
+  relation_collection_id?: string | null;
+};
+
+function normalizeCmsField(raw: GoCmsField): CmsField {
+  return {
+    ...raw,
+    name: String(raw.name ?? ""),
+    kind: raw.kind ?? raw.type ?? "text",
+    required: Boolean(raw.required),
+    index: raw.index ?? "none",
+    relation_collection:
+      raw.relation_collection ?? raw.relation_collection_id ?? null,
+  };
+}
+
+function normalizeCmsCollection(raw: CmsCollection): CmsCollection {
+  return {
+    ...raw,
+    fields: raw.fields?.map((field) => normalizeCmsField(field as GoCmsField)),
+  };
+}
+
+function fieldCreatePayload(field: CmsField): Record<string, unknown> {
+  const { kind, relation_collection, ...rest } = field;
+  return {
+    ...rest,
+    type: kind,
+    relation_collection,
+  };
+}
+
 export const CmsAPI = {
   listCollections: async (
     projectId: string | number,
   ): Promise<CmsCollection[]> => {
     const d = await api<unknown>(cms(projectId));
-    return unwrapList<CmsCollection>(d);
+    return unwrapList<CmsCollection>(d).map(normalizeCmsCollection);
   },
-  getCollection: (
+  getCollection: async (
     projectId: string | number,
     name: string,
-  ): Promise<CmsCollection> => api<CmsCollection>(cms(projectId, name)),
+  ): Promise<CmsCollection> =>
+    normalizeCmsCollection(await api<CmsCollection>(cms(projectId, name))),
   // internal/modules/cms dto.go CreateCollectionRequest requires BOTH `name`
   // (required) and `slug` (required, min=1, max=80, lowercase snake_case —
   // becomes the immutable Mongo collection name). The dashboard's schema
@@ -758,20 +794,20 @@ export const CmsAPI = {
     name: string,
     field: CmsField,
   ): Promise<CmsField> =>
-    api<CmsField>(cms(projectId, name, "fields"), {
+    api<GoCmsField>(cms(projectId, name, "fields"), {
       method: "POST",
-      json: field,
-    }),
+      json: fieldCreatePayload(field),
+    }).then(normalizeCmsField),
   updateField: (
     projectId: string | number,
     name: string,
     fieldName: string,
     patch: Partial<CmsField>,
   ): Promise<CmsField> =>
-    api<CmsField>(cms(projectId, name, "fields", fieldName), {
+    api<GoCmsField>(cms(projectId, name, "fields", fieldName), {
       method: "PATCH",
       json: patch,
-    }),
+    }).then(normalizeCmsField),
   removeField: (
     projectId: string | number,
     name: string,

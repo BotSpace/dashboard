@@ -60,15 +60,11 @@ import { MessageMarkdown } from "./message-markdown";
 import { ProjectPicker } from "./project-picker";
 import { ThinkingEffortControl } from "./thinking-effort-control";
 import { ThreadsSidebar } from "./threads-sidebar";
-import { ToolStrip } from "./tool-strip";
-import { SubAgentAccordion } from "./sub-agent-accordion";
 import { RunStatusChip } from "./typing-indicator";
 import { UsageBadge } from "./usage-badge";
 import type {
   ChatTurn,
-  ToolCallView,
   PlanItem,
-  WorkflowProgressItem,
 } from "../types";
 import type { Project } from "@/shared/types/api";
 import { newThreadId, titleFromPrompt, type ThreadMeta } from "../storage";
@@ -117,48 +113,18 @@ type RenderItem =
       outputTokens?: number;
       reasoning?: string;
     }
-  | { kind: "tool-group"; id: string; calls: ToolCallView[]; pending: boolean }
-  | { kind: "plan"; id: string; plan: PlanItem[] }
-  | {
-      kind: "sub_agent";
-      id: string;
-      turn: Extract<ChatTurn, { kind: "sub_agent" }>;
-    };
+  | { kind: "plan"; id: string; plan: PlanItem[] };
 
-function renderTurns(turns: ChatTurn[], phase: string): RenderItem[] {
+function renderTurns(turns: ChatTurn[], _phase: string): RenderItem[] {
   const items: RenderItem[] = [];
-  let group: ToolCallView[] | null = null;
-  let groupStartId = "";
-  const flushGroup = (pending: boolean) => {
-    if (group && group.length) {
-      items.push({
-        kind: "tool-group",
-        id: `tg-${groupStartId}`,
-        calls: group,
-        pending,
-      });
-    }
-    group = null;
-    groupStartId = "";
-  };
   for (const t of turns) {
-    if (t.kind === "tool") {
-      if (!group) {
-        group = [];
-        groupStartId = t.id;
-      }
-      group.push(t.call);
-      continue;
-    }
-    flushGroup(false);
-    if (t.kind === "sub_agent") {
-      items.push({ kind: "sub_agent", id: t.id, turn: t });
-      continue;
-    }
+    // Tool/sub-agent events remain in stream state for counters, status and
+    // diagnostics, but are deliberately not rendered as chat cards. The user
+    // sees the live header status and the final result instead of an expanding
+    // wall of "project inspected / schema loaded" implementation details.
+    if (t.kind === "tool" || t.kind === "sub_agent") continue;
     items.push(t as RenderItem);
   }
-  const liveRunning = phase !== "done" && phase !== "error" && phase !== "idle";
-  flushGroup(liveRunning);
   return items;
 }
 
@@ -744,27 +710,14 @@ function ChatThread({
                     />
                   );
                 }
-                if (item.kind === "sub_agent") {
-                  return <SubAgentAccordion key={item.id} turn={item.turn} />;
-                }
                 if (item.kind === "plan") {
                   return null; // legacy step-checklist plans are no longer shown
                 }
-                return (
-                  <ToolStrip
-                    key={item.id}
-                    calls={item.calls}
-                    pending={item.pending}
-                  />
-                );
+                return null;
               })}
 
               {stream.thinking && stream.phase === "thinking" && (
                 <LiveThinking text={stream.thinking} />
-              )}
-
-              {stream.workflowProgress.length > 0 && (
-                <WorkflowProgress items={stream.workflowProgress} />
               )}
 
               {/* Inline approval prompt — renders when agent gates a destructive action */}
@@ -1221,66 +1174,6 @@ function LiveThinking({ text }: { text: string }) {
         >
           {text}
         </div>
-      </div>
-    </div>
-  );
-}
-
-const WORKFLOW_STEP_LABELS: Record<string, string> = {
-  blueprint: "Talab tushunildi",
-  collections: "Ma'lumotlar sxemasi tekshirildi",
-  validation: "Flow tekshirildi",
-  simulation: "Bot sinovdan o'tkazildi",
-  apply: "O'zgarishlar qo'llandi",
-};
-
-function WorkflowProgress({ items }: { items: WorkflowProgressItem[] }) {
-  return (
-    <div className="ml-11 max-w-xl rounded-2xl border bg-card/70 px-4 py-3 shadow-sm">
-      <p className="mb-2 text-xs font-semibold text-foreground">
-        Qurish jarayoni
-      </p>
-      <div className="space-y-2">
-        {items.map((item) => {
-          const failed = item.status === "failed";
-          const complete = item.status === "done";
-          const skipped = item.status === "skipped";
-          return (
-            <div key={item.step} className="flex items-start gap-2.5 text-xs">
-              <span
-                className={cn(
-                  "mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border",
-                  complete && "border-emerald-500 bg-emerald-500 text-white",
-                  failed &&
-                    "border-destructive bg-destructive text-destructive-foreground",
-                  skipped && "border-muted-foreground/30 text-muted-foreground",
-                  !complete &&
-                    !failed &&
-                    !skipped &&
-                    "border-primary text-primary",
-                )}
-              >
-                {complete ? (
-                  <Check className="h-2.5 w-2.5" />
-                ) : failed ? (
-                  <span className="text-[9px] font-bold">!</span>
-                ) : skipped ? (
-                  <span className="h-1 w-1 rounded-full bg-current" />
-                ) : (
-                  <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                )}
-              </span>
-              <div className="min-w-0">
-                <p className={cn("font-medium", failed && "text-destructive")}>
-                  {WORKFLOW_STEP_LABELS[item.step] ?? item.step}
-                </p>
-                {item.detail && (
-                  <p className="mt-0.5 text-muted-foreground">{item.detail}</p>
-                )}
-              </div>
-            </div>
-          );
-        })}
       </div>
     </div>
   );
