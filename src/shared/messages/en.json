@@ -32,7 +32,7 @@
     "dashboard": "Dashboard",
     "agent": "AI Agent",
     "bots": "Bots",
-	"boards": "Work",
+    "boards": "Work",
     "cms": "Data",
     "templates": "Templates",
     "files": "Files",
@@ -148,13 +148,7 @@
       "eyebrow": "AI Agent",
       "title": "Build a bot by chatting",
       "subtitle": "Talk to the agent in plain language — it builds the flow, adds nodes and deploys for you.",
-      "tags": [
-        "Flow building",
-        "Deploy",
-        "CRM",
-        "Broadcast",
-        "Analytics"
-      ],
+      "tags": ["Flow building", "Deploy", "CRM", "Broadcast", "Analytics"],
       "chat": {
         "headerTitle": "BotSpace AI",
         "headerStatus": "Online · Telegram bot builder",
@@ -411,7 +405,7 @@
       "env": "Settings",
       "releases": "Releases",
       "monitoring": "Monitoring",
-	  "boards": "Work",
+      "boards": "Work",
       "plan": "Plan"
     },
     "release": {
@@ -836,12 +830,129 @@
     }
   },
   "kanban": {
-    "title": "Work", "subtitle": "Manage leads, tasks, orders, and any other workflow", "linkedSubtitle": "Boards linked to {name}", "filtered": "Filtered by {name}", "filteredCards": "Cards are filtered by the selected bot", "viewAll": "View all", "emptyTitle": "No boards yet", "emptyDescription": "Create your first workflow from a template.", "manage": "Manage {type}", "process": "{type} workflow", "botCount": "{count} bots", "back": "Boards",
-    "search": "Search cards…", "allPriorities": "All priorities", "add": "Add {type}", "dropHere": "Drop a card here", "terminal": "Done", "bot": "Bot", "save": "Save", "saving": "Saving…", "saved": "Saved", "cancel": "Cancel", "archive": "Archive", "titleField": "Title", "descriptionField": "Description", "priority": "Priority", "due": "Due date", "comments": "Comments", "commentPlaceholder": "Write a comment…", "activity": "Activity", "noActivity": "No activity yet", "yes": "Yes", "newCard": "New {type}", "moveFailed": "Card could not be moved", "saveFailed": "Could not save", "archiveFailed": "Card could not be archived", "commentFailed": "Comment could not be sent", "mutationFailed": "Kanban action failed",
-    "priorities": { "low": "Low", "normal": "Normal", "high": "High", "urgent": "Urgent" }, "activities": { "created": "Created", "updated": "Updated", "moved": "Moved", "archived": "Archived", "commented": "Comment added" },
-    "templates": { "blank": { "label": "Blank board", "card": "Card", "columns": ["New", "In progress", "Done"] }, "leads": { "label": "Sales leads", "card": "Lead", "columns": ["New lead", "Contacted", "Proposal", "Won"] }, "support": { "label": "Customer support", "card": "Request", "columns": ["New", "Reviewing", "Waiting for reply", "Closed"] }, "orders": { "label": "Orders", "card": "Order", "columns": ["New", "Confirmed", "Preparing", "Delivered"] }, "hiring": { "label": "Hiring", "card": "Candidate", "columns": ["New", "Interview", "Offer", "Hired"] }, "tasks": { "label": "Tasks", "card": "Task", "columns": ["Planned", "In progress", "Review", "Done"] } },
-    "newBoard": "New board", "newBoardTitle": "New work board", "newBoardDescription": "Create a workflow that every bot can use.", "name": "Name", "namePlaceholder": "For example, Sales pipeline", "template": "Workflow template", "linkBots": "Link bots", "linkBotsCreateHint": "You can change this later in settings.", "creating": "Creating…", "create": "Create", "createFailed": "Board could not be created",
-    "settings": "Settings", "settingsTitle": "Board settings", "settingsDescription": "Manage the workflow, bot links, columns, and card fields.", "cardType": "Card type label", "linkBotsHint": "Linked bots can send leads and tasks to this board.", "findBot": "Search bots…", "botNotFound": "No bot found", "columns": "Columns", "column": "Column", "newColumn": "New column", "terminalColumn": "Terminal column", "customFields": "Custom card fields", "field": "Field", "noFields": "No custom fields.", "dangerZone": "Danger zone", "dangerHint": "The board and its cards will be removed from active lists.", "archiveConfirm": "Archive “{name}”?", "boardArchived": "Board archived", "boardArchiveFailed": "Board could not be archived", "settingsSaved": "Board settings saved", "settingsFailed": "Settings could not be saved", "removeColumnFailed": "Only an empty column can be removed", "fieldTypes": { "text": "Text", "number": "Number", "date": "Date", "boolean": "Yes/no" }
+    "title": "Work",
+    "subtitle": "Manage leads, tasks, orders, and any other workflow",
+    "linkedSubtitle": "Boards linked to {name}",
+    "filtered": "Filtered by {name}",
+    "filteredCards": "Cards are filtered by the selected bot",
+    "viewAll": "View all",
+    "emptyTitle": "No boards yet",
+    "emptyDescription": "Create your first workflow from a template.",
+    "manage": "Manage {type}",
+    "process": "{type} workflow",
+    "botCount": "{count} bots",
+    "back": "Boards",
+    "search": "Search cards…",
+    "allPriorities": "All priorities",
+    "add": "Add {type}",
+    "dropHere": "Drop a card here",
+    "terminal": "Done",
+    "bot": "Bot",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "archive": "Archive",
+    "titleField": "Title",
+    "descriptionField": "Description",
+    "priority": "Priority",
+    "due": "Due date",
+    "comments": "Comments",
+    "commentPlaceholder": "Write a comment…",
+    "activity": "Activity",
+    "noActivity": "No activity yet",
+    "yes": "Yes",
+    "newCard": "New {type}",
+    "moveFailed": "Card could not be moved",
+    "saveFailed": "Could not save",
+    "archiveFailed": "Card could not be archived",
+    "commentFailed": "Comment could not be sent",
+    "mutationFailed": "Kanban action failed",
+    "priorities": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "activities": {
+      "created": "Created",
+      "updated": "Updated",
+      "moved": "Moved",
+      "archived": "Archived",
+      "commented": "Comment added"
+    },
+    "templates": {
+      "blank": {
+        "label": "Blank board",
+        "card": "Card",
+        "columns": ["New", "In progress", "Done"]
+      },
+      "leads": {
+        "label": "Sales leads",
+        "card": "Lead",
+        "columns": ["New lead", "Contacted", "Proposal", "Won"]
+      },
+      "support": {
+        "label": "Customer support",
+        "card": "Request",
+        "columns": ["New", "Reviewing", "Waiting for reply", "Closed"]
+      },
+      "orders": {
+        "label": "Orders",
+        "card": "Order",
+        "columns": ["New", "Confirmed", "Preparing", "Delivered"]
+      },
+      "hiring": {
+        "label": "Hiring",
+        "card": "Candidate",
+        "columns": ["New", "Interview", "Offer", "Hired"]
+      },
+      "tasks": {
+        "label": "Tasks",
+        "card": "Task",
+        "columns": ["Planned", "In progress", "Review", "Done"]
+      }
+    },
+    "newBoard": "New board",
+    "newBoardTitle": "New work board",
+    "newBoardDescription": "Create a workflow that every bot can use.",
+    "name": "Name",
+    "namePlaceholder": "For example, Sales pipeline",
+    "template": "Workflow template",
+    "linkBots": "Link bots",
+    "linkBotsCreateHint": "You can change this later in settings.",
+    "creating": "Creating…",
+    "create": "Create",
+    "createFailed": "Board could not be created",
+    "settings": "Settings",
+    "settingsTitle": "Board settings",
+    "settingsDescription": "Manage the workflow, bot links, columns, and card fields.",
+    "cardType": "Card type label",
+    "linkBotsHint": "Linked bots can send leads and tasks to this board.",
+    "findBot": "Search bots…",
+    "botNotFound": "No bot found",
+    "columns": "Columns",
+    "column": "Column",
+    "newColumn": "New column",
+    "terminalColumn": "Terminal column",
+    "customFields": "Custom card fields",
+    "field": "Field",
+    "fieldNamePlaceholder": "Field name, for example: Phone",
+    "noFields": "No custom fields.",
+    "dangerZone": "Danger zone",
+    "dangerHint": "The board and its cards will be removed from active lists.",
+    "archiveConfirm": "Archive “{name}”?",
+    "boardArchived": "Board archived",
+    "boardArchiveFailed": "Board could not be archived",
+    "settingsSaved": "Board settings saved",
+    "settingsFailed": "Settings could not be saved",
+    "removeColumnFailed": "Only an empty column can be removed",
+    "fieldTypes": {
+      "text": "Text",
+      "number": "Number",
+      "date": "Date",
+      "boolean": "Yes/no"
+    }
   },
   "onboarding": {
     "welcome": {

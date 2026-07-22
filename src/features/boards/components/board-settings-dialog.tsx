@@ -11,7 +11,6 @@ import {
   Search,
   Settings2,
   Trash2,
-  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "@/shared/i18n/routing";
@@ -47,7 +46,22 @@ import {
   updateColumnAction,
 } from "../actions";
 
-type Field = { key: string; label: string; type: string };
+type Field = { key: string; label: string; type: string; isNew?: boolean };
+
+function makeFieldKey(label: string, usedKeys: Set<string>) {
+  const base = label
+    .trim()
+    .toLocaleLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}]+/gu, "_")
+    .replace(/^_+|_+$/g, "");
+  if (!base) return "";
+  let key = base;
+  let suffix = 2;
+  while (usedKeys.has(key)) key = `${base}_${suffix++}`;
+  return key;
+}
 
 export function BoardSettingsDialog({
   board,
@@ -85,9 +99,9 @@ export function BoardSettingsDialog({
           icon: board.icon,
           color: board.color,
           card_type_label: cardLabel,
-          field_schema: fields.filter(
-            (field) => field.key.trim() && field.label.trim(),
-          ),
+          field_schema: fields
+            .filter((field) => field.key.trim() && field.label.trim())
+            .map(({ key, label, type }) => ({ key, label, type })),
         });
         const savedColumns = await Promise.all(
           columns.map((column) =>
@@ -210,29 +224,6 @@ export function BoardSettingsDialog({
                 {t("linkBotsHint")}
               </p>
             </div>
-            {linked.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {linked.map((id) => {
-                  const project = projects.find((item) => item.id === id);
-                  return project ? (
-                    <button
-                      type="button"
-                      key={id}
-                      onClick={() =>
-                        setLinked((current) =>
-                          current.filter((item) => item !== id),
-                        )
-                      }
-                      className="flex items-center gap-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 px-2.5 py-1 text-xs text-blue-500 transition hover:bg-blue-500/15"
-                    >
-                      <Bot className="h-3 w-3" />
-                      {project.name}
-                      <X className="h-3 w-3" />
-                    </button>
-                  ) : null;
-                })}
-              </div>
-            )}
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -415,7 +406,7 @@ export function BoardSettingsDialog({
                 onClick={() =>
                   setFields((current) => [
                     ...current,
-                    { key: "", label: "", type: "text" },
+                    { key: "", label: "", type: "text", isNew: true },
                   ])
                 }
               >
@@ -431,35 +422,31 @@ export function BoardSettingsDialog({
             {fields.map((field, index) => (
               <div
                 key={index}
-                className="grid grid-cols-[1fr_1fr_120px_36px] gap-2"
+                className="grid grid-cols-[minmax(0,1fr)_120px_36px] gap-2"
               >
                 <Input
-                  value={field.key}
-                  placeholder="phone"
+                  value={field.label}
+                  placeholder={t("fieldNamePlaceholder")}
                   onChange={(e) =>
-                    setFields((current) =>
-                      current.map((item, i) =>
-                        i === index
+                    setFields((current) => {
+                      const label = e.target.value;
+                      const usedKeys = new Set(
+                        current
+                          .filter((_, itemIndex) => itemIndex !== index)
+                          .map((item) => item.key),
+                      );
+                      return current.map((item, itemIndex) =>
+                        itemIndex === index
                           ? {
                               ...item,
-                              key: e.target.value
-                                .replace(/\s+/g, "_")
-                                .toLowerCase(),
+                              label,
+                              key: item.isNew
+                                ? makeFieldKey(label, usedKeys)
+                                : item.key,
                             }
                           : item,
-                      ),
-                    )
-                  }
-                />
-                <Input
-                  value={field.label}
-                  placeholder="Telefon"
-                  onChange={(e) =>
-                    setFields((current) =>
-                      current.map((item, i) =>
-                        i === index ? { ...item, label: e.target.value } : item,
-                      ),
-                    )
+                      );
+                    })
                   }
                 />
                 <Select
@@ -477,9 +464,13 @@ export function BoardSettingsDialog({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="text">{t("fieldTypes.text")}</SelectItem>
-                    <SelectItem value="number">{t("fieldTypes.number")}</SelectItem>
+                    <SelectItem value="number">
+                      {t("fieldTypes.number")}
+                    </SelectItem>
                     <SelectItem value="date">{t("fieldTypes.date")}</SelectItem>
-                    <SelectItem value="boolean">{t("fieldTypes.boolean")}</SelectItem>
+                    <SelectItem value="boolean">
+                      {t("fieldTypes.boolean")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <Button

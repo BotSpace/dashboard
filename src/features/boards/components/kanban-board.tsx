@@ -588,7 +588,7 @@ function CardEditor({
   }
   return (
     <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+      <DialogContent className="max-h-[92vh] w-[min(96vw,1024px)] max-w-5xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {card
@@ -596,146 +596,150 @@ function CardEditor({
               : t("newCard", { type: board.card_type_label.toLowerCase() })}
           </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-6 md:grid-cols-[1fr_280px]">
-          <div className="space-y-4">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>{t("titleField")}</Label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>{t("descriptionField")}</Label>
+            <Textarea
+              rows={6}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label>{t("titleField")}</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+              <Label>{t("priority")}</Label>
+              <Select
+                value={priority}
+                onValueChange={(value) => setPriority(value as KanbanPriority)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">{t("priorities.low")}</SelectItem>
+                  <SelectItem value="normal">
+                    {t("priorities.normal")}
+                  </SelectItem>
+                  <SelectItem value="high">{t("priorities.high")}</SelectItem>
+                  <SelectItem value="urgent">
+                    {t("priorities.urgent")}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
-              <Label>{t("descriptionField")}</Label>
-              <Textarea
-                rows={6}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+              <Label>{t("due")}</Label>
+              <Input
+                type="date"
+                value={due}
+                onChange={(e) => setDue(e.target.value)}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label>{t("priority")}</Label>
-                <Select
-                  value={priority}
-                  onValueChange={(value) =>
-                    setPriority(value as KanbanPriority)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">{t("priorities.low")}</SelectItem>
-                    <SelectItem value="normal">
-                      {t("priorities.normal")}
-                    </SelectItem>
-                    <SelectItem value="high">{t("priorities.high")}</SelectItem>
-                    <SelectItem value="urgent">
-                      {t("priorities.urgent")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>{t("due")}</Label>
-                <Input
-                  type="date"
-                  value={due}
-                  onChange={(e) => setDue(e.target.value)}
-                />
-              </div>
-            </div>
-            {(board.field_schema ?? []).length > 0 && (
-              <div className="grid gap-3 border-t pt-4 sm:grid-cols-2">
-                {board.field_schema.map((field) => (
-                  <div key={field.key} className="space-y-2">
-                    <Label>{field.label}</Label>
-                    {field.type === "boolean" ? (
-                      <label className="flex h-10 items-center gap-2 rounded-md border px-3 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(customFields[field.key])}
-                          onChange={(e) =>
-                            setCustomFields((current) => ({
-                              ...current,
-                              [field.key]: e.target.checked,
-                            }))
-                          }
-                        />
-                        {t("yes")}
-                      </label>
-                    ) : (
-                      <Input
-                        type={
-                          field.type === "number"
-                            ? "number"
-                            : field.type === "date"
-                              ? "date"
-                              : "text"
-                        }
-                        value={String(customFields[field.key] ?? "")}
+          </div>
+          {(board.field_schema ?? []).length > 0 && (
+            <div className="grid gap-3 border-t pt-4 sm:grid-cols-2">
+              {board.field_schema.map((field) => (
+                <div key={field.key} className="space-y-2">
+                  <Label>{field.label}</Label>
+                  {field.type === "boolean" ? (
+                    <label className="flex h-10 items-center gap-2 rounded-md border px-3 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(customFields[field.key])}
                         onChange={(e) =>
                           setCustomFields((current) => ({
                             ...current,
-                            [field.key]:
-                              field.type === "number" && e.target.value !== ""
-                                ? Number(e.target.value)
-                                : e.target.value,
+                            [field.key]: e.target.checked,
                           }))
                         }
                       />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-            {card && (
-              <div className="space-y-3 border-t pt-4">
-                <h3 className="flex items-center gap-2 text-sm font-medium">
-                  <MessageSquare className="h-4 w-4" />
-                  {t("comments")}
-                </h3>
-                {comments.map((item) => (
-                  <div
-                    key={item.id}
-                    className="rounded-lg bg-muted p-3 text-sm"
-                  >
-                    <p>{item.body}</p>
-                    <span className="mt-1 block text-[10px] text-muted-foreground">
-                      {new Date(item.created_at).toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-                <div className="flex gap-2">
-                  <Input
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder={t("commentPlaceholder")}
-                    onKeyDown={(e) => e.key === "Enter" && sendComment()}
-                  />
-                  <Button size="icon" onClick={sendComment} disabled={pending}>
-                    <Send className="h-4 w-4" />
-                  </Button>
+                      {t("yes")}
+                    </label>
+                  ) : (
+                    <Input
+                      type={
+                        field.type === "number"
+                          ? "number"
+                          : field.type === "date"
+                            ? "date"
+                            : "text"
+                      }
+                      value={String(customFields[field.key] ?? "")}
+                      onChange={(e) =>
+                        setCustomFields((current) => ({
+                          ...current,
+                          [field.key]:
+                            field.type === "number" && e.target.value !== ""
+                              ? Number(e.target.value)
+                              : e.target.value,
+                        }))
+                      }
+                    />
+                  )}
                 </div>
-              </div>
-            )}
-          </div>
-          <aside className="space-y-3 border-l pl-4">
-            <h3 className="flex items-center gap-2 text-sm font-medium">
-              <Clock3 className="h-4 w-4" />
-              {t("activity")}
-            </h3>
-            {activities.length === 0 ? (
-              <p className="text-xs text-muted-foreground">{t("noActivity")}</p>
-            ) : (
-              activities.map((item) => (
-                <div key={item.id} className="border-l-2 pl-3 text-xs">
-                  <div className="font-medium">{activityNames[item.event] ?? item.event}</div>
-                  <div className="text-muted-foreground">
+              ))}
+            </div>
+          )}
+          {card && (
+            <div className="space-y-3 border-t pt-4">
+              <h3 className="flex items-center gap-2 text-sm font-medium">
+                <MessageSquare className="h-4 w-4" />
+                {t("comments")}
+              </h3>
+              {comments.map((item) => (
+                <div key={item.id} className="rounded-lg bg-muted p-3 text-sm">
+                  <p>{item.body}</p>
+                  <span className="mt-1 block text-[10px] text-muted-foreground">
                     {new Date(item.created_at).toLocaleString()}
-                  </div>
+                  </span>
                 </div>
-              ))
-            )}
-          </aside>
+              ))}
+              <div className="flex gap-2">
+                <Input
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder={t("commentPlaceholder")}
+                  onKeyDown={(e) => e.key === "Enter" && sendComment()}
+                />
+                <Button size="icon" onClick={sendComment} disabled={pending}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+          {card && (
+            <details className="group border-t pt-4">
+              <summary className="flex cursor-pointer list-none items-center gap-2 text-xs font-medium text-muted-foreground transition hover:text-foreground [&::-webkit-details-marker]:hidden">
+                <Clock3 className="h-3.5 w-3.5" />
+                {t("activity")}
+                <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
+                  {activities.length}
+                </Badge>
+              </summary>
+              <div className="mt-3 grid max-h-48 gap-2 overflow-y-auto rounded-lg border bg-muted/20 p-3 sm:grid-cols-2">
+                {activities.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    {t("noActivity")}
+                  </p>
+                ) : (
+                  activities.map((item) => (
+                    <div key={item.id} className="border-l-2 pl-3 text-xs">
+                      <div className="font-medium">
+                        {activityNames[item.event] ?? item.event}
+                      </div>
+                      <div className="text-muted-foreground">
+                        {new Date(item.created_at).toLocaleString()}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </details>
+          )}
         </div>
         <DialogFooter className="justify-between sm:justify-between">
           {card ? (
