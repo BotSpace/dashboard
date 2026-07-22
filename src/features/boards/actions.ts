@@ -45,3 +45,33 @@ export async function getCardTimelineAction(cardId: string) {
   ]);
   return { activities, comments };
 }
+
+export async function updateBoardAction(boardId: string, body: Record<string, unknown>) {
+  const board = await KanbanAPI.update(boardId, body);
+  revalidatePath("/app/boards");
+  revalidatePath(`/app/boards/${boardId}`);
+  return board;
+}
+
+export async function setBoardProjectAction(boardId: string, projectId: string, linked: boolean) {
+  if (linked) await KanbanAPI.linkProject(boardId, projectId);
+  else await KanbanAPI.unlinkProject(boardId, projectId);
+  revalidatePath(`/app/boards/${boardId}`);
+}
+
+export async function createColumnAction(boardId: string, body: Record<string, unknown>) {
+  const column = await KanbanAPI.createColumn(boardId, body);
+  revalidatePath(`/app/boards/${boardId}`);
+  return column;
+}
+
+export async function updateColumnAction(boardId: string, columnId: string, body: Record<string, unknown>) {
+  const column = await KanbanAPI.updateColumn(boardId, columnId, body);
+  revalidatePath(`/app/boards/${boardId}`);
+  return column;
+}
+
+export async function removeColumnAction(boardId: string, columnId: string) {
+  await KanbanAPI.removeColumn(boardId, columnId);
+  revalidatePath(`/app/boards/${boardId}`);
+}
