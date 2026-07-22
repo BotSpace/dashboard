@@ -60,10 +60,13 @@ import { MessageMarkdown } from "./message-markdown";
 import { ProjectPicker } from "./project-picker";
 import { ThinkingEffortControl } from "./thinking-effort-control";
 import { ThreadsSidebar } from "./threads-sidebar";
+import { ToolStrip } from "./tool-strip";
+import { SubAgentAccordion } from "./sub-agent-accordion";
 import { RunStatusChip } from "./typing-indicator";
 import { UsageBadge } from "./usage-badge";
 import type {
   ChatTurn,
+  ToolCallView,
   PlanItem,
 } from "../types";
 import type { Project } from "@/shared/types/api";
@@ -113,18 +116,48 @@ type RenderItem =
       outputTokens?: number;
       reasoning?: string;
     }
-  | { kind: "plan"; id: string; plan: PlanItem[] };
+  | { kind: "tool-group"; id: string; calls: ToolCallView[]; pending: boolean }
+  | { kind: "plan"; id: string; plan: PlanItem[] }
+  | {
+      kind: "sub_agent";
+      id: string;
+      turn: Extract<ChatTurn, { kind: "sub_agent" }>;
+    };
 
-function renderTurns(turns: ChatTurn[], _phase: string): RenderItem[] {
+function renderTurns(turns: ChatTurn[], phase: string): RenderItem[] {
   const items: RenderItem[] = [];
+  let group: ToolCallView[] | null = null;
+  let groupStartId = "";
+  const flushGroup = (pending: boolean) => {
+    if (group && group.length) {
+      items.push({
+        kind: "tool-group",
+        id: `tg-${groupStartId}`,
+        calls: group,
+        pending,
+      });
+    }
+    group = null;
+    groupStartId = "";
+  };
   for (const t of turns) {
-    // Tool/sub-agent events remain in stream state for counters, status and
-    // diagnostics, but are deliberately not rendered as chat cards. The user
-    // sees the live header status and the final result instead of an expanding
-    // wall of "project inspected / schema loaded" implementation details.
-    if (t.kind === "tool" || t.kind === "sub_agent") continue;
+    if (t.kind === "tool") {
+      if (!group) {
+        group = [];
+        groupStartId = t.id;
+      }
+      group.push(t.call);
+      continue;
+    }
+    flushGroup(false);
+    if (t.kind === "sub_agent") {
+      items.push({ kind: "sub_agent", id: t.id, turn: t });
+      continue;
+    }
     items.push(t as RenderItem);
   }
+  const liveRunning = phase !== "done" && phase !== "error" && phase !== "idle";
+  flushGroup(liveRunning);
   return items;
 }
 
@@ -710,10 +743,19 @@ function ChatThread({
                     />
                   );
                 }
+                if (item.kind === "sub_agent") {
+                  return <SubAgentAccordion key={item.id} turn={item.turn} />;
+                }
                 if (item.kind === "plan") {
                   return null; // legacy step-checklist plans are no longer shown
                 }
-                return null;
+                return (
+                  <ToolStrip
+                    key={item.id}
+                    calls={item.calls}
+                    pending={item.pending}
+                  />
+                );
               })}
 
               {stream.thinking && stream.phase === "thinking" && (
