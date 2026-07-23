@@ -25,6 +25,7 @@ export type TourStep = {
 export const TOUR_STEPS: TourStep[] = [
   { key: "agent", target: "nav-agent", placement: "right", pad: 6 },
   { key: "bots", target: "nav-bots", placement: "right", pad: 6 },
+  { key: "boards", target: "nav-boards", navigateTo: "/app/boards", placement: "right", pad: 6 },
   { key: "templates", target: "nav-templates", placement: "right", pad: 6 },
   { key: "fab", target: "agent-fab", placement: "top", pad: 12 },
   {

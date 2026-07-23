@@ -991,6 +991,10 @@
         "title": "Botlaringiz",
         "body": "Yaratgan barcha botlaringiz shu yerda turadi — ularni tahrirlash, ishga tushirish va kuzatish mumkin."
       },
+      "boards": {
+        "title": "Board — ishlar boshqaruvi",
+        "body": "Board yordamida lead, buyurtma, vazifa yoki murojaatlarni ustunlar bo'yicha boshqaring. Board yarating, botni ulang va kartalarni flow orqali yangilang."
+      },
       "templates": {
         "title": "Shablonlar",
         "body": "Noldan boshlashni istamasangiz — tayyor shablonlardan birini tanlab, bir zumda ishga tushiring."

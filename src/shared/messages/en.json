@@ -987,7 +987,11 @@
       },
       "bots": {
         "title": "Your bots",
-        "body": "Every bot you create lives here — edit, launch and monitor them all in one place."
+        "body": "All bots you create live here — edit, launch and monitor them from one place."
+      },
+      "boards": {
+        "title": "Boards for work management",
+        "body": "Use a board to manage leads, orders, tasks or requests in columns. Create a board, connect a bot and update cards from your flow."
       },
       "templates": {
         "title": "Templates",
