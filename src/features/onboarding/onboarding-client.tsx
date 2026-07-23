@@ -9,7 +9,9 @@ import { ONBOARDING_COOKIE } from "@/shared/lib/constants";
 import { TOUR_STEPS } from "@/features/onboarding/steps";
 import { Spotlight } from "@/features/onboarding/spotlight";
 
-const DONE_KEY = "bs_onboarding_done";
+// Versioned so users who completed the first short tour can see the expanded
+// Board/platform tour after it changes, without clearing their browser storage.
+const DONE_KEY = "bs_onboarding_done_v2";
 
 type Phase = "closed" | "welcome" | "tour";
 
@@ -61,18 +63,17 @@ export function OnboardingClient({ firstName }: { firstName?: string }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [rect, setRect] = useState<DOMRect | null>(null);
 
-  // Trigger once on first-ever sign-in (cookie seeded by the login route),
-  // unless a previous run already completed it (localStorage).
+  // Show the current tour once per browser. The login cookie is still
+  // consumed when present, but is no longer required: existing users should
+  // also receive newly added guidance such as the Board step.
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (localStorage.getItem(DONE_KEY) === "1") return;
-    if (consumeCookie()) {
-      // Mark done up-front: the seed cookie carries the session domain and may
-      // not be clearable from JS, so localStorage is the authoritative one-shot
-      // gate. Guarantees the tour shows exactly once per registration.
-      localStorage.setItem(DONE_KEY, "1");
-      setPhase("welcome");
-    }
+    consumeCookie();
+    // Mark done up-front so the tour remains a one-shot experience even when
+    // the cookie belongs to a different session domain.
+    localStorage.setItem(DONE_KEY, "1");
+    setPhase("welcome");
   }, []);
 
   const finish = useCallback(() => {
