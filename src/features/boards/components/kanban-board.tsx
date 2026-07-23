@@ -20,9 +20,7 @@ import {
   Archive,
   Bot,
   Calendar,
-  CircleDot,
   Clock3,
-  Flag,
   Inbox,
   Loader2,
   MessageSquare,
@@ -30,8 +28,6 @@ import {
   RotateCcw,
   Search,
   Send,
-  Tag,
-  UserCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "@/shared/i18n/routing";
@@ -712,7 +708,6 @@ function CardEditor({
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<KanbanPriority>("normal");
   const [due, setDue] = useState("");
-  const [columnId, setColumnId] = useState("");
   const [customFields, setCustomFields] = useState<Record<string, unknown>>({});
   const [activities, setActivities] = useState<KanbanActivity[]>([]);
   const [comments, setComments] = useState<KanbanComment[]>([]);
@@ -723,7 +718,6 @@ function CardEditor({
     setDescription(card?.description ?? "");
     setPriority(card?.priority ?? "normal");
     setDue(card?.due_at?.slice(0, 10) ?? "");
-    setColumnId(card?.column_id ?? createColumnId ?? board.columns?.[0]?.id ?? "");
     setCustomFields(card?.custom_fields ?? {});
     setActivities([]);
     setComments([]);
@@ -751,12 +745,9 @@ function CardEditor({
           ? await updateCardAction(board.id, card.id, body)
           : await createCardAction(board.id, {
               ...body,
-              column_id: columnId,
+              column_id: createColumnId,
             });
-        const moved = card && columnId !== card.column_id
-          ? await moveCardAction(board.id, card.id, columnId, 0)
-          : saved;
-        onSaved(moved);
+        onSaved(saved);
         toast.success(t("saved"));
       } catch (error) {
         toast.error(error instanceof Error ? error.message : t("saveFailed"));
@@ -788,60 +779,37 @@ function CardEditor({
   }
   return (
     <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
-      <DialogContent className="max-h-[92vh] w-[min(96vw,980px)] max-w-5xl gap-0 overflow-y-auto bg-[#242333] p-0 text-foreground">
-        <DialogHeader className="border-b border-white/10 px-6 py-4">
+      <DialogContent className="max-h-[92vh] w-[min(96vw,1024px)] max-w-5xl overflow-y-auto p-0">
+        <DialogHeader className="border-b px-6 py-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Badge variant="outline" className="border-blue-400/30 text-blue-300">{board.name}</Badge>
-            <Badge variant="outline" className="border-white/10">No template</Badge>
+            <Badge variant="outline">{board.name}</Badge>
+            <Badge variant="secondary">No template</Badge>
             <span>›</span>
             <DialogTitle className="font-normal text-foreground">
-              {card ? "Edit issue" : "New issue"}
+              {card ? "Edit task" : t("newCard", { type: board.card_type_label.toLowerCase() })}
             </DialogTitle>
           </div>
         </DialogHeader>
-        <div className={cn("relative space-y-5 px-6 py-6", card && "lg:pr-80")}>
-          <div className="space-y-3">
-            <Label className="sr-only">{t("titleField")}</Label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={t("titleField")}
-              className="h-auto border-0 bg-transparent px-0 text-2xl font-medium shadow-none placeholder:text-muted-foreground/70 focus-visible:ring-0"
-              autoFocus={!card}
-            />
-            <Label className="sr-only">{t("descriptionField")}</Label>
+        <div className={cn("grid gap-6 px-6 py-6", card ? "lg:grid-cols-[minmax(0,1fr)_240px]" : "space-y-4")}>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="sr-only">{t("titleField")}</Label>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titleField")} className="h-auto border-0 px-0 text-2xl font-medium shadow-none focus-visible:ring-0" autoFocus={!card} />
+            </div>
+            <div className="space-y-2">
+              <Label className="sr-only">{t("descriptionField")}</Label>
             <Textarea
-              rows={3}
+              rows={6}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add description..."
-              className="min-h-20 resize-none border-0 bg-transparent px-0 text-base shadow-none placeholder:text-muted-foreground/70 focus-visible:ring-0"
             />
           </div>
-          <div className="flex flex-wrap items-center gap-2 border-y border-white/10 py-4">
-            <Badge variant="outline" className="h-9 gap-2 rounded-lg border-white/10 px-3 font-normal">
-              <CircleDot className="h-4 w-4 text-slate-400" /> {board.card_type_label}
-            </Badge>
-            <Badge variant="outline" className="h-9 gap-2 rounded-lg border-white/10 px-3 font-normal">
-              <UserCircle className="h-4 w-4 text-muted-foreground" /> Assignee
-            </Badge>
-            <Badge variant="outline" className="h-9 gap-2 rounded-lg border-white/10 px-3 font-normal">
-              <Tag className="h-4 w-4 text-muted-foreground" /> Labels
-            </Badge>
-            <Badge variant="outline" className="h-9 gap-2 rounded-lg border-white/10 px-3 font-normal">
-              <Flag className="h-4 w-4 text-muted-foreground" /> {priority === "normal" ? "No priority" : t(`priorities.${priority}`)}
-            </Badge>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline" className="font-normal">{board.columns?.find((column) => column.id === (card?.column_id ?? createColumnId))?.name ?? "Backlog"}</Badge>
+            <Badge variant="outline" className="font-normal">{priority === "normal" ? "No priority" : t(`priorities.${priority}`)}</Badge>
+            {due && <Badge variant="outline" className="font-normal">{due}</Badge>}
           </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select value={columnId} onValueChange={setColumnId}>
-                <SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger>
-                <SelectContent>
-                  {(board.columns ?? []).map((column) => <SelectItem key={column.id} value={column.id}>{column.name}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>{t("priority")}</Label>
               <Select
@@ -873,7 +841,7 @@ function CardEditor({
             </div>
           </div>
           {(board.field_schema ?? []).length > 0 && (
-            <div className="grid gap-3 border-t border-white/10 pt-5 sm:grid-cols-2">
+            <div className="grid gap-3 border-t pt-4 sm:grid-cols-2">
               <div className="sm:col-span-2"><h3 className="text-sm font-medium">Additional fields</h3><p className="text-xs text-muted-foreground">Board-specific task information</p></div>
               {board.field_schema.map((field) => (
                 <div key={field.key} className="space-y-2">
@@ -973,17 +941,20 @@ function CardEditor({
               </div>
             </details>
           )}
+          </div>
+          {card && (
+            <aside className="h-fit space-y-4 rounded-xl border bg-muted/20 p-4">
+              <h3 className="text-sm font-medium">Task details</h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between gap-3"><span className="text-muted-foreground">Status</span><span>{board.columns?.find((column) => column.id === card.column_id)?.name ?? "—"}</span></div>
+                <div className="flex items-center justify-between gap-3"><span className="text-muted-foreground">Priority</span><span>{t(`priorities.${priority}`)}</span></div>
+                <div className="flex items-center justify-between gap-3"><span className="text-muted-foreground">Due date</span><span>{due || "—"}</span></div>
+                <div className="flex items-center justify-between gap-3"><span className="text-muted-foreground">Task type</span><span>{board.card_type_label}</span></div>
+              </div>
+            </aside>
+          )}
         </div>
-        {card && (
-          <aside className="mx-6 mb-5 grid gap-3 rounded-xl border border-white/10 bg-black/10 p-4 lg:absolute lg:right-6 lg:top-24 lg:mb-0 lg:w-64">
-            <h3 className="text-sm font-medium">Issue details</h3>
-            <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Status</span><span>{board.columns?.find((column) => column.id === columnId)?.name ?? "—"}</span></div>
-            <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Priority</span><span>{t(`priorities.${priority}`)}</span></div>
-            <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Due date</span><span>{due || "—"}</span></div>
-            <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Task type</span><span>{board.card_type_label}</span></div>
-          </aside>
-        )}
-        <DialogFooter className="border-t border-white/10 px-6 py-4">
+        <DialogFooter className="justify-between border-t px-6 py-4 sm:justify-between">
           {card ? (
             <Button variant="ghost" className="text-red-400" onClick={archive}>
               <Archive className="mr-2 h-4 w-4" />
