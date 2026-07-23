@@ -181,26 +181,26 @@ export function OnboardingClient({ firstName }: { firstName?: string }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 16, scale: 0.96 }}
               transition={{ duration: 0.28, ease: "easeOut" }}
-              className="w-full max-w-md rounded-2xl border border-border bg-card p-7 shadow-2xl"
+              className="w-full max-w-md rounded-2xl border border-cyan-300/25 bg-[#171717] p-7 text-white shadow-2xl shadow-black/40"
             >
-              <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-blue-600/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
+              <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl border border-cyan-300/20 bg-cyan-300/10 text-cyan-200">
                 <Wand2 className="h-5 w-5" />
               </div>
-              <h2 className="text-lg font-semibold text-foreground">{greeting}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              <h2 className="text-lg font-semibold text-white">{greeting}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-400">
                 {t("welcome.body")}
               </p>
               <div className="mt-6 flex items-center gap-2">
                 <button
                   onClick={startTour}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
                 >
                   <Sparkles className="h-4 w-4" />
                   {t("welcome.start")}
                 </button>
                 <button
                   onClick={finish}
-                  className="rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  className="rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-400 transition hover:bg-white/10 hover:text-white"
                 >
                   {t("welcome.skip")}
                 </button>
