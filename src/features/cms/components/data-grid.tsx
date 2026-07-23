@@ -21,7 +21,7 @@ import type { CmsCollection, CmsDocument, CmsField } from "@/shared/types/api";
 import { ExcelExportButton } from "./excel-export";
 import { ExcelImportButton } from "./excel-import";
 import { cmsCollectionHref } from "../lib/href";
-import { DocumentViewDrawer } from "./document-view-drawer";
+
 import { RelationValue } from "./relation-value";
 
 // ─── Filter types ──────────────────────────────────────────────────────────
@@ -346,9 +346,7 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const filterPanelRef = useRef<HTMLDivElement>(null);
 
-  // ── View drawer ───────────────────────────────────────────────────────
-  const [viewDoc, setViewDoc] = useState<CmsDocument | null>(null);
-  const [viewOpen, setViewOpen] = useState(false);
+
 
   // Close panel on outside click
   useEffect(() => {
@@ -466,8 +464,7 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
   };
 
   const openView = (doc: CmsDocument) => {
-    setViewDoc(doc);
-    setViewOpen(true);
+    router.push(cmsCollectionHref(projectId, collectionName, `/data/${encodeURIComponent(String(doc._id))}`));
   };
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
@@ -669,21 +666,21 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
           <table className="w-full min-w-[760px] text-sm">
             <thead className="sticky top-0 z-10 bg-muted/95 text-[11px] uppercase tracking-wide backdrop-blur">
               <tr>
-                <th className="w-10 px-3 py-3 text-left">
+                <th className="w-10 whitespace-nowrap px-3 py-3 text-left">
                   <input
                     type="checkbox"
                     checked={docs.length > 0 && selected.size === docs.length}
                     onChange={toggleAll}
                   />
                 </th>
-                <th className="px-3 py-3 text-left text-muted-foreground">_id</th>
+                <th className="whitespace-nowrap px-3 py-3 text-left text-muted-foreground">_id</th>
                 {cols.map((f) => (
-                  <th key={f.name} className="px-3 py-3 text-left text-muted-foreground">
+                  <th key={f.name} className="whitespace-nowrap px-3 py-3 text-left text-muted-foreground">
                     {f.label || f.name}
                     <span className="ml-1 text-[10px] text-muted-foreground/60">{f.kind}</span>
                   </th>
                 ))}
-                <th className="w-32 px-3 py-3 text-left text-muted-foreground">_created_at</th>
+                <th className="w-32 whitespace-nowrap px-3 py-3 text-left text-muted-foreground">_created_at</th>
               </tr>
             </thead>
             <tbody>
@@ -771,20 +768,6 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
         </div>
       </div>
 
-      {/* Document view drawer */}
-      <DocumentViewDrawer
-        open={viewOpen}
-        onClose={() => {
-          setViewOpen(false);
-          setViewDoc(null);
-        }}
-        projectId={projectId}
-        collectionName={collectionName}
-        doc={viewDoc}
-        fields={fields}
-        collections={collections}
-        onDeleted={() => reload()}
-      />
     </>
   );
 }

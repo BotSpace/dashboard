@@ -101,6 +101,7 @@
     "viewDocTitle": "Hujjat",
     "deleteDoc": "O'chirish",
     "deleteDocConfirm": "Hujjatni o'chirishni tasdiqlaysizmi?",
+    "deleteDocSuccess": "Hujjat o'chirildi",
     "noValue": "—",
     "fieldId": "_id",
     "fieldCreatedAt": "Yaratilgan vaqt",

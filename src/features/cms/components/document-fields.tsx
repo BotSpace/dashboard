@@ -338,7 +338,7 @@ export function DocumentFields({
   }
 
   return (
-    <div className="space-y-5">
+    <div className="grid gap-x-6 gap-y-5 md:grid-cols-2">
       {fields.map((f) => {
         const err = errors[f.name];
         const hint = fieldHint(f);
@@ -347,7 +347,7 @@ export function DocumentFields({
           (f.kind === "text" || f.kind === "longtext") && maxL !== undefined;
         const len = String(values[f.name] ?? "").length;
         return (
-          <div key={f.name} className="space-y-1.5">
+          <div key={f.name} className={cn("space-y-1.5", (f.kind === "longtext" || f.kind === "json" || f.kind === "array") && "md:col-span-2")}>
             <div className="flex items-baseline justify-between gap-2">
               <label className="flex items-baseline gap-2">
                 <span className="text-sm font-medium">{f.label || f.name}</span>

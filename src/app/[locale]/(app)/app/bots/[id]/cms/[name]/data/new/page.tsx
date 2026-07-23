@@ -24,7 +24,7 @@ export default async function BotCmsNewDocPage({
   const collections = await CmsAPI.listCollections(id).catch(() => []);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       <PageHeader
         icon={<FilePlus2 className="h-5 w-5" />}
         title={t("newDoc")}
@@ -39,7 +39,7 @@ export default async function BotCmsNewDocPage({
         }
       />
 
-      <Section>
+      <Section className="border-border/70 shadow-sm" title={t("newDoc")} icon={<FilePlus2 className="h-4 w-4" />}>
         <DocumentForm
           projectId={id}
           collectionName={cmsCollectionSlug(collection)}

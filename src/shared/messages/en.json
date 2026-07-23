@@ -370,6 +370,7 @@
     "viewDocTitle": "Document",
     "deleteDoc": "Delete",
     "deleteDocConfirm": "Are you sure you want to delete this document?",
+    "deleteDocSuccess": "Document deleted",
     "noValue": "—",
     "fieldId": "_id",
     "fieldCreatedAt": "Created at",
