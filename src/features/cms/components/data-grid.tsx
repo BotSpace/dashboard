@@ -481,9 +481,9 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
 
   return (
     <>
-      <div className="space-y-3">
+      <div className="space-y-4">
         {/* ── Toolbar ── */}
-        <div className="flex flex-wrap items-start gap-2">
+        <div className="flex flex-wrap items-start gap-2 rounded-xl border border-border/60 bg-muted/20 p-2">
           {/* Filter button + panel */}
           <div className="relative" ref={filterPanelRef}>
             <Button
@@ -503,7 +503,7 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
 
             {filterPanelOpen && (
               <div className="absolute left-0 top-full z-30 mt-1">
-                <div className="rounded-md border bg-background p-3 shadow-md min-w-[540px] space-y-3">
+                <div className="w-[min(92vw,620px)] rounded-xl border bg-background p-4 shadow-xl shadow-black/10 space-y-3">
                   {/* Mode toggle */}
                   <div className="flex items-center justify-between border-b pb-2">
                     <div className="flex gap-2 text-xs">
@@ -664,38 +664,39 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
         </div>
 
         {/* ── Table ── */}
-        <div className="rounded-md border overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/40 text-xs">
+        <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">
+          <div className="max-h-[min(62vh,680px)] overflow-auto">
+          <table className="w-full min-w-[760px] text-sm">
+            <thead className="sticky top-0 z-10 bg-muted/95 text-[11px] uppercase tracking-wide backdrop-blur">
               <tr>
-                <th className="w-8 px-2 py-2 text-left">
+                <th className="w-10 px-3 py-3 text-left">
                   <input
                     type="checkbox"
                     checked={docs.length > 0 && selected.size === docs.length}
                     onChange={toggleAll}
                   />
                 </th>
-                <th className="px-2 py-2 text-left text-muted-foreground">_id</th>
+                <th className="px-3 py-3 text-left text-muted-foreground">_id</th>
                 {cols.map((f) => (
-                  <th key={f.name} className="px-2 py-2 text-left text-muted-foreground">
+                  <th key={f.name} className="px-3 py-3 text-left text-muted-foreground">
                     {f.label || f.name}
                     <span className="ml-1 text-[10px] text-muted-foreground/60">{f.kind}</span>
                   </th>
                 ))}
-                <th className="w-24 px-2 py-2 text-left text-muted-foreground">_created_at</th>
+                <th className="w-32 px-3 py-3 text-left text-muted-foreground">_created_at</th>
               </tr>
             </thead>
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={cols.length + 3} className="py-10 text-center text-muted-foreground">
+                  <td colSpan={cols.length + 3} className="py-14 text-center text-muted-foreground">
                     Yuklanmoqda…
                   </td>
                 </tr>
               )}
               {!loading && docs.length === 0 && (
                 <tr>
-                  <td colSpan={cols.length + 3} className="py-10 text-center text-muted-foreground">
+                  <td colSpan={cols.length + 3} className="py-14 text-center text-muted-foreground">
                     Hujjatlar yo'q
                   </td>
                 </tr>
@@ -705,21 +706,21 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
                 return (
                   <tr
                     key={id}
-                    className="border-t hover:bg-muted/20 cursor-pointer"
+                    className="cursor-pointer border-t transition-colors hover:bg-primary/[0.03]"
                     onClick={() => openView(d)}
                   >
-                    <td className="px-2 py-2" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         checked={selected.has(id)}
                         onChange={() => toggle(id)}
                       />
                     </td>
-                    <td className="px-2 py-2 font-mono text-xs">
+                    <td className="px-3 py-3 font-mono text-xs">
                       <span className="hover:underline cursor-pointer">{id.slice(-8)}</span>
                     </td>
                     {cols.map((f) => (
-                      <td key={f.name} className="px-2 py-2 max-w-xs truncate">
+                      <td key={f.name} className="max-w-xs truncate px-3 py-3">
                         {f.kind === "relation" ? (
                           <RelationValue
                             projectId={projectId}
@@ -733,7 +734,7 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
                         )}
                       </td>
                     ))}
-                    <td className="px-2 py-2 text-xs text-muted-foreground">
+                    <td className="px-3 py-3 text-xs text-muted-foreground">
                       {(d._created_at as string)?.slice(0, 16) ?? "—"}
                     </td>
                   </tr>
@@ -741,6 +742,7 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
               })}
             </tbody>
           </table>
+          </div>
         </div>
 
         {/* ── Pagination ── */}

@@ -68,6 +68,7 @@
     "fieldsConfigured": "Sozlangan field'lar",
     "customCollections": "Maxsus kollektsiyalar",
     "noDescription": "Hali tavsif qo'shilmagan",
+    "schemaHint": "Ushbu collection hujjatlarini belgilaydigan field'larni sozlang. O'zgarishlar schema'ga darhol qo'llanadi.",
     "system": "system",
     "fields": "field",
     "openData": "Ma'lumot",

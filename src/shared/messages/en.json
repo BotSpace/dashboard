@@ -337,6 +337,7 @@
     "fieldsConfigured": "Fields configured",
     "customCollections": "Custom collections",
     "noDescription": "No description added yet",
+    "schemaHint": "Define the fields that shape every document in this collection. Changes are applied to the schema immediately.",
     "system": "system",
     "fields": "fields",
     "openData": "Data",

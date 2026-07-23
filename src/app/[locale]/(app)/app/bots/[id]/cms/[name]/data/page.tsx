@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft, Database, Settings2 } from "lucide-react";
+import { ArrowLeft, Database, FileText, Settings2, Table2 } from "lucide-react";
 import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
+import { Card, CardContent } from "@/shared/components/ui/card";
+
 import { CmsAPI } from "@/shared/api/services";
 import { DataGrid } from "@/features/cms/components/data-grid";
 import { DeleteCollectionButton } from "@/features/cms/components/delete-collection-button";
@@ -33,6 +35,7 @@ export default async function BotCmsDataPage({
           <span>
             <code className="font-mono">{collection.name}</code>
             {" · "}v{collection.schema_version}
+            {collection.description && <span className="ml-2">{collection.description}</span>}
           </span>
         }
         actions={
@@ -62,7 +65,47 @@ export default async function BotCmsDataPage({
         }
       />
 
-      <Section>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Card className="border-primary/20 bg-primary/[0.04]">
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Table2 className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{t("openData")}</p>
+              <p className="font-semibold">{collection.label || collection.name}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <FileText className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{t("fields")}</p>
+              <p className="font-semibold">{collection.fields?.length ?? collection.fields_count ?? 0}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <Database className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{t("schema")}</p>
+              <p className="font-semibold">v{collection.schema_version}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Section
+        title={t("openData")}
+        icon={<Table2 className="h-4 w-4" />}
+        contentClassName="min-w-0"
+      >
         <DataGrid
           projectId={id}
           collectionName={cmsCollectionSlug(collection)}

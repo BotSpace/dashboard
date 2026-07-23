@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft, Database, Settings2, Table } from "lucide-react";
+import { ArrowLeft, Columns3, Database, KeyRound, Settings2, Table } from "lucide-react";
 import { CmsAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
+import { Card, CardContent } from "@/shared/components/ui/card";
 import { FieldEditor } from "@/features/cms/components/field-editor";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { Section } from "@/shared/components/common/section";
@@ -67,10 +68,50 @@ export default async function BotCmsDetailPage({
         }
       />
 
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Card className="border-primary/20 bg-primary/[0.04]">
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Columns3 className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{t("fields")}</p>
+              <p className="font-semibold">{collection.fields?.length ?? collection.fields_count ?? 0}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <KeyRound className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">Primary field</p>
+              <p className="truncate font-mono text-sm">{collection.primary_field || "_id"}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <Database className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{t("schema")}</p>
+              <p className="font-semibold">v{collection.schema_version}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <Section
         icon={<Settings2 className="h-4 w-4" />}
         title={t("schema")}
+        contentClassName="space-y-5"
       >
+        <div className="rounded-lg border border-dashed bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
+          {t("schemaHint")}
+        </div>
         <FieldEditor
           projectId={id}
           collectionName={cmsCollectionSlug(collection)}
