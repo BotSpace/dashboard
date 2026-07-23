@@ -179,7 +179,7 @@ export default async function TemplateDetailPage({
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Heart className="h-4 w-4" />
                   <span>
-                    {formatNumber(toNumber(tpl.likes), locale)} {t("likes")}
+                    {formatNumber(toNumber(tpl.likes_count), locale)} {t("likes")}
                   </span>
                 </div>
               </div>

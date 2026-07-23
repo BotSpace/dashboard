@@ -1,7 +1,6 @@
 import { ArrowRight, Bot } from "lucide-react";
 import { Link } from "@/shared/i18n/routing";
-import { Badge } from "@/shared/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
 import { initials } from "@/shared/lib/utils";
 import type { Project } from "@/shared/types/api";
 
@@ -10,8 +9,6 @@ type BotItem = {
   uuid?: string;
   name: string;
   username?: string;
-  avatar?: string;
-  status?: "active" | "inactive" | "draft";
   updatedAt?: string;
   initial?: string;
 };
@@ -22,8 +19,6 @@ function toBotItems(bots: Project[]): BotItem[] {
     uuid: b.uuid,
     name: b.name,
     username: b.username,
-    avatar: b.avatar,
-    status: b.status,
     updatedAt: b.updated_at
       ? new Date(b.updated_at).toLocaleDateString("uz-UZ", { day: "numeric", month: "short" })
       : undefined,
@@ -60,7 +55,6 @@ export function RecentBotsV2({ bots }: { bots: Project[] }) {
           >
             {/* Avatar */}
             <Avatar className="h-9 w-9 shrink-0">
-              {bot.avatar && <AvatarImage src={bot.avatar} alt={bot.name} />}
               <AvatarFallback className="bg-blue-500/15 text-xs font-bold text-blue-300">
                 {bot.initial ?? initials(bot.name)}
               </AvatarFallback>
@@ -74,14 +68,7 @@ export function RecentBotsV2({ bots }: { bots: Project[] }) {
               </div>
             </div>
 
-            {/* Status + arrow */}
             <div className="flex shrink-0 items-center gap-2">
-              <Badge
-                variant={bot.status === "active" ? "success" : "secondary"}
-                className="text-[10px]"
-              >
-                {bot.status === "active" ? "Faol" : bot.status === "inactive" ? "Nofaol" : "Draft"}
-              </Badge>
               <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
             </div>
           </Link>

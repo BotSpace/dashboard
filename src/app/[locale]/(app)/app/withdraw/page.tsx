@@ -21,9 +21,9 @@ export default async function WithdrawPage({ params }: { params: Promise<{ local
   setRequestLocale(locale);
 
   const [kyc, earnings, withdrawals] = await Promise.all([
-    KycAPI.status().catch(() => ({ is_verified: false, verification: null })),
-    EarningsAPI.summary().catch(() => null),
-    WithdrawalAPI.list().catch(() => []),
+    KycAPI.status(),
+    EarningsAPI.summary(),
+    WithdrawalAPI.list(),
   ]);
 
   // Faqat bot daromadi yechiladi (o'zi to'ldirgan pul emas).

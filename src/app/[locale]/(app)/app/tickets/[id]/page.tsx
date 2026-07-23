@@ -79,9 +79,9 @@ export default async function TicketDetailPage({
                       )}
                     >
                       <p className="whitespace-pre-wrap">{m.message}</p>
-                      {m.attachment && (
+                      {m.attachment_url && (
                         <a
-                          href={m.attachment}
+                          href={m.attachment_url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className={cn(

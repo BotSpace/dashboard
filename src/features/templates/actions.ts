@@ -59,11 +59,7 @@ export type CreateFromTemplateResult = {
 export async function loadMoreTemplatesAction(
   params: TemplateListParams
 ): Promise<PaginatedTemplates> {
-  try {
-    return await TemplatesAPI.listPaginated(params);
-  } catch {
-    return { items: [], page: Number(params.page) || 1, totalPages: 1, hasMore: false };
-  }
+  return TemplatesAPI.listPaginated(params);
 }
 
 export async function orderTemplateAction(templateId: number | string): Promise<OrderResult> {

@@ -116,8 +116,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
             const Icon = PLAN_ICONS[p.name] ?? Zap;
             const planMaxBots = (p as { max_bots?: number }).max_bots ?? 1;
             const planMaxTokens =
-              ((p as { max_input_tokens?: number }).max_input_tokens ?? 0) +
-                ((p as { max_output_tokens?: number }).max_output_tokens ?? 0) || 200_000;
+              p.max_tokens ?? 200_000;
 
             return (
               <Card

@@ -21,8 +21,7 @@ export type ApiOptions = RequestInit & {
 // A path that starts with "/api/" but NOT "/api/v1" (e.g. a missing version
 // segment like the old "/api/cms/...") bypasses this rewrite and can only 404 —
 // it used to pass through silently and render empty lists. So it now throws in
-// development to surface the mistake immediately; in production it warns and
-// falls through rather than crash the page.
+// every environment so a malformed route can never be sent silently.
 const CANONICAL_API_PREFIX = "/api/v1";
 
 export function applyApiPrefix(path: string): string {
@@ -34,8 +33,7 @@ export function applyApiPrefix(path: string): string {
 
   if (path.startsWith("/api/")) {
     const msg = `[api] backend path "${path}" must start with "${CANONICAL_API_PREFIX}/" — non-v1 /api path (likely a missing version segment); this request would 404`;
-    if (process.env.NODE_ENV !== "production") throw new Error(msg);
-    console.warn(msg);
+    throw new Error(msg);
   }
   return path;
 }
@@ -91,15 +89,6 @@ export async function apiFetch<T = unknown>(path: string, opts: ApiOptions = {})
   return data as T;
 }
 
-function pickMessage(d: Record<string, unknown>): string | undefined {
-  for (const key of ["detail", "message", "error", "errors"]) {
-    const v = d[key];
-    if (typeof v === "string") return v;
-    if (Array.isArray(v) && typeof v[0] === "string") return v[0];
-  }
-  return undefined;
-}
-
 /** Go backend's error envelope (internal/shared/httpx.ErrorResponse): `{ error: { code, message, details } }`. */
 type BackendErrorBody = { code?: string; message?: string; details?: unknown };
 
@@ -110,8 +99,7 @@ function extractMessage(data: unknown): string | undefined {
     const msg = d.error.message;
     if (typeof msg === "string" && msg) return msg;
   }
-  // Fallback for any endpoint that doesn't follow the standard envelope.
-  return pickMessage(d);
+  return undefined;
 }
 
 /** Machine-readable error code from the Go backend's envelope, e.g. "auth.invalid_token". */

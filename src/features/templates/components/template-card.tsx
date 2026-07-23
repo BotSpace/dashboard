@@ -91,10 +91,10 @@ export function TemplateCard({
                   {formatNumber(tpl.views, locale)}
                 </span>
               )}
-              {typeof tpl.likes === "number" && (
+              {typeof tpl.likes_count === "number" && (
                 <span className="flex items-center gap-1">
                   <Heart className="h-3.5 w-3.5" />
-                  {formatNumber(tpl.likes, locale)}
+                  {formatNumber(tpl.likes_count, locale)}
                 </span>
               )}
             </div>

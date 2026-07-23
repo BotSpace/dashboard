@@ -346,7 +346,11 @@ export function CreateBotWizard({ labels, source }: Props) {
 
       if (res.ok) {
         analytics.projectCreated({ source: "blank", mode: botMode, connected: !res.noConnect });
-        toast.success(labels.success);
+        if (res.launchError) {
+          toast.error(res.launchError);
+        } else {
+          toast.success(labels.success);
+        }
         const project = res.project;
         // Raqamli id afzal — barcha status endpointlari pk bilan bir xil ishlaydi.
         const targetId = project.id ?? project.uuid;
@@ -359,7 +363,10 @@ export function CreateBotWizard({ labels, source }: Props) {
           bot_link: project.bot_link,
         });
         setStepIndex(STEPS.length - 1); // "launch" — always the final step
-        if (res.noConnect) {
+        if (res.launchError) {
+          setLaunchState("failed");
+          analytics.botLaunchResult({ state: "failed", source: "blank", mode: botMode });
+        } else if (res.noConnect) {
           // No token/managed-bot ended up attached (see createBlankBotAction's
           // gap note) — polling would just spin to a timeout, so skip it.
           setLaunchState("no_connect");

@@ -4,13 +4,6 @@
 // endpoints return the resource directly — there is no `{status,data}`
 // wrapper like the old Django API had. IDs are UUID strings everywhere.
 //
-// Some fields below are kept OPTIONAL even though the current Go backend
-// never sends them — they're old Django-era fields still read by UI
-// components (avatar, bot status/mode, etc.) that have no backend equivalent
-// yet. Marking them optional keeps those components compiling/rendering
-// (with a graceful "unknown" fallback) without a UI redesign; see the
-// mission report for the full list of gaps.
-
 export type Paginated<T> = {
   count: number;
   next: string | null;
@@ -62,18 +55,10 @@ export type Project = {
   created_at: string;
   updated_at: string;
 
-  // ── No backend equivalent yet (see report) — kept optional so existing
-  // bot-list/bot-detail UI still renders a graceful fallback instead of
-  // crashing on a missing field.
-  avatar?: string;
-  token?: string;
-  status?: "active" | "inactive" | "draft";
   bot_mode?: "release" | "debug";
   bot_username?: string | null;
   bot_link?: string | null;
   debug?: { status?: string } | null;
-  release_bot?: boolean;
-  debug_bot?: boolean;
 };
 
 export type KanbanPriority = "low" | "normal" | "high" | "urgent";
@@ -174,10 +159,6 @@ export type Plan = {
   currency?: string;
   max_bots?: number;
   max_tokens?: number;
-  /** @deprecated backend reports a single `max_tokens` pool — kept for old callers */
-  max_output_tokens?: number;
-  /** @deprecated see max_output_tokens */
-  max_input_tokens?: number;
   features?: string[] | Record<string, unknown>;
   is_top?: boolean;
   is_default?: boolean;
@@ -238,8 +219,6 @@ export type FileItem = {
   url?: string;
   size?: number;
   filetype?: string;
-  /** @deprecated old Django field name — use `filetype` */
-  mime?: string;
   created_at?: string;
   expires_at?: string | null;
 };
@@ -272,8 +251,6 @@ export type Template = {
   features: TemplateFeature[];
   views?: number;
   likes_count?: number;
-  /** @deprecated old field name — use likes_count */
-  likes?: number;
   is_liked?: boolean;
   is_ordered?: boolean;
   demo_url?: string | null;
@@ -312,8 +289,6 @@ export type TicketMessage = {
   sender: "user" | "admin";
   message: string;
   attachment_url?: string | null;
-  /** @deprecated old field name — use attachment_url */
-  attachment?: string | null;
   created_at?: string;
 };
 

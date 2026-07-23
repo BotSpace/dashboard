@@ -62,9 +62,14 @@ type BackendListEnvelope<T> = {
 
 function unwrapList<T>(d: unknown): T[] {
   if (Array.isArray(d)) return d as T[];
-  if (!d || typeof d !== "object") return [];
+  if (!d || typeof d !== "object") {
+    throw new Error("Backend list javobi object yoki array bo'lishi kerak");
+  }
   const e = d as BackendListEnvelope<T>;
-  return Array.isArray(e.items) ? e.items : [];
+  if (!Array.isArray(e.items)) {
+    throw new Error("Backend list javobida items array yo'q");
+  }
+  return e.items;
 }
 
 export type PaginatedResult<T> = {
@@ -126,23 +131,28 @@ export const ProjectsAPI = {
   // pathID() -> uuid.Parse(c.Param("id")) against the PK). Callers must link
   // with project.id, not project.uuid.
   get: async (id: string | number) => api<Project>(`/api/v1/projects/${id}`),
-  create: (body: Partial<Project>) =>
+  create: (body: Partial<Project> & { token?: string; managed_bot_id?: string }) =>
     api<Project>("/api/v1/projects", { method: "POST", json: body }),
-  update: (id: string | number, body: Partial<Project>) =>
+  update: (
+    id: string | number,
+    body: Partial<Project> & { token?: string; managed_bot_id?: string },
+  ) =>
     api<Project>(`/api/v1/projects/${id}`, { method: "PATCH", json: body }),
   remove: (id: string | number) =>
     api<void>(`/api/v1/projects/${id}`, { method: "DELETE" }),
 
-  // ── No backend equivalent yet — see mission report. Kept as no-op/throwing
-  // stubs so existing callers (bot wizard, token dialog, monitoring tab)
-  // keep compiling and fail gracefully instead of crashing the page.
   setBotToken: async (
-    _projectId: string | number,
-    _body: { token?: string; managed_bot_id?: string },
+    projectId: string | number,
+    body: { token?: string; managed_bot_id?: string },
   ): Promise<{ detail: string; username: string }> => {
-    throw new Error(
-      "Bot token ulash hali Go backend'da yo'q (project modulida deploy/engine ulanmagan)",
-    );
+    const project = await api<Project>(`/api/v1/projects/${projectId}`, {
+      method: "PATCH",
+      json: body,
+    });
+    return {
+      detail: "Bot ulandi",
+      username: project.bot_username ?? project.username ?? "",
+    };
   },
   // internal/modules/project: POST /projects/create-from-template — resolves
   // + purchase-checks the template (buyer must already hold a paid order,
@@ -179,9 +189,19 @@ export const ProjectsAPI = {
     });
   },
   templateRequirements: async (
-    _templateId: string | number,
+    templateId: string | number,
   ): Promise<TemplateRequirements> => {
-    return { credentials: [], modules: [], envs: [] };
+    const template = await TemplatesAPI.get(String(templateId));
+    return {
+      credentials: [],
+      modules: [],
+      envs: (template.required_envs ?? []).map((env) => ({
+        key: env.key,
+        required: true,
+        label: env.key,
+        description: env.description,
+      })),
+    };
   },
   startDebug: (id: string | number) =>
     api<void>(`/api/v1/projects/${id}/debug`),
@@ -409,27 +429,26 @@ export type TemplateListParams = {
   page_size?: number | string;
 };
 
-// Template list javobidan massiv + jami sahifani ISHONCHLI o'qiydi. Backend
-// ikki xil konvertda kelishi mumkin (eski `{items,...}` yoki yangi DRF
-// `{status,data:{results,total_pages}}`) — sitemap kabi to'liq ro'yxat kerak
-// bo'lganda ikkalasini ham qamrab olamiz (unwrapList faqat `items` o'qigani
-// sabab yangi konvertda bo'sh qaytarardi).
 function readTemplatePage(d: unknown): {
   items: Template[];
   totalPages: number;
 } {
-  const root =
-    d && typeof d === "object" && "data" in d
-      ? (d as { data: unknown }).data
-      : d;
-  if (Array.isArray(root)) return { items: root as Template[], totalPages: 1 };
-  const e = (root ?? {}) as {
+  if (!d || typeof d !== "object") {
+    throw new Error("Backend template list javobi object bo'lishi kerak");
+  }
+  const e = d as {
     items?: Template[];
-    results?: Template[];
-    total_pages?: number;
+    total?: number;
+    limit?: number;
   };
-  const items = e.results ?? e.items ?? [];
-  return { items, totalPages: Number(e.total_pages) || 1 };
+  if (!Array.isArray(e.items)) {
+    throw new Error("Backend template list javobida items array yo'q");
+  }
+  const limit = Number(e.limit) || e.items.length || 1;
+  return {
+    items: e.items,
+    totalPages: Math.max(1, Math.ceil((Number(e.total) || e.items.length) / limit)),
+  };
 }
 
 export type PaginatedTemplates = {
@@ -1004,8 +1023,8 @@ export const CredentialsAPI = {
 export const DashboardAPI = {
   overview: async (): Promise<DashboardOverview> => {
     const [projects, usage] = await Promise.all([
-      ProjectsAPI.list().catch(() => [] as Project[]),
-      SubscriptionAPI.usage().catch(() => null),
+      ProjectsAPI.list(),
+      SubscriptionAPI.usage(),
     ]);
     return {
       totals: {

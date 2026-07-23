@@ -70,17 +70,8 @@ export async function getBotLaunchStatusAction(
 ): Promise<BotLaunchStatusResult> {
   try {
     const [project, releases] = await Promise.all([
-      ProjectsAPI.get(projectId).catch((e) => {
-        // Yutilgan xato diagnostikasiz qolmasin — poll nega "none"
-        // qaytarayotganini server logidan ko'rish uchun.
-        console.error(
-          "[launch-poll] project fetch failed",
-          projectId,
-          isApiError(e) ? `${e.status} ${e.message}` : e
-        );
-        return undefined;
-      }),
-      ReleasesAPI.list(projectId).catch(() => []),
+      ProjectsAPI.get(projectId),
+      ReleasesAPI.list(projectId),
     ]);
 
     // Debug (tokenless) mode never creates a Release row — the container's
@@ -139,7 +130,7 @@ export type CreateBlankBotBody = {
 };
 
 export type CreateBlankBotResult =
-  | { ok: true; project: Project; noConnect: boolean }
+  | { ok: true; project: Project; noConnect: boolean; launchError?: string }
   | { ok: false; message: string };
 
 // Creates a plain (non-template) project and — unlike the flat legacy
@@ -147,15 +138,7 @@ export type CreateBlankBotResult =
 // wizard's "Ishga tushirish" step has something to poll, mirroring the
 // template-create wizard's UX.
 //
-// KNOWN BACKEND GAP: the project create endpoint is not documented to accept
-// `managed_bot_id` / `mode` — those are currently only wired into
-// create-from-template. We pass them through opportunistically
-// (best-effort, ignored if unsupported) and then try to deploy a release; if
-// that fails with `bot_token_required` the project simply has no token yet
-// (managed-bot linking didn't take, or "Tokensiz sinov" was chosen and the
-// backend has no template-less debug mode). In that case we return
-// `noConnect: true` so the UI can show a "connect a token on the project page"
-// note instead of polling forever.
+// Backend CreateRequest token, managed_bot_id and mode fields are canonical.
 export async function createBlankBotAction(
   body: CreateBlankBotBody
 ): Promise<CreateBlankBotResult> {
@@ -165,11 +148,9 @@ export async function createBlankBotAction(
       name: body.name,
       description: body.description,
       ...(body.token ? { token: body.token } : {}),
-      // Not part of the typed Project shape (see gap note above) — passed
-      // opportunistically in case the base endpoint's serializer accepts it.
       ...(body.managed_bot_id ? { managed_bot_id: body.managed_bot_id } : {}),
       ...(body.mode ? { mode: body.mode } : {}),
-    } as Partial<Project>);
+    });
   } catch (e) {
     if (isApiError(e)) {
       const details = e.details as { detail?: string; name?: string[]; token?: string[] } | undefined;
@@ -186,28 +167,29 @@ export async function createBlankBotAction(
   // Project created — now try to bring it online (mirrors DeployButton).
   // Debug (tokenless) mode uses the shared BotSpace bot via a DEBUG container
   // (?start=<uuid> deep-link), not a Release — so start debug, not a release.
-  let noConnect = false;
+	let noConnect = false;
+	let launchError: string | undefined;
   try {
     if (body.mode === "debug") {
       await ProjectsAPI.startDebug(project.id);
     } else {
       await ReleasesAPI.create(project.id);
     }
-  } catch (e) {
-    if (isApiError(e) && e.status === 400) {
+	} catch (e) {
+		if (isApiError(e) && e.status === 400) {
       const raw = e.details as Record<string, unknown> | null;
       const code = raw?.code ?? (raw?.data as Record<string, unknown> | undefined)?.code;
-      if (code === "bot_token_required") {
-        noConnect = true;
-      }
-    }
-    // Other deploy errors (e.g. running_bot_limit) are swallowed here — the
-    // project still exists, the launch step will time out and the user can
-    // manage it from the project page like any other bot.
-  }
+			if (code === "bot_token_required") {
+				noConnect = true;
+			}
+		}
+		if (!noConnect) {
+			launchError = isApiError(e) ? e.message : "Botni ishga tushirib bo‘lmadi";
+		}
+	}
 
   revalidatePath("/app/bots");
-  return { ok: true, project, noConnect };
+	return { ok: true, project, noConnect, launchError };
 }
 
 export type DeployResult =

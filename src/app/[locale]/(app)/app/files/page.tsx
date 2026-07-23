@@ -101,7 +101,7 @@ export default async function FilesPage({
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">{f.mime ?? "—"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{f.filetype ?? "—"}</td>
                     <td className="px-4 py-3 text-right text-muted-foreground">{humanSize(f.size)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{f.created_at ?? "—"}</td>
                     <td className="px-4 py-3">

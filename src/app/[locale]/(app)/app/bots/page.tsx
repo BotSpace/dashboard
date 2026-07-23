@@ -4,8 +4,7 @@ import { ProjectsAPI } from "@/shared/api/services";
 import { Link } from "@/shared/i18n/routing";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { Badge } from "@/shared/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
 import { PageHeader } from "@/shared/components/common/page-header";
 import { EmptyState } from "@/shared/components/common/empty-state";
 import { initials } from "@/shared/lib/utils";
@@ -95,12 +94,8 @@ export default async function BotsPage({
               >
                 <div className="flex items-start justify-between">
                   <Avatar className="h-12 w-12 ring-2 ring-border/40 transition-all group-hover:ring-blue-500/20">
-                    {b.avatar && <AvatarImage src={b.avatar} alt={b.name} />}
                     <AvatarFallback className="text-xs font-semibold">{initials(b.name)}</AvatarFallback>
                   </Avatar>
-                  <Badge variant={b.status === "active" ? "success" : "secondary"} className="text-[11px]">
-                    {b.status ?? "draft"}
-                  </Badge>
                 </div>
                 <div className="mt-4 truncate text-base font-semibold leading-tight">{b.name}</div>
                 <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">

@@ -23,8 +23,8 @@ export default async function BotOverviewPage({
         <BotInfoCard
           projectId={id}
           username={bot?.username ?? bot?.bot_username}
-          releaseBot={bot?.release_bot}
-          debugBot={bot?.debug_bot}
+          releaseBot={bot?.bot_mode === "release"}
+          debugBot={bot?.bot_mode === "debug"}
         />
       </div>
 
@@ -51,7 +51,7 @@ export default async function BotOverviewPage({
         icon={<Activity className="h-4 w-4 text-emerald-400" />}
         contentClassName="space-y-3 text-sm"
       >
-        <Row label={t("status")} value={bot?.status ?? "draft"} />
+        <Row label={t("status")} value={bot?.debug?.status ?? bot?.bot_mode ?? "draft"} />
         <Row label={t("id")} value={String(bot?.id ?? id)} copy />
         <Row label={t("created")} value={bot?.created_at ? formatLongDate(bot.created_at, locale) : undefined} />
       </Section>

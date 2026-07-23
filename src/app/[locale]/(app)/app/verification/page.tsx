@@ -10,7 +10,7 @@ export default async function VerificationPage({ params }: { params: Promise<{ l
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const kyc = await KycAPI.status().catch(() => ({ is_verified: false, verification: null }));
+  const kyc = await KycAPI.status();
   const verification = kyc.verification;
 
   return (

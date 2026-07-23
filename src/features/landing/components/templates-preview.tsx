@@ -87,9 +87,9 @@ export async function TemplatesPreview({ locale }: { locale: string }) {
                             <Eye className="h-3 w-3" /> {formatNumber(tpl.views, locale)}
                           </span>
                         )}
-                        {typeof tpl.likes === "number" && (
+                        {typeof tpl.likes_count === "number" && (
                           <span className="flex items-center gap-1">
-                            <Heart className="h-3 w-3" /> {formatNumber(tpl.likes, locale)}
+                            <Heart className="h-3 w-3" /> {formatNumber(tpl.likes_count, locale)}
                           </span>
                         )}
                       </div>

@@ -82,7 +82,7 @@ export default async function BotFilesPage({
                       );
                     })()}
                     <span className="block text-xs text-muted-foreground">
-                      {f.mime ?? "—"} · {humanSize(f.size)}
+                      {f.filetype ?? "—"} · {humanSize(f.size)}
                     </span>
                     {f.uuid && (
                       <div className="mt-0.5 flex items-center gap-1">
