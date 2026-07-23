@@ -164,18 +164,19 @@ export async function createBlankBotAction(
     return { ok: false, message: "Server bilan bog'lanib bo'lmadi" };
   }
 
-  // Project created — now try to bring it online (mirrors DeployButton).
-  // Debug (tokenless) mode uses the shared BotSpace bot via a DEBUG container
-  // (?start=<uuid> deep-link), not a Release — so start debug, not a release.
+  // The Go project-create endpoint already schedules the debug runtime in the
+  // background. Calling startDebug again here used to be harmless with a
+  // dedicated pod, but with the shared pool it makes this request wait for
+  // workers/runtime readiness and can fail even though the runtime is starting.
+  // Let the client poll the project status instead. Release mode still needs
+  // an explicit first release because it is not created by project creation.
 	let noConnect = false;
 	let launchError: string | undefined;
   try {
-    if (body.mode === "debug") {
-      await ProjectsAPI.startDebug(project.id);
-    } else {
+    if (body.mode !== "debug") {
       await ReleasesAPI.create(project.id);
     }
-	} catch (e) {
+  } catch (e) {
 		if (isApiError(e) && e.status === 400) {
       const raw = e.details as Record<string, unknown> | null;
       const code = raw?.code ?? (raw?.data as Record<string, unknown> | undefined)?.code;
