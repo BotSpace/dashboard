@@ -37,9 +37,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // list() emas listAll() — list() paginatsiya sabab faqat 1-sahifani (10 ta)
   // qaytaradi, sitemapga barcha template kirishi kerak.
   const templates = await TemplatesAPI.listAll().catch(() => []);
-  const templateEntries: MetadataRoute.Sitemap = templates
-    .filter((t) => t.slug)
-    .map((t) => entry(`/templates/${t.slug}`, { changeFrequency: "weekly", priority: 0.7 }));
+  const templateSlugs = [...new Set(templates.map((t) => t.slug).filter(Boolean))];
+  const templateEntries: MetadataRoute.Sitemap = templateSlugs.map((slug) =>
+    entry(`/templates/${slug}`, { changeFrequency: "weekly", priority: 0.7 })
+  );
 
   const blog = await BlogAPI.list({ page: 1 }).catch(() => null);
   const blogEntries: MetadataRoute.Sitemap = (blog?.results ?? [])

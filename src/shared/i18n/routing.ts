@@ -3,11 +3,10 @@ import { createNavigation } from "next-intl/navigation";
 
 export const routing = defineRouting({
   locales: ["uz", "en", "ru"],
-  defaultLocale: "uz",
-  localePrefix: "as-needed",
-  // First visit should land on Uzbek (no Accept-Language sniffing that sent
-  // users to /en). The user's explicit choice is still honoured via the
-  // NEXT_LOCALE cookie that next-intl sets when switching languages.
+  defaultLocale: "en",
+  localePrefix: "always",
+  // Keep every public URL explicit and stable for users and search engines:
+  // / redirects to /en, while selected Uzbek and Russian use /uz and /ru.
   localeDetection: false,
 });
 

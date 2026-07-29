@@ -13,13 +13,9 @@ const OG_LOCALE: Record<Locale, string> = {
   ru: "ru_RU",
 };
 
-/**
- * Absolute URL for a route in a given locale, honouring next-intl's
- * `as-needed` prefix (default locale `uz` has no prefix; `en`/`ru` do).
- */
+/** Absolute URL for a route with the locale prefix required by routing. */
 export function localizedUrl(locale: Locale, path = "/"): string {
   const clean = path === "/" ? "" : `/${path.replace(/^\/+/, "")}`;
-  if (locale === routing.defaultLocale) return `${SITE_URL}${clean}`;
   return `${SITE_URL}/${locale}${clean}`;
 }
 
