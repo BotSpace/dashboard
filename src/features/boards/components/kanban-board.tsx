@@ -712,6 +712,7 @@ function CardEditor({
   const [activities, setActivities] = useState<KanbanActivity[]>([]);
   const [comments, setComments] = useState<KanbanComment[]>([]);
   const [comment, setComment] = useState("");
+  const commentListRef = useRef<HTMLDivElement>(null);
   const [pending, startTransition] = useTransition();
   useEffect(() => {
     setTitle(card?.title ?? "");
@@ -729,6 +730,10 @@ function CardEditor({
         })
         .catch(() => undefined);
   }, [card, createColumnId]);
+  useEffect(() => {
+    const list = commentListRef.current;
+    if (list) list.scrollTop = list.scrollHeight;
+  }, [comments.length]);
   function save() {
     if (!title.trim()) return;
     startTransition(async () => {
@@ -891,14 +896,19 @@ function CardEditor({
                 <MessageSquare className="h-4 w-4" />
                 {t("comments")}
               </h3>
-              {comments.map((item) => (
-                <div key={item.id} className="rounded-lg bg-muted p-3 text-sm">
-                  <p>{item.body}</p>
-                  <span className="mt-1 block text-[10px] text-muted-foreground">
-                    {new Date(item.created_at).toLocaleString()}
-                  </span>
-                </div>
-              ))}
+              <div
+                ref={commentListRef}
+                className="grid max-h-64 gap-3 overflow-y-auto overscroll-contain pr-2"
+              >
+                {comments.map((item) => (
+                  <div key={item.id} className="rounded-lg bg-muted p-3 text-sm">
+                    <p>{item.body}</p>
+                    <span className="mt-1 block text-[10px] text-muted-foreground">
+                      {new Date(item.created_at).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
               <div className="flex gap-2">
                 <Input
                   value={comment}
