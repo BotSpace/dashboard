@@ -382,15 +382,20 @@
 }
 
 /* Animated conic gradient border (Pro plan, accent cards) */
+@property --conic-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
 @keyframes lp-conic-rotate {
-  to { transform: rotate(1turn); }
+  to { --conic-angle: 1turn; }
 }
 .conic-ring {
   position: absolute;
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: conic-gradient(from 0deg, transparent 0%, var(--accent-cyan) 25%, var(--accent-violet) 50%, transparent 75%, transparent 100%);
+  background: conic-gradient(from var(--conic-angle), transparent 0%, var(--accent-cyan) 25%, var(--accent-violet) 50%, transparent 75%, transparent 100%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
