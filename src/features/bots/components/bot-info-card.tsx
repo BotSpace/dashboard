@@ -24,14 +24,14 @@ export function BotInfoCard({ projectId, username, releaseBot, debugBot }: Props
   const [open, setOpen] = useState(false);
 
   const modeBadge = releaseBot ? (
-    <Badge variant="secondary" className="gap-1 text-emerald-500">
-      <Rocket className="h-3 w-3" />
-      {t("modeRelease")}
+    <Badge variant="secondary" className="min-w-0 max-w-full gap-1 text-emerald-500">
+      <Rocket className="h-3 w-3 shrink-0" />
+      <span className="truncate">{t("modeRelease")}</span>
     </Badge>
   ) : debugBot ? (
-    <Badge variant="secondary" className="gap-1 text-amber-500">
-      <Sparkles className="h-3 w-3" />
-      {t("modeDebug")}
+    <Badge variant="secondary" className="min-w-0 max-w-full gap-1 text-amber-500">
+      <Sparkles className="h-3 w-3 shrink-0" />
+      <span className="truncate">{t("modeDebug")}</span>
     </Badge>
   ) : null;
 
@@ -40,7 +40,8 @@ export function BotInfoCard({ projectId, username, releaseBot, debugBot }: Props
       <Section
         title={t("title")}
         icon={<Bot className="h-4 w-4 text-blue-400" />}
-        contentClassName="space-y-3 text-sm"
+        className="min-w-0"
+        contentClassName="min-w-0 space-y-3 text-sm"
         actions={
           <Button
             variant="ghost"
@@ -54,30 +55,32 @@ export function BotInfoCard({ projectId, username, releaseBot, debugBot }: Props
           </Button>
         }
       >
-        <div className="flex items-center justify-between gap-3 border-b border-border/50 pb-2">
+        <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-3 border-b border-border/50 pb-2">
           <span className="text-muted-foreground">{t("usernameLabel")}</span>
           {username ? (
             <a
               href={`https://telegram.me/${username}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+              className="inline-flex min-w-0 max-w-full items-center justify-self-end gap-1 overflow-hidden font-medium text-primary hover:underline"
             >
-              @{username}
-              <ExternalLink className="h-3.5 w-3.5" />
+              <span className="truncate">@{username}</span>
+              <ExternalLink className="h-3.5 w-3.5 shrink-0" />
             </a>
           ) : (
-            <span className="truncate text-xs italic text-muted-foreground/70">
+            <span className="truncate justify-self-end text-xs italic text-muted-foreground/70">
               {t("noUsername")}
             </span>
           )}
         </div>
 
-        <div className="flex items-center justify-between gap-3 pb-1">
+        <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-3 pb-1">
           <span className="text-muted-foreground">{t("modeLabel")}</span>
+          <span className="min-w-0 max-w-full justify-self-end overflow-hidden">
           {modeBadge ?? (
-            <span className="text-xs italic text-muted-foreground/70">{t("noUsername")}</span>
+            <span className="block truncate text-xs italic text-muted-foreground/70">{t("noUsername")}</span>
           )}
+          </span>
         </div>
       </Section>
 

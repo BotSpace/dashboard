@@ -69,7 +69,7 @@ export function BoardCreateDialog({ projects }: { projects: Project[] }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button size="sm" className="gap-2">
           <Plus className="h-4 w-4" />
           {t("newBoard")}
         </Button>

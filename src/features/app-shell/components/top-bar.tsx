@@ -32,13 +32,13 @@ export function TopBar({ user }: { user: UserMenuUser }) {
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden"
+          className="shrink-0 lg:hidden"
           onClick={() => setMobileOpen(true)}
           aria-label="Menu"
         >
           <Menu />
         </Button>
-        <form onSubmit={onSearch} role="search" className="relative w-full max-w-sm lg:max-w-xl">
+        <form onSubmit={onSearch} role="search" className="relative min-w-0 flex-1 max-w-sm lg:max-w-xl">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
