@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { Sparkles } from "lucide-react";
+import { Bot, Sparkles } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/shared/i18n/routing";
@@ -19,28 +18,16 @@ export function AgentFloatingButton() {
       href="/app/agent"
       data-tour="agent-fab"
       aria-label={t("agentFabAria")}
-      className="group fixed bottom-5 right-4 z-40 flex items-center gap-2 overflow-hidden rounded-full border border-cyan-300/50 bg-background/90 px-2.5 py-2 pr-4 shadow-[0_16px_45px_rgba(8,47,73,0.22)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_22px_60px_rgba(8,47,73,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 sm:bottom-6 sm:right-6 dark:border-cyan-300/20 dark:bg-card/90 dark:shadow-[0_18px_50px_rgba(0,0,0,0.45)]"
+      className="group fixed bottom-5 right-4 z-40 isolate flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-300/30 bg-background/90 p-0 shadow-[0_12px_35px_rgba(37,99,235,0.28)] backdrop-blur-xl transition duration-200 hover:-translate-y-1 hover:border-blue-300/60 hover:shadow-[0_18px_45px_rgba(79,70,229,0.38)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:bottom-6 sm:right-6 sm:h-auto sm:w-auto sm:gap-3 sm:rounded-full sm:px-2 sm:py-2 sm:pr-4 dark:border-white/15 dark:bg-slate-950/90"
     >
-      <span className="pointer-events-none absolute inset-0 rounded-full bg-[conic-gradient(from_120deg,rgba(34,211,238,0.0),rgba(34,211,238,0.18),rgba(132,204,22,0.14),rgba(34,211,238,0.0))] opacity-75 motion-safe:animate-[agent-halo_3.8s_linear_infinite]" />
-      <span className="pointer-events-none absolute inset-px rounded-full bg-background/90 dark:bg-card/90" />
-      <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full border border-white/60 bg-gradient-to-br from-cyan-200 via-white to-lime-100 shadow-inner motion-safe:animate-[agent-float_2.7s_ease-in-out_infinite] dark:border-white/15 dark:from-cyan-300/30 dark:via-slate-900 dark:to-lime-300/20">
-        <Image
-          src="/logo-icon-light.png"
-          alt=""
-          width={32}
-          height={32}
-          className="h-8 w-8 object-contain drop-shadow-sm dark:hidden"
-        />
-        <Image
-          src="/logo-icon-dark.png"
-          alt=""
-          width={32}
-          height={32}
-          className="hidden h-8 w-8 object-contain drop-shadow-sm dark:block"
-        />
-        <span className="absolute right-1 top-1 grid h-3.5 w-3.5 place-items-center rounded-full bg-cyan-400 text-white shadow-sm">
-          <Sparkles className="h-2.5 w-2.5" />
+      <span className="pointer-events-none absolute -inset-1 -z-10 rounded-[18px] bg-linear-to-br from-blue-500/40 via-indigo-500/30 to-violet-500/40 opacity-60 blur-md transition-opacity group-hover:opacity-90 sm:rounded-full" />
+      <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl border border-white/25 bg-linear-to-br from-blue-500 via-indigo-500 to-violet-600 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_8px_20px_rgba(37,99,235,0.35)] motion-safe:animate-[agent-float_2.7s_ease-in-out_infinite] sm:rounded-full">
+        <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.35),transparent_38%)]" />
+        <Bot className="relative h-6 w-6 drop-shadow-sm transition-transform duration-200 group-hover:scale-110" strokeWidth={2.2} />
+        <span className="absolute right-0.5 top-0.5 grid h-4 w-4 place-items-center rounded-full border border-white/40 bg-white text-indigo-600 shadow-sm">
+          <Sparkles className="h-2.5 w-2.5" strokeWidth={2.5} />
         </span>
+        <span className="absolute bottom-1 right-1 h-2 w-2 rounded-full border border-white/80 bg-emerald-400 shadow-[0_0_7px_rgba(52,211,153,0.9)]" />
       </span>
       <span className="relative hidden min-w-0 flex-col leading-tight sm:flex">
         <span className="text-xs font-semibold text-foreground">{t("agentFab")}</span>
