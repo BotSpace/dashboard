@@ -196,10 +196,10 @@ export function BoardSettingsDialog({
               />
             </div>
           </section>
-          <section className="space-y-3 rounded-xl border bg-muted/15 p-4">
+          <section className="space-y-3 rounded-lg border bg-muted/10 p-4">
             <div>
               <Label className="flex items-center gap-2 text-base">
-                <Bot className="h-4 w-4 text-blue-500" />
+                <Bot className="h-4 w-4 text-muted-foreground" />
                 {t("linkBots")}
               </Label>
               <p className="mt-1 text-xs text-muted-foreground">
@@ -229,10 +229,10 @@ export function BoardSettingsDialog({
                           : [...current, project.id],
                       )
                     }
-                    className={`flex items-center gap-3 rounded-lg border p-3 text-left transition ${selected ? "border-blue-500/40 bg-blue-500/10" : "bg-card hover:border-foreground/20 hover:bg-muted/40"}`}
+                    className={`flex items-center gap-3 rounded-md border p-3 text-left transition-colors ${selected ? "border-foreground bg-muted/40" : "bg-card hover:border-foreground/20 hover:bg-muted/20"}`}
                   >
                     <span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${selected ? "bg-blue-500 text-white" : "bg-muted text-muted-foreground"}`}
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${selected ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}`}
                     >
                       {selected ? (
                         <Check className="h-4 w-4" />
@@ -282,7 +282,7 @@ export function BoardSettingsDialog({
               </Button>
             </div>
             {columns.map((column, index) => (
-              <div key={column.id} className="rounded-xl border bg-card p-3">
+              <div key={column.id} className="rounded-md border bg-card p-3">
                 <div className="grid grid-cols-[64px_1fr_82px_82px_36px] gap-2">
                   <div className="flex">
                     <Button
@@ -356,7 +356,7 @@ export function BoardSettingsDialog({
                     disabled={columns.length <= 1}
                     onClick={() => removeColumn(column.id)}
                   >
-                    <Trash2 className="h-4 w-4 text-red-400" />
+                    <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
                 <label className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
@@ -464,15 +464,15 @@ export function BoardSettingsDialog({
                     )
                   }
                 >
-                  <Trash2 className="h-4 w-4 text-red-400" />
+                  <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
             ))}
           </section>
-          <section className="rounded-xl border border-red-500/20 bg-red-500/[0.04] p-4">
+          <section className="rounded-lg border p-4">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <h3 className="text-sm font-medium text-red-400">
+                <h3 className="text-sm font-medium">
                   {t("dangerZone")}
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -482,7 +482,7 @@ export function BoardSettingsDialog({
               <Button
                 type="button"
                 variant="outline"
-                className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-400"
+                className="text-destructive hover:bg-destructive/5 hover:text-destructive"
                 onClick={archiveBoard}
                 disabled={pending}
               >

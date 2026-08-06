@@ -37,9 +37,9 @@ export function TemplateCard({
   const isFreePromo = price === 0 && original > 0;
   const hasDiscount = original > 0 && price > 0 && price < original;
   return (
-    <Link href={`${basePath}/${tpl.slug}`} className="group">
-      <Card className="overflow-hidden transition group-hover:border-primary/40 group-hover:shadow-md h-full flex flex-col">
-        <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/10 via-primary/5 to-sky-500/10">
+    <Link href={`${basePath}/${tpl.slug}`} className="group rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <Card className="flex h-full flex-col overflow-hidden rounded-lg border-border bg-card shadow-none transition-colors group-hover:border-foreground/25">
+        <div className="relative aspect-[16/9] border-b border-border bg-muted/40">
           {tpl.image ? (
             <LazyImage src={tpl.image} alt={tpl.name} />
           ) : (
@@ -48,17 +48,17 @@ export function TemplateCard({
             </div>
           )}
           {ownedLabel && tpl.is_ordered && (
-            <Badge className="absolute right-2 top-2" variant="success">
+            <Badge className="absolute right-2 top-2 border-border bg-background/90 text-foreground shadow-none" variant="outline">
               {ownedLabel}
             </Badge>
           )}
         </div>
-        <div className="flex flex-1 flex-col gap-2 p-5">
-          <h3 className="line-clamp-1 text-base font-semibold">{tpl.name}</h3>
+        <div className="flex flex-1 flex-col gap-2 p-4">
+          <h3 className="line-clamp-1 text-sm font-semibold">{tpl.name}</h3>
           {tpl.categories.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {tpl.categories.slice(0, 3).map((c) => (
-                <Badge key={c.id} variant="secondary" className="text-[10px]">
+                <Badge key={c.id} variant="secondary" className="rounded-md px-1.5 text-[10px] font-normal">
                   {c.name}
                 </Badge>
               ))}
@@ -69,7 +69,7 @@ export function TemplateCard({
               {tpl.short_description}
             </p>
           )}
-          <div className="mt-auto flex items-end justify-between pt-2">
+          <div className="mt-auto flex items-end justify-between border-t border-border pt-3">
             <div className="space-y-0.5">
               <div className="text-sm font-semibold">
                 {price === 0

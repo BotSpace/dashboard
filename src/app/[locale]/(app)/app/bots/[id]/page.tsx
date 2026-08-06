@@ -30,7 +30,7 @@ export default async function BotOverviewPage({
 
       <Section
         title={t("info")}
-        icon={<Info className="h-4 w-4 text-blue-400" />}
+        icon={<Info className="h-4 w-4 text-muted-foreground" />}
         className="min-w-0"
         contentClassName="min-w-0 space-y-3 text-sm"
       >
@@ -49,7 +49,7 @@ export default async function BotOverviewPage({
 
       <Section
         title={t("state")}
-        icon={<Activity className="h-4 w-4 text-emerald-400" />}
+        icon={<Activity className="h-4 w-4 text-muted-foreground" />}
         className="min-w-0"
         contentClassName="min-w-0 space-y-3 text-sm"
       >

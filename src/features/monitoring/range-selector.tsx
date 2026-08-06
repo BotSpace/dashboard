@@ -23,17 +23,17 @@ export function RangeSelector({ current }: { current: MonitoringRange }) {
   }
 
   return (
-    <div className="inline-flex items-center gap-1 rounded-lg border border-border/60 bg-card p-1">
+    <div className="inline-flex items-center gap-0.5 rounded-md border border-border bg-card p-0.5">
       {RANGES.map((r) => (
         <button
           key={r.value}
           type="button"
           onClick={() => select(r.value)}
           className={cn(
-            "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+            "rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors",
             current === r.value
-              ? "bg-primary/15 text-primary"
-              : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+              ? "bg-foreground text-background"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground",
           )}
         >
           {r.label}

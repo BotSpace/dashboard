@@ -26,7 +26,7 @@ export default async function BotCmsDetailPage({
   const collections = await CmsAPI.listCollections(id).catch(() => []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         icon={<Database className="h-5 w-5" />}
         title={
@@ -69,9 +69,9 @@ export default async function BotCmsDetailPage({
       />
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="border-primary/20 bg-primary/[0.04]">
+        <Card className="border-border bg-card">
           <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
               <Columns3 className="h-4 w-4" />
             </div>
             <div>
@@ -82,7 +82,7 @@ export default async function BotCmsDetailPage({
         </Card>
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
               <KeyRound className="h-4 w-4" />
             </div>
             <div className="min-w-0">
@@ -93,7 +93,7 @@ export default async function BotCmsDetailPage({
         </Card>
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
               <Database className="h-4 w-4" />
             </div>
             <div>
@@ -109,7 +109,7 @@ export default async function BotCmsDetailPage({
         title={t("schema")}
         contentClassName="space-y-5"
       >
-        <div className="rounded-lg border border-dashed bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
+        <div className="rounded-md border border-dashed border-border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
           {t("schemaHint")}
         </div>
         <FieldEditor

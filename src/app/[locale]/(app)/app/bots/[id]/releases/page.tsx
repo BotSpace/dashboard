@@ -29,7 +29,7 @@ export default async function ReleasesPage({
   const releases = await ReleasesAPI.list(id).catch(() => []);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <ReleasesAutoRefresh statuses={releases.map((r) => r.status ?? "")} />
       <div className="flex justify-end">
         <DeployButton projectId={id} />
@@ -46,7 +46,7 @@ export default async function ReleasesPage({
         <Card>
           <CardContent className="p-0">
             <div className="overflow-x-auto"><table className="w-full min-w-[600px] text-sm">
-              <thead className="border-b bg-muted/30 text-xs uppercase text-muted-foreground">
+              <thead className="border-b bg-muted/40 text-xs text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 text-left">{t("version")}</th>
                   <th className="px-4 py-3 text-left">{t("status")}</th>
@@ -57,7 +57,7 @@ export default async function ReleasesPage({
               </thead>
               <tbody>
                 {releases.map((r) => (
-                  <tr key={r.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                  <tr key={r.id} className="border-b transition-colors last:border-0 hover:bg-muted/40">
                     <td className="px-4 py-3 font-medium">{r.version ?? r.id}</td>
                     <td className="px-4 py-3">
                       <Badge variant={statusToVariant[r.status ?? "pending"] ?? "secondary"}>

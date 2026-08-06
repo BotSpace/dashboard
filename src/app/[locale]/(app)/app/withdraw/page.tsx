@@ -36,10 +36,10 @@ export default async function WithdrawPage({ params }: { params: Promise<{ local
 
       {!kyc.is_verified ? (
         /* Verifikatsiya qilinmagan — alohida sahifaga yo'naltirish */
-        <Card className="border-amber-500/30 bg-amber-500/5">
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
-            <div className="grid h-14 w-14 place-items-center rounded-full bg-amber-500/10">
-              <ShieldAlert className="h-7 w-7 text-amber-500" />
+            <div className="grid h-12 w-12 place-items-center rounded-md border border-border bg-muted/50">
+              <ShieldAlert className="h-6 w-6 text-muted-foreground" />
             </div>
             <div>
               <p className="text-lg font-semibold">Siz verifikatsiyadan o&apos;tmagansiz</p>
@@ -49,7 +49,7 @@ export default async function WithdrawPage({ params }: { params: Promise<{ local
                   : "Pul yechishdan oldin shaxsingizni tasdiqlashingiz kerak."}
               </p>
             </div>
-            <Button asChild className="bg-amber-600 hover:bg-amber-700 text-white">
+            <Button asChild>
               <Link href="/app/verification">
                 <ShieldCheck className="h-4 w-4" />
                 {isPending ? "Holatni ko'rish" : "Verifikatsiyadan o'tish"}
@@ -60,20 +60,20 @@ export default async function WithdrawPage({ params }: { params: Promise<{ local
       ) : (
         <>
           {/* Yechiladigan balans */}
-          <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-transparent">
+          <Card className="rounded-lg border-border bg-card shadow-none">
             <CardContent className="flex items-center gap-4 py-6">
-              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-emerald-500/15">
-                <Wallet className="h-6 w-6 text-emerald-500" />
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-border bg-muted/50">
+                <Wallet className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Yechish mumkin (bot daromadi)</p>
-                <p className="text-2xl font-bold">{formatCurrency(withdrawable, "UZS", locale)}</p>
+                <p className="text-2xl font-semibold tracking-tight">{formatCurrency(withdrawable, "UZS", locale)}</p>
               </div>
             </CardContent>
           </Card>
 
           {/* Forma */}
-          <Card>
+          <Card className="rounded-lg border-border bg-card shadow-none">
             <CardContent className="py-6">
               {withdrawable < 1000 ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">
@@ -90,7 +90,7 @@ export default async function WithdrawPage({ params }: { params: Promise<{ local
       {/* Pul yechish tarixi */}
       <section className="space-y-3">
         <h2 className="text-base font-semibold">So&apos;rovlar tarixi</h2>
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardContent className="p-0">
             {withdrawals.length === 0 ? (
               <p className="py-10 text-center text-sm text-muted-foreground">Hozircha so&apos;rovlar yo&apos;q</p>
@@ -107,7 +107,7 @@ export default async function WithdrawPage({ params }: { params: Promise<{ local
                         </p>
                       </div>
                       <span className="flex shrink-0 items-center gap-1.5">
-                        {w.status === "approved" && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
+                        {w.status === "approved" && <CheckCircle2 className="h-3.5 w-3.5 text-muted-foreground" />}
                         <Badge variant={meta.variant}>{meta.label}</Badge>
                       </span>
                     </li>

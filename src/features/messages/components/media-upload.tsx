@@ -79,7 +79,7 @@ export function MediaUpload({ value, onChange, disabled }: MediaUploadProps) {
 
   if (value) {
     return (
-      <div className="group relative overflow-hidden rounded-xl border border-border bg-muted/20">
+      <div className="group relative overflow-hidden rounded-lg border border-border bg-muted/20">
         {value.type === "photo" ? (
           <>
             <img
@@ -87,17 +87,15 @@ export function MediaUpload({ value, onChange, disabled }: MediaUploadProps) {
               alt="Media preview"
               className="max-h-64 w-full object-cover"
             />
-            {/* Overlay gradient for readability */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
             {/* Bottom info chip */}
-            <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-xs text-white backdrop-blur-sm">
+            <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-md border border-white/20 bg-black/70 px-2.5 py-1 text-xs text-white">
               <ImageIcon className="h-3 w-3" />
               <span className="font-medium">{formatBytes(value.file.size)}</span>
             </div>
           </>
         ) : (
           <div className="flex items-center gap-3 p-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
               <FileVideo className="h-6 w-6" />
             </div>
             <div className="min-w-0 flex-1">
@@ -113,7 +111,7 @@ export function MediaUpload({ value, onChange, disabled }: MediaUploadProps) {
           type="button"
           variant="destructive"
           size="icon"
-          className="absolute right-2 top-2 h-7 w-7 rounded-full shadow-lg opacity-90 transition-opacity hover:opacity-100"
+          className="absolute right-2 top-2 h-7 w-7 rounded-md opacity-90 transition-opacity hover:opacity-100"
           onClick={handleRemove}
           disabled={disabled}
         >
@@ -162,17 +160,17 @@ export function MediaUpload({ value, onChange, disabled }: MediaUploadProps) {
         if ((e.key === "Enter" || e.key === " ") && !disabled) inputRef.current?.click();
       }}
       className={cn(
-        "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border border-dashed px-6 py-8 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         dragging
-          ? "border-primary bg-primary/5 text-primary scale-[1.01]"
-          : "border-border text-muted-foreground hover:border-primary/40 hover:bg-muted/30 hover:text-foreground",
+          ? "border-foreground/30 bg-muted/60 text-foreground"
+          : "border-border bg-card text-muted-foreground hover:border-foreground/20 hover:bg-muted/30 hover:text-foreground",
         disabled && "pointer-events-none opacity-50",
       )}
     >
       <div
         className={cn(
-          "flex h-12 w-12 items-center justify-center rounded-xl transition-colors",
-          dragging ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground",
+          "flex h-10 w-10 items-center justify-center rounded-md border border-border transition-colors",
+          dragging ? "bg-background text-foreground" : "bg-muted text-muted-foreground",
         )}
       >
         <UploadCloud className="h-6 w-6" />

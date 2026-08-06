@@ -69,7 +69,7 @@ export function WithdrawForm({ withdrawable }: { withdrawable: number }) {
           <button
             type="button"
             onClick={() => setAmount(withdrawable >= MIN ? withdrawable : "")}
-            className="font-medium text-blue-500 hover:underline"
+            className="font-medium text-foreground underline-offset-4 hover:underline"
           >
             Maksimal: {fmt.format(withdrawable)} so&apos;m
           </button>

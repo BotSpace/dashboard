@@ -4,16 +4,16 @@ import { SidebarContent } from "./sidebar";
 
 export function MobileSidebar({
   open,
-  onOpenChange,
+  onOpenChangeAction,
 }: {
   open: boolean;
-  onOpenChange: (v: boolean) => void;
+  onOpenChangeAction: (v: boolean) => void;
 }) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChangeAction}>
       <DialogContent className="left-0 top-0 h-svh w-72 max-w-none translate-x-0 translate-y-0 rounded-none border-r p-0 sm:max-w-none sm:rounded-none">
         <DialogTitle className="sr-only">Menyu</DialogTitle>
-        <SidebarContent onNavigate={() => onOpenChange(false)} />
+        <SidebarContent onNavigateAction={() => onOpenChangeAction(false)} />
       </DialogContent>
     </Dialog>
   );

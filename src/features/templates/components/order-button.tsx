@@ -25,7 +25,7 @@ export function OrderButton({ templateId, isFree, isOwned, labels, onOrdered }: 
 
   if (isOwned) {
     return (
-      <Button className="w-full" size="lg" variant="secondary" disabled>
+      <Button className="w-full" variant="secondary" disabled>
         <Check className="h-4 w-4" />
         {labels.owned}
       </Button>
@@ -52,7 +52,7 @@ export function OrderButton({ templateId, isFree, isOwned, labels, onOrdered }: 
   };
 
   return (
-    <Button onClick={onClick} disabled={pending} className="w-full" size="lg">
+    <Button onClick={onClick} disabled={pending} className="w-full">
       {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
       {isFree ? labels.use : labels.buy}
     </Button>

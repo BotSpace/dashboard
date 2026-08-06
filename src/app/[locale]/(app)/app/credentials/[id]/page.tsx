@@ -103,7 +103,7 @@ export default async function CredentialDetailPage({
     : [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Back link */}
       <Link
         href="/app/credentials"
@@ -114,16 +114,9 @@ export default async function CredentialDetailPage({
       </Link>
 
       {/* Header card */}
-      <header className="flex flex-wrap items-center gap-4 rounded-xl border border-border/60 bg-card p-5">
-        <div
-          className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-blue-400 ring-2 ring-blue-500/20"
-          style={
-            credType?.color
-              ? { backgroundColor: `${credType.color}1A`, color: credType.color, boxShadow: `0 0 0 2px ${credType.color}33` }
-              : undefined
-          }
-        >
-          <TypeIcon className="h-7 w-7" style={credType?.color ? { color: credType.color } : undefined} />
+      <header className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-border bg-muted/50 text-muted-foreground">
+          <TypeIcon className="h-5 w-5" />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -144,7 +137,7 @@ export default async function CredentialDetailPage({
         {isOAuth ? (
           <Section
             title="OAuth ulanish"
-            icon={<CheckCircle2 className="h-4 w-4 text-emerald-400" />}
+            icon={<CheckCircle2 className="h-4 w-4 text-muted-foreground" />}
             contentClassName="space-y-3 text-sm"
           >
             <Row label="Holat" value="Ulangan" />
@@ -165,7 +158,7 @@ export default async function CredentialDetailPage({
         ) : (
           <Section
             title="Ma'lumotlar"
-            icon={<Info className="h-4 w-4 text-blue-400" />}
+            icon={<Info className="h-4 w-4 text-muted-foreground" />}
             contentClassName="space-y-3 text-sm"
           >
             {dataEntries.length === 0 ? (
@@ -206,8 +199,8 @@ export default async function CredentialDetailPage({
       </div>
 
       {/* Action buttons + dialogs */}
-      <div className="rounded-xl border border-border/60 bg-card p-5">
-        <div className="mb-4 flex items-center gap-2">
+      <div className="rounded-lg border border-border bg-card p-4">
+        <div className="mb-3 flex items-center gap-2">
           <KeyRound className="h-4 w-4 shrink-0 text-muted-foreground" />
           <span className="font-semibold leading-none">Amallar</span>
         </div>

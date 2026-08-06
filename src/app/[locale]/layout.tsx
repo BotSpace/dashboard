@@ -1,11 +1,22 @@
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import Script from "next/script";
+import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { routing } from "@/shared/i18n/routing";
 import { UmamiAuthEvent } from "@/shared/analytics/umami";
 import { ThemeProvider } from "@/shared/providers/theme-provider";
 import { Toaster } from "@/shared/providers/toaster";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -24,7 +35,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body>
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
         {/* Umami analytics (self-hosted) — landing + app tashriflarini kuzatadi.
             website-id ommaviy (script tegida ko'rinadi), sir emas. */}
         <Script

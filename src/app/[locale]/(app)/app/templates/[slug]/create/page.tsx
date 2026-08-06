@@ -5,7 +5,7 @@ import { TemplatesAPI } from "@/shared/api/services";
 import { Button } from "@/shared/components/ui/button";
 import { Link } from "@/shared/i18n/routing";
 import { PageHeader } from "@/shared/components/common/page-header";
-import { Section } from "@/shared/components/common/section";
+
 import { TemplateCreateWizard } from "@/features/templates/components/template-create-wizard";
 import { getTemplateRequirementsAction } from "@/features/templates/actions";
 
@@ -35,7 +35,7 @@ export default async function TemplateCreatePage({
   const templateSlug = tpl.slug ?? String(tpl.id);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         title={t("wizardPageTitle", { name: tpl.name })}
         subtitle={t("wizardPageSubtitle")}
@@ -50,8 +50,7 @@ export default async function TemplateCreatePage({
         }
       />
 
-      <Section>
-        <TemplateCreateWizard
+      <TemplateCreateWizard
           templateId={tpl.id}
           templateSlug={templateSlug}
           defaultName={tpl.name}
@@ -122,7 +121,6 @@ export default async function TemplateCreatePage({
             launchTimeoutText: t("launchTimeoutText"),
           }}
         />
-      </Section>
     </div>
   );
 }

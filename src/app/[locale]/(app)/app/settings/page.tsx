@@ -25,12 +25,11 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
       <PageHeader title={t("title")} icon={<Settings className="h-5 w-5" />} />
 
       {/* Identity header */}
-      <Card className="relative overflow-hidden border-border/60">
-        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-transparent" />
-        <CardContent className="relative flex flex-col items-center gap-4 pt-6 text-center sm:flex-row sm:items-center sm:text-left">
-          <Avatar className="h-16 w-16 shrink-0 ring-2 ring-border/50">
+      <Card className="rounded-lg border-border bg-card shadow-none">
+        <CardContent className="flex flex-col items-center gap-4 py-5 text-center sm:flex-row sm:items-center sm:text-left">
+          <Avatar className="h-14 w-14 shrink-0 rounded-md border border-border">
             {avatar && <AvatarImage src={avatar} alt={fullName} />}
-            <AvatarFallback className="text-lg font-semibold">{initials(fullName)}</AvatarFallback>
+            <AvatarFallback className="rounded-md bg-muted text-base font-semibold">{initials(fullName)}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
             <h2 className="truncate text-lg font-semibold">{fullName}</h2>
@@ -51,7 +50,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
       </Card>
 
       <Tabs defaultValue="general">
-        <TabsList>
+        <TabsList className="rounded-md border border-border bg-muted/40 p-1">
           <TabsTrigger value="general" className="gap-1.5">
             <User className="h-4 w-4" /> {t("tabs.general")}
           </TabsTrigger>
@@ -64,10 +63,10 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
         </TabsList>
 
         <TabsContent value="general">
-          <Card>
+          <Card className="rounded-lg border-border bg-card shadow-none">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-4 w-4 text-blue-400" /> {t("tabs.general")}
+                <User className="h-4 w-4 text-muted-foreground" /> {t("tabs.general")}
               </CardTitle>
               <CardDescription>Ism, familiya va aloqa ma&apos;lumotlaringizni boshqaring.</CardDescription>
             </CardHeader>
@@ -83,10 +82,10 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
         </TabsContent>
 
         <TabsContent value="security">
-          <Card>
+          <Card className="rounded-lg border-border bg-card shadow-none">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-emerald-400" /> {t("changePassword")}
+                <Shield className="h-4 w-4 text-muted-foreground" /> {t("changePassword")}
               </CardTitle>
               <CardDescription>Hisobingiz xavfsizligi uchun kuchli, takrorlanmas parol tanlang.</CardDescription>
             </CardHeader>
@@ -97,10 +96,10 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
         </TabsContent>
 
         <TabsContent value="tokens">
-          <Card>
+          <Card className="rounded-lg border-border bg-card shadow-none">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <KeyRound className="h-4 w-4 text-amber-400" /> {t("tabs.tokens")}
+                <KeyRound className="h-4 w-4 text-muted-foreground" /> {t("tabs.tokens")}
               </CardTitle>
               <CardDescription>
                 Tashqi xizmatlar (MCP, CI/CD, monitoring) BotSpace&apos;ga ulanish uchun API tokenlar.

@@ -43,30 +43,27 @@ export function SubAgentAccordion({ turn }: Props) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "group flex w-full items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-xs transition-all",
+          "group flex w-full items-start gap-2.5 rounded-lg border px-3 py-2.5 text-left text-xs transition-colors",
           running
-            ? "border-blue-400/50 bg-blue-500/10 shadow-[0_0_0_3px_rgba(59,130,246,0.08)] dark:border-blue-400/40"
-            : "border-border bg-card/60 hover:bg-card",
+            ? "border-foreground/30 bg-muted/40"
+            : "border-border bg-card hover:bg-muted/20",
           failed && "border-destructive/40",
         )}
       >
         <div
           className={cn(
-            "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+            "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-md border bg-muted/30",
             running
-              ? "bg-blue-500/20 text-blue-600 dark:text-blue-300"
+              ? "text-foreground"
               : failed
-                ? "bg-destructive/10 text-destructive"
-                : "bg-primary/10 text-primary",
+                ? "text-destructive"
+                : "text-muted-foreground",
           )}
         >
           {running ? (
             <>
               <Bot className="h-3.5 w-3.5" />
-              <span className="absolute -right-0.5 -top-0.5 flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500" />
-              </span>
+              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 animate-pulse rounded-full border border-background bg-foreground" />
             </>
           ) : failed ? (
             <XCircle className="h-3.5 w-3.5" />
@@ -79,22 +76,22 @@ export function SubAgentAccordion({ turn }: Props) {
             <span
               className={cn(
                 "font-semibold",
-                running ? "text-blue-700 dark:text-blue-200" : "text-foreground",
+                "text-foreground",
               )}
             >
               {label}
             </span>
             {running ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-300">
+              <span className="inline-flex items-center gap-1 rounded-full border bg-background px-2 py-0.5 text-[10px] font-medium text-foreground">
                 <Loader2 className="h-2.5 w-2.5 animate-spin" />
                 ishlamoqda
               </span>
             ) : failed ? (
-              <span className="inline-flex items-center rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive">
+              <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium text-destructive">
                 xatolik
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-300">
+              <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                 <CheckCircle2 className="h-2.5 w-2.5" />
                 bajarildi
               </span>
@@ -132,7 +129,7 @@ export function SubAgentAccordion({ turn }: Props) {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.15 }}
-            className="mt-1.5 overflow-hidden rounded-xl border bg-muted/30 px-3 py-2"
+            className="mt-1.5 overflow-hidden rounded-lg border bg-muted/20 px-3 py-2"
           >
             <div className="mb-2 text-[10px] uppercase tracking-wide text-muted-foreground/70">
               Vazifa
@@ -162,8 +159,8 @@ export function SubAgentAccordion({ turn }: Props) {
             )}
 
             {turn.summary && (
-              <div className="mt-3 rounded-md border border-emerald-500/20 bg-emerald-500/5 px-2 py-1.5 text-[11px] text-foreground/90">
-                <div className="mb-0.5 text-[10px] uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
+              <div className="mt-3 rounded-md border bg-background px-2 py-1.5 text-[11px] text-foreground/90">
+                <div className="mb-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
                   Xulosa
                 </div>
                 <div className="whitespace-pre-wrap">{turn.summary}</div>
@@ -231,7 +228,7 @@ function SubAgentStep({ step, index }: StepProps) {
         ) : step.isError ? (
           <XCircle className="ml-auto h-3 w-3 shrink-0 text-destructive" />
         ) : (
-          <CheckCircle2 className="ml-auto h-3 w-3 shrink-0 text-emerald-500" />
+          <CheckCircle2 className="ml-auto h-3 w-3 shrink-0 text-muted-foreground" />
         )}
         {(hasArgs || hasFullResult || resLine) && (
           <span className="text-muted-foreground/60">

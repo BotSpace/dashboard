@@ -42,12 +42,12 @@ export default async function EarningsPage({
   const selectedBots = (sp.bots ?? "").split(",").map((s) => s.trim()).filter(Boolean);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <PageHeader title={t("title")} icon={<TrendingUp className="h-5 w-5" />} />
 
       {/* Umumiy ko'rsatkichlar */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-transparent">
+      <div className="grid gap-3 md:grid-cols-3">
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardHeader className="pb-2">
             <CardDescription className="flex items-center gap-1.5">
               <Wallet className="h-3.5 w-3.5" /> {t("withdrawable")}
@@ -57,13 +57,13 @@ export default async function EarningsPage({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+            <Button asChild size="sm">
               <Link href="/app/withdraw">{t("withdraw")}</Link>
             </Button>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardHeader className="pb-2">
             <CardDescription className="flex items-center gap-1.5">
               <TrendingUp className="h-3.5 w-3.5" /> {t("totalEarned")}
@@ -74,7 +74,7 @@ export default async function EarningsPage({
           </CardHeader>
         </Card>
 
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardHeader className="pb-2">
             <CardDescription className="flex items-center gap-1.5">
               <Coins className="h-3.5 w-3.5" /> {t("totalCommission")}
@@ -90,15 +90,15 @@ export default async function EarningsPage({
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">{t("byBot")}</h2>
         {summary.by_bot.length === 0 ? (
-          <Card>
+          <Card className="rounded-lg border-border bg-card shadow-none">
             <CardContent className="py-12 text-center text-sm text-muted-foreground">
               {t("noEarnings")}
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {summary.by_bot.map((b) => (
-              <Card key={b.project_id}>
+              <Card key={b.project_id} className="rounded-lg border-border bg-card shadow-none">
                 <CardHeader className="pb-2">
                   <CardDescription className="truncate">{b.project_name}</CardDescription>
                   <CardTitle className="text-xl">
@@ -122,13 +122,13 @@ export default async function EarningsPage({
           <h2 className="text-lg font-semibold">{t("transactions")}</h2>
           <TransactionsFilter bots={botOptions} selected={selectedBots} />
         </div>
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardContent className="p-0">
             {summary.orders.length === 0 ? (
               <p className="py-12 text-center text-sm text-muted-foreground">{t("noTransactions")}</p>
             ) : (
               <div className="overflow-x-auto"><table className="w-full min-w-[600px] text-sm">
-                <thead className="border-b bg-muted/30 text-xs uppercase text-muted-foreground">
+                <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
                   <tr>
                     <th className="px-4 py-3 text-left">{t("date")}</th>
                     <th className="px-4 py-3 text-left">{t("bot")}</th>
@@ -142,7 +142,7 @@ export default async function EarningsPage({
                   {summary.orders.map((o) => {
                     const payerName = [o.payer_first_name, o.payer_last_name].filter(Boolean).join(" ");
                     return (
-                      <tr key={o.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                      <tr key={o.id} className="border-b border-border transition-colors last:border-0 hover:bg-muted/30">
                         <td className="px-4 py-3 text-muted-foreground">
                           <Link href={`/app/earnings/${o.id}`} className="block hover:text-foreground">
                             {o.paid_at ?? o.created_at ?? "—"}
@@ -155,7 +155,7 @@ export default async function EarningsPage({
                         <td className="px-4 py-3 text-right">
                           {formatCurrency(Number(o.amount), "UZS", locale)}
                         </td>
-                        <td className="px-4 py-3 text-right font-medium text-emerald-500">
+                        <td className="px-4 py-3 text-right font-medium text-foreground">
                           {formatCurrency(Number(o.net_amount), "UZS", locale)}
                         </td>
                         <td className="px-4 py-3">

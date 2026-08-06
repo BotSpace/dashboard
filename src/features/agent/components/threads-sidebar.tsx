@@ -33,8 +33,8 @@ export function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, o
           </Button>
         )}
         <div className="flex items-center gap-2 md:hidden">
-          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10">
-            <Sparkles className="h-3 w-3 text-primary" />
+          <div className="flex h-6 w-6 items-center justify-center rounded-md border bg-muted/30">
+            <Sparkles className="h-3 w-3 text-muted-foreground" />
           </div>
           <span className="text-sm font-semibold">BotSpace</span>
         </div>
@@ -82,7 +82,7 @@ export function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, o
                 className={cn(
                   "group flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                   isActive
-                    ? "bg-primary/10 font-medium text-foreground"
+                    ? "bg-muted font-medium text-foreground"
                     : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                 )}
               >
@@ -94,7 +94,7 @@ export function ThreadsSidebar({ threads, activeId, onSelect, onNew, onDelete, o
                   <MessageSquare
                     className={cn(
                       "h-4 w-4 shrink-0",
-                      isActive ? "text-primary" : "text-muted-foreground/60"
+                      isActive ? "text-foreground" : "text-muted-foreground/60"
                     )}
                   />
                   <span className="truncate">{t.title}</span>

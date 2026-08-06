@@ -177,9 +177,9 @@ export function CredentialsPanel({ initialData, types }: CredentialsPanelProps) 
   return (
     <>
       {/* Filter bar */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-3">
         <Select value={filterType} onValueChange={handleFilterChange}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="h-8 w-48 bg-background">
             <SelectValue placeholder="Barcha turlar" />
           </SelectTrigger>
           <SelectContent>
@@ -218,16 +218,16 @@ export function CredentialsPanel({ initialData, types }: CredentialsPanelProps) 
           }
         />
       ) : (
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[600px] text-sm">
-                <thead className="border-b bg-muted/30 text-xs uppercase text-muted-foreground">
+                <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
                   <tr>
-                    <th className="px-4 py-3 text-left">Nom</th>
-                    <th className="px-4 py-3 text-left">Tur</th>
-                    <th className="px-4 py-3 text-left">Yangilangan</th>
-                    <th className="px-4 py-3 text-right">Amallar</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Nom</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Tur</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Yangilangan</th>
+                    <th className="px-3 py-2.5 text-right font-medium">Amallar</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -236,26 +236,15 @@ export function CredentialsPanel({ initialData, types }: CredentialsPanelProps) 
                     const isTesting = testing[cred.id] ?? false;
                     const credTypeDef = types.find((t) => t.key === cred.type_key);
                     const TypeIcon = getTypeIcon(credTypeDef?.icon);
-                    const typeColor = credTypeDef?.color;
                     return (
                       <tr
                         key={cred.id}
-                        className="border-b last:border-0 transition-colors hover:bg-muted/20"
+                        className="border-b border-border transition-colors last:border-0 hover:bg-muted/30"
                       >
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-2.5">
                           <div className="flex items-center gap-2.5">
-                            <div
-                              className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-blue-500/10 text-blue-400"
-                              style={
-                                typeColor
-                                  ? { backgroundColor: `${typeColor}1A`, color: typeColor }
-                                  : undefined
-                              }
-                            >
-                              <TypeIcon
-                                className="h-3.5 w-3.5"
-                                style={typeColor ? { color: typeColor } : undefined}
-                              />
+                            <div className="grid h-7 w-7 shrink-0 place-items-center rounded-md border border-border bg-muted/50 text-muted-foreground">
+                              <TypeIcon className="h-3.5 w-3.5" />
                             </div>
                             <Link
                               href={`/app/credentials/${cred.id}`}
@@ -265,19 +254,19 @@ export function CredentialsPanel({ initialData, types }: CredentialsPanelProps) 
                             </Link>
                           </div>
                         </td>
-                        <td className="px-4 py-3">
-                          <Badge variant="secondary">{cred.type.label}</Badge>
+                        <td className="px-3 py-2.5">
+                          <Badge variant="secondary" className="rounded-md font-normal">{cred.type.label}</Badge>
                         </td>
-                        <td className="px-4 py-3 text-muted-foreground">
+                        <td className="px-3 py-2.5 text-muted-foreground">
                           {cred.updated_at
                             ? new Date(cred.updated_at).toLocaleDateString("uz-UZ")
                             : "—"}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-2">
                           <div className="flex items-center justify-end gap-1">
                             {/* Test result indicator */}
                             {testRes === true && (
-                              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                              <CheckCircle2 className="h-4 w-4 text-foreground" />
                             )}
                             {testRes === false && (
                               <XCircle className="h-4 w-4 text-destructive" />

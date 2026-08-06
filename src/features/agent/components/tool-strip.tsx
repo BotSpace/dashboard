@@ -13,16 +13,15 @@ function toolState(c: ToolCallView): ToolState {
   return c.isError ? "error" : "done";
 }
 
-// Small Claude-Code-style status dot: amber pulse while running, red on error,
-// green when done.
+// Compact status dot: animated while running and destructive on error.
 function StatusDot({ state, className }: { state: ToolState; className?: string }) {
   return (
     <span
       className={cn(
         "inline-block h-1.5 w-1.5 shrink-0 rounded-full",
-        state === "running" && "animate-pulse bg-amber-400",
-        state === "done" && "bg-emerald-500",
-        state === "error" && "bg-red-500",
+        state === "running" && "animate-pulse bg-foreground",
+        state === "done" && "bg-muted-foreground",
+        state === "error" && "bg-destructive",
         className,
       )}
     />
@@ -68,7 +67,7 @@ export function ToolStrip({ calls, pending }: Props) {
         <span
           className={cn(
             "shrink-0 whitespace-nowrap font-medium",
-            pending && "text-amber-500/90",
+            pending && "text-foreground",
           )}
         >
           {lastLabel}
@@ -107,7 +106,7 @@ export function ToolStrip({ calls, pending }: Props) {
                     <span
                       className={cn(
                         "shrink-0 whitespace-nowrap font-medium",
-                        c.isError ? "text-red-500" : "text-muted-foreground/80",
+                        c.isError ? "text-destructive" : "text-muted-foreground/80",
                       )}
                     >
                       {label}
@@ -116,7 +115,7 @@ export function ToolStrip({ calls, pending }: Props) {
                       <span className="min-w-0 truncate text-muted-foreground/50">· {argLine}</span>
                     )}
                     {st === "running" && (
-                      <span className="ml-auto shrink-0 text-[10px] font-medium text-amber-500/90">
+                      <span className="ml-auto shrink-0 text-[10px] font-medium text-foreground">
                         bajarilmoqda…
                       </span>
                     )}

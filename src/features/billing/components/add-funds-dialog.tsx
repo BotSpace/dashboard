@@ -64,7 +64,7 @@ export function AddFundsDialog({ label }: { label: string }) {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Wallet className="h-5 w-5 text-blue-400" />
+              <Wallet className="h-4 w-4 text-muted-foreground" />
               {label}
             </DialogTitle>
             <DialogDescription>
@@ -106,7 +106,7 @@ export function AddFundsDialog({ label }: { label: string }) {
                     key={p}
                     type="button"
                     onClick={() => setAmount(p)}
-                    className="rounded-lg border border-border/60 bg-muted/40 px-2.5 py-1 text-xs font-medium hover:border-blue-500/40 hover:text-foreground"
+                    className="rounded-md border border-border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
                   >
                     {fmt.format(p)}
                   </button>

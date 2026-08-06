@@ -28,7 +28,7 @@ export default async function BotCmsEditDocPage({
   const collections = await CmsAPI.listCollections(id).catch(() => []);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-5xl space-y-5">
       <PageHeader
         icon={<FileEdit className="h-5 w-5" />}
         title={t("editDoc")}
@@ -49,7 +49,7 @@ export default async function BotCmsEditDocPage({
         }
       />
 
-      <Section className="border-border/70 shadow-sm" title={t("editDoc")} icon={<FileEdit className="h-4 w-4" />}>
+      <Section className="border-border" title={t("editDoc")} icon={<FileEdit className="h-4 w-4" />}>
         <DocumentEditForm
           projectId={id}
           collectionName={collectionSlug}

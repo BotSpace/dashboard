@@ -28,7 +28,7 @@ export function TopBar({ user }: { user: UserMenuUser }) {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-6">
+      <header className="sticky top-0 z-30 flex h-12 items-center gap-3 border-b border-border bg-background/90 px-3 backdrop-blur-xl lg:px-4">
         <Button
           variant="ghost"
           size="icon"
@@ -38,7 +38,7 @@ export function TopBar({ user }: { user: UserMenuUser }) {
         >
           <Menu />
         </Button>
-        <form onSubmit={onSearch} role="search" className="relative min-w-0 flex-1 max-w-sm lg:max-w-xl">
+        <form onSubmit={onSearch} role="search" className="relative min-w-0 flex-1 sm:max-w-xs lg:max-w-sm">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
@@ -46,11 +46,11 @@ export function TopBar({ user }: { user: UserMenuUser }) {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Botlarni qidirish…"
             aria-label="Botlarni qidirish"
-            className="h-9 w-full pl-9 bg-muted/40 focus-visible:bg-background"
+            className="h-8 w-full border-transparent bg-muted/70 pl-9 shadow-none hover:border-border focus-visible:border-border focus-visible:bg-background"
           />
         </form>
-        <div className="ml-auto flex items-center gap-1">
-          <Button variant="ghost" size="icon" aria-label="Bildirishnomalar" className="relative">
+        <div className="ml-auto flex items-center gap-0.5">
+          <Button variant="ghost" size="icon" aria-label="Bildirishnomalar" className="h-8 w-8">
             <Bell className="h-4 w-4" />
           </Button>
           <LanguageSwitcher />
@@ -59,7 +59,7 @@ export function TopBar({ user }: { user: UserMenuUser }) {
           </div>
         </div>
       </header>
-      <MobileSidebar open={mobileOpen} onOpenChange={setMobileOpen} />
+      <MobileSidebar open={mobileOpen} onOpenChangeAction={setMobileOpen} />
     </>
   );
 }

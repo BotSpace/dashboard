@@ -50,12 +50,8 @@ export function TypingIndicator({ phase, currentTool, currentSubAgent }: Props) 
     >
       <div
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-2 ring-transparent",
-          activeSubAgent
-            ? "animate-pulse bg-blue-500/15 text-blue-600 ring-blue-400/30 dark:text-blue-300"
-            : phase === "tool"
-              ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-              : "bg-gradient-to-br from-primary/20 to-primary/5 text-primary"
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-muted/30 text-muted-foreground",
+          activeSubAgent && "animate-pulse text-foreground"
         )}
       >
         {activeSubAgent ? (
@@ -68,15 +64,13 @@ export function TypingIndicator({ phase, currentTool, currentSubAgent }: Props) 
       </div>
       <div
         className={cn(
-          "flex items-center gap-2.5 rounded-2xl px-4 py-2.5",
-          activeSubAgent ? "bg-blue-500/10" : "bg-muted/40"
+          "flex items-center gap-2.5 rounded-lg border bg-card px-3 py-2"
         )}
       >
         <Dots />
         <span
           className={cn(
-            "text-xs font-medium",
-            activeSubAgent ? "text-blue-700 dark:text-blue-200" : "text-muted-foreground"
+            "text-xs font-medium text-muted-foreground"
           )}
         >
           {label(phase, currentTool, currentSubAgent)}
@@ -85,7 +79,7 @@ export function TypingIndicator({ phase, currentTool, currentSubAgent }: Props) 
           <Loader2
             className={cn(
               "h-3 w-3 animate-spin",
-              activeSubAgent ? "text-blue-500" : "text-muted-foreground/60"
+              "text-muted-foreground/60"
             )}
           />
         )}
@@ -109,12 +103,8 @@ export function RunStatusChip({ phase, currentTool, currentSubAgent }: Props) {
   const activeSubAgent = Boolean(currentSubAgent);
   const color =
     phase === "error"
-      ? "bg-destructive/10 text-destructive"
-      : phase === "waiting"
-        ? "bg-amber-500/10 text-amber-700 dark:text-amber-300"
-        : activeSubAgent
-          ? "bg-blue-500/15 text-blue-700 dark:text-blue-300"
-          : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
+      ? "text-destructive"
+      : "text-muted-foreground";
 
   const text =
     phase === "error"
@@ -132,7 +122,7 @@ export function RunStatusChip({ phase, currentTool, currentSubAgent }: Props) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium",
+        "inline-flex items-center gap-1.5 rounded-full border bg-muted/20 px-2.5 py-1 text-[10px] font-medium",
         color
       )}
     >

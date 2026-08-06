@@ -31,13 +31,13 @@ export function RecentBotsV2({ bots }: { bots: Project[] }) {
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40">
+        <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-muted/40">
           <Bot className="h-5 w-5 text-muted-foreground" />
         </div>
         <p className="text-sm text-muted-foreground">Hali bot yo&apos;q</p>
         <Link
           href="/app/bots/new?src=recent-empty"
-          className="text-xs font-medium text-blue-400 hover:text-blue-300"
+          className="text-xs font-medium text-foreground underline-offset-4 hover:underline"
         >
           Birinchi botni yarating
         </Link>
@@ -46,16 +46,16 @@ export function RecentBotsV2({ bots }: { bots: Project[] }) {
   }
 
   return (
-    <ul className="space-y-2.5">
+    <ul className="space-y-1">
       {items.map((bot) => (
         <li key={bot.id}>
           <Link
             href={`/app/bots/${bot.id}`}
-            className="group flex items-center gap-3 rounded-xl border border-border/40 bg-card/50 p-3 transition-all duration-150 hover:border-border hover:bg-card"
+            className="group flex items-center gap-3 rounded-md p-2.5 transition-colors hover:bg-accent"
           >
             {/* Avatar */}
-            <Avatar className="h-9 w-9 shrink-0">
-              <AvatarFallback className="bg-blue-500/15 text-xs font-bold text-blue-300">
+            <Avatar className="h-8 w-8 shrink-0 rounded-md">
+              <AvatarFallback className="rounded-md border border-border bg-muted text-xs font-medium text-foreground">
                 {bot.initial ?? initials(bot.name)}
               </AvatarFallback>
             </Avatar>

@@ -137,12 +137,12 @@ function FilterChip({
       : `${label} ${opLabel}${row.value ? ` "${row.value}"` : ""}`;
 
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border bg-muted px-2.5 py-0.5 text-xs font-medium">
+    <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted px-2 py-0.5 text-xs font-medium">
       {text}
       <button
         type="button"
         onClick={onRemove}
-        className="ml-0.5 rounded-full p-0.5 hover:bg-accent"
+        className="ml-0.5 rounded-sm p-0.5 hover:bg-accent"
         aria-label="Filterni olib tashlash"
       >
         <X className="h-3 w-3" />
@@ -300,7 +300,7 @@ function FilterPanel({
       <button
         type="button"
         onClick={addRow}
-        className="flex items-center gap-1 text-xs text-primary hover:underline"
+        className="flex items-center gap-1 text-xs font-medium text-foreground hover:underline"
       >
         <Plus className="h-3.5 w-3.5" />
         Shart qo'shish
@@ -480,7 +480,7 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
     <>
       <div className="space-y-4">
         {/* ── Toolbar ── */}
-        <div className="flex flex-wrap items-start gap-2 rounded-xl border border-border/60 bg-muted/20 p-2">
+        <div className="flex flex-wrap items-start gap-2 rounded-lg border border-border bg-muted/30 p-2">
           {/* Filter button + panel */}
           <div className="relative" ref={filterPanelRef}>
             <Button
@@ -500,7 +500,7 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
 
             {filterPanelOpen && (
               <div className="absolute left-0 top-full z-30 mt-1">
-                <div className="w-[min(92vw,620px)] rounded-xl border bg-background p-4 shadow-xl shadow-black/10 space-y-3">
+                <div className="w-[min(92vw,620px)] space-y-3 rounded-lg border border-border bg-popover p-3 shadow-md">
                   {/* Mode toggle */}
                   <div className="flex items-center justify-between border-b pb-2">
                     <div className="flex gap-2 text-xs">
@@ -661,10 +661,10 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
         </div>
 
         {/* ── Table ── */}
-        <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">
+        <div className="overflow-hidden rounded-lg border border-border bg-card">
           <div className="max-h-[min(62vh,680px)] overflow-auto">
           <table className="w-full min-w-[760px] text-sm">
-            <thead className="sticky top-0 z-10 bg-muted/95 text-[11px] uppercase tracking-wide backdrop-blur">
+            <thead className="sticky top-0 z-10 bg-muted text-[11px] tracking-wide">
               <tr>
                 <th className="w-10 whitespace-nowrap px-3 py-3 text-left">
                   <input
@@ -703,7 +703,7 @@ export function DataGrid({ projectId, collectionName, fields, collections = [] }
                 return (
                   <tr
                     key={id}
-                    className="cursor-pointer border-t transition-colors hover:bg-primary/[0.03]"
+                    className="cursor-pointer border-t transition-colors hover:bg-muted/40"
                     onClick={() => openView(d)}
                   >
                     <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>

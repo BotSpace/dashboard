@@ -25,14 +25,14 @@ type IconComponent = React.ElementType<{ className?: string }>;
 function MediaTypeChip({ type }: { type: BroadcastMessage["message_type"] }) {
   if (type === "photo")
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-sky-500/10 px-2 py-0.5 text-[11px] font-medium text-sky-600 dark:text-sky-400">
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-md border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
         <ImageIcon className="h-3 w-3" />
         Rasm
       </span>
     );
   if (type === "video")
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-blue-500/10 px-2 py-0.5 text-[11px] font-medium text-blue-600 dark:text-blue-400">
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-md border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
         <Video className="h-3 w-3" />
         Video
       </span>
@@ -95,9 +95,9 @@ function ProgressCell({ done, total, status }: { done?: number; total?: number; 
 
 function HistoryEmpty() {
   return (
-    <div className="flex flex-col items-center gap-4 py-16">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
-        <Radio className="h-7 w-7 text-muted-foreground/50" />
+    <div className="flex flex-col items-center gap-3 py-12">
+      <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-muted">
+        <Radio className="h-5 w-5 text-muted-foreground" />
       </div>
       <div className="text-center">
         <p className="text-sm font-medium text-foreground">Yuborilgan broadcastlar yo&apos;q</p>
@@ -121,7 +121,7 @@ export default async function BotMessagesPage({
   const items = await MessagesAPI.list(id).catch(() => []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <BroadcastComposer projectId={id} />
 
       {/* History */}
@@ -143,7 +143,7 @@ export default async function BotMessagesPage({
                   className={cn(
                     "flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3.5",
                     "sm:flex-nowrap",
-                    "transition-colors hover:bg-muted/20",
+                    "transition-colors hover:bg-muted/40",
                   )}
                 >
                   {/* Media type chip */}

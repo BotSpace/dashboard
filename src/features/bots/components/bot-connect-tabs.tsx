@@ -258,8 +258,8 @@ export function BotConnectTabs({
                     className={[
                       "flex items-center gap-3 rounded-lg border p-3 cursor-pointer transition-colors",
                       selectedManagedId === bot.id
-                        ? "border-primary bg-primary/5"
-                        : "hover:bg-muted/50",
+                        ? "border-foreground/30 bg-muted/60"
+                        : "border-border hover:bg-muted/40",
                       bot.used ? "opacity-60" : "",
                     ].join(" ")}
                   >
@@ -270,7 +270,7 @@ export function BotConnectTabs({
                       value={String(bot.id)}
                       checked={selectedManagedId === bot.id}
                       onChange={() => pickBot(bot)}
-                      className="accent-primary h-4 w-4 shrink-0"
+                      className="h-4 w-4 shrink-0 accent-foreground"
                     />
                     <Bot className="h-4 w-4 text-muted-foreground shrink-0" />
                     <div className="min-w-0 flex-1">
@@ -320,7 +320,7 @@ export function BotConnectTabs({
                 <p className="text-xs text-destructive">{labels.managedUsernameHint}</p>
               )}
               {usernameValid && (
-                <p className="text-xs text-primary">@{effectiveUsername}</p>
+                <p className="text-xs font-medium text-foreground">@{effectiveUsername}</p>
               )}
             </div>
 
@@ -385,8 +385,8 @@ export function BotConnectTabs({
       {/* DEBUG (tokensiz sinov) tab */}
       {showDebugTab && (
         <TabsContent value="debug" className="mt-4">
-          <div className="rounded-lg border border-dashed bg-muted/20 p-4 flex gap-3">
-            <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+          <div className="flex gap-3 rounded-md border border-dashed border-border bg-muted/30 p-3">
+            <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">{labels.debugInfoText}</p>
           </div>
         </TabsContent>

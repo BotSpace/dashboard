@@ -60,16 +60,16 @@ export function KycForm() {
             <label
               key={d.name}
               className={cn(
-                "group relative flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed p-5 text-center transition-colors",
+                "group relative flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed p-5 text-center transition-colors",
                 selected
-                  ? "border-emerald-500/50 bg-emerald-500/5"
-                  : "border-border hover:border-blue-500/50 hover:bg-muted/30"
+                  ? "border-foreground/30 bg-muted/50"
+                  : "border-border hover:bg-muted/30"
               )}
             >
               <div
                 className={cn(
-                  "grid h-11 w-11 place-items-center rounded-full transition-colors",
-                  selected ? "bg-emerald-500/10 text-emerald-500" : "bg-muted text-muted-foreground"
+                  "grid h-10 w-10 place-items-center rounded-md border border-border transition-colors",
+                  selected ? "bg-foreground text-background" : "bg-muted text-muted-foreground"
                 )}
               >
                 {selected ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
@@ -78,7 +78,7 @@ export function KycForm() {
               <span className="line-clamp-1 max-w-full text-xs text-muted-foreground">
                 {selected ?? d.hint}
               </span>
-              <span className="mt-0.5 inline-flex items-center gap-1 text-xs font-medium text-blue-500">
+              <span className="mt-0.5 inline-flex items-center gap-1 text-xs font-medium text-foreground">
                 <Upload className="h-3 w-3" /> {selected ? "O'zgartirish" : "Yuklash"}
               </span>
               <input

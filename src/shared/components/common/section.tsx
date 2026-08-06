@@ -25,7 +25,7 @@ export function Section({
   return (
     <div
       className={cn(
-        "rounded-xl border border-border/60 bg-card p-5 transition-colors hover:border-border",
+        "rounded-lg border border-border bg-card p-5",
         className
       )}
     >
@@ -36,7 +36,7 @@ export function Section({
               <span className="shrink-0 text-muted-foreground">{icon}</span>
             )}
             {title && (
-              <span className="font-semibold leading-none">{title}</span>
+              <span className="text-sm font-medium leading-none">{title}</span>
             )}
           </div>
           {actions && (

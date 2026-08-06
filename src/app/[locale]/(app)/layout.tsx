@@ -23,18 +23,17 @@ export default async function AppLayout({
   if (!session) redirect(`/${locale}/login`);
 
   return (
-    <div className="flex min-h-svh">
+    <div className="dashboard-shell flex min-h-svh bg-background">
       <UmamiIdentify
         userId={session.user.id}
         role={session.user.role}
         username={session.user.username}
       />
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col bg-background">
         <TopBar user={session.user} />
-        {/* Extra bottom padding so the floating AI widget never overlaps
-            page content (e.g. the bot danger zone). */}
-        <main className="flex-1 overflow-x-clip px-4 py-6 pb-28 lg:px-8 lg:py-8 lg:pb-28">
+        {/* Extra bottom padding keeps the floating AI widget clear of page content. */}
+        <main className="flex-1 overflow-x-clip px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:py-7 lg:pb-28">
           <PageTransition>{children}</PageTransition>
         </main>
       </div>

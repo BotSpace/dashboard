@@ -127,14 +127,14 @@ export function FileUploader({ projectId, accept, maxSizeMb = 50 }: Props) {
           upload(e.dataTransfer.files);
         }}
         className={cn(
-          "flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed py-8 px-4 text-center transition",
-          dragOver ? "border-primary bg-primary/5" : "border-border",
+          "flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-card px-4 py-6 text-center transition-colors",
+          dragOver ? "border-foreground/40 bg-muted/50" : "border-border",
           pending && "opacity-60 pointer-events-none"
         )}
       >
-        <div className="rounded-full bg-muted p-3">
+        <div className="rounded-md border border-border bg-muted/50 p-2.5">
           {pending ? (
-            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           ) : (
             <Upload className="h-5 w-5 text-muted-foreground" />
           )}

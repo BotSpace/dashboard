@@ -131,7 +131,7 @@ export function APITokensPanel() {
                   </DialogDescription>
                 </DialogHeader>
                 <div className="py-4">
-                  <div className="flex items-center gap-2 rounded-lg border bg-muted/50 p-3">
+                  <div className="flex items-center gap-2 rounded-md border border-border bg-muted/40 p-3">
                     <code className="flex-1 overflow-x-auto text-xs font-mono select-all break-all">
                       {newToken}
                     </code>
@@ -141,7 +141,7 @@ export function APITokensPanel() {
                       className="h-8 w-8 shrink-0"
                       onClick={() => handleCopy(newToken)}
                     >
-                      {copied ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+                      {copied ? <Check className="h-4 w-4 text-foreground" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
                 </div>
@@ -160,7 +160,7 @@ export function APITokensPanel() {
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : tokens.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border py-12 text-center">
           <Key className="h-10 w-10 text-muted-foreground/30" />
           <div>
             <p className="text-sm font-medium">Tokenlar yo'q</p>
@@ -172,7 +172,7 @@ export function APITokensPanel() {
           {tokens.map((t) => (
             <div
               key={t.id}
-              className="flex items-center justify-between rounded-lg border px-4 py-3 transition-colors hover:bg-muted/30"
+              className="flex items-center justify-between rounded-md border border-border px-3 py-2.5 transition-colors hover:bg-muted/30"
             >
               <div className="flex items-center gap-3">
                 <div className="grid h-8 w-8 place-items-center rounded-md bg-muted">

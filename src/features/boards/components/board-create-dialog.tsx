@@ -100,11 +100,11 @@ export function BoardCreateDialog({ projects }: { projects: Project[] }) {
                     type="button"
                     key={key}
                     onClick={() => setTemplate(key)}
-                    className={`rounded-xl border p-3 text-left transition ${active ? "border-primary/50 bg-primary/10 shadow-sm" : "bg-card hover:border-foreground/20"}`}
+                    className={`rounded-md border p-3 text-left transition-colors ${active ? "border-foreground bg-muted/40" : "bg-card hover:border-foreground/20 hover:bg-muted/20"}`}
                   >
                     <div className="flex items-center gap-2">
                       <span
-                        className={`flex h-8 w-8 items-center justify-center rounded-lg ${active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                        className={`flex h-7 w-7 items-center justify-center rounded-md ${active ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}`}
                       >
                         {active ? (
                           <Check className="h-4 w-4" />
@@ -133,14 +133,14 @@ export function BoardCreateDialog({ projects }: { projects: Project[] }) {
             <div className="space-y-2">
               <div>
                 <Label className="flex items-center gap-2">
-                  <Bot className="h-4 w-4 text-blue-500" />
+                  <Bot className="h-4 w-4 text-muted-foreground" />
                   {t("linkBots")}
                 </Label>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {t("linkBotsCreateHint")}
                 </p>
               </div>
-              <div className="grid max-h-48 gap-2 overflow-y-auto rounded-xl border bg-muted/10 p-2 sm:grid-cols-2">
+              <div className="grid max-h-48 gap-1.5 overflow-y-auto rounded-md border bg-muted/10 p-2 sm:grid-cols-2">
                 {projects.map((project) => {
                   const selected = projectIds.includes(project.id);
                   return (
@@ -154,10 +154,10 @@ export function BoardCreateDialog({ projects }: { projects: Project[] }) {
                             : [...current, project.id],
                         )
                       }
-                      className={`flex items-center gap-3 rounded-lg border p-2.5 text-left transition ${selected ? "border-blue-500/40 bg-blue-500/10" : "border-transparent bg-card hover:border-foreground/15"}`}
+                      className={`flex items-center gap-3 rounded-md border p-2.5 text-left transition-colors ${selected ? "border-foreground bg-muted/40" : "border-transparent bg-card hover:border-foreground/20 hover:bg-muted/20"}`}
                     >
                       <span
-                        className={`flex h-7 w-7 items-center justify-center rounded-md ${selected ? "bg-blue-500 text-white" : "bg-muted text-muted-foreground"}`}
+                        className={`flex h-7 w-7 items-center justify-center rounded-md ${selected ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}`}
                       >
                         {selected ? (
                           <Check className="h-3.5 w-3.5" />

@@ -46,16 +46,16 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
   const tokenPct = tokensLimit > 0 ? (tokensUsed / tokensLimit) * 100 : 0;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <PageHeader
         title={t("title")}
         icon={<CreditCard className="h-5 w-5" />}
       />
 
       {/* Stats cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-3">
         {/* Current plan */}
-        <Card className="border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-transparent">
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardHeader className="pb-2">
             <CardDescription>{t("currentPlan")}</CardDescription>
             <CardTitle className="flex items-center gap-2 text-2xl capitalize">
@@ -75,7 +75,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
         </Card>
 
         {/* Token usage */}
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardHeader className="pb-2">
             <CardDescription>AI Token iste&apos;moli (oylik)</CardDescription>
             <CardTitle className="text-2xl">
@@ -94,7 +94,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
         </Card>
 
         {/* Balance */}
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardHeader className="pb-2">
             <CardDescription>{t("balance")}</CardDescription>
             <CardTitle className="text-2xl">
@@ -110,7 +110,7 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
       {/* Plans grid */}
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Tariflar</h2>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-3">
           {plans.map((p) => {
             const isCurrent = p.name === currentPlanName;
             const Icon = PLAN_ICONS[p.name] ?? Zap;
@@ -122,23 +122,21 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
               <Card
                 key={p.id}
                 className={
-                  "flex h-full flex-col" +
-                  (isCurrent
-                    ? " border-blue-500/40 ring-2 ring-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent"
-                    : "")
+                  "flex h-full flex-col rounded-lg border-border bg-card shadow-none" +
+                  (isCurrent ? " border-foreground/20 bg-muted/20 ring-1 ring-border" : "")
                 }
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="grid h-8 w-8 place-items-center rounded-lg bg-blue-500/10 text-blue-400">
+                      <div className="grid h-8 w-8 place-items-center rounded-md border border-border bg-muted/50 text-muted-foreground">
                         <Icon className="h-4 w-4" />
                       </div>
                       <CardTitle className="text-lg capitalize">{p.name_display ?? p.name}</CardTitle>
                     </div>
-                    {isCurrent && <Badge className="bg-blue-600 text-white border-none">Joriy</Badge>}
+                    {isCurrent && <Badge variant="secondary">Joriy</Badge>}
                   </div>
-                  <div className="mt-2 text-3xl font-bold">
+                  <div className="mt-2 text-2xl font-semibold tracking-tight">
                     {Number(p.price) > 0 ? formatCurrency(Number(p.price), "UZS", locale) : "Bepul"}
                     {Number(p.price) > 0 && <span className="text-sm font-normal text-muted-foreground">/oy</span>}
                   </div>
@@ -146,20 +144,20 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                 <CardContent className="flex flex-1 flex-col gap-4">
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-muted-foreground" />
                       <span>{formatTokens(planMaxTokens)} AI token/oy</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-muted-foreground" />
                       <span>{planMaxBots === 0 ? "Cheksiz" : planMaxBots} bot</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-muted-foreground" />
                       <span>Vizual konstruktor</span>
                     </li>
                     {p.name !== "free" && (
                       <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-muted-foreground" />
                         <span>Priority support</span>
                       </li>
                     )}
@@ -183,13 +181,13 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
       {/* Payment history */}
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">{t("history")}</h2>
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardContent className="p-0">
             {history.length === 0 ? (
               <p className="py-12 text-center text-sm text-muted-foreground">{t("noHistory")}</p>
             ) : (
               <div className="overflow-x-auto"><table className="w-full min-w-[600px] text-sm">
-                <thead className="border-b bg-muted/30 text-xs uppercase text-muted-foreground">
+                <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
                   <tr>
                     <th className="px-4 py-3 text-left">Sana</th>
                     <th className="px-4 py-3 text-left">Tur</th>
@@ -199,13 +197,13 @@ export default async function BillingPage({ params }: { params: Promise<{ locale
                 </thead>
                 <tbody>
                   {history.map((h) => (
-                    <tr key={h.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                    <tr key={h.id} className="border-b border-border transition-colors last:border-0 hover:bg-muted/30">
                       <td className="px-4 py-3 text-muted-foreground">{h.created_at ?? "—"}</td>
                       <td className="px-4 py-3">
                         {h.type === "income" ? (
-                          <span className="font-medium text-emerald-500">Kirim</span>
+                          <span className="font-medium text-foreground">Kirim</span>
                         ) : h.type === "expense" ? (
-                          <span className="font-medium text-red-500">Chiqim</span>
+                          <span className="font-medium text-muted-foreground">Chiqim</span>
                         ) : (
                           (h.type ?? "—")
                         )}

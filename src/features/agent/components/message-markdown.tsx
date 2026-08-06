@@ -53,7 +53,7 @@ export function MessageMarkdown({ children, className }: Props) {
             const isInline = !/language-/.test(className ?? "");
             if (isInline) {
               return (
-                <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[12px]" {...props}>
+                <code className="rounded bg-muted px-1 py-0.5 font-mono text-[12px]" {...props}>
                   {children}
                 </code>
               );
@@ -65,10 +65,10 @@ export function MessageMarkdown({ children, className }: Props) {
             );
           },
           pre: ({ children }) => (
-            <pre className="my-2 overflow-x-auto rounded-xl bg-muted/70 p-3 text-xs">{children}</pre>
+            <pre className="my-2 overflow-x-auto rounded-md border bg-muted/30 p-3 text-xs">{children}</pre>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="my-2 border-l-2 border-primary/30 pl-3 text-muted-foreground">
+            <blockquote className="my-2 border-l-2 pl-3 text-muted-foreground">
               {children}
             </blockquote>
           ),

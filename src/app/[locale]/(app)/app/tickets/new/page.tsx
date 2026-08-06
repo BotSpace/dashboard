@@ -24,8 +24,8 @@ export default async function NewTicketPage({ params }: { params: Promise<{ loca
           </Button>
         }
       />
-      <Card>
-        <CardContent className="py-6">
+      <Card className="rounded-lg border-border bg-card shadow-none">
+        <CardContent className="py-5">
           <NewTicketForm />
         </CardContent>
       </Card>

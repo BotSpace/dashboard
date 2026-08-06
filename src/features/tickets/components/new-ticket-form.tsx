@@ -47,10 +47,10 @@ export function NewTicketForm() {
         {/* Bitta doimiy input — fayl tanlangach almashtirilmaydi (aks holda yo'qoladi) */}
         <label
           className={cn(
-            "flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-3 text-sm transition-colors",
+            "flex cursor-pointer items-center gap-2 rounded-md border px-3 py-3 text-sm transition-colors",
             fileName
-              ? "border-emerald-500/40 bg-emerald-500/5"
-              : "border-dashed text-muted-foreground hover:border-blue-500/50 hover:bg-muted/30"
+              ? "border-border bg-muted/50 text-foreground"
+              : "border-dashed border-border text-muted-foreground hover:bg-muted/30 hover:text-foreground"
           )}
         >
           <Paperclip className="h-4 w-4 shrink-0" />

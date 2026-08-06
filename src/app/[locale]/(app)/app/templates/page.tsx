@@ -54,28 +54,28 @@ export default async function TemplatesPage({
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         title={t("title")}
         subtitle={t("subtitle")}
         icon={<PackageOpen className="h-5 w-5" />}
       />
 
-      <form className="grid gap-3 md:grid-cols-[1fr_180px_140px_140px_auto]">
+      <form className="grid gap-2 rounded-lg border border-border bg-card p-3 md:grid-cols-[1fr_180px_140px_140px_auto]">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             name="search"
             defaultValue={sp.search ?? ""}
             placeholder={t("search")}
-            className="pl-9 bg-muted/40 focus-visible:bg-background"
+            className="bg-background pl-9"
           />
         </div>
         <div className="relative">
           <select
             name="categories"
             defaultValue={activeCategory}
-            className="h-9 w-full appearance-none rounded-md border border-input bg-muted/40 px-3 pr-8 text-sm text-foreground shadow-xs focus-visible:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-9 w-full appearance-none rounded-md border border-input bg-background px-3 pr-8 text-sm text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <option value="" className="bg-background text-foreground">
               {t("allCategories")}
@@ -102,10 +102,10 @@ export default async function TemplatesPage({
           defaultValue={sp.price_max ?? ""}
           placeholder={t("priceTo")}
         />
-        <div className="flex gap-2">
-          <Button type="submit">{t("filter")}</Button>
+        <div className="flex gap-1.5">
+          <Button type="submit" size="sm">{t("filter")}</Button>
           {hasFilters && (
-            <Button asChild type="button" variant="ghost">
+            <Button asChild type="button" variant="ghost" size="sm">
               <Link href="/app/templates">{t("reset")}</Link>
             </Button>
           )}

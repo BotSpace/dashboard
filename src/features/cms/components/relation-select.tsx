@@ -124,7 +124,7 @@ export function RelationSelect({ projectId, collections, field, value, onChange 
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
+        className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm transition-colors"
         placeholder="ID kiriting…"
       />
     );
@@ -141,7 +141,7 @@ export function RelationSelect({ projectId, collections, field, value, onChange 
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex h-9 w-full items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-1 text-left text-sm shadow-sm transition-colors hover:bg-accent/40"
+        className="flex h-9 w-full items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-1 text-left text-sm transition-colors hover:bg-accent/40"
       >
         <span className={value ? "truncate" : "truncate text-muted-foreground"}>
           {value ? selectedLabel || String(value).slice(-8) : "— tanlang —"}

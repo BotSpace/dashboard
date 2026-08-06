@@ -273,7 +273,7 @@ function FieldControl({
             href={str}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-blue-500 hover:underline"
+            className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:underline"
           >
             <ExternalLink className="h-3 w-3" /> Ochish
           </a>

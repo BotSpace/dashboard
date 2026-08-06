@@ -46,12 +46,12 @@ export function DangerZone({
   };
 
   return (
-    <div className="rounded-xl border border-destructive/30 bg-card transition-colors">
+    <div className="rounded-lg border border-border bg-card transition-colors">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
         aria-expanded={expanded}
-        className="flex w-full items-center justify-between gap-2 p-5 text-left"
+        className="flex w-full items-center justify-between gap-2 p-4 text-left"
       >
         <span className="flex items-center gap-2 font-semibold">
           <AlertTriangle className="h-4 w-4 text-destructive" />
@@ -66,7 +66,7 @@ export function DangerZone({
       </button>
 
       {expanded && (
-        <div className="space-y-4 border-t border-destructive/20 p-5">
+        <div className="space-y-4 border-t border-border p-4">
           <p className="text-sm text-muted-foreground">{t("desc")}</p>
 
           <div className="space-y-2">

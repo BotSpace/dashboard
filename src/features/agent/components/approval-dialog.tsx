@@ -49,19 +49,19 @@ export function ApprovalDialog({ projectId, requestId, payload }: Props) {
         className="flex gap-3"
       >
         {/* Icon avatar */}
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/10">
-          <ShieldAlert className="h-4 w-4 text-amber-500" />
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-muted/30">
+          <ShieldAlert className="h-4 w-4 text-muted-foreground" />
         </div>
 
         {/* Card body */}
-        <div className="min-w-0 flex-1 rounded-2xl border border-amber-500/20 bg-card px-4 py-3 shadow-sm">
+        <div className="min-w-0 flex-1 rounded-lg border bg-card px-4 py-3">
           <p className="mb-1 text-sm font-medium">Tasdiqlash kerak</p>
           <p className="mb-3 text-xs text-muted-foreground">
             Agent quyidagi amalni bajarmoqchi. Ruxsat berasizmi?
           </p>
 
           {/* Tool info */}
-          <div className="mb-3 space-y-1.5 rounded-xl bg-muted/40 px-3 py-2.5 text-xs">
+          <div className="mb-3 space-y-1.5 rounded-md border bg-muted/20 px-3 py-2.5 text-xs">
             {payload.tool_name && (
               <div>
                 <span className="text-muted-foreground">Tool: </span>
@@ -85,7 +85,7 @@ export function ApprovalDialog({ projectId, requestId, payload }: Props) {
             placeholder="Izoh (ixtiyoriy)…"
             rows={2}
             disabled={pending}
-            className="mb-3 w-full resize-none rounded-xl border bg-muted/20 px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/20 disabled:opacity-50"
+            className="mb-3 w-full resize-none rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
           />
 
           {/* Action buttons */}
@@ -95,7 +95,7 @@ export function ApprovalDialog({ projectId, requestId, payload }: Props) {
               size="sm"
               onClick={() => decide(false)}
               disabled={pending}
-              className="flex-1 rounded-xl border-destructive/30 text-destructive hover:border-destructive/60 hover:bg-destructive/5 hover:text-destructive"
+              className="flex-1 rounded-md text-destructive hover:bg-destructive/5 hover:text-destructive"
             >
               <X className="mr-1.5 h-3.5 w-3.5" />
               Rad etish
@@ -104,7 +104,7 @@ export function ApprovalDialog({ projectId, requestId, payload }: Props) {
               size="sm"
               onClick={() => decide(true)}
               disabled={pending}
-              className="flex-1 rounded-xl"
+              className="flex-1 rounded-md"
             >
               <Check className="mr-1.5 h-3.5 w-3.5" />
               Tasdiqlash

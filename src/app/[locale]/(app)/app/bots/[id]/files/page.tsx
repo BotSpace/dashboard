@@ -47,7 +47,7 @@ export default async function BotFilesPage({
   const files = paged.results;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <FileUploader projectId={id} />
 
       {files.length === 0 ? (
@@ -61,7 +61,7 @@ export default async function BotFilesPage({
           <CardContent className="p-0">
             <ul className="divide-y">
               {files.map((f) => (
-                <li key={f.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm transition-colors hover:bg-muted/20">
+                <li key={f.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm transition-colors hover:bg-muted/40">
                   <div className="min-w-0 flex-1">
                     {(() => {
                       const dl = fileDownloadUrl(f.url);
@@ -71,7 +71,7 @@ export default async function BotFilesPage({
                             href={dl}
                             target="_blank"
                             rel="noreferrer"
-                            className="block truncate font-medium hover:underline hover:text-blue-400 transition-colors"
+                            className="block truncate font-medium transition-colors hover:text-foreground hover:underline"
                           >
                             {f.name}
                           </a>

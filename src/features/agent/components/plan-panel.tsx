@@ -8,11 +8,11 @@ import { cn } from "@/shared/lib/utils";
 function StatusIcon({ status }: { status: PlanItem["status"] }) {
   switch (status) {
     case "completed":
-      return <Check className="h-3.5 w-3.5 text-emerald-500" />;
+      return <Check className="h-3.5 w-3.5 text-foreground" />;
     case "in_progress":
-      return <CircleDashed className="h-3.5 w-3.5 animate-pulse text-primary" />;
+      return <CircleDashed className="h-3.5 w-3.5 animate-pulse text-foreground" />;
     case "blocked":
-      return <AlertCircle className="h-3.5 w-3.5 text-amber-500" />;
+      return <AlertCircle className="h-3.5 w-3.5 text-muted-foreground" />;
     default:
       return <Circle className="h-3.5 w-3.5 text-muted-foreground/40" />;
   }
@@ -25,13 +25,13 @@ export function PlanPanel({ plan }: { plan: PlanItem[] }) {
   const done = plan.filter((i) => i.status === "completed").length;
 
   return (
-    <div className="rounded-xl border bg-card/50">
+    <div className="rounded-lg border bg-card">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-xs"
       >
-        <ListChecks className="h-3.5 w-3.5 text-primary" />
+        <ListChecks className="h-3.5 w-3.5 text-muted-foreground" />
         <span className="font-medium">Plan</span>
         <span className="text-muted-foreground">
           {done}/{plan.length}

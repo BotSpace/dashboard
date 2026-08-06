@@ -169,7 +169,7 @@ export function ButtonBuilder({ rows, onRowsChange, disabled }: ButtonBuilderPro
           {rows.map((row, ri) => (
             <div
               key={ri}
-              className="rounded-xl border border-border bg-muted/20 overflow-hidden"
+              className="overflow-hidden rounded-lg border border-border bg-muted/20"
             >
               {/* Row header */}
               <div className="flex items-center justify-between gap-2 px-3 py-2 bg-muted/40 border-b border-border">
@@ -206,8 +206,8 @@ export function ButtonBuilder({ rows, onRowsChange, disabled }: ButtonBuilderPro
                   onClick={() => addBtnToRow(ri)}
                   disabled={disabled}
                   className={cn(
-                    "flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-border py-2 text-xs font-medium text-muted-foreground transition-colors",
-                    "hover:border-primary/40 hover:bg-primary/5 hover:text-primary",
+                    "flex w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-border py-2 text-xs font-medium text-muted-foreground transition-colors",
+                    "hover:border-foreground/20 hover:bg-muted/40 hover:text-foreground",
                     "disabled:pointer-events-none disabled:opacity-50",
                   )}
                 >

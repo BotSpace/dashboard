@@ -47,7 +47,7 @@ export default async function TicketsPage({ params }: { params: Promise<{ locale
           }
         />
       ) : (
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardContent className="p-0">
             <ul className="divide-y">
               {items.map((tk) => {
@@ -57,9 +57,9 @@ export default async function TicketsPage({ params }: { params: Promise<{ locale
                   <li key={tk.id}>
                     <Link
                       href={`/app/tickets/${tk.id}`}
-                      className="flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-muted/30"
+                      className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-muted/40"
                     >
-                      <div className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-blue-500/10 text-blue-500">
+                      <div className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-md border border-border bg-muted/50 text-muted-foreground">
                         <MessageSquare className="h-4 w-4" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -67,7 +67,7 @@ export default async function TicketsPage({ params }: { params: Promise<{ locale
                         {tk.last_message && (
                           <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
                             {tk.last_message.sender === "admin" && (
-                              <span className="font-medium text-blue-500">Support: </span>
+                              <span className="font-medium text-foreground">Support: </span>
                             )}
                             {tk.last_message.message}
                           </p>

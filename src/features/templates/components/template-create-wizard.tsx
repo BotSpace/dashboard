@@ -359,10 +359,10 @@ function StepConfirm({
       : token;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <p className="text-sm text-muted-foreground">{labels.confirmTitle}</p>
 
-      <div className="rounded-xl border bg-muted/30 divide-y">
+      <div className="divide-y divide-border rounded-lg border border-border bg-card">
         {/* Name */}
         <div className="flex items-start justify-between gap-4 px-4 py-3">
           <span className="text-sm text-muted-foreground shrink-0">
@@ -448,7 +448,7 @@ function StepConfirm({
                       {c.label}
                     </span>
                     {credValues[c.key] != null ? (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                      <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-foreground" />
                     ) : (
                       <span className="text-xs text-destructive">—</span>
                     )}
@@ -461,7 +461,7 @@ function StepConfirm({
 
       {/* Modules */}
       {modules.length > 0 && (
-        <div className="rounded-xl border bg-muted/20 p-4 space-y-3">
+        <div className="space-y-3 rounded-lg border border-border bg-card p-4">
           <div className="flex items-center gap-2">
             <Boxes className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">{labels.modulesLabel}</span>
@@ -702,14 +702,14 @@ export function TemplateCreateWizard({
   // ---------------------------------------------------------------------------
 
   return (
-    <div className="mx-auto max-w-lg w-full">
+    <div className="mx-auto w-full max-w-lg">
       <WizardStepper
         steps={steps.map((s) => labels[STEP_LABEL_KEYS[s]])}
         currentIndex={stepIndex}
       />
 
       {/* Step content */}
-      <div className="min-h-[240px]">
+      <div className="min-h-[240px] rounded-lg border border-border bg-card p-4">
         {currentStep === "bot" && (
           <StepBot
             name={name}
@@ -775,7 +775,7 @@ export function TemplateCreateWizard({
           o'zining "Botni ochish" / "Loyihani ochish" tugmalarini ko'rsatadi. */}
       {currentStep !== "launch" && (
         <>
-          <Separator className="my-6" />
+          <Separator className="my-4" />
 
           {/* Navigation */}
           <div className="flex items-center justify-between gap-3">

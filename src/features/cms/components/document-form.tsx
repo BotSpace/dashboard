@@ -67,7 +67,7 @@ export function DocumentForm({ projectId, collectionName, fields, collections }:
         disabled={pending}
       />
 
-      <div className="sticky bottom-0 -mx-5 -mb-5 flex items-center justify-end gap-2 rounded-b-xl border-t bg-card/95 px-5 pb-5 pt-3 backdrop-blur">
+      <div className="sticky bottom-0 -mx-5 -mb-5 flex items-center justify-end gap-2 rounded-b-lg border-t border-border bg-card px-5 pb-5 pt-3">
         <Button variant="ghost" onClick={() => router.back()} disabled={pending}>
           Bekor
         </Button>

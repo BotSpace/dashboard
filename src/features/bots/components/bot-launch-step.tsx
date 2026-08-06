@@ -46,7 +46,7 @@ export function BotLaunchStep({ state, project, labels }: BotLaunchStepProps) {
   if (state === "starting") {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-14 text-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
         <p className="text-sm font-medium">{labels.launchStartingTitle}</p>
         <p className="text-xs text-muted-foreground">{labels.launchStartingText}</p>
       </div>
@@ -76,7 +76,7 @@ export function BotLaunchStep({ state, project, labels }: BotLaunchStepProps) {
   if (state === "failed" || state === "timeout") {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-        <AlertTriangle className="h-8 w-8 text-amber-500" />
+        <AlertTriangle className="h-7 w-7 text-muted-foreground" />
         <p className="text-sm font-medium">
           {state === "failed" ? labels.launchFailedTitle : labels.launchTimeoutTitle}
         </p>
@@ -96,8 +96,8 @@ export function BotLaunchStep({ state, project, labels }: BotLaunchStepProps) {
   // running
   return (
     <div className="flex flex-col items-center gap-4 py-6 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10">
-        <CheckCircle2 className="h-7 w-7 text-emerald-500" />
+      <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-muted">
+        <CheckCircle2 className="h-6 w-6 text-foreground" />
       </div>
       <div className="space-y-1">
         <p className="text-base font-semibold">{labels.launchRunningTitle}</p>

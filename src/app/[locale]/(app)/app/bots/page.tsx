@@ -51,12 +51,12 @@ export default async function BotsPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         title={t("title")}
         subtitle={`${totalItems} ${t("title").toLowerCase()}`}
         actions={
-          <Button asChild className="gap-2 shadow-sm shadow-blue-500/20">
+          <Button asChild className="gap-2">
             <Link href="/app/bots/new?src=bots-header">
               <Plus className="h-4 w-4" /> {t("new")}
             </Link>
@@ -66,7 +66,7 @@ export default async function BotsPage({
 
       <form className="relative max-w-md">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input name="q" defaultValue={q} placeholder={t("search")} className="pl-9 bg-muted/40 focus-visible:bg-background" />
+        <Input name="q" defaultValue={q} placeholder={t("search")} className="bg-background pl-9" />
         {/* Reset page on new search */}
         <input type="hidden" name="page" value="1" />
       </form>
@@ -85,19 +85,19 @@ export default async function BotsPage({
         />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {bots.map((b) => (
               <Link
                 key={b.id}
                 href={`/app/bots/${b.id}`}
-                className="group min-w-0 rounded-xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:border-blue-500/30 hover:shadow-md hover:shadow-blue-500/5"
+                className="group min-w-0 rounded-lg border border-border bg-card p-4 transition-colors hover:border-foreground/20 hover:bg-muted/30"
               >
                 <div className="flex items-start justify-between">
-                  <Avatar className="h-12 w-12 ring-2 ring-border/40 transition-all group-hover:ring-blue-500/20">
+                  <Avatar className="h-10 w-10 border border-border">
                     <AvatarFallback className="text-xs font-semibold">{initials(b.name)}</AvatarFallback>
                   </Avatar>
                 </div>
-                <div className="mt-4 truncate text-base font-semibold leading-tight">{b.name}</div>
+                <div className="mt-3 truncate text-sm font-semibold leading-tight">{b.name}</div>
                 <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                   {b.description ?? (b.username ? `@${b.username}` : "—")}
                 </div>

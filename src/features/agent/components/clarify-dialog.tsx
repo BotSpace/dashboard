@@ -81,12 +81,12 @@ export function ClarifyDialog({ projectId, requestId, payload }: Props) {
         className="flex gap-3"
       >
         {/* Bot avatar */}
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
-          <HelpCircle className="h-4 w-4 text-primary" />
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-muted/30">
+          <HelpCircle className="h-4 w-4 text-muted-foreground" />
         </div>
 
         {/* Card body */}
-        <div className="min-w-0 flex-1 rounded-2xl border border-primary/20 bg-card px-4 py-3 shadow-sm">
+        <div className="min-w-0 flex-1 rounded-lg border bg-card px-4 py-3">
           {/* Question */}
           <p className="mb-3 text-sm leading-relaxed">
             {payload.question ?? "Agent qo'shimcha ma'lumot kutmoqda"}
@@ -94,7 +94,7 @@ export function ClarifyDialog({ projectId, requestId, payload }: Props) {
 
           {/* --- text input --- */}
           {inputType === "text" && (
-            <div className="flex items-end gap-2 rounded-xl border bg-muted/30 px-3 py-2">
+            <div className="flex items-end gap-2 rounded-md border bg-background px-3 py-2">
               <textarea
                 value={textValue}
                 onChange={(e) => setTextValue(e.target.value)}
@@ -129,10 +129,10 @@ export function ClarifyDialog({ projectId, requestId, payload }: Props) {
                   <label
                     key={option}
                     className={cn(
-                      "flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition-colors",
+                      "flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 text-sm transition-colors",
                       selectedSingle === option
-                        ? "border-primary/50 bg-primary/5 text-foreground"
-                        : "border-border bg-muted/20 text-muted-foreground hover:border-primary/30 hover:bg-primary/5 hover:text-foreground"
+                        ? "border-foreground bg-muted/40 text-foreground"
+                        : "border-border bg-card text-muted-foreground hover:border-foreground/20 hover:bg-muted/20 hover:text-foreground"
                     )}
                   >
                     {/* Custom radio */}
@@ -166,7 +166,7 @@ export function ClarifyDialog({ projectId, requestId, payload }: Props) {
                   onClick={submit}
                   disabled={pending || !isSubmittable()}
                   size="sm"
-                  className="rounded-xl"
+                  className="rounded-md"
                 >
                   <Send className="mr-1.5 h-3.5 w-3.5" />
                   Yuborish
@@ -185,10 +185,10 @@ export function ClarifyDialog({ projectId, requestId, payload }: Props) {
                     <label
                       key={option}
                       className={cn(
-                        "flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition-colors",
+                        "flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 text-sm transition-colors",
                         checked
-                          ? "border-primary/50 bg-primary/5 text-foreground"
-                          : "border-border bg-muted/20 text-muted-foreground hover:border-primary/30 hover:bg-primary/5 hover:text-foreground"
+                          ? "border-foreground bg-muted/40 text-foreground"
+                          : "border-border bg-card text-muted-foreground hover:border-foreground/20 hover:bg-muted/20 hover:text-foreground"
                       )}
                     >
                       {/* Custom checkbox */}
@@ -237,7 +237,7 @@ export function ClarifyDialog({ projectId, requestId, payload }: Props) {
                   onClick={submit}
                   disabled={pending}
                   size="sm"
-                  className="rounded-xl"
+                  className="rounded-md"
                 >
                   <Send className="mr-1.5 h-3.5 w-3.5" />
                   Yuborish

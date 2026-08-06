@@ -25,7 +25,7 @@ export default async function BotLayout({
   if (!bot) notFound();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Link
         href="/app/bots"
         className="inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -34,8 +34,8 @@ export default async function BotLayout({
         {tNav("bots")}
       </Link>
 
-      <header className="flex flex-wrap items-center gap-4 rounded-xl border border-border/60 bg-card p-5">
-        <Avatar className="h-14 w-14 ring-2 ring-blue-500/20 shrink-0">
+      <header className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
+        <Avatar className="h-11 w-11 shrink-0 border border-border">
           <AvatarFallback className="text-sm font-semibold">{initials(bot.name)}</AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
@@ -55,7 +55,7 @@ export default async function BotLayout({
       </header>
 
       <BotTabs id={id} />
-      <div className="pt-6">{children}</div>
+      <div className="pt-3">{children}</div>
     </div>
   );
 }

@@ -182,7 +182,7 @@ export function ChatPanel(props: Props) {
     return (
       <div className="grid h-full place-items-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-pulse rounded-2xl bg-primary/10" />
+          <div className="h-8 w-8 animate-pulse rounded-md border bg-muted/40" />
           <span className="text-sm text-muted-foreground">Yuklanmoqda…</span>
         </div>
       </div>
@@ -280,7 +280,7 @@ function ChatPanelInner({ projectId, projects, initialPrompt }: Props) {
   };
 
   return (
-    <div className="relative flex h-full overflow-hidden rounded-xl border bg-background">
+    <div className="relative flex h-full overflow-hidden rounded-lg border bg-background">
       {/* Desktop sidebar */}
       <div className="hidden w-64 shrink-0 border-r md:block">
         <ThreadsSidebar
@@ -695,8 +695,8 @@ function ChatThread({
         </Button>
 
         <div className="hidden items-center gap-2 md:flex">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
-            <Sparkles className="h-3.5 w-3.5 text-primary" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-md border bg-muted/30">
+            <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
           </div>
           <span className="text-sm font-semibold">BotSpace Agent</span>
         </div>
@@ -781,8 +781,8 @@ function ChatThread({
               )}
 
               {stream.error && (
-                <div className="mx-auto flex max-w-xl items-start gap-3 rounded-2xl border border-destructive/20 bg-destructive/[0.04] px-4 py-3.5">
-                  <div className="mt-0.5 rounded-full bg-destructive/10 p-1.5 text-destructive">
+                <div className="mx-auto flex max-w-xl items-start gap-3 rounded-lg border bg-card px-4 py-3">
+                  <div className="mt-0.5 rounded-md border bg-muted/20 p-1.5 text-destructive">
                     <CircleStop className="h-4 w-4" />
                   </div>
                   <div className="min-w-0">
@@ -797,8 +797,8 @@ function ChatThread({
               )}
 
               {stream.cancelled && (
-                <div className="mx-auto flex max-w-xl items-center gap-3 rounded-2xl border bg-muted/25 px-4 py-3.5 text-muted-foreground">
-                  <div className="rounded-full border bg-background p-1.5">
+                <div className="mx-auto flex max-w-xl items-center gap-3 rounded-lg border bg-card px-4 py-3 text-muted-foreground">
+                  <div className="rounded-md border bg-muted/20 p-1.5">
                     <CircleStop className="h-4 w-4" />
                   </div>
                   <div>
@@ -813,7 +813,7 @@ function ChatThread({
               )}
 
               {stream.reconnecting && !stream.finished && (
-                <div className="mx-auto flex max-w-xl items-center gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/[0.04] px-4 py-3 text-amber-700 dark:text-amber-300">
+                <div className="mx-auto flex max-w-xl items-center gap-3 rounded-lg border bg-card px-4 py-3 text-muted-foreground">
                   <RefreshCw className="h-4 w-4 animate-spin" />
                   <div>
                     <p className="text-sm font-medium">Qayta ulanmoqda…</p>
@@ -825,8 +825,8 @@ function ChatThread({
               )}
 
               {stream.connectionError && !stream.finished && (
-                <div className="mx-auto flex max-w-xl items-start gap-3 rounded-2xl border border-destructive/20 bg-destructive/[0.04] px-4 py-3.5">
-                  <div className="mt-0.5 rounded-full bg-destructive/10 p-1.5 text-destructive">
+                <div className="mx-auto flex max-w-xl items-start gap-3 rounded-lg border bg-card px-4 py-3">
+                  <div className="mt-0.5 rounded-md border bg-muted/20 p-1.5 text-destructive">
                     <RefreshCw className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -865,7 +865,7 @@ function ChatThread({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8 rounded-full shadow-md"
+                className="h-8 w-8 rounded-md"
                 onClick={() => scrollToBottom()}
               >
                 <ArrowDown className="h-4 w-4" />
@@ -879,15 +879,15 @@ function ChatThread({
       <div className="border-t bg-background px-3 pb-3 pt-2 sm:px-6 sm:pb-4 sm:pt-3">
         <div className="mx-auto max-w-3xl xl:max-w-5xl 2xl:max-w-6xl">
           {mode === "plan" && isRunning && !pendingPlan && (
-            <div className="mb-2 flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-1.5 text-xs text-amber-600 dark:text-amber-400">
+            <div className="mb-2 flex items-center gap-2 rounded-md border bg-muted/20 px-3 py-1.5 text-xs text-muted-foreground">
               <ClipboardList className="h-3.5 w-3.5 animate-pulse" />
               Reja tuzilmoqda…
             </div>
           )}
           {pendingPlan && (
-            <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border bg-muted/30 px-3 py-2">
+            <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-md border bg-muted/20 px-3 py-2">
               <div className="flex items-center gap-2">
-                <ClipboardList className="h-4 w-4 shrink-0 text-amber-500" />
+                <ClipboardList className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <span className="text-xs font-medium">Reja tayyor</span>
                 <span className="text-xs text-muted-foreground">
                   — bajaraymi?
@@ -920,9 +920,8 @@ function ChatThread({
           )}
           <div
             className={cn(
-              "flex items-end gap-2 rounded-2xl border bg-card px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md focus-within:ring-2 focus-within:ring-ring/20",
-              mode === "plan" && "border-amber-500/50 ring-1 ring-amber-500/30",
-              mode === "full" && "border-red-500/50 ring-1 ring-red-500/30",
+              "flex items-end gap-2 rounded-lg border bg-card px-3 py-2 transition-colors focus-within:border-foreground/30 focus-within:ring-1 focus-within:ring-ring",
+              mode !== "agent" && "bg-muted/20",
             )}
           >
             <Select
@@ -932,10 +931,8 @@ function ChatThread({
               <SelectTrigger
                 title="Rejim: Agent (oddiy) / Plan (avval reja) / Full (barchasiga ruxsat)"
                 className={cn(
-                  "h-8 w-auto shrink-0 gap-1 rounded-xl border-none bg-transparent px-2 text-xs font-medium shadow-none focus:ring-0 focus:ring-offset-0 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:opacity-60",
-                  mode === "plan" && "text-amber-600 dark:text-amber-400",
-                  mode === "full" && "text-red-600 dark:text-red-400",
-                  mode === "agent" && "text-muted-foreground",
+                  "h-8 w-auto shrink-0 gap-1 rounded-md border-none bg-transparent px-2 text-xs font-medium text-muted-foreground shadow-none focus:ring-0 focus:ring-offset-0 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:opacity-60",
+                  mode !== "agent" && "text-foreground",
                 )}
               >
                 {mode === "plan" ? (
@@ -1005,7 +1002,7 @@ function ChatThread({
                 disabled={pending}
                 size="icon"
                 variant="destructive"
-                className="h-8 w-8 shrink-0 rounded-xl"
+                className="h-8 w-8 shrink-0 rounded-md"
                 aria-label="To'xtatish"
               >
                 <Square className="h-3.5 w-3.5 fill-current" />
@@ -1015,7 +1012,7 @@ function ChatThread({
                 onClick={() => send()}
                 disabled={!input.trim() || pending}
                 size="icon"
-                className="h-8 w-8 shrink-0 rounded-xl"
+                className="h-8 w-8 shrink-0 rounded-md"
                 aria-label="Yuborish"
               >
                 {pending ? (
@@ -1043,7 +1040,7 @@ function ChatThread({
                 <span
                   className={cn(
                     "flex items-center gap-1 tabular-nums",
-                    stream.liveTokens > 0 && "text-emerald-500",
+                    stream.liveTokens > 0 && "text-foreground",
                   )}
                   title={`Shu sessiyada ishlatilgan token (realtime): ${t.toLocaleString()}`}
                 >
@@ -1085,7 +1082,7 @@ function ChatThread({
             )}
             {queue.length > 0 && (
               <span
-                className="flex items-center gap-1 text-sky-500"
+                className="flex items-center gap-1 text-foreground"
                 title="Navbatdagi xabarlar"
               >
                 <ListPlus className="h-3 w-3 shrink-0" />
@@ -1104,29 +1101,20 @@ function ChatThread({
             {isRunning &&
               stream.phase !== "waiting" &&
               (() => {
-                // Priority: executing tool (amber) → tool being composed
-                // mid-stream (sky "🔧 … yozilmoqda") → default reply (emerald).
+                // Keep the compact run state visible without introducing decorative color.
                 const tool = stream.currentTool;
                 const pending = !tool ? stream.pendingTool : null;
                 return (
                   <span
                     className={cn(
                       "flex min-w-0 max-w-full shrink items-center gap-1.5",
-                      tool
-                        ? "text-amber-500/90"
-                        : pending
-                          ? "text-sky-500/90"
-                          : "text-emerald-500",
+                      "text-foreground",
                     )}
                   >
                     <span
                       className={cn(
                         "inline-block h-1.5 w-1.5 shrink-0 animate-pulse rounded-full",
-                        tool
-                          ? "bg-amber-400"
-                          : pending
-                            ? "bg-sky-400"
-                            : "bg-emerald-500",
+                        "bg-foreground",
                       )}
                     />
                     {tool ? (
@@ -1164,8 +1152,8 @@ function ChatThread({
 
 function BotAvatar() {
   return (
-    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5">
-      <Bot className="h-4 w-4 text-primary" />
+    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-muted/30">
+      <Bot className="h-4 w-4 text-muted-foreground" />
     </div>
   );
 }
@@ -1178,7 +1166,7 @@ function UserMessage({ text }: { text: string }) {
       transition={{ duration: 0.2 }}
       className="flex gap-3"
     >
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-muted/30">
         <User className="h-4 w-4 text-muted-foreground" />
       </div>
       <div className="min-w-0 flex-1 pt-1">
@@ -1304,8 +1292,8 @@ function EmptyState({
         transition={{ duration: 0.3 }}
         className="flex flex-col items-center"
       >
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent sm:h-20 sm:w-20">
-          <Sparkles className="h-8 w-8 text-primary sm:h-10 sm:w-10" />
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border bg-muted/30 sm:h-14 sm:w-14">
+          <Sparkles className="h-6 w-6 text-muted-foreground sm:h-7 sm:w-7" />
         </div>
         <h2 className="mb-1 text-lg font-semibold sm:text-xl">
           BotSpace Agent
@@ -1320,7 +1308,7 @@ function EmptyState({
               key={s}
               type="button"
               onClick={() => onSend(s)}
-              className="rounded-xl border bg-card px-4 py-3 text-left text-sm text-muted-foreground transition-all hover:border-primary/30 hover:bg-primary/5 hover:text-foreground active:scale-[0.98]"
+              className="rounded-md border bg-card px-3 py-2.5 text-left text-sm text-muted-foreground transition-colors hover:border-foreground/20 hover:bg-muted/20 hover:text-foreground"
             >
               {s}
             </button>

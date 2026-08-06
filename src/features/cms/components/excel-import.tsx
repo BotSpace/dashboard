@@ -302,7 +302,7 @@ export function ExcelImportButton({ projectId, collectionName, fields, onImporte
                           </select>
                         </div>
                         {field ? (
-                          <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-foreground" />
                         ) : (
                           <X className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                         )}
@@ -376,7 +376,7 @@ export function ExcelImportButton({ projectId, collectionName, fields, onImporte
           {done !== null && (
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                <CheckCircle2 className="h-4 w-4 text-foreground" />
                 <span>
                   {t("importDone", {
                     ok: done,

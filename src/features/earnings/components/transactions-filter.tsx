@@ -36,10 +36,10 @@ export function TransactionsFilter({ bots, selected }: { bots: BotOption[]; sele
         type="button"
         onClick={() => push(new Set())}
         className={cn(
-          "rounded-full border px-3 py-1 text-xs transition-colors",
+          "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors",
           current.size === 0
-            ? "border-blue-500/40 bg-blue-500/10 text-blue-400"
-            : "border-border text-muted-foreground hover:bg-muted/50"
+            ? "border-foreground bg-foreground text-background"
+            : "border-border bg-background text-muted-foreground hover:bg-muted/50 hover:text-foreground"
         )}
       >
         Hammasi
@@ -52,10 +52,10 @@ export function TransactionsFilter({ bots, selected }: { bots: BotOption[]; sele
             type="button"
             onClick={() => toggle(b.id)}
             className={cn(
-              "rounded-full border px-3 py-1 text-xs transition-colors",
+              "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors",
               active
-                ? "border-blue-500/40 bg-blue-500/10 text-blue-400"
-                : "border-border text-muted-foreground hover:bg-muted/50"
+                ? "border-foreground bg-foreground text-background"
+                : "border-border bg-background text-muted-foreground hover:bg-muted/50 hover:text-foreground"
             )}
           >
             {b.name}

@@ -71,7 +71,7 @@ export function EditableCredentialName({ id, initialName }: EditableCredentialNa
         disabled={pending}
         // size-based width (not w-full) so the input matches the text and the type
         // badge beside it never reflows when entering edit mode.
-        className="max-w-full text-2xl font-semibold tracking-tight bg-transparent border-b border-border outline-none disabled:opacity-60"
+        className="max-w-full border-b border-border bg-transparent text-xl font-semibold tracking-tight outline-none disabled:opacity-60"
       />
     );
   }
@@ -82,7 +82,7 @@ export function EditableCredentialName({ id, initialName }: EditableCredentialNa
       onClick={startEditing}
       className="group inline-flex items-center gap-1.5 min-w-0 text-left"
     >
-      <span className="truncate text-2xl font-semibold tracking-tight">{initialName}</span>
+      <span className="truncate text-xl font-semibold tracking-tight">{initialName}</span>
       <Pencil className="h-4 w-4 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
     </button>
   );

@@ -111,22 +111,22 @@ export function Spotlight(props: SpotlightProps) {
       initial={{ opacity: 0, y: 6, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="rounded-xl border border-cyan-300/25 bg-[#171717] p-4 text-white shadow-2xl shadow-black/40"
+      className="rounded-lg border border-border bg-popover p-4 text-popover-foreground shadow-2xl"
     >
       <div className="mb-2 flex items-center gap-2">
-        <span className="text-[11px] font-medium tabular-nums text-cyan-300">
+        <span className="text-[11px] font-medium tabular-nums text-muted-foreground">
           {props.index + 1} / {props.total}
         </span>
         <button
           onClick={props.onSkip}
           aria-label={props.skipLabel}
-          className="-mr-1 ml-auto rounded-md p-1 text-zinc-500 transition hover:bg-white/10 hover:text-white"
+          className="-mr-1 ml-auto rounded-md p-1 text-muted-foreground transition hover:bg-accent hover:text-foreground"
         >
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
-      <h3 className="text-sm font-semibold text-white">{props.title}</h3>
-      <p className="mt-1 text-[13px] leading-relaxed text-zinc-400">{props.body}</p>
+      <h3 className="text-sm font-semibold text-foreground">{props.title}</h3>
+      <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{props.body}</p>
 
       <div className="mt-4 flex items-center justify-between gap-2">
         <div className="flex gap-1.5">
@@ -135,7 +135,7 @@ export function Spotlight(props: SpotlightProps) {
               key={i}
               className={cn(
                 "h-1.5 rounded-full transition-all",
-                i === props.index ? "w-4 bg-cyan-300" : "w-1.5 bg-zinc-700"
+                i === props.index ? "w-4 bg-foreground" : "w-1.5 bg-muted"
               )}
             />
           ))}
@@ -144,7 +144,7 @@ export function Spotlight(props: SpotlightProps) {
           {props.index > 0 && (
             <button
               onClick={props.onPrev}
-              className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-400 transition hover:bg-white/10 hover:text-white"
+              className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               {props.backLabel}
@@ -152,7 +152,7 @@ export function Spotlight(props: SpotlightProps) {
           )}
           <button
             onClick={props.onNext}
-            className="inline-flex items-center gap-1 rounded-md bg-cyan-300 px-3 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-cyan-200"
+            className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:bg-primary/90"
           >
             {props.isLast ? props.doneLabel : props.nextLabel}
             {!props.isLast && <ArrowRight className="h-3.5 w-3.5" />}
@@ -173,7 +173,7 @@ export function Spotlight(props: SpotlightProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
-          className="pointer-events-auto absolute rounded-lg ring-2 ring-blue-500/70"
+          className="pointer-events-auto absolute rounded-lg ring-2 ring-foreground/70"
           style={{
             top: cut.top,
             left: cut.left,

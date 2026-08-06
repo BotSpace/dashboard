@@ -121,23 +121,19 @@ function TypePicker({
           <div className="grid grid-cols-2 gap-2">
             {filtered.map((type) => {
               const Icon = getTypeIcon(type.icon);
-              const color = type.color || undefined;
               return (
                 <button
                   key={type.key}
                   type="button"
                   onClick={() => onSelect(type)}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-lg border p-3 text-left",
-                    "transition-colors hover:border-primary/40 hover:bg-muted/50",
+                    "flex items-center gap-2.5 rounded-md border border-border bg-card p-2.5 text-left",
+                    "transition-colors hover:bg-muted/50",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   )}
                 >
-                  <div
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted"
-                    style={color ? { backgroundColor: `${color}1A` } : undefined}
-                  >
-                    <Icon className="h-5 w-5" style={color ? { color } : undefined} />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-muted/50 text-muted-foreground">
+                    <Icon className="h-4 w-4" />
                   </div>
                   <span className="line-clamp-2 text-[12px] font-medium leading-tight">
                     {type.label}
@@ -524,14 +520,14 @@ function OAuthConnect({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col items-center justify-center gap-5 py-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-xl border bg-muted">
-          <Icon className="h-7 w-7 text-foreground" />
+      <div className="flex flex-col items-center justify-center gap-4 py-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-border bg-muted/50">
+          <Icon className="h-6 w-6 text-muted-foreground" />
         </div>
 
         {isReconnect ? (
           <div className="flex flex-col items-center gap-1 text-center">
-            <div className="flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400">
+            <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
               <CheckCircle2 className="h-4 w-4" />
               <span>Ulangan</span>
             </div>

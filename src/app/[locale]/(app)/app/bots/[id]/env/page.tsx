@@ -13,7 +13,7 @@ export default async function EnvPage({
   setRequestLocale(locale);
   const items = await EnvAPI.list(id).catch(() => []);
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         icon={<KeyRound className="h-5 w-5" />}
         title="Muhit o'zgaruvchilari"

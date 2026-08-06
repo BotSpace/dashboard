@@ -6,14 +6,14 @@ import type { DashboardOverview } from "@/shared/types/api";
 
 type Distribution = DashboardOverview["distribution"];
 
-const COLORS = ["#3b82f6", "#6366f1", "#d946ef", "#6b7280"];
+const COLORS = ["#ededed", "#8f8f8f", "#525252", "#262626"];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-blue-500/20 bg-[#0f0f18] px-3 py-2 shadow-xl">
-      <p className="text-xs text-slate-400">{payload[0].name}</p>
+    <div className="rounded-md border border-border bg-popover px-3 py-2 shadow-xl">
+      <p className="text-xs text-muted-foreground">{payload[0].name}</p>
       <p className="text-sm font-semibold" style={{ color: payload[0].payload.color }}>
         {payload[0].value}%
       </p>
@@ -51,7 +51,7 @@ export function AnalyticsDonut({ distribution }: AnalyticsDonutProps) {
   if (total === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40">
+        <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-muted/40">
           <PieChartIcon className="h-5 w-5 text-muted-foreground" />
         </div>
         <p className="text-sm text-muted-foreground">Analitika ma&apos;lumoti yo&apos;q</p>
@@ -88,7 +88,7 @@ export function AnalyticsDonut({ distribution }: AnalyticsDonutProps) {
 
         {/* Center label */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xl font-bold">{centerLabel}</span>
+          <span className="text-xl font-semibold tabular-nums">{centerLabel}</span>
           <span className="text-[10px] text-muted-foreground">Jami foydalanuvchi</span>
         </div>
       </div>
@@ -99,7 +99,7 @@ export function AnalyticsDonut({ distribution }: AnalyticsDonutProps) {
           <div key={item.name} className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
               <span
-                className="inline-block h-2.5 w-2.5 rounded-full"
+                className="inline-block h-2 w-2 rounded-sm"
                 style={{ backgroundColor: item.color }}
               />
               <span className="text-muted-foreground">{item.name}</span>

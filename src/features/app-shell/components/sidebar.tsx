@@ -11,7 +11,7 @@ import {
   LifeBuoy,
   PackageOpen,
   Settings,
-  Sparkles,
+  ArrowUpRight,
   TrendingUp,
   Wand2,
   Plug,
@@ -23,7 +23,7 @@ import { cn } from "@/shared/lib/utils";
 
 type Item = { href: string; icon: typeof LayoutDashboard; key: string };
 
-export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+export function SidebarContent({ onNavigateAction }: { onNavigateAction?: () => void }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const locale = useLocale();
@@ -52,13 +52,13 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className="flex items-center px-4 py-4">
-        <Link href="/app" aria-label="BotSpace" onClick={onNavigate} className="block max-w-[160px]">
+      <div className="flex h-12 items-center px-3">
+        <Link href="/app" aria-label="BotSpace" onClick={onNavigateAction} className="block max-w-33">
           <Logo className="w-full" />
         </Link>
       </div>
       <Separator />
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
         {main.map((i) => (
           <NavLink
             key={i.key}
@@ -66,11 +66,11 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             icon={i.icon}
             label={t(i.key)}
             active={isActive(i.href)}
-            onClick={onNavigate}
+            onClick={onNavigateAction}
             tourId={`nav-${i.key}`}
           />
         ))}
-        <div className="my-3 px-3 pt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+        <div className="mb-1 mt-4 px-2 text-[11px] font-medium text-muted-foreground">
           {t("settings")}
         </div>
         <div className="space-y-0.5">
@@ -81,60 +81,44 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               icon={i.icon}
               label={t(i.key)}
               active={isActive(i.href)}
-              onClick={onNavigate}
+              onClick={onNavigateAction}
             />
           ))}
         </div>
 
         {/* MCP section — separated, near the bottom */}
-        <div className="mt-4 border-t border-border/60 pt-3">
+        <div className="mt-4 border-t border-border pt-3">
           <Link
             href="/docs/mcp"
-            onClick={onNavigate}
+            onClick={onNavigateAction}
             className={cn(
-              "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+              "flex h-8 items-center gap-2 rounded-md px-2 text-sm transition-colors",
               pathname.includes("/docs/mcp")
-                ? "bg-violet-500/10 text-violet-400 font-medium"
-                : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground"
+                ? "bg-sidebar-accent text-foreground"
+                : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
             )}
           >
-            {pathname.includes("/docs/mcp") && (
-              <span
-                className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-violet-500"
-                aria-hidden="true"
-              />
-            )}
-            <Plug
-              className={cn(
-                "h-4 w-4 shrink-0",
-                pathname.includes("/docs/mcp") ? "text-violet-400" : ""
-              )}
-            />
+            <Plug className="h-4 w-4 shrink-0" />
             {t("mcp")}
             <span
-              className="ml-auto rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider"
-              style={{
-                background: "rgba(139,92,246,0.15)",
-                color: "rgba(167,139,250,0.9)",
-                border: "1px solid rgba(139,92,246,0.25)",
-              }}
+              className="ml-auto rounded border border-border bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground"
             >
               MCP
             </span>
           </Link>
         </div>
       </nav>
-      <div className="px-3 pb-4">
+      <div className="border-t border-border p-2">
         <Link
           href="/app/billing"
-          onClick={onNavigate}
-          className="block rounded-xl border border-primary/30 bg-gradient-to-br from-primary/10 to-fuchsia-500/10 p-4 transition hover:from-primary/15"
+          onClick={onNavigateAction}
+          className="group block rounded-md border border-border bg-card p-3 transition-colors hover:bg-accent"
         >
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" />
+          <div className="flex items-center justify-between gap-2">
             <span className="text-sm font-medium">{t("upgradeTitle")}</span>
+            <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">{t("upgradeDesc")}</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">{t("upgradeDesc")}</p>
         </Link>
       </div>
     </div>
@@ -143,7 +127,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
 export function Sidebar() {
   return (
-    <aside className="sticky top-0 hidden h-svh w-64 shrink-0 border-r lg:flex lg:flex-col">
+    <aside className="sticky top-0 hidden h-svh w-55 shrink-0 border-r border-sidebar-border lg:flex lg:flex-col">
       <SidebarContent />
     </aside>
   );
@@ -170,19 +154,13 @@ function NavLink({
       onClick={onClick}
       data-tour={tourId}
       className={cn(
-        "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+        "flex h-8 items-center gap-2 rounded-md px-2 text-sm transition-colors",
         active
-          ? "bg-blue-500/10 text-blue-400 font-medium"
-          : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground"
+          ? "bg-sidebar-accent font-medium text-foreground"
+          : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
       )}
     >
-      {active && (
-        <span
-          className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-blue-500"
-          aria-hidden="true"
-        />
-      )}
-      <Icon className={cn("h-4 w-4 shrink-0", active && "text-blue-400")} />
+      <Icon className="h-4 w-4 shrink-0" />
       {label}
     </Link>
   );

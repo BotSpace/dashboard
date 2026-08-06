@@ -48,9 +48,9 @@ export function BotPerformanceChart({ data, labels }: BotPerformanceChartProps) 
   function CustomTooltip({ active, payload, label }: any) {
     if (!active || !payload?.length) return null;
     return (
-      <div className="rounded-lg border border-blue-500/20 bg-[#0f0f18] px-3 py-2 shadow-xl">
-        <p className="mb-1 text-xs text-slate-400">{label}</p>
-        <p className="text-sm font-semibold text-blue-300">
+      <div className="rounded-md border border-border bg-popover px-3 py-2 shadow-xl">
+        <p className="mb-1 text-xs text-muted-foreground">{label}</p>
+        <p className="text-sm font-semibold text-foreground">
           {formatY(payload[0].value)} {labels.msgUnit}
         </p>
       </div>
@@ -68,8 +68,8 @@ export function BotPerformanceChart({ data, labels }: BotPerformanceChartProps) 
 
   if (chartData.length === 0) {
     return (
-      <div className="flex h-[220px] flex-col items-center justify-center gap-3 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40">
+      <div className="flex h-55 flex-col items-center justify-center gap-3 text-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-muted/40">
           <TrendingUp className="h-5 w-5 text-muted-foreground" />
         </div>
         <div>
@@ -78,7 +78,7 @@ export function BotPerformanceChart({ data, labels }: BotPerformanceChartProps) 
         </div>
         <Link
           href="/app/bots/new?src=chart-empty"
-          className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-3 py-1.5 text-xs font-medium text-blue-400 transition-colors hover:bg-blue-500/20"
+          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
         >
           <Plus className="h-3.5 w-3.5" />
           {labels.emptyCta}
@@ -92,13 +92,13 @@ export function BotPerformanceChart({ data, labels }: BotPerformanceChartProps) 
       <AreaChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
         <defs>
           <linearGradient id="perfGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.35} />
-            <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+            <stop offset="0%" stopColor="#ededed" stopOpacity={0.18} />
+            <stop offset="100%" stopColor="#ededed" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid
           strokeDasharray="3 3"
-          stroke="rgba(255,255,255,0.05)"
+          stroke="rgba(255,255,255,0.08)"
           vertical={false}
         />
         <XAxis
@@ -117,16 +117,16 @@ export function BotPerformanceChart({ data, labels }: BotPerformanceChartProps) 
         />
         <Tooltip
           content={<CustomTooltip />}
-          cursor={{ stroke: "rgba(59,130,246,0.3)", strokeWidth: 1 }}
+          cursor={{ stroke: "rgba(255,255,255,0.22)", strokeWidth: 1 }}
         />
         <Area
           type="monotone"
           dataKey="messages"
-          stroke="#3b82f6"
+          stroke="#ededed"
           strokeWidth={2}
           fill="url(#perfGrad)"
           dot={false}
-          activeDot={{ r: 4, fill: "#3b82f6", stroke: "#fff", strokeWidth: 2 }}
+          activeDot={{ r: 4, fill: "#000", stroke: "#ededed", strokeWidth: 2 }}
         />
       </AreaChart>
     </ResponsiveContainer>

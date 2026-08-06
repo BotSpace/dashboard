@@ -186,7 +186,7 @@ function StepConfirm({ name, description, token, botMode, managedBot, labels }: 
     <div className="space-y-5">
       <p className="text-sm text-muted-foreground">{labels.confirmTitle}</p>
 
-      <div className="rounded-xl border bg-muted/30 divide-y">
+      <div className="divide-y rounded-lg border border-border bg-card">
         <div className="flex items-start justify-between gap-4 px-4 py-3">
           <span className="text-sm text-muted-foreground shrink-0">{labels.summaryName}</span>
           <span className="text-sm font-medium text-right">{name}</span>
@@ -226,7 +226,7 @@ function StepConfirm({ name, description, token, botMode, managedBot, labels }: 
             <span className="text-sm text-muted-foreground shrink-0">
               {labels.summaryConnection}
             </span>
-            <code className="text-xs font-mono bg-muted px-2 py-0.5 rounded text-right">
+            <code className="rounded-md border border-border bg-muted px-2 py-0.5 text-right font-mono text-xs">
               {maskedToken}
             </code>
           </div>
@@ -390,7 +390,7 @@ export function CreateBotWizard({ labels, source }: Props) {
   const selectedManagedBot = managedBots.find((b) => b.id === selectedManagedId) ?? null;
 
   return (
-    <div className="mx-auto max-w-lg w-full">
+    <div className="mx-auto w-full max-w-lg">
       <WizardStepper
         steps={STEPS.map((s) => labels[STEP_LABEL_KEYS[s]])}
         currentIndex={stepIndex}

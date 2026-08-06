@@ -175,33 +175,33 @@ export function OnboardingClient({ firstName }: { firstName?: string }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] grid place-items-center bg-black/55 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[200] grid place-items-center bg-black/70 p-4"
           >
             <motion.div
               initial={{ opacity: 0, y: 16, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 16, scale: 0.96 }}
               transition={{ duration: 0.28, ease: "easeOut" }}
-              className="w-full max-w-md rounded-2xl border border-cyan-300/25 bg-[#171717] p-7 text-white shadow-2xl shadow-black/40"
+              className="w-full max-w-md rounded-lg border border-border bg-popover p-6 text-popover-foreground shadow-2xl"
             >
-              <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl border border-cyan-300/20 bg-cyan-300/10 text-cyan-200">
+              <div className="mb-4 grid h-10 w-10 place-items-center rounded-md border border-border bg-muted text-foreground">
                 <Wand2 className="h-5 w-5" />
               </div>
-              <h2 className="text-lg font-semibold text-white">{greeting}</h2>
+              <h2 className="text-lg font-semibold text-foreground">{greeting}</h2>
               <p className="mt-2 text-sm leading-relaxed text-zinc-400">
                 {t("welcome.body")}
               </p>
               <div className="mt-6 flex items-center gap-2">
                 <button
                   onClick={startTour}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
                 >
                   <Sparkles className="h-4 w-4" />
                   {t("welcome.start")}
                 </button>
                 <button
                   onClick={finish}
-                  className="rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-400 transition hover:bg-white/10 hover:text-white"
+                  className="inline-flex h-9 items-center rounded-md px-4 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
                 >
                   {t("welcome.skip")}
                 </button>

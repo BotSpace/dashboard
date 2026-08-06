@@ -23,7 +23,7 @@ interface Props {
   errorLabel: string;
 }
 
-const DEFAULT_GRID_CLASS = "grid gap-5 sm:grid-cols-2 lg:grid-cols-3";
+const DEFAULT_GRID_CLASS = "grid gap-3 sm:grid-cols-2 lg:grid-cols-3";
 
 export function TemplatesInfiniteLoader({
   initialItems,

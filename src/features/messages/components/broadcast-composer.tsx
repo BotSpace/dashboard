@@ -58,7 +58,7 @@ function OptionalBlock({
   children: React.ReactNode;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card">
+    <div className="overflow-hidden rounded-lg border border-border bg-card">
       <div className="flex items-center gap-2.5 border-b border-border px-3 py-2.5">
         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
           <Icon className="h-3.5 w-3.5" />
@@ -100,8 +100,8 @@ function AddButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-dashed border-border py-2.5 text-xs font-medium text-muted-foreground transition-colors",
-        "hover:border-primary/40 hover:bg-primary/5 hover:text-primary",
+        "flex flex-1 items-center justify-center gap-1.5 rounded-md border border-dashed border-border py-2.5 text-xs font-medium text-muted-foreground transition-colors",
+        "hover:border-foreground/20 hover:bg-muted/40 hover:text-foreground",
         "disabled:pointer-events-none disabled:opacity-50",
       )}
     >
@@ -262,7 +262,7 @@ export function BroadcastComposer({ projectId }: { projectId: string | number })
                 rows={4}
                 maxLength={CAPTION_LIMIT}
                 className={cn(
-                  "w-full resize-none rounded-xl border border-input bg-background px-3.5 py-3 text-sm leading-relaxed",
+                  "w-full resize-none rounded-md border border-input bg-background px-3 py-2.5 text-sm leading-relaxed",
                   "ring-offset-background placeholder:text-muted-foreground",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   "disabled:cursor-not-allowed disabled:opacity-50",
@@ -330,7 +330,7 @@ export function BroadcastComposer({ projectId }: { projectId: string | number })
             )}
 
             {/* Footer: audience note + submit */}
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/20 px-4 py-3">
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
               <span className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Users className="h-3.5 w-3.5 shrink-0" />
                 Botning barcha foydalanuvchilariga yuboriladi

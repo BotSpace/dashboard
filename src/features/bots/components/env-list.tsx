@@ -22,7 +22,7 @@ export function EnvList({ projectId, items }: { projectId: string | number; item
   }, [state]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Section
         icon={<Plus className="h-4 w-4" />}
         title="Yangi env var qo'shish"
@@ -53,7 +53,7 @@ export function EnvList({ projectId, items }: { projectId: string | number; item
         ) : (
           <ul className="divide-y">
             {items.map((e) => (
-              <li key={e.id} className="flex items-center gap-3 px-5 py-3">
+              <li key={e.id} className="flex items-center gap-3 px-5 py-2.5 transition-colors hover:bg-muted/40">
                 <span className="font-mono text-sm font-medium">{e.key}</span>
                 <span className="font-mono flex-1 truncate text-sm text-muted-foreground">
                   {showValues[e.id] ? e.value : "•".repeat(Math.min(20, e.value?.length ?? 8))}

@@ -40,7 +40,7 @@ export function BoardArchiveList({
 
   if (boards.length === 0) {
     return (
-      <div className="flex min-h-64 flex-col items-center justify-center rounded-2xl border border-dashed bg-muted/10 text-center">
+      <div className="flex min-h-64 flex-col items-center justify-center rounded-lg border border-dashed bg-muted/10 text-center">
         <Archive className="mb-3 h-8 w-8 text-muted-foreground/60" />
         <h2 className="font-medium">{t("archiveEmpty")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -51,23 +51,23 @@ export function BoardArchiveList({
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {boards.map((board) => (
-        <article key={board.id} className="rounded-xl border bg-card p-5">
+        <article key={board.id} className="rounded-lg border bg-card p-4">
           <div className="flex items-start gap-3">
             <span
-              className="mt-1 h-3 w-3 rounded-full opacity-60"
+              className="mt-1.5 h-2.5 w-2.5 rounded-sm opacity-60"
               style={{ backgroundColor: board.color }}
             />
             <div className="min-w-0 flex-1">
-              <h2 className="truncate font-semibold">{board.name}</h2>
+              <h2 className="truncate text-sm font-semibold">{board.name}</h2>
               <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                 {board.description ||
                   t("manage", { type: board.card_type_label })}
               </p>
             </div>
           </div>
-          <div className="mt-5 flex flex-wrap items-center gap-2">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <Badge variant="secondary">
               {board.card_count} {board.card_type_label.toLowerCase()}
             </Badge>

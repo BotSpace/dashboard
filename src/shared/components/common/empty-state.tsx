@@ -15,11 +15,11 @@ export function EmptyState({ icon, title, description, action, className }: Empt
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-4 rounded-xl border border-border/60 bg-card py-16 text-center",
+        "flex flex-col items-center gap-4 rounded-lg border border-border bg-card px-4 py-14 text-center",
         className
       )}
     >
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+      <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
         {icon}
       </div>
       <div className="space-y-1">

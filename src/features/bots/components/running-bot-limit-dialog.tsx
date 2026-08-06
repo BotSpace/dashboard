@@ -64,7 +64,7 @@ export function RunningBotLimitDialog({ open, onClose, limit, running, projectId
       <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-amber-500" />
+            <AlertTriangle className="h-5 w-5 text-muted-foreground" />
             <DialogTitle>{t("title")}</DialogTitle>
           </div>
           <DialogDescription>{t("description", { limit })}</DialogDescription>
@@ -76,8 +76,8 @@ export function RunningBotLimitDialog({ open, onClose, limit, running, projectId
               key={`${bot.project_id}-${bot.kind}`}
               className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors ${
                 selected === bot.project_id
-                  ? "border-blue-500/60 bg-blue-500/5"
-                  : "border-border/60 hover:border-border"
+                  ? "border-foreground/30 bg-muted/60"
+                  : "border-border hover:bg-muted/40"
               }`}
             >
               <input
@@ -98,7 +98,7 @@ export function RunningBotLimitDialog({ open, onClose, limit, running, projectId
               </div>
               <div
                 className={`h-4 w-4 shrink-0 rounded-full border-2 transition-colors ${
-                  selected === bot.project_id ? "border-blue-500 bg-blue-500" : "border-border"
+                  selected === bot.project_id ? "border-foreground bg-foreground" : "border-border"
                 }`}
               />
             </label>

@@ -38,7 +38,7 @@ export default async function TemplateDetailPage({
   const isOwned = Boolean(tpl.is_ordered);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         title={tpl.name}
         subtitle={
@@ -61,9 +61,9 @@ export default async function TemplateDetailPage({
         }
       />
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-        <div className="space-y-6">
-          <div className="relative overflow-hidden rounded-xl border bg-gradient-to-br from-primary/10 via-primary/5 to-sky-500/10 aspect-[16/9]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="space-y-5">
+          <div className="relative aspect-[16/9] overflow-hidden rounded-lg border border-border bg-muted/40">
             {tpl.image ? (
               <LazyImage src={tpl.image} alt={tpl.name} eager />
             ) : (
@@ -81,7 +81,7 @@ export default async function TemplateDetailPage({
           )}
 
           {tpl.video && (
-            <div className="overflow-hidden rounded-xl border">
+            <div className="overflow-hidden rounded-lg border border-border bg-card">
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
               <video src={tpl.video} controls className="w-full" />
             </div>
@@ -100,7 +100,7 @@ export default async function TemplateDetailPage({
             <Section title={t("features")} icon={<Sparkles className="h-4 w-4" />}>
               <ul className="grid gap-3 sm:grid-cols-2">
                 {tpl.features.map((f) => (
-                  <li key={f.id} className="rounded-lg border border-border/60 p-3 bg-muted/30">
+                  <li key={f.id} className="rounded-md border border-border bg-card p-3">
                     <div className="text-sm font-medium">{f.name}</div>
                     {f.value && (
                       <div className="mt-1 text-xs text-muted-foreground" dangerouslySetInnerHTML={{ __html: sanitizeRichText(f.value) }} />
@@ -116,7 +116,7 @@ export default async function TemplateDetailPage({
               <ul className="space-y-2">
                 {(tpl.required_envs ?? []).map((env) => (
                   <li key={env.key} className="flex flex-col gap-0.5">
-                    <code className="text-sm font-mono bg-muted px-2 py-1 rounded self-start">
+                    <code className="self-start rounded-md border border-border bg-muted/50 px-2 py-1 font-mono text-sm">
                       {env.key}
                     </code>
                     {env.description && (
@@ -133,7 +133,7 @@ export default async function TemplateDetailPage({
           <Section>
             <div className="space-y-4">
               <div>
-                <div className="text-3xl font-bold">
+                <div className="text-2xl font-semibold tracking-tight">
                   {isFree ? t("free") : formatCurrency(price, "UZS", locale)}
                 </div>
                 {hasDiscount && (
@@ -159,7 +159,7 @@ export default async function TemplateDetailPage({
               />
 
               {tpl.demo_url && (
-                <Button asChild variant="outline" className="w-full" size="lg">
+                <Button asChild variant="outline" className="w-full">
                   <a href={tpl.demo_url} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="h-4 w-4" />
                     {t("preview")}

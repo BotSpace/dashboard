@@ -71,10 +71,10 @@ import {
 } from "../actions";
 
 const priorityStyle: Record<KanbanPriority, string> = {
-  low: "bg-slate-500/10 text-slate-400",
-  normal: "bg-blue-500/10 text-blue-400",
-  high: "bg-amber-500/10 text-amber-400",
-  urgent: "bg-red-500/10 text-red-400",
+  low: "text-muted-foreground",
+  normal: "text-muted-foreground",
+  high: "text-foreground",
+  urgent: "text-destructive",
 };
 
 export function KanbanBoard({
@@ -357,8 +357,8 @@ export function KanbanBoard({
   return (
     <>
       {projectFilter && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border bg-card px-4 py-3 text-sm">
-          <Bot className="h-4 w-4 text-blue-400" />
+        <div className="mb-4 flex items-center gap-2 rounded-md border bg-muted/20 px-3 py-2 text-sm">
+          <Bot className="h-4 w-4 text-muted-foreground" />
           {t("filteredCards")}
         </div>
       )}
@@ -422,7 +422,7 @@ export function KanbanBoard({
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : archivedCards.length === 0 ? (
-            <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+            <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
               {t("archivedCardsEmpty")}
             </div>
           ) : (
@@ -430,7 +430,7 @@ export function KanbanBoard({
               {archivedCards.map((card) => (
                 <div
                   key={card.id}
-                  className="flex items-center gap-3 rounded-xl border bg-card p-3"
+                  className="flex items-center gap-3 rounded-md border bg-card p-3"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-medium">
@@ -508,17 +508,17 @@ function ColumnLane({
     <section
       ref={setNodeRef}
       className={cn(
-        "flex w-[320px] shrink-0 flex-col overflow-hidden rounded-2xl border bg-muted/20 shadow-sm transition-all",
-        isOver && "border-blue-500/70 bg-blue-500/[0.06] shadow-blue-500/10",
+        "flex w-[312px] shrink-0 flex-col overflow-hidden rounded-lg border bg-muted/20 transition-colors",
+        isOver && "border-foreground/40 bg-muted/50",
       )}
     >
-      <header className="flex items-center gap-2 border-b bg-card/70 px-4 py-3.5 backdrop-blur">
+      <header className="flex items-center gap-2 border-b bg-card px-3 py-2.5">
         <span
-          className="h-2.5 w-2.5 rounded-full shadow-[0_0_0_4px_var(--lane-color)]"
+          className="h-2.5 w-2.5 rounded-sm opacity-70"
           style={
             {
               backgroundColor: column.color,
-              "--lane-color": `${column.color}22`,
+
             } as React.CSSProperties
           }
         />
@@ -526,7 +526,7 @@ function ColumnLane({
         {column.is_terminal && (
           <Badge
             variant="outline"
-            className="border-emerald-500/30 text-[10px] text-emerald-500"
+            className="text-[10px] text-muted-foreground"
           >
             {t("terminal")}
           </Badge>
@@ -554,7 +554,7 @@ function ColumnLane({
             />
           ))}
           {cards.length === 0 && (
-            <div className="flex h-24 flex-col items-center justify-center rounded-xl border border-dashed text-xs text-muted-foreground">
+            <div className="flex h-24 flex-col items-center justify-center rounded-md border border-dashed text-xs text-muted-foreground">
               <Inbox className="mb-2 h-5 w-5 opacity-50" />
               {t("dropHere")}
             </div>
@@ -626,20 +626,18 @@ function CardTile({
     <article
       {...dragProps}
       className={cn(
-        "group relative cursor-grab touch-none overflow-hidden rounded-xl border bg-card p-3.5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md active:cursor-grabbing",
-        overlay && "w-[295px] rotate-2 shadow-xl",
+        "group relative cursor-grab touch-none overflow-hidden rounded-md border bg-card p-3 transition-colors hover:border-foreground/20 hover:bg-muted/20 active:cursor-grabbing",
+        overlay && "w-[288px] border-foreground/30 shadow-lg",
       )}
     >
       <span
         className={cn(
           "absolute inset-y-0 left-0 w-0.5",
           card.priority === "urgent"
-            ? "bg-red-500"
+            ? "bg-destructive"
             : card.priority === "high"
-              ? "bg-amber-500"
-              : card.priority === "low"
-                ? "bg-slate-500"
-                : "bg-blue-500",
+              ? "bg-foreground"
+              : "bg-muted-foreground/50",
         )}
       />
       <button
@@ -655,7 +653,8 @@ function CardTile({
       </button>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Badge
-          className={cn("border-0 text-[10px]", priorityStyle[card.priority])}
+          variant="outline"
+          className={cn("text-[10px]", priorityStyle[card.priority])}
         >
           {t(`priorities.${card.priority}`)}
         </Badge>
@@ -667,7 +666,7 @@ function CardTile({
         )}
         {card.source_project_id && (
           <span
-            className="ml-auto flex max-w-[130px] items-center gap-1 truncate text-[10px] text-blue-400"
+            className="ml-auto flex max-w-[130px] items-center gap-1 truncate text-[10px] text-muted-foreground"
             title={projectName}
           >
             <Bot className="h-3.5 w-3.5 shrink-0" />
@@ -901,7 +900,7 @@ function CardEditor({
                 className="grid max-h-64 gap-3 overflow-y-auto overscroll-contain pr-2"
               >
                 {comments.map((item) => (
-                  <div key={item.id} className="rounded-lg bg-muted p-3 text-sm">
+                  <div key={item.id} className="rounded-md border bg-muted/20 p-3 text-sm">
                     <p>{item.body}</p>
                     <span className="mt-1 block text-[10px] text-muted-foreground">
                       {new Date(item.created_at).toLocaleString()}
@@ -931,7 +930,7 @@ function CardEditor({
                   {activities.length}
                 </Badge>
               </summary>
-              <div className="mt-3 grid max-h-48 gap-2 overflow-y-auto rounded-lg border bg-muted/20 p-3 sm:grid-cols-2">
+              <div className="mt-3 grid max-h-48 gap-2 overflow-y-auto rounded-md border bg-muted/20 p-3 sm:grid-cols-2">
                 {activities.length === 0 ? (
                   <p className="text-xs text-muted-foreground">
                     {t("noActivity")}
@@ -953,7 +952,7 @@ function CardEditor({
           )}
           </div>
           {card && (
-            <aside className="h-fit space-y-4 rounded-xl border bg-muted/20 p-4">
+            <aside className="h-fit space-y-4 rounded-lg border bg-muted/20 p-4">
               <h3 className="text-sm font-medium">Task details</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-between gap-3"><span className="text-muted-foreground">Status</span><span>{board.columns?.find((column) => column.id === card.column_id)?.name ?? "—"}</span></div>
@@ -966,7 +965,7 @@ function CardEditor({
         </div>
         <DialogFooter className="justify-between border-t px-6 py-4 sm:justify-between">
           {card ? (
-            <Button variant="ghost" className="text-red-400" onClick={archive}>
+            <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={archive}>
               <Archive className="mr-2 h-4 w-4" />
               {t("archive")}
             </Button>

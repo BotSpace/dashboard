@@ -71,7 +71,7 @@ function formatValue(value: unknown, kind: string): React.ReactNode {
           href={url}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center gap-1 text-xs text-blue-500 hover:underline"
+          className="flex items-center gap-1 text-xs font-medium text-foreground hover:underline"
         >
           <ExternalLink className="h-3 w-3" />
           {url.length > 60 ? url.slice(0, 60) + "…" : url}
@@ -87,7 +87,7 @@ function formatValue(value: unknown, kind: string): React.ReactNode {
         href={url}
         target="_blank"
         rel="noreferrer"
-        className="flex items-center gap-1 text-xs text-blue-500 hover:underline break-all"
+        className="flex items-center gap-1 break-all text-xs font-medium text-foreground hover:underline"
       >
         <ExternalLink className="h-3 w-3 shrink-0" />
         {url}

@@ -32,7 +32,7 @@ export default async function EarningOrderDetailPage({
   const payerName = [order.payer_first_name, order.payer_last_name].filter(Boolean).join(" ");
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <PageHeader
         title={`To'lov #${order.id}`}
         icon={<Receipt className="h-5 w-5" />}
@@ -45,12 +45,12 @@ export default async function EarningOrderDetailPage({
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         {/* To'lovchi ma'lumotlari */}
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <User className="h-5 w-5 text-blue-500" /> To&apos;lovchi
+              <User className="h-4 w-4 text-muted-foreground" /> To&apos;lovchi
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
@@ -66,10 +66,10 @@ export default async function EarningOrderDetailPage({
         </Card>
 
         {/* To'lov ma'lumotlari */}
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Receipt className="h-5 w-5 text-emerald-500" /> To&apos;lov
+              <Receipt className="h-4 w-4 text-muted-foreground" /> To&apos;lov
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
@@ -79,7 +79,7 @@ export default async function EarningOrderDetailPage({
             <Row
               label="Sof daromad"
               value={
-                <span className="text-emerald-500">
+                <span className="text-foreground">
                   {formatCurrency(Number(order.net_amount), "UZS", locale)}
                 </span>
               }

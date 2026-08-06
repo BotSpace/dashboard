@@ -55,7 +55,7 @@ export default async function TicketDetailPage({
       </div>
 
       {/* Suhbat */}
-      <Card>
+      <Card className="rounded-lg border-border bg-card shadow-none">
         <CardContent className="space-y-4 py-5">
           {messages.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">Xabar yo&apos;q</p>
@@ -66,16 +66,16 @@ export default async function TicketDetailPage({
                 <div key={m.id} className={cn("flex", isUser ? "justify-end" : "justify-start")}>
                   <div className={cn("max-w-[80%] space-y-1", isUser ? "items-end" : "items-start")}>
                     {!isUser && (
-                      <span className="flex items-center gap-1 text-xs font-medium text-blue-500">
+                      <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
                         <Headset className="h-3 w-3" /> Support
                       </span>
                     )}
                     <div
                       className={cn(
-                        "rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+                        "rounded-lg border px-3 py-2 text-sm leading-relaxed",
                         isUser
-                          ? "rounded-br-sm bg-blue-600 text-white"
-                          : "rounded-bl-sm bg-muted text-foreground"
+                          ? "rounded-br-sm border-foreground bg-foreground text-background"
+                          : "rounded-bl-sm border-border bg-muted/60 text-foreground"
                       )}
                     >
                       <p className="whitespace-pre-wrap">{m.message}</p>
@@ -85,8 +85,10 @@ export default async function TicketDetailPage({
                           target="_blank"
                           rel="noopener noreferrer"
                           className={cn(
-                            "mt-2 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs",
-                            isUser ? "bg-white/15 hover:bg-white/25" : "bg-background hover:bg-muted-foreground/10"
+                            "mt-2 inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs",
+                            isUser
+                              ? "border-background/20 bg-background/10 hover:bg-background/15"
+                              : "border-border bg-background hover:bg-muted"
                           )}
                         >
                           <Paperclip className="h-3.5 w-3.5" /> Fayl
@@ -108,7 +110,7 @@ export default async function TicketDetailPage({
           Murojaat yopilgan. Yangi xabar yozsangiz qayta ochiladi.
         </p>
       ) : null}
-      <Card>
+      <Card className="rounded-lg border-border bg-card shadow-none">
         <CardContent className="py-4">
           <TicketReplyForm id={ticket.id} />
         </CardContent>

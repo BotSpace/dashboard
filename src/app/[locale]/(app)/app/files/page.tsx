@@ -48,7 +48,7 @@ export default async function FilesPage({
   const files = paged.results;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         title="Fayllar"
         subtitle={`${formatNumber(files.length)} ta fayl`}
@@ -62,28 +62,28 @@ export default async function FilesPage({
           description="Fayllar bot ichida (loyiha sahifasida) yuklanadi"
         />
       ) : (
-        <Card>
+        <Card className="rounded-lg border-border bg-card shadow-none">
           <CardContent className="p-0">
             <div className="overflow-x-auto"><table className="w-full min-w-[600px] text-sm">
-              <thead className="border-b bg-muted/30 text-xs uppercase text-muted-foreground">
+              <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3 text-left">Nom</th>
-                  <th className="px-4 py-3 text-left">Tur</th>
-                  <th className="px-4 py-3 text-right">Hajm</th>
-                  <th className="px-4 py-3 text-left">Sana</th>
-                  <th className="px-4 py-3 text-left">Muddat</th>
-                  <th className="px-4 py-3 text-right">Amal</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Nom</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Tur</th>
+                  <th className="px-3 py-2.5 text-right font-medium">Hajm</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Sana</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Muddat</th>
+                  <th className="px-3 py-2.5 text-right font-medium">Amal</th>
                 </tr>
               </thead>
               <tbody>
                 {files.map((f) => (
-                  <tr key={f.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
-                    <td className="px-4 py-3 font-medium">
+                  <tr key={f.id} className="border-b border-border transition-colors last:border-0 hover:bg-muted/30">
+                    <td className="px-3 py-2.5 font-medium">
                       {(() => {
                         const dl = fileDownloadUrl(f.url);
                         return dl ? (
                           <span className="inline-flex items-center gap-1">
-                            <a href={dl} target="_blank" rel="noreferrer" className="hover:underline hover:text-blue-400 transition-colors">
+                            <a href={dl} target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground hover:underline">
                               {f.name}
                             </a>
                             <CopyButton value={dl} label="Yuklab olish havolasi" className="p-1" />
@@ -101,10 +101,10 @@ export default async function FilesPage({
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">{f.filetype ?? "—"}</td>
-                    <td className="px-4 py-3 text-right text-muted-foreground">{humanSize(f.size)}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{f.created_at ?? "—"}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2.5 text-muted-foreground">{f.filetype ?? "—"}</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">{humanSize(f.size)}</td>
+                    <td className="px-3 py-2.5 text-muted-foreground">{f.created_at ?? "—"}</td>
+                    <td className="px-3 py-2.5">
                       {(() => {
                         const { text, variant } = fileExpiryLabel(f.expires_at);
                         return (
@@ -114,7 +114,7 @@ export default async function FilesPage({
                         );
                       })()}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-3 py-2 text-right">
                       <FileDeleteButton uuid={f.uuid} name={f.name} />
                     </td>
                   </tr>

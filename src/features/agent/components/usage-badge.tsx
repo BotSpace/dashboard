@@ -36,12 +36,9 @@ export function UsageBadge({ refreshKey, liveDelta = 0 }: Props) {
   const color =
     remaining === 0
       ? "text-destructive"
-      : pct >= 80
-      ? "text-amber-500"
       : "text-muted-foreground";
 
-  const barColor =
-    remaining === 0 ? "bg-destructive" : pct >= 80 ? "bg-amber-500" : "bg-primary";
+  const barColor = remaining === 0 ? "bg-destructive" : "bg-foreground";
 
   const title = [
     `Token: ${used.toLocaleString()} / ${limit.toLocaleString()}`,

@@ -23,7 +23,7 @@ export default async function BotCmsListPage({
   const collections = await CmsAPI.listCollections(projectId).catch(() => []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         icon={<Database className="h-5 w-5" />}
         title={t("title")}
@@ -52,15 +52,15 @@ export default async function BotCmsListPage({
           }
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {collections.map((c) => (
             <Link
               key={c.id}
               href={cmsCollectionHref(projectId, cmsCollectionSlug(c), "/data")}
               className="block h-full"
             >
-              <Card className="h-full overflow-hidden transition hover:border-blue-500/40">
-                <CardContent className="flex h-full flex-col space-y-3 p-5">
+              <Card className="h-full overflow-hidden transition-colors hover:border-foreground/20 hover:bg-muted/30">
+                <CardContent className="flex h-full flex-col space-y-3 p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">

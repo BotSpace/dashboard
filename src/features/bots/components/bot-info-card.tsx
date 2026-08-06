@@ -24,12 +24,12 @@ export function BotInfoCard({ projectId, username, releaseBot, debugBot }: Props
   const [open, setOpen] = useState(false);
 
   const modeBadge = releaseBot ? (
-    <Badge variant="secondary" className="min-w-0 max-w-full gap-1 text-emerald-500">
+    <Badge variant="secondary" className="min-w-0 max-w-full gap-1 text-foreground">
       <Rocket className="h-3 w-3 shrink-0" />
       <span className="truncate">{t("modeRelease")}</span>
     </Badge>
   ) : debugBot ? (
-    <Badge variant="secondary" className="min-w-0 max-w-full gap-1 text-amber-500">
+    <Badge variant="secondary" className="min-w-0 max-w-full gap-1 text-foreground">
       <Sparkles className="h-3 w-3 shrink-0" />
       <span className="truncate">{t("modeDebug")}</span>
     </Badge>
@@ -39,7 +39,7 @@ export function BotInfoCard({ projectId, username, releaseBot, debugBot }: Props
     <>
       <Section
         title={t("title")}
-        icon={<Bot className="h-4 w-4 text-blue-400" />}
+        icon={<Bot className="h-4 w-4 text-muted-foreground" />}
         className="min-w-0"
         contentClassName="min-w-0 space-y-3 text-sm"
         actions={
@@ -62,7 +62,7 @@ export function BotInfoCard({ projectId, username, releaseBot, debugBot }: Props
               href={`https://telegram.me/${username}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-w-0 max-w-full items-center justify-self-end gap-1 overflow-hidden font-medium text-primary hover:underline"
+              className="inline-flex min-w-0 max-w-full items-center justify-self-end gap-1 overflow-hidden font-medium text-foreground hover:underline"
             >
               <span className="truncate">@{username}</span>
               <ExternalLink className="h-3.5 w-3.5 shrink-0" />

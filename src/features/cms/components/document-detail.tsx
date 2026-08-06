@@ -30,11 +30,11 @@ function formatValue(value: unknown, kind: string): React.ReactNode {
   }
   if (kind === "image") {
     const url = String(value);
-    return <div className="space-y-2"><img src={url} alt="" className="max-h-48 max-w-full rounded-lg border object-contain" onError={(event) => { event.currentTarget.style.display = "none"; }} /><a href={url} target="_blank" rel="noreferrer" className="flex items-center gap-1 break-all text-xs text-primary hover:underline"><ExternalLink className="h-3 w-3 shrink-0" />{url}</a></div>;
+    return <div className="space-y-2"><img src={url} alt="" className="max-h-48 max-w-full rounded-lg border object-contain" onError={(event) => { event.currentTarget.style.display = "none"; }} /><a href={url} target="_blank" rel="noreferrer" className="flex items-center gap-1 break-all text-xs font-medium text-foreground hover:underline"><ExternalLink className="h-3 w-3 shrink-0" />{url}</a></div>;
   }
   if (kind === "file" || kind === "audio" || kind === "video" || kind === "url") {
     const url = String(value);
-    return <a href={url} target="_blank" rel="noreferrer" className="flex items-center gap-1 break-all text-sm text-primary hover:underline"><ExternalLink className="h-3 w-3 shrink-0" />{url}</a>;
+    return <a href={url} target="_blank" rel="noreferrer" className="flex items-center gap-1 break-all text-sm font-medium text-foreground hover:underline"><ExternalLink className="h-3 w-3 shrink-0" />{url}</a>;
   }
   if (kind === "json" || kind === "array" || typeof value === "object") {
     let pretty = String(value);
@@ -77,7 +77,7 @@ export function DocumentDetail({ projectId, collectionName, fields, collections,
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/70 bg-card p-4 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground">{t("fieldId")}</p>
           <p className="mt-1 truncate font-mono text-sm">{docId}</p>
@@ -95,7 +95,7 @@ export function DocumentDetail({ projectId, collectionName, fields, collections,
         </div>
       </div>
 
-      <div className="rounded-xl border border-border/70 bg-card px-4 shadow-sm sm:px-6">
+      <div className="rounded-lg border border-border bg-card px-4 sm:px-5">
         <DetailRow label={t("fieldId")} kind="text"><span className="break-all font-mono text-xs">{docId}</span></DetailRow>
         {fields.map((field) => (
           <DetailRow key={field.name} label={field.label || field.name} kind={field.kind}>

@@ -17,7 +17,7 @@ export function CreateProjectButton({ slug, label }: Props) {
   return (
     <Button
       className="w-full"
-      size="lg"
+
       disabled={pending}
       onClick={() =>
         startTransition(() => router.push(`/app/templates/${slug}/create`))

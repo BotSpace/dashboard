@@ -43,8 +43,8 @@ export function UserMenu({ user }: { user: UserMenuUser }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Avatar className="h-8 w-8">
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-md">
+          <Avatar className="h-6 w-6">
             {user.avatar && <AvatarImage src={user.avatar} alt={display} />}
             <AvatarFallback>{initials(display)}</AvatarFallback>
           </Avatar>

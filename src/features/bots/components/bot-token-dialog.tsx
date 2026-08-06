@@ -185,7 +185,7 @@ export function BotTokenDialog({ open, onClose, projectId }: Props) {
       <DialogContent className="max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <KeyRound className="h-5 w-5 text-blue-500" />
+            <KeyRound className="h-5 w-5 text-muted-foreground" />
             <DialogTitle>{t("title")}</DialogTitle>
           </div>
           <DialogDescription>{t("description")}</DialogDescription>

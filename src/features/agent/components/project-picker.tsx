@@ -43,7 +43,7 @@ export function ProjectPicker({ projects, current }: Props) {
           {current === "global" ? (
             <Globe className="h-3.5 w-3.5 text-muted-foreground" />
           ) : (
-            <Bot className="h-3.5 w-3.5 text-primary" />
+            <Bot className="h-3.5 w-3.5 text-muted-foreground" />
           )}
           <span className="hidden max-w-[100px] truncate sm:inline">{currentLabel}</span>
           <ChevronDown className="h-3 w-3 text-muted-foreground" />
@@ -63,7 +63,7 @@ export function ProjectPicker({ projects, current }: Props) {
             onClick={() => select(String(p.id))}
             className="gap-2"
           >
-            <Bot className="h-4 w-4 text-primary" />
+            <Bot className="h-4 w-4 text-muted-foreground" />
             <span className="flex-1 truncate">{p.name}</span>
             <code className="text-[10px] text-muted-foreground">#{p.id}</code>
           </DropdownMenuItem>
