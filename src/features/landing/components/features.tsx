@@ -1,122 +1,71 @@
 "use client";
-import { Blocks, BrainCircuit, ShoppingBag, Globe, Database, BarChart3 } from "lucide-react";
-import { useTranslations } from "next-intl";
+
 import { motion } from "framer-motion";
-import { SectionWrapper } from "./section-wrapper";
+import { BarChart3, Blocks, Bot, BrainCircuit, Database, Globe, ShoppingBag } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const icons = [Blocks, BrainCircuit, ShoppingBag, Globe, Database, BarChart3];
-const accents = [
-  { color: "#22d3ee", glow: "rgba(6,182,212,0.30)" },
-  { color: "#a78bfa", glow: "rgba(139,92,246,0.30)" },
-  { color: "#f0abfc", glow: "rgba(232,121,249,0.28)" },
-  { color: "#60a5fa", glow: "rgba(59,130,246,0.28)" },
-  { color: "#34d399", glow: "rgba(16,185,129,0.28)" },
-  { color: "#fbbf24", glow: "rgba(251,191,36,0.26)" },
-];
 
 export function Features() {
   const t = useTranslations("landing.features");
-  const items = Array.from({ length: 6 }, (_, i) => ({
-    title: t(`items.${i}.title`),
-    desc: t(`items.${i}.desc`),
-    Icon: icons[i],
-    ...accents[i],
+  const items = Array.from({ length: 6 }, (_, index) => ({
+    title: t(`items.${index}.title`),
+    desc: t(`items.${index}.desc`),
+    Icon: icons[index],
   }));
 
   return (
-    <SectionWrapper id="features" className="relative isolate bg-deep py-28 md:py-36">
-      {/* Soft top spotlight that fades in */}
-      <div className="spot-orb spot-cyan left-1/2 top-[-100px] h-[420px] w-[820px] -translate-x-1/2 opacity-[0.35]" />
-      <div className="pointer-events-none absolute inset-0 bg-grid bg-grid-fade opacity-[0.35]" />
-
-      <div className="container-page relative">
-        {/* Heading */}
-        <div className="mx-auto max-w-2xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-white/55"
-          >
-            <span className="h-1 w-1 rounded-full bg-cyan-300" />
-            {t("eyebrow")}
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.05 }}
-            className="display mt-5 text-3xl font-semibold text-white md:text-4xl lg:text-[44px]"
-          >
-            {t("title")}
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className="mt-4 text-[15px] text-white/50 md:text-base"
-          >
-            {t("subtitle")}
-          </motion.p>
+    <section id="features" className="border-b border-white/10 bg-black py-24 md:py-32">
+      <div className="container-page">
+        <div className="grid gap-10 border-b border-white/10 pb-14 lg:grid-cols-[1fr_1fr] lg:items-end">
+          <div>
+            <div className="text-sm font-medium text-white/45">{t("eyebrow")}</div>
+            <h2 className="mt-4 max-w-2xl text-4xl font-semibold tracking-[-0.04em] text-white md:text-5xl">{t("title")}</h2>
+          </div>
+          <p className="max-w-xl text-base leading-7 text-white/45 lg:justify-self-end">{t("subtitle")}</p>
         </div>
 
-        {/* Grid */}
-        <div className="mt-14 grid gap-4 md:grid-cols-2 lg:mt-16 lg:grid-cols-3">
-          {items.map(({ title, desc, Icon, color, glow }, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 24 }}
+        <div className="mt-0 grid overflow-hidden border-x border-white/10 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map(({ title, desc, Icon }, index) => (
+            <motion.article
+              key={title}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.55, delay: i * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
-              whileHover={{ y: -4 }}
-              className="group surface-card relative overflow-hidden p-6 transition-colors duration-300"
-              style={{ ["--accent" as string]: color, ["--accent-glow" as string]: glow }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = `${color}33`;
-                (e.currentTarget as HTMLElement).style.boxShadow = `inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 1px ${color}1a, 0 30px 70px -30px ${glow}, 0 14px 38px -14px ${glow}`;
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)";
-                (e.currentTarget as HTMLElement).style.boxShadow = "";
-              }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.45, delay: index * 0.04 }}
+              className="group relative min-h-64 border-b border-white/10 p-7 transition-colors hover:bg-white/[0.035] lg:p-8 [&:not(:nth-child(3n))]:lg:border-r sm:[&:nth-child(odd)]:border-r lg:[&:nth-child(odd)]:border-r-0"
             >
-              {/* Corner glow on hover */}
-              <div
-                className="pointer-events-none absolute -top-16 -right-16 h-44 w-44 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                style={{ background: `radial-gradient(circle, ${color}26, transparent 70%)` }}
-              />
-
-              {/* Icon */}
-              <div
-                className="relative mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl"
-                style={{
-                  background: `linear-gradient(180deg, ${color}1c 0%, ${color}06 100%)`,
-                  border: `1px solid ${color}26`,
-                  boxShadow: `inset 0 1px 0 ${color}33, 0 6px 20px -6px ${color}22`,
-                }}
-              >
-                <Icon className="h-5 w-5" style={{ color }} />
-                <span
-                  className="pointer-events-none absolute -inset-2 rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  style={{ background: `radial-gradient(circle, ${color}20, transparent 70%)`, filter: "blur(12px)" }}
-                />
+              <div className="flex items-start justify-between">
+                <div className="flex h-10 w-10 items-center justify-center rounded-md border border-white/15 bg-white/[0.03]">
+                  <Icon className="h-4.5 w-4.5 text-white/75" />
+                </div>
+                <span className="font-mono text-[11px] text-white/20">0{index + 1}</span>
               </div>
-
-              <h3 className="text-[16px] font-semibold tracking-tight text-white/92">{title}</h3>
-              <p className="mt-2 text-[14px] leading-relaxed text-white/45">{desc}</p>
-
-              {/* Bottom accent line on hover */}
-              <div
-                className="absolute inset-x-6 bottom-0 h-px scale-x-0 origin-left bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 transition-all duration-500 group-hover:scale-x-100 group-hover:opacity-100"
-                style={{ background: `linear-gradient(90deg, transparent, ${color}66, transparent)` }}
-              />
-            </motion.div>
+              <h3 className="mt-12 text-lg font-medium tracking-tight text-white">{title}</h3>
+              <p className="mt-3 max-w-sm text-sm leading-6 text-white/45">{desc}</p>
+              <div className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-white transition-transform duration-300 group-hover:scale-x-100" />
+            </motion.article>
           ))}
         </div>
+
+        <div className="grid border-x border-b border-white/10 md:grid-cols-[1.3fr_.7fr]">
+          <div className="relative min-h-72 overflow-hidden border-b border-white/10 p-8 md:border-b-0 md:border-r">
+            <div className="landing-dot-grid absolute inset-0 opacity-60" />
+            <div className="relative max-w-md">
+              <Bot className="h-6 w-6 text-white/80" />
+              <div className="mt-6 text-2xl font-medium tracking-tight text-white">{t("title")}</div>
+              <p className="mt-3 text-sm leading-6 text-white/45">{t("subtitle")}</p>
+            </div>
+          </div>
+          <div className="flex min-h-72 items-center justify-center bg-[#050505] p-8">
+            <div className="relative flex h-36 w-36 items-center justify-center">
+              <div className="absolute inset-0 rotate-45 border border-white/15" />
+              <div className="absolute inset-6 rotate-45 border border-white/25" />
+              <Bot className="relative h-10 w-10 text-white" />
+            </div>
+          </div>
+        </div>
       </div>
-    </SectionWrapper>
+    </section>
   );
 }

@@ -1,211 +1,65 @@
 "use client";
-import { Check, Zap, Sparkles, Crown, ArrowUpRight } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
-import { Link } from "@/shared/i18n/routing";
-import { SectionWrapper } from "./section-wrapper";
 
-type Plan = {
-  name: string;
-  price: string;
-  tokens: string;
-  bots: string;
-  features: string[];
-  highlighted?: boolean;
-  icon: typeof Zap;
-  accent: string;
-};
+import { ArrowRight, Check } from "lucide-react";
+import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { Link } from "@/shared/i18n/routing";
 
 export function Pricing() {
   const t = useTranslations("landing.pricing");
-  const free = t.raw("plans.free") as { name: string; tagBots: string; features: string[] };
-  const pro = t.raw("plans.pro") as { name: string; tagBots: string; features: string[] };
-  const max = t.raw("plans.max") as { name: string; tagBots: string; features: string[] };
-
-  const plans: Plan[] = [
-    {
-      name: free.name,
-      price: "$0",
-      tokens: "200K",
-      bots: free.tagBots,
-      icon: Zap,
-      accent: "#22d3ee",
-      features: free.features,
-    },
-    {
-      name: pro.name,
-      price: "$10",
-      tokens: "1M",
-      bots: pro.tagBots,
-      icon: Sparkles,
-      accent: "#a78bfa",
-      highlighted: true,
-      features: pro.features,
-    },
-    {
-      name: max.name,
-      price: "$20",
-      tokens: "2M",
-      bots: max.tagBots,
-      icon: Crown,
-      accent: "#f0abfc",
-      features: max.features,
-    },
-  ];
+  const source = ["free", "pro", "max"] as const;
+  const prices = ["$0", "$10", "$20"];
+  const tokens = ["200K", "1M", "2M"];
+  const plans = source.map((key, index) => {
+    const plan = t.raw(`plans.${key}`) as { name: string; tagBots: string; features: string[] };
+    return { ...plan, price: prices[index], tokens: tokens[index], highlighted: key === "pro" };
+  });
 
   return (
-    <SectionWrapper id="pricing" className="relative isolate bg-deep py-28 md:py-36">
-      <div className="spot-orb spot-violet left-1/2 top-[-100px] h-[420px] w-[820px] -translate-x-1/2 opacity-[0.30]" />
-      <div className="pointer-events-none absolute inset-0 bg-grid bg-grid-fade opacity-[0.30]" />
-
-      <div className="container-page relative">
-        <div className="mx-auto max-w-2xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-white/55">
-            <span className="h-1 w-1 rounded-full bg-violet-300" />
-            {t("eyebrow")}
-          </div>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="display mt-5 text-3xl font-semibold text-white md:text-4xl lg:text-[44px]"
-          >
-            {t("title")}
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="mt-4 text-[15px] text-white/50 md:text-base"
-          >
-            {t("subtitle")}
-          </motion.p>
+    <section id="pricing" className="border-b border-white/10 bg-black py-24 md:py-32">
+      <div className="container-page">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="text-sm text-white/45">{t("eyebrow")}</div>
+          <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-white md:text-5xl">{t("title")}</h2>
+          <p className="mt-4 text-base text-white/45">{t("subtitle")}</p>
         </div>
 
-        <div className="mx-auto mt-14 grid max-w-6xl gap-5 lg:mt-16 lg:grid-cols-3">
-          {plans.map((p, i) => (
-            <motion.div
-              key={p.name}
-              initial={{ opacity: 0, y: 28 }}
+        <div className="mt-14 grid overflow-hidden rounded-xl border border-white/15 lg:grid-cols-3">
+          {plans.map((plan, index) => (
+            <motion.article
+              key={plan.name}
+              initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              whileHover={{ y: -6 }}
-              className={`relative ${p.highlighted ? "lg:-my-2" : ""}`}
+              transition={{ delay: index * 0.06 }}
+              className={`relative flex min-h-[520px] flex-col p-7 md:p-8 ${index < 2 ? "border-b border-white/10 lg:border-b-0 lg:border-r" : ""} ${plan.highlighted ? "bg-white/[0.04]" : "bg-black"}`}
             >
-              {/* Animated conic ring for Pro */}
-              {p.highlighted && <span className="conic-ring rounded-2xl" />}
-
-              <div
-                className="relative h-full overflow-hidden rounded-2xl p-7"
-                style={{
-                  background: p.highlighted
-                    ? "linear-gradient(180deg, rgba(20,21,32,0.95) 0%, rgba(10,11,18,0.98) 100%)"
-                    : "linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.008) 100%)",
-                  border: p.highlighted ? "none" : "1px solid rgba(255,255,255,0.07)",
-                  boxShadow: p.highlighted
-                    ? "inset 0 1px 0 rgba(255,255,255,0.05), 0 30px 60px -20px rgba(139,92,246,0.35), 0 14px 30px -10px rgba(0,0,0,0.5)"
-                    : "inset 0 1px 0 rgba(255,255,255,0.04)",
-                }}
-              >
-                {/* Inner glow for Pro */}
-                {p.highlighted && (
-                  <div
-                    className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full opacity-30"
-                    style={{ background: `radial-gradient(circle, ${p.accent}, transparent 70%)` }}
-                  />
-                )}
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="flex h-9 w-9 items-center justify-center rounded-xl"
-                      style={{
-                        background: `linear-gradient(180deg, ${p.accent}1c 0%, ${p.accent}06 100%)`,
-                        border: `1px solid ${p.accent}26`,
-                        boxShadow: `inset 0 1px 0 ${p.accent}33`,
-                      }}
-                    >
-                      <p.icon className="h-4 w-4" style={{ color: p.accent }} />
-                    </div>
-                    <div className="text-lg font-semibold text-white/90">{p.name}</div>
-                  </div>
-                  {p.highlighted && (
-                    <div
-                      className="rounded-full px-2.5 py-0.5 text-[9.5px] font-bold uppercase tracking-[0.16em] text-white"
-                      style={{
-                        background: "linear-gradient(135deg, #22d3ee, #8b5cf6)",
-                        boxShadow: "0 4px 14px rgba(139,92,246,0.4)",
-                      }}
-                    >
-                      {t("popular")}
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-6 flex items-baseline gap-1.5">
-                  <span
-                    className="text-5xl font-bold tracking-tight"
-                    style={{
-                      background: "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.7) 100%)",
-                      WebkitBackgroundClip: "text",
-                      backgroundClip: "text",
-                      color: "transparent",
-                    }}
-                  >
-                    {p.price}
-                  </span>
-                  <span className="text-sm text-white/35">{t("perMonth")}</span>
-                </div>
-
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <span
-                    className="rounded-md px-2 py-1 text-[11px] font-medium"
-                    style={{
-                      background: `${p.accent}10`,
-                      border: `1px solid ${p.accent}26`,
-                      color: p.accent,
-                    }}
-                  >
-                    {p.tokens} {t("perTokens")}
-                  </span>
-                  <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-medium text-white/55">
-                    {p.bots}
-                  </span>
-                </div>
-
-                <Link
-                  href="/login"
-                  className={`mt-7 flex w-full items-center justify-center gap-1.5 rounded-xl py-2.5 text-sm font-semibold transition-all ${
-                    p.highlighted ? "btn-primary" : "btn-ghost"
-                  }`}
-                >
-                  {t("cta")}
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-
-                <ul className="mt-6 space-y-2.5">
-                  {p.features.map((f) => (
-                    <li
-                      key={f}
-                      className="flex items-start gap-2.5 text-[13px] text-white/55"
-                    >
-                      <Check
-                        className="mt-0.5 h-3.5 w-3.5 shrink-0"
-                        style={{ color: p.accent }}
-                        strokeWidth={2.5}
-                      />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
+              {plan.highlighted ? <div className="absolute inset-x-0 top-0 h-px bg-white" /> : null}
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-white">{plan.name}</h3>
+                {plan.highlighted ? <span className="rounded-full border border-white/15 bg-white px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-black">{t("popular")}</span> : null}
               </div>
-            </motion.div>
+              <div className="mt-8 flex items-end gap-2">
+                <span className="text-5xl font-semibold tracking-[-0.05em] text-white">{plan.price}</span>
+                <span className="pb-1 text-sm text-white/35">{t("perMonth")}</span>
+              </div>
+              <div className="mt-5 flex gap-2 text-xs text-white/45">
+                <span className="rounded-md border border-white/10 px-2 py-1">{plan.tokens} {t("perTokens")}</span>
+                <span className="rounded-md border border-white/10 px-2 py-1">{plan.tagBots}</span>
+              </div>
+              <Link href="/login" className={`mt-7 flex h-11 items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors ${plan.highlighted ? "bg-white text-black hover:bg-white/85" : "border border-white/15 text-white hover:bg-white/5"}`}>
+                {t("cta")} <ArrowRight className="h-4 w-4" />
+              </Link>
+              <div className="my-7 h-px bg-white/10" />
+              <ul className="space-y-3">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3 text-sm leading-6 text-white/55"><Check className="mt-1 h-3.5 w-3.5 shrink-0 text-white" /> {feature}</li>
+                ))}
+              </ul>
+            </motion.article>
           ))}
         </div>
       </div>
-    </SectionWrapper>
+    </section>
   );
 }

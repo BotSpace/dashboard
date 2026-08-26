@@ -1,81 +1,43 @@
 "use client";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+
+import { AnimatePresence, motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { SectionWrapper } from "./section-wrapper";
+import { useState } from "react";
 
 export function FAQ() {
   const t = useTranslations("landing.faq");
   const items = t.raw("items") as { q: string; a: string }[];
-  const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <SectionWrapper className="relative isolate bg-deep py-28 md:py-36">
-      <div className="spot-orb spot-cyan left-1/2 top-[20%] h-[360px] w-[700px] -translate-x-1/2 opacity-[0.18]" />
-
-      <div className="container-page relative">
-        <div className="mx-auto max-w-2xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-white/55">
-            <span className="h-1 w-1 rounded-full bg-cyan-300" />
-            {t("eyebrow")}
-          </div>
-          <h2 className="display mt-5 text-3xl font-semibold text-white md:text-4xl lg:text-[44px]">
-            {t("title")}
-          </h2>
+    <section className="border-b border-white/10 bg-black py-24 md:py-32">
+      <div className="container-page grid gap-14 lg:grid-cols-[.65fr_1.35fr]">
+        <div>
+          <div className="text-sm text-white/45">{t("eyebrow")}</div>
+          <h2 className="mt-4 max-w-sm text-4xl font-semibold tracking-[-0.04em] text-white md:text-5xl">{t("title")}</h2>
         </div>
-
-        <div className="mx-auto mt-12 max-w-3xl divide-y divide-white/[0.07] rounded-2xl border border-white/[0.07]"
-          style={{
-            background: "linear-gradient(180deg, rgba(255,255,255,0.015) 0%, rgba(255,255,255,0.005) 100%)",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
-          }}
-        >
-          {items.map((item, i) => {
-            const isOpen = openIdx === i;
+        <div className="border-t border-white/15">
+          {items.map((item, index) => {
+            const isOpen = open === index;
             return (
-              <div key={i} className="overflow-hidden">
-                <button
-                  onClick={() => setOpenIdx(isOpen ? null : i)}
-                  className="group flex w-full items-center justify-between gap-6 px-6 py-5 text-left transition-colors hover:bg-white/[0.018]"
-                  aria-expanded={isOpen}
-                >
-                  <span className={`text-[15px] font-medium transition-colors ${isOpen ? "text-white" : "text-white/80 group-hover:text-white/95"}`}>
-                    {item.q}
-                  </span>
-                  <motion.span
-                    animate={{ rotate: isOpen ? 45 : 0 }}
-                    transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white/60"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                  </motion.span>
+              <div key={item.q} className="border-b border-white/15">
+                <button type="button" onClick={() => setOpen(isOpen ? null : index)} className="flex w-full items-center justify-between gap-6 py-6 text-left" aria-expanded={isOpen}>
+                  <span className="text-base font-medium text-white/85">{item.q}</span>
+                  <motion.span animate={{ rotate: isOpen ? 45 : 0 }} className="flex h-7 w-7 shrink-0 items-center justify-center text-white/50"><Plus className="h-4 w-4" /></motion.span>
                 </button>
-
                 <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      key="answer"
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{
-                        height: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] },
-                        opacity: { duration: 0.25, delay: isOpen ? 0.08 : 0 },
-                      }}
-                      style={{ overflow: "hidden" }}
-                    >
-                      <p className="px-6 pb-5 pr-12 text-[14px] leading-relaxed text-white/55">
-                        {item.a}
-                      </p>
+                  {isOpen ? (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                      <p className="max-w-2xl pb-6 pr-12 text-sm leading-7 text-white/45">{item.a}</p>
                     </motion.div>
-                  )}
+                  ) : null}
                 </AnimatePresence>
               </div>
             );
           })}
         </div>
       </div>
-    </SectionWrapper>
+    </section>
   );
 }

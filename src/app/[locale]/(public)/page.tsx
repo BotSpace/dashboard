@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Hero } from "@/features/landing/components/hero";
 import { Features } from "@/features/landing/components/features";
+import { FlowBuilder } from "@/features/landing/components/flow-builder";
 import { AIAgent } from "@/features/landing/components/ai-agent";
 import { Pricing } from "@/features/landing/components/pricing";
 import { FAQ } from "@/features/landing/components/faq";
@@ -87,6 +88,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <JsonLd data={jsonLd} />
       <Hero />
       <Features />
+      <FlowBuilder />
       <AIAgent />
       <Pricing />
       <FAQ />
