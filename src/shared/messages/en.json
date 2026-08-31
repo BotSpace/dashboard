@@ -28,6 +28,7 @@
     "themeDark": "Dark",
     "themeSystem": "System"
   },
+
   "nav": {
     "dashboard": "Dashboard",
     "agent": "AI Agent",
