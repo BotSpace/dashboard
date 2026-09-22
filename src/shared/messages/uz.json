@@ -127,9 +127,9 @@
     "hero": {
       "badge": "Yangi: AI yordamchi va vizual flow konstruktor",
       "title": "AI yordamida Telegram bot yarating",
-      "subtitle": "Drag-and-drop, AI agent va marketplace — bir joyda. Kod yozmasdan startap boshlang.",
+      "subtitle": "Buyurtma qabul qiluvchi, savollarga javob beruvchi va mijozlar bilan ishlovchi Telegram botni kod yozmasdan sozlang.",
       "ctaPrimary": "Bepul boshlash",
-      "ctaSecondary": "Imkoniyatlarni ko'rish",
+      "ctaSecondary": "Shablonlarni ko'rish",
       "stats": {
         "users": "10K+ foydalanuvchi",
         "bots": "50K+ bot ishga tushgan",
@@ -153,8 +153,8 @@
           "desc": "Tayyor botlarni sotib oling yoki o'zingiznikini sotib daromad qiling"
         },
         {
-          "title": "Multi-channel",
-          "desc": "Telegram, web va boshqa kanallar uchun bir kod baza"
+          "title": "Telegram-first",
+          "desc": "Telegram to'liq qo'llab-quvvatlanadi; WhatsApp va web kanallar yo'l xaritasida"
         },
         {
           "title": "Ma'lumotlar bazasi",

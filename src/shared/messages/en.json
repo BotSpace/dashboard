@@ -67,9 +67,9 @@
     "hero": {
       "badge": "New: AI assistant & visual flow builder",
       "title": "Build Telegram bots with AI",
-      "subtitle": "Drag-and-drop, AI agent and a marketplace — all in one. Launch a startup without code.",
+      "subtitle": "Build a Telegram bot that takes orders, answers questions and helps manage customer conversations — without writing code.",
       "ctaPrimary": "Start free",
-      "ctaSecondary": "See features",
+      "ctaSecondary": "Browse templates",
       "stats": {
         "users": "10K+ users",
         "bots": "50K+ bots launched",
@@ -93,8 +93,8 @@
           "desc": "Buy ready-made bots or sell yours and earn"
         },
         {
-          "title": "Multi-channel",
-          "desc": "One codebase for Telegram, web and more"
+          "title": "Telegram-first",
+          "desc": "Telegram is fully supported; WhatsApp and web channels are on the roadmap"
         },
         {
           "title": "Built-in database",

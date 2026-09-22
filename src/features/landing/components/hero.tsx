@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Bot, Check, Play, Plus, Workflow } from "lucide-react";
+import { ArrowRight, Bot, Check, LayoutTemplate, Plus, Workflow } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/shared/i18n/routing";
 
@@ -66,10 +66,10 @@ export function Hero() {
             {t("ctaPrimary")}
             <ArrowRight className="h-4 w-4" />
           </Link>
-          <a href="#features" className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/20 bg-black px-6 text-sm font-medium text-white transition-colors hover:bg-white/5">
-            <Play className="h-3.5 w-3.5 fill-current" />
+          <Link href="/templates" className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/20 bg-black px-6 text-sm font-medium text-white transition-colors hover:bg-white/5">
+            <LayoutTemplate className="h-3.5 w-3.5" />
             {t("ctaSecondary")}
-          </a>
+          </Link>
         </motion.div>
 
         <motion.div

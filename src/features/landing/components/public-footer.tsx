@@ -13,8 +13,8 @@ export function PublicFooter() {
   const t = useTranslations("landing.footer");
   const tn = useTranslations("landing");
   const groups = [
-    { title: t("product"), items: [{ label: t("docs"), href: "/docs" }, { label: tn("navMcp"), href: "/docs/mcp" }, { label: tn("navTemplates"), href: "/templates" }] },
-    { title: t("company"), items: [{ label: t("about"), href: "/about" }, { label: t("contact"), href: "/contact" }, { label: t("blog"), href: "/blog" }] },
+    { title: t("product"), items: [{ label: tn("navMcp"), href: "/docs/mcp" }, { label: tn("navPricing"), href: "/#pricing" }, { label: tn("navTemplates"), href: "/templates" }] },
+    { title: t("company"), items: [{ label: t("contact"), href: "mailto:support@botspace.uz" }, { label: t("blog"), href: "/blog" }] },
     { title: t("legal"), items: [{ label: t("terms"), href: "/terms" }, { label: t("privacy"), href: "/privacy" }] },
   ];
 
@@ -24,13 +24,23 @@ export function PublicFooter() {
         <div>
           <Logo className="w-32" />
           <p className="mt-5 max-w-xs text-sm leading-6 text-white/45">{t("tagline")}</p>
-          <div className="mt-5 flex items-center gap-2 text-xs text-white/35"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> {t("systemsNormal")}</div>
+          <a href="mailto:support@botspace.uz" className="mt-5 inline-flex text-xs text-white/35 transition-colors hover:text-white">
+            {t("contact")}: support@botspace.uz
+          </a>
         </div>
         {groups.map((group) => (
           <div key={group.title}>
             <div className="text-xs font-medium text-white">{group.title}</div>
             <ul className="mt-4 space-y-3">
-              {group.items.map((item) => <li key={item.label}><Link href={item.href} className="text-sm text-white/45 transition-colors hover:text-white">{item.label}</Link></li>)}
+              {group.items.map((item) => (
+                <li key={item.label}>
+                  {item.href.startsWith("mailto:") ? (
+                    <a href={item.href} className="text-sm text-white/45 transition-colors hover:text-white">{item.label}</a>
+                  ) : (
+                    <Link href={item.href} className="text-sm text-white/45 transition-colors hover:text-white">{item.label}</Link>
+                  )}
+                </li>
+              ))}
             </ul>
           </div>
         ))}
